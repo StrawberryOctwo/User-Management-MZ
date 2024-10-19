@@ -42,6 +42,10 @@ const ViewFranchisePage: React.FC = () => {
     window.open(`/franchise/edit/${id}`, '_blank');
   };
 
+  const handleView = (id: any) => {
+    console.log('Delete franchise with ID:', id);
+  };
+
   const handleDelete = (id: any) => {
     console.log('Delete franchise with ID:', id);
   };
@@ -55,7 +59,8 @@ const ViewFranchisePage: React.FC = () => {
       columns={columns}
       title="Franchise List"
       onEdit={handleEdit}
-      onView={handleDelete}
+      onView={handleView}
+      onDelete={handleDelete}
     />
   );
 };

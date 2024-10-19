@@ -18,10 +18,13 @@ import {
     Tooltip,
     IconButton,
     useTheme,
+    TableSortLabel,
 } from '@mui/material';
 import Label from 'src/components/Label';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
+import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
+import useTableSort from './useTableSort';
 
 interface Column {
     field: string;
@@ -35,6 +38,7 @@ interface ReusableTableProps {
     title: string;
     onEdit?: (id: any) => void;
     onView?: (id: any) => void;
+    onDelete?: (selectedIds: number[]) => void;
 }
 
 const getStatusLabel = (status: string): JSX.Element => {
@@ -60,10 +64,16 @@ const ReusableTable: FC<ReusableTableProps> = ({
     title,
     onEdit,
     onView,
+    onDelete
 }) => {
     const [selectedRows, setSelectedRows] = useState<number[]>([]);
     const [page, setPage] = useState<number>(0);
     const [limit, setLimit] = useState<number>(5);
+    const { order, orderBy, handleRequestSort, sortData } = useTableSort(columns[0]?.field || '');
+    const sortedData = sortData(data);
+    const paginatedData = applyPagination(sortedData, page, limit);
+    const allSelected = selectedRows.length === data.length;
+
     const theme = useTheme();
 
     const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
@@ -83,8 +93,7 @@ const ReusableTable: FC<ReusableTableProps> = ({
     const handleLimitChange = (event: ChangeEvent<HTMLInputElement>) =>
         setLimit(parseInt(event.target.value, 10));
 
-    const paginatedData = applyPagination(data, page, limit);
-    const allSelected = selectedRows.length === data.length;
+
 
     return (
         <Card>
@@ -102,7 +111,15 @@ const ReusableTable: FC<ReusableTableProps> = ({
                                 />
                             </TableCell>
                             {columns.map((column) => (
-                                <TableCell key={column.field}>{column.headerName}</TableCell>
+                                <TableCell key={column.field}>
+                                    <TableSortLabel
+                                        active={orderBy === column.field}
+                                        direction={orderBy === column.field ? order : 'asc'}
+                                        onClick={() => handleRequestSort(column.field)}
+                                    >
+                                        {column.headerName}
+                                    </TableSortLabel>
+                                </TableCell>
                             ))}
                             <TableCell align="right">Actions</TableCell>
                         </TableRow>
@@ -176,6 +193,22 @@ const ReusableTable: FC<ReusableTableProps> = ({
                                                 size="small"
                                             >
                                                 <VisibilityTwoToneIcon fontSize="small" />
+                                            </IconButton>
+                                        </Tooltip>
+                                    )}
+                                    {onDelete && (
+                                        <Tooltip title="Delete" arrow>
+                                            <IconButton
+                                                onClick={() => onDelete(row.id)}
+                                                sx={{
+                                                    '&:hover': {
+                                                        background: theme.colors.error.lighter,
+                                                    },
+                                                    color: theme.palette.error.main,
+                                                }}
+                                                size="small"
+                                            >
+                                                <DeleteTwoToneIcon fontSize="small" />
                                             </IconButton>
                                         </Tooltip>
                                     )}
