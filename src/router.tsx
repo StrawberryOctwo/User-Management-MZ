@@ -23,6 +23,7 @@ const Overview = Loader(lazy(() => import('src/content/overview')));
 // Dashboards
 
 const Crypto = Loader(lazy(() => import('src/content/dashboards/Crypto')));
+const Calendar = Loader(lazy(() => import('src/components/Calendar/CalendarContent')));
 
 // Testing
 
@@ -146,6 +147,10 @@ const routes: RouteObject[] = [
           {
             path: '',
             element: <Navigate to="crypto" replace />
+          },
+          {
+            path:'calendar',
+            element:<Calendar />
           },
           {
             path: 'crypto',
