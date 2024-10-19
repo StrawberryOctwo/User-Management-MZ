@@ -6,6 +6,8 @@ import SidebarLayout from 'src/layouts/SidebarLayout';
 import BaseLayout from 'src/layouts/BaseLayout';
 
 import SuspenseLoader from 'src/components/SuspenseLoader';
+import ProtectedRoute from './protectedRoute';
+import Login from './content/pages/Login/Login';
 
 const Loader = (Component) => (props) =>
 (
@@ -84,6 +86,7 @@ const StatusMaintenance = Loader(
   lazy(() => import('src/content/pages/Status/Maintenance'))
 );
 
+
 const routes: RouteObject[] = [
   {
     path: '',
@@ -91,7 +94,11 @@ const routes: RouteObject[] = [
     children: [
       {
         path: '/',
-        element: <Overview />
+        element: <Overview /> // This remains unprotected
+      },
+      {
+        path: 'login',
+        element: <Login />
       },
       {
         path: 'overview',
@@ -129,122 +136,129 @@ const routes: RouteObject[] = [
     ]
   },
   {
-    path: 'dashboards',
-    element: <SidebarLayout />,
+    path: '',
+    element: <ProtectedRoute />, // Protected routes wrapper
     children: [
       {
-        path: '',
-        element: <Navigate to="crypto" replace />
-      },
-      {
-        path: 'crypto',
-        element: <Crypto />
-      },
-      {
-        path: 'messenger',
-        element: <Messenger />
-      }
-    ]
-  },
-  {
-    path: 'testing',
-    element: <SidebarLayout />,
-    children: [
-      {
-        path: '',
-        element: <Navigate to="test1" replace />
-      },
-      {
-        path: 'test1',
-        element: <Test1 />
-      },
-      {
-        path: 'test2',
-        element: <Test2 />
-      },
-    ]
-  },
-  {
-    path: 'management',
-    element: <SidebarLayout />,
-    children: [
-      {
-        path: '',
-        element: <Navigate to="transactions" replace />
-      },
-      {
-        path: 'transactions',
-        element: <Transactions />
-      },
-      {
-        path: 'franchises',
-        element: <Franchises />
-      },
-      {
-        path: 'profile',
+        path: 'dashboard',
+        element: <SidebarLayout />,
         children: [
           {
             path: '',
-            element: <Navigate to="details" replace />
+            element: <Navigate to="crypto" replace />
           },
           {
-            path: 'details',
-            element: <UserProfile />
+            path: 'crypto',
+            element: <Crypto />
           },
           {
-            path: 'settings',
-            element: <UserSettings />
+            path: 'messenger',
+            element: <Messenger />
           }
         ]
-      }
-    ]
-  },
-  {
-    path: '/components',
-    element: <SidebarLayout />,
-    children: [
-      {
-        path: '',
-        element: <Navigate to="buttons" replace />
       },
       {
-        path: 'buttons',
-        element: <Buttons />
+        path: 'testing',
+        element: <SidebarLayout />,
+        children: [
+          {
+            path: '',
+            element: <Navigate to="test1" replace />
+          },
+          {
+            path: 'test1',
+            element: <Test1 />
+          },
+          {
+            path: 'test2',
+            element: <Test2 />
+          }
+        ]
       },
       {
-        path: 'modals',
-        element: <Modals />
+        path: 'management',
+        element: <SidebarLayout />,
+        children: [
+          {
+            path: '',
+            element: <Navigate to="transactions" replace />
+          },
+          {
+            path: 'transactions',
+            element: <Transactions />
+          },
+          {
+            path: 'franchises',
+            element: <Franchises />
+          },
+          {
+            path: 'profile',
+            children: [
+              {
+                path: '',
+                element: <Navigate to="details" replace />
+              },
+              {
+                path: 'details',
+                element: <UserProfile />
+              },
+              {
+                path: 'settings',
+                element: <UserSettings />
+              }
+            ]
+          }
+        ]
       },
       {
-        path: 'accordions',
-        element: <Accordions />
-      },
-      {
-        path: 'tabs',
-        element: <Tabs />
-      },
-      {
-        path: 'badges',
-        element: <Badges />
-      },
-      {
-        path: 'tooltips',
-        element: <Tooltips />
-      },
-      {
-        path: 'avatars',
-        element: <Avatars />
-      },
-      {
-        path: 'cards',
-        element: <Cards />
-      },
-      {
-        path: 'forms',
-        element: <Forms />
+        path: '/components',
+        element: <SidebarLayout />,
+        children: [
+          {
+            path: '',
+            element: <Navigate to="buttons" replace />
+          },
+          {
+            path: 'buttons',
+            element: <Buttons />
+          },
+          {
+            path: 'modals',
+            element: <Modals />
+          },
+          {
+            path: 'accordions',
+            element: <Accordions />
+          },
+          {
+            path: 'tabs',
+            element: <Tabs />
+          },
+          {
+            path: 'badges',
+            element: <Badges />
+          },
+          {
+            path: 'tooltips',
+            element: <Tooltips />
+          },
+          {
+            path: 'avatars',
+            element: <Avatars />
+          },
+          {
+            path: 'cards',
+            element: <Cards />
+          },
+          {
+            path: 'forms',
+            element: <Forms />
+          }
+        ]
       }
     ]
   }
 ];
 
 export default routes;
+
