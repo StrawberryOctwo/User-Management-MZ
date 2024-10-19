@@ -1,7 +1,8 @@
+// src/pages/ViewFranchisePage.tsx
+
 import React, { useEffect, useState } from 'react';
-import axios from 'axios'; // Import axios
+import ReusableTable from 'src/components/Table';
 import { Franchise } from 'src/models/FranchiseModel';
-import RecentOrdersTable from './RecentOrdersTable';
 import { fetchFranchises } from 'src/services/franchiseService';
 
 const ViewFranchisePage: React.FC = () => {
@@ -14,8 +15,8 @@ const ViewFranchisePage: React.FC = () => {
     setErrorMessage(null);
 
     try {
-      const response = await fetchFranchises(1, 4, '');
-      setFranchises(response.data);
+      const response = await fetchFranchises(1, 10, '');
+      setFranchises(response?.data || []);
     } catch (error) {
       console.error('Error fetching franchises:', error);
       setErrorMessage('Failed to load franchises. Please try again.');
@@ -28,10 +29,35 @@ const ViewFranchisePage: React.FC = () => {
     loadFranchises();
   }, []);
 
+  const columns = [
+    { field: 'name', headerName: 'Franchise Name' },
+    { field: 'ownerName', headerName: 'Owner Name' },
+    { field: 'status', headerName: 'Status', render: (value: any) => (value === '1' ? '1' : '0') },
+    { field: 'totalEmployees', headerName: 'Total Employees' },
+    { field: 'created_at', headerName: 'Created At', render: (value: any) => new Date(value).toLocaleDateString() },
+  ];
+
+  const handleEdit = (id: any) => {
+    console.log('Edit franchise with ID:', id);
+    window.open(`/franchise/edit/${id}`, '_blank');
+  };
+
+  const handleDelete = (id: any) => {
+    console.log('Delete franchise with ID:', id);
+  };
+
   if (loading) return <div>Loading franchises...</div>;
   if (errorMessage) return <div>{errorMessage}</div>;
 
-  return <RecentOrdersTable franchises={franchises} />;
+  return (
+    <ReusableTable
+      data={franchises}
+      columns={columns}
+      title="Franchise List"
+      onEdit={handleEdit}
+      onView={handleDelete}
+    />
+  );
 };
 
 export default ViewFranchisePage;
