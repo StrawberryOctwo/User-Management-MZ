@@ -19,12 +19,14 @@ import {
     IconButton,
     useTheme,
     TableSortLabel,
+    Button,
 } from '@mui/material';
 import Label from 'src/components/Label';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import useTableSort from './useTableSort';
+import { CSVLink } from 'react-csv';
 
 interface Column {
     field: string;
@@ -93,11 +95,25 @@ const ReusableTable: FC<ReusableTableProps> = ({
     const handleLimitChange = (event: ChangeEvent<HTMLInputElement>) =>
         setLimit(parseInt(event.target.value, 10));
 
-
+    const csvData = sortedData.map((row) =>
+        columns.reduce((acc: any, column) => {
+            acc[column.headerName] = row[column.field];
+            return acc;
+        }, {})
+    );
 
     return (
         <Card>
-            <CardHeader title={title} />
+            <CardHeader
+                title={title}
+                action={
+                    <CSVLink data={csvData} filename={`${title}-export.csv`}>
+                        <Button variant="contained" color="primary">
+                            Export to CSV
+                        </Button>
+                    </CSVLink>
+                }
+            />
             <Divider />
             <TableContainer>
                 <Table>
