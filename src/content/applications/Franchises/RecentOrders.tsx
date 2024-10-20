@@ -82,7 +82,8 @@ export default function ViewFranchisePage() {
         onView={handleView}
         onDelete={confirmDelete}
         onSearchChange={loadFranchises}
-
+        loading={loading}
+        error={!!errorMessage}
       />
 
       <ReusableDialog
