@@ -16,11 +16,22 @@ const useTableSort = (defaultOrderBy: string) => {
 
     const getComparator = (order: Order, orderBy: string) => {
         return (a: any, b: any): number => {
-            if (a[orderBy] < b[orderBy]) return order === 'asc' ? -1 : 1;
-            if (a[orderBy] > b[orderBy]) return order === 'asc' ? 1 : -1;
+            const valueA = a[orderBy];
+            const valueB = b[orderBy];
+
+            if (typeof valueA === 'string' && typeof valueB === 'string') {
+                return order === 'asc'
+                    ? valueA.localeCompare(valueB, undefined, { sensitivity: 'base' })
+                    : valueB.localeCompare(valueA, undefined, { sensitivity: 'base' });
+            }
+
+            // Fallback to basic comparison for other data types
+            if (valueA < valueB) return order === 'asc' ? -1 : 1;
+            if (valueA > valueB) return order === 'asc' ? 1 : -1;
             return 0;
         };
     };
+
 
     const sortData = (data: any[]) => {
         const comparator = getComparator(order, orderBy);

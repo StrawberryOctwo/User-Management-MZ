@@ -26,7 +26,6 @@ export default function ViewFranchisePage() {
     setLoading(true);
     try {
       const { data, total } = await fetchFranchises(page + 1, limit, searchQuery);
-      console.log('Fetched Data:', data); // Debug: Check if correct data is fetched
       setFranchises([...data]);
       setTotalCount(total);
     } catch (error) {
@@ -45,7 +44,6 @@ export default function ViewFranchisePage() {
   ];
 
   const handleEdit = (id: any) => {
-    console.log('Edit franchise with ID:', id);
     window.open('/franchise/edit/${id}', '_blank');
   };
 

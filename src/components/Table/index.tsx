@@ -1,5 +1,3 @@
-// src/components/ReusableTable.tsx
-
 import { FC, ChangeEvent, useState, useEffect } from 'react';
 import {
     Card,
@@ -24,8 +22,10 @@ import {
     Backdrop,
     CircularProgress,
     Skeleton,
+    InputAdornment,
 } from '@mui/material';
 import Label from 'src/components/Label';
+import ClearIcon from '@mui/icons-material/Clear';
 import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
@@ -179,7 +179,7 @@ export default function ReusableTable({
             );
         }
 
-        if (data.length === 0) {
+        if (sortData.length === 0) {
             return (
                 <TableRow>
                     <TableCell colSpan={columns.length + 2}>
@@ -198,7 +198,7 @@ export default function ReusableTable({
             );
         }
 
-        return data.map((row) => (
+        return sortedData.map((row) => (
             <TableRow key={row.id} hover>
                 <TableCell padding="checkbox">
                     <Checkbox
@@ -293,20 +293,58 @@ export default function ReusableTable({
     return (
         <Card sx={{ position: 'relative' }}>
             <CardHeader
-                title={title}
-                action={
-                    <Box>
-                        <TextField
-                            placeholder="Search..."
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                            size="small"
-                        />
-                        <CSVLink data={csvData} filename={`${title}-export.csv`}>
-                            <IconButton aria-label="delete" sx={{ margin: 1 }}>
-                                <CloudDownloadIcon fontSize="medium" />
-                            </IconButton>
-                        </CSVLink>
+                title={
+                    <Box
+                        sx={{
+                            display: 'flex',
+                            flexDirection: { xs: 'column', sm: 'row' },
+                            alignItems: { xs: 'flex-start', sm: 'center' },
+                            gap: 2,
+                            width: '100%',
+                        }}
+                    >
+                        {title}
+
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                alignItems: 'center',
+                                gap: 1,
+                                flex: 1,
+                                width: '100%',
+                                justifyContent: { xs: 'space-between', sm: 'flex-end' },
+                            }}
+                        >
+                            <TextField
+                                placeholder="Search..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                size="small"
+                                sx={{
+                                    width: { xs: '100%', sm: 300 },
+                                }}
+                                InputProps={{
+                                    endAdornment: (
+                                        <InputAdornment position="end">
+                                            {searchQuery && (
+                                                <IconButton
+                                                    onClick={() => setSearchQuery('')}
+                                                    aria-label="clear search"
+                                                    edge="end"
+                                                >
+                                                    <ClearIcon />
+                                                </IconButton>
+                                            )}
+                                        </InputAdornment>
+                                    ),
+                                }}
+                            />
+                            <CSVLink data={csvData} filename={`${title}-export.csv`}>
+                                <IconButton aria-label="download" sx={{ margin: 1 }}>
+                                    <CloudDownloadIcon fontSize="medium" />
+                                </IconButton>
+                            </CSVLink>
+                        </Box>
                     </Box>
                 }
             />
@@ -327,7 +365,9 @@ export default function ReusableTable({
                                     <TableSortLabel
                                         active={orderBy === column.field}
                                         direction={orderBy === column.field ? order : 'asc'}
-                                        onClick={() => handleRequestSort(column.field)}
+                                        onClick={() => {
+                                            handleRequestSort(column.field);
+                                        }}
                                     >
                                         {column.headerName}
                                     </TableSortLabel>
@@ -347,7 +387,7 @@ export default function ReusableTable({
                     onPageChange={handlePageChange}
                     rowsPerPage={limit}
                     onRowsPerPageChange={handleLimitChange}
-                    rowsPerPageOptions={[5, 10, 25]}
+                    rowsPerPageOptions={[5, 10, 25, 50, 100]}
                 />
             </Box>
         </Card>
