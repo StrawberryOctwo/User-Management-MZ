@@ -1,5 +1,3 @@
-// src/pages/ViewFranchisePage.tsx
-
 import { Box, Button, CircularProgress } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import ReusableTable from 'src/components/Table';
@@ -8,7 +6,7 @@ import { useSnackbar } from 'src/contexts/SnackbarContext';
 import { Franchise } from 'src/models/FranchiseModel';
 import { deleteFranchise, fetchFranchises } from 'src/services/franchiseService';
 
-const ViewFranchisePage: React.FC = () => {
+export default function ViewFranchisePage() {
   const [franchises, setFranchises] = useState<Franchise[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -16,24 +14,21 @@ const ViewFranchisePage: React.FC = () => {
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const { showMessage } = useSnackbar();
 
-  const loadFranchises = async () => {
-    setLoading(true);
-    setErrorMessage(null);
+  useEffect(() => {
+    loadFranchises();
+  }, []);
 
+  const loadFranchises = async (searchQuery = '') => {
+    setLoading(true);
     try {
-      const response = await fetchFranchises(1, 10, '');
-      setFranchises(response?.data || []);
-    } catch (error) {
-      console.error('Error fetching franchises:', error);
-      setErrorMessage('Failed to load franchises. Please try again.');
+      const { data } = await fetchFranchises(1, 5, searchQuery);
+      setFranchises(data);
+    } catch {
+      showMessage('Failed to load franchises.', 'error');
     } finally {
       setLoading(false);
     }
   };
-
-  useEffect(() => {
-    loadFranchises();
-  }, []);
 
   const columns = [
     { field: 'name', headerName: 'Franchise Name' },
@@ -45,7 +40,7 @@ const ViewFranchisePage: React.FC = () => {
 
   const handleEdit = (id: any) => {
     console.log('Edit franchise with ID:', id);
-    window.open(`/franchise/edit/${id}`, '_blank');
+    window.open('/franchise/edit/${id}', '_blank');
   };
 
   const handleView = (id: any) => {
@@ -74,7 +69,7 @@ const ViewFranchisePage: React.FC = () => {
     setDialogOpen(true);
   };
 
-  if (loading) return <div>Loading franchises...</div>;
+  /* if (!loading) return <div>Loading franchises...</div>; */
   if (errorMessage) return <div>{errorMessage}</div>;
 
   return (
@@ -86,6 +81,8 @@ const ViewFranchisePage: React.FC = () => {
         onEdit={handleEdit}
         onView={handleView}
         onDelete={confirmDelete}
+        onSearchChange={loadFranchises}
+
       />
 
       <ReusableDialog
@@ -113,5 +110,3 @@ const ViewFranchisePage: React.FC = () => {
     </Box>
   );
 };
-
-export default ViewFranchisePage;

@@ -1,6 +1,6 @@
 // src/components/ReusableTable.tsx
 
-import { FC, ChangeEvent, useState } from 'react';
+import { FC, ChangeEvent, useState, useEffect } from 'react';
 import {
     Card,
     Table,
@@ -20,6 +20,7 @@ import {
     useTheme,
     TableSortLabel,
     Button,
+    TextField,
 } from '@mui/material';
 import Label from 'src/components/Label';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
@@ -27,6 +28,7 @@ import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import useTableSort from './useTableSort';
 import { CSVLink } from 'react-csv';
+import React from 'react';
 
 interface Column {
     field: string;
@@ -41,6 +43,7 @@ interface ReusableTableProps {
     onEdit?: (id: any) => void;
     onView?: (id: any) => void;
     onDelete?: (selectedIds: number[]) => void;
+    onSearchChange?: (query: string) => void;
 }
 
 const getStatusLabel = (status: string): JSX.Element => {
@@ -65,8 +68,10 @@ const ReusableTable: FC<ReusableTableProps> = ({
     title,
     onEdit,
     onView,
-    onDelete
+    onDelete,
+    onSearchChange
 }) => {
+    const [searchQuery, setSearchQuery] = useState('');
     const [selectedRows, setSelectedRows] = useState<number[]>([]);
     const [page, setPage] = useState<number>(0);
     const [limit, setLimit] = useState<number>(5);
@@ -74,8 +79,29 @@ const ReusableTable: FC<ReusableTableProps> = ({
     const sortedData = sortData(data);
     const paginatedData = applyPagination(sortedData, page, limit);
     const allSelected = selectedRows.length === data.length;
-
+    const debounceTimeout = React.useRef<NodeJS.Timeout | null>(null);
     const theme = useTheme();
+
+    useEffect(() => {
+
+        if (debounceTimeout.current) {
+            clearTimeout(debounceTimeout.current);
+        }
+
+        debounceTimeout.current = setTimeout(() => {
+            if (onSearchChange) {
+                onSearchChange(searchQuery);
+            }
+        }, 500);
+
+        return () => {
+            if (debounceTimeout.current) {
+                clearTimeout(debounceTimeout.current);
+            }
+        };
+
+
+    }, [searchQuery]);
 
     const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
         setSelectedRows(event.target.checked ? data.map((item) => item.id) : []);
@@ -106,11 +132,20 @@ const ReusableTable: FC<ReusableTableProps> = ({
             <CardHeader
                 title={title}
                 action={
-                    <CSVLink data={csvData} filename={`${title}-export.csv`}>
-                        <Button variant="contained" color="primary">
-                            Export to CSV
-                        </Button>
-                    </CSVLink>
+                    <Box>
+                        <TextField
+                            placeholder="Search..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            size="small"
+                        />
+                        <CSVLink data={csvData} filename={`${title}-export.csv`}>
+                            <Button variant="contained" color="primary">
+                                Export to CSV
+                            </Button>
+                        </CSVLink>
+
+                    </Box>
                 }
             />
             <Divider />
