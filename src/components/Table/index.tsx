@@ -1,6 +1,6 @@
 // src/components/ReusableTable.tsx
 
-import { FC, ChangeEvent, useState } from 'react';
+import { FC, ChangeEvent, useState, useEffect } from 'react';
 import {
     Card,
     Table,
@@ -20,6 +20,10 @@ import {
     useTheme,
     TableSortLabel,
     Button,
+    TextField,
+    Backdrop,
+    CircularProgress,
+    Skeleton,
 } from '@mui/material';
 import Label from 'src/components/Label';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
@@ -27,6 +31,7 @@ import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import useTableSort from './useTableSort';
 import { CSVLink } from 'react-csv';
+import React from 'react';
 
 interface Column {
     field: string;
@@ -41,10 +46,12 @@ interface ReusableTableProps {
     onEdit?: (id: any) => void;
     onView?: (id: any) => void;
     onDelete?: (selectedIds: number[]) => void;
+    onSearchChange?: (query: string) => void;
+    loading: boolean;
+    error?: boolean;
 }
 
 const getStatusLabel = (status: string): JSX.Element => {
-    console.log(status)
     const map = {
         1: { text: 'Active', color: 'success' },
         0: { text: 'Inactive', color: 'error' },
@@ -66,8 +73,12 @@ const ReusableTable: FC<ReusableTableProps> = ({
     title,
     onEdit,
     onView,
-    onDelete
+    onDelete,
+    onSearchChange,
+    loading = false,
+    error = false
 }) => {
+    const [searchQuery, setSearchQuery] = useState('');
     const [selectedRows, setSelectedRows] = useState<number[]>([]);
     const [page, setPage] = useState<number>(0);
     const [limit, setLimit] = useState<number>(5);
@@ -75,8 +86,26 @@ const ReusableTable: FC<ReusableTableProps> = ({
     const sortedData = sortData(data);
     const paginatedData = applyPagination(sortedData, page, limit);
     const allSelected = selectedRows.length === data.length;
-
+    const debounceTimeout = React.useRef<NodeJS.Timeout | null>(null);
     const theme = useTheme();
+
+    useEffect(() => {
+        if (debounceTimeout.current) {
+            clearTimeout(debounceTimeout.current);
+        }
+
+        debounceTimeout.current = setTimeout(() => {
+            if (onSearchChange) {
+                onSearchChange(searchQuery);
+            }
+        }, 500);
+
+        return () => {
+            if (debounceTimeout.current) {
+                clearTimeout(debounceTimeout.current);
+            }
+        };
+    }, [searchQuery]);
 
     const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
         setSelectedRows(event.target.checked ? data.map((item) => item.id) : []);
@@ -102,16 +131,176 @@ const ReusableTable: FC<ReusableTableProps> = ({
         }, {})
     );
 
+    const renderTableBody = () => {
+        if (loading) {
+            return (
+                <TableRow>
+                    <TableCell colSpan={columns.length + 2}>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                height: 200,
+                            }}
+                        >
+                            <CircularProgress />
+                        </Box>
+                    </TableCell>
+                </TableRow>
+            );
+        }
+
+        if (error) {
+            return (
+                <TableRow>
+                    <TableCell colSpan={columns.length + 2}>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                height: 200,
+                            }}
+                        >
+                            <Typography variant="h6" color="error">
+                                Error fetching data
+                            </Typography>
+                        </Box>
+                    </TableCell>
+                </TableRow>
+            );
+        }
+
+        if (data.length === 0) {
+            return (
+                <TableRow>
+                    <TableCell colSpan={columns.length + 2}>
+                        <Box
+                            sx={{
+                                display: 'flex',
+                                justifyContent: 'center',
+                                alignItems: 'center',
+                                height: 200,
+                            }}
+                        >
+                            <Typography variant="h6">No Data Available</Typography>
+                        </Box>
+                    </TableCell>
+                </TableRow>
+            );
+        }
+
+        return paginatedData.map((row) => (
+            <TableRow key={row.id} hover>
+                <TableCell padding="checkbox">
+                    <Checkbox
+                        color="primary"
+                        checked={selectedRows.includes(row.id)}
+                        onChange={(event) => handleSelectOne(event, row.id)}
+                    />
+                </TableCell>
+                {columns.map((column) => (
+                    <TableCell key={column.field}>
+                        {column.field === 'status' ? (
+                            getStatusLabel(row[column.field])
+                        ) : column.field === 'created_at' ? (
+                            <Typography
+                                variant="body2"
+                                color="text.secondary"
+                                noWrap
+                            >
+                                {column.render
+                                    ? column.render(row[column.field], row)
+                                    : row[column.field]}
+                            </Typography>
+                        ) : (
+                            <Typography
+                                variant="body1"
+                                fontWeight="bold"
+                                color="text.primary"
+                                gutterBottom
+                                noWrap
+                            >
+                                {column.render
+                                    ? column.render(row[column.field], row)
+                                    : row[column.field]}
+                            </Typography>
+                        )}
+                    </TableCell>
+                ))}
+                <TableCell align="right">
+                    {onEdit && (
+                        <Tooltip title="Edit" arrow>
+                            <IconButton
+                                onClick={() => onEdit(row.id)}
+                                sx={{
+                                    '&:hover': {
+                                        background: theme.colors.primary.lighter,
+                                    },
+                                    color: theme.palette.primary.main,
+                                }}
+                                size="small"
+                            >
+                                <EditTwoToneIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                    )}
+                    {onView && (
+                        <Tooltip title="View" arrow>
+                            <IconButton
+                                onClick={() => onView(row.id)}
+                                sx={{
+                                    '&:hover': {
+                                        background: theme.colors.secondary.lighter,
+                                    },
+                                    color: theme.palette.secondary.main,
+                                }}
+                                size="small"
+                            >
+                                <VisibilityTwoToneIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                    )}
+                    {onDelete && (
+                        <Tooltip title="Delete" arrow>
+                            <IconButton
+                                onClick={() => onDelete(row.id)}
+                                sx={{
+                                    '&:hover': {
+                                        background: theme.colors.error.lighter,
+                                    },
+                                    color: theme.palette.error.main,
+                                }}
+                                size="small"
+                            >
+                                <DeleteTwoToneIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                    )}
+                </TableCell>
+            </TableRow>
+        ));
+    };
+
     return (
-        <Card>
+        <Card sx={{ position: 'relative' }}>
             <CardHeader
                 title={title}
                 action={
-                    <CSVLink data={csvData} filename={`${title}-export.csv`}>
-                        <Button variant="contained" color="primary">
-                            Export to CSV
-                        </Button>
-                    </CSVLink>
+                    <Box>
+                        <TextField
+                            placeholder="Search..."
+                            value={searchQuery}
+                            onChange={(e) => setSearchQuery(e.target.value)}
+                            size="small"
+                        />
+                        <CSVLink data={csvData} filename={`${title}-export.csv`}>
+                            <Button variant="contained" color="primary">
+                                Export to CSV
+                            </Button>
+                        </CSVLink>
+                    </Box>
                 }
             />
             <Divider />
@@ -140,98 +329,7 @@ const ReusableTable: FC<ReusableTableProps> = ({
                             <TableCell align="right">Actions</TableCell>
                         </TableRow>
                     </TableHead>
-                    <TableBody>
-                        {paginatedData.map((row) => (
-                            <TableRow key={row.id} hover>
-                                <TableCell padding="checkbox">
-                                    <Checkbox
-                                        color="primary"
-                                        checked={selectedRows.includes(row.id)}
-                                        onChange={(event) => handleSelectOne(event, row.id)}
-                                    />
-                                </TableCell>
-                                {columns.map((column) => (
-                                    <TableCell key={column.field}>
-                                        {column.field === 'status' ? (
-                                            getStatusLabel(row[column.field])
-                                        ) : column.field === 'created_at' ? (
-                                            <Typography
-                                                variant="body2"
-                                                color="text.secondary"
-                                                noWrap
-                                            >
-                                                {column.render
-                                                    ? column.render(row[column.field], row)
-                                                    : row[column.field]}
-                                            </Typography>
-                                        ) : (
-                                            <Typography
-                                                variant="body1"
-                                                fontWeight="bold"
-                                                color="text.primary"
-                                                gutterBottom
-                                                noWrap
-                                            >
-                                                {column.render
-                                                    ? column.render(row[column.field], row)
-                                                    : row[column.field]}
-                                            </Typography>
-                                        )}
-                                    </TableCell>
-                                ))}
-                                <TableCell align="right">
-                                    {onEdit && (
-                                        <Tooltip title="Edit" arrow>
-                                            <IconButton
-                                                onClick={() => onEdit(row.id)}
-                                                sx={{
-                                                    '&:hover': {
-                                                        background: theme.colors.primary.lighter,
-                                                    },
-                                                    color: theme.palette.primary.main,
-                                                }}
-                                                size="small"
-                                            >
-                                                <EditTwoToneIcon fontSize="small" />
-                                            </IconButton>
-                                        </Tooltip>
-                                    )}
-                                    {onView && (
-                                        <Tooltip title="View" arrow>
-                                            <IconButton
-                                                onClick={() => onView(row.id)}
-                                                sx={{
-                                                    '&:hover': {
-                                                        background: theme.colors.secondary.lighter,
-                                                    },
-                                                    color: theme.palette.secondary.main,
-                                                }}
-                                                size="small"
-                                            >
-                                                <VisibilityTwoToneIcon fontSize="small" />
-                                            </IconButton>
-                                        </Tooltip>
-                                    )}
-                                    {onDelete && (
-                                        <Tooltip title="Delete" arrow>
-                                            <IconButton
-                                                onClick={() => onDelete(row.id)}
-                                                sx={{
-                                                    '&:hover': {
-                                                        background: theme.colors.error.lighter,
-                                                    },
-                                                    color: theme.palette.error.main,
-                                                }}
-                                                size="small"
-                                            >
-                                                <DeleteTwoToneIcon fontSize="small" />
-                                            </IconButton>
-                                        </Tooltip>
-                                    )}
-                                </TableCell>
-                            </TableRow>
-                        ))}
-                    </TableBody>
+                    <TableBody>{renderTableBody()}</TableBody>
                 </Table>
             </TableContainer>
             <Box p={2}>

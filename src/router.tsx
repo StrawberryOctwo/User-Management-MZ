@@ -26,10 +26,6 @@ const Overview = Loader(lazy(() => import('src/content/overview')));
 const Crypto = Loader(lazy(() => import('src/content/dashboards/Crypto')));
 const Calendar = Loader(lazy(() => import('src/components/Calendar/CalendarContent')));
 
-// Testing
-
-const Test1 = Loader(lazy(() => import('src/content/applications/Testing/test1')));
-const Test2 = Loader(lazy(() => import('src/content/applications/Testing/test2')));
 
 // Applications
 
@@ -156,8 +152,8 @@ const routes: RouteObject[] = [
             element: <Navigate to="crypto" replace />
           },
           {
-            path:'calendar',
-            element:<Calendar />
+            path: 'calendar',
+            element: <Calendar />
           },
           {
             path: 'crypto',
@@ -166,24 +162,6 @@ const routes: RouteObject[] = [
           {
             path: 'messenger',
             element: <Messenger />
-          }
-        ]
-      },
-      {
-        path: 'testing',
-        element: <SidebarLayout />,
-        children: [
-          {
-            path: '',
-            element: <Navigate to="test1" replace />
-          },
-          {
-            path: 'test1',
-            element: <Test1 />
-          },
-          {
-            path: 'test2',
-            element: <Test2 />
           }
         ]
       },

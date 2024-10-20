@@ -47,7 +47,7 @@ export const updateFranchiseAdmin = async (franchiseAdminId: number, franchiseAd
 };
 
 // Function to delete multiple locations
-export const deleteFranchiseAdmin = async (franchiseAdminsIds: number[]) => {
+export const deleteFranchiseAdmin = async (franchiseAdminsIds: number) => {
     try {
         const response = await api.post('/admins-franchises/delete', {
             ids: franchiseAdminsIds  // Send `ids` directly in the request body
