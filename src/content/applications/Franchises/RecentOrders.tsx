@@ -46,7 +46,9 @@ export default function ViewFranchisePage() {
   };
 
   const handleView = (id: any) => {
-    console.log('Delete franchise with ID:', id);
+    console.log('View franchise with ID:', id);
+    navigate(`view/${id}`); // Navigate to the Create Franchise page
+
   };
 
   const handleDelete = async () => {

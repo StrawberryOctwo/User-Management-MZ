@@ -10,6 +10,7 @@ const EditFranchise = () => {
     const { id } = useParams<{ id: string }>(); // Get franchise ID from URL
     const [franchiseData, setFranchiseData] = useState<Record<string, any> | null>(null);
     const [loading, setLoading] = useState(true);
+    const [submitLoading, setSubmitLoading] = useState(false);
 
     // Fetch franchise data by ID on component mount
     const fetchFranchise = async () => {
@@ -23,12 +24,13 @@ const EditFranchise = () => {
             setLoading(false);
         }
     };
+
     useEffect(() => {
         fetchFranchise();
     }, [id]);
 
     const handleFranchiseSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
-        setLoading(true);
+        setSubmitLoading(true);
         try {
             const payload = {
                 name: data.name,
@@ -40,15 +42,12 @@ const EditFranchise = () => {
                 totalEmployees: data.totalEmployees,
             };
             const response = await updateFranchise(Number(id), payload); // Update franchise
-
-            // Refetch the updated franchise data and reset the form
-            await fetchFranchise();
-            return response;
+            return response; // Don't fetch again to prevent re-rendering
         } catch (error: any) {
             console.error('Error updating Franchise:', error);
             throw error;
         } finally {
-            setLoading(false);
+            setSubmitLoading(false); // Reset submit loading state
         }
     };
 
@@ -65,7 +64,7 @@ const EditFranchise = () => {
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            { franchiseData && (
+            {!loading && franchiseData && (
                 <ReusableForm
                     key={franchiseData.id} // Add key to force re-render when franchiseData changes
                     fields={franchiseFields} // Use franchise fields array
