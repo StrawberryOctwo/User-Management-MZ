@@ -1,14 +1,20 @@
 // src/pages/ViewFranchisePage.tsx
 
+import { Box, Button, CircularProgress } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import ReusableTable from 'src/components/Table';
+import ReusableDialog from 'src/content/pages/Components/Dialogs';
+import { useSnackbar } from 'src/contexts/SnackbarContext';
 import { Franchise } from 'src/models/FranchiseModel';
-import { fetchFranchises } from 'src/services/franchiseService';
+import { deleteFranchise, fetchFranchises } from 'src/services/franchiseService';
 
 const ViewFranchisePage: React.FC = () => {
   const [franchises, setFranchises] = useState<Franchise[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [dialogOpen, setDialogOpen] = useState(false);
+  const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const { showMessage } = useSnackbar();
 
   const loadFranchises = async () => {
     setLoading(true);
@@ -46,22 +52,65 @@ const ViewFranchisePage: React.FC = () => {
     console.log('Delete franchise with ID:', id);
   };
 
-  const handleDelete = (id: any) => {
-    console.log('Delete franchise with ID:', id);
+  const handleDelete = async () => {
+    setDialogOpen(false);
+    setLoading(true);
+
+    try {
+      const response = await deleteFranchise(selectedIds);
+      showMessage(response.message, 'success');
+      await loadFranchises();
+    } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Failed to delete franchises.';
+      showMessage(errorMessage, 'error');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const confirmDelete = (ids: number | number[]) => {
+    const idsArray = Array.isArray(ids) ? ids : [ids];
+    setSelectedIds(idsArray);
+    setDialogOpen(true);
   };
 
   if (loading) return <div>Loading franchises...</div>;
   if (errorMessage) return <div>{errorMessage}</div>;
 
   return (
-    <ReusableTable
-      data={franchises}
-      columns={columns}
-      title="Franchise List"
-      onEdit={handleEdit}
-      onView={handleView}
-      onDelete={handleDelete}
-    />
+    <Box>
+      <ReusableTable
+        data={franchises}
+        columns={columns}
+        title="Franchise List"
+        onEdit={handleEdit}
+        onView={handleView}
+        onDelete={confirmDelete}
+      />
+
+      <ReusableDialog
+        open={dialogOpen}
+        title="Confirm Deletion"
+        onClose={() => setDialogOpen(false)}
+        actions={
+          <>
+            <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
+              Cancel
+            </Button>
+            <Button
+              onClick={handleDelete}
+              color="primary"
+              autoFocus
+              disabled={loading}
+            >
+              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+            </Button>
+          </>
+        }
+      >
+        <p>Are you sure you want to delete the selected franchise admins?</p>
+      </ReusableDialog>
+    </Box>
   );
 };
 
