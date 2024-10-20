@@ -5,6 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
 import { Franchise } from 'src/models/FranchiseModel';
 import { deleteFranchise, fetchFranchises } from 'src/services/franchiseService';
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 export default function ViewFranchisePage() {
   const [franchises, setFranchises] = useState<Franchise[]>([]);
@@ -13,6 +14,7 @@ export default function ViewFranchisePage() {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const { showMessage } = useSnackbar();
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     loadFranchises();
@@ -40,7 +42,7 @@ export default function ViewFranchisePage() {
 
   const handleEdit = (id: any) => {
     console.log('Edit franchise with ID:', id);
-    window.open('/franchise/edit/${id}', '_blank');
+    navigate(`edit/${id}`); // Navigate to the Create Franchise page
   };
 
   const handleView = (id: any) => {

@@ -41,6 +41,9 @@ const Franchises = Loader(
 const FranchiseCreate = Loader(
   lazy(() => import('src/content/applications/Franchises/Create'))
 );
+const FranchiseEdit = Loader(
+  lazy(() => import('src/content/applications/Franchises/Edit'))
+);
 const UserProfile = Loader(
   lazy(() => import('src/content/applications/Users/profile'))
 );
@@ -182,8 +185,12 @@ const routes: RouteObject[] = [
             element: <Franchises />
           },
           {
-            path: 'franchises/create',
+            path: 'franchise/create',
             element: <FranchiseCreate />
+          },
+          {
+            path: 'franchises/edit/:id',
+            element: <FranchiseEdit />
           },
           {
             path: 'profile',
