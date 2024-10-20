@@ -1,7 +1,6 @@
 import React, { useState, ReactNode, useEffect } from 'react';
 import { Button, TextField, Box, Grid, Paper, Typography, Divider } from '@mui/material';
 
-
 export interface FieldConfig {
   name: string;
   label: string;
@@ -26,14 +25,13 @@ interface ReusableFormProps {
 }
 
 const ReusableForm: React.FC<ReusableFormProps> = ({ fields, onSubmit, entityName, entintyFunction, initialData = {} }) => {
-  //const { showMessage } = useSnackbar();
+  
+  // Initialize formData state with initialData when it changes
+  const [formData, setFormData] = useState<Record<string, any>>(initialData);
 
-  const initialState = fields.reduce((acc, field) => {
-    acc[field.name] = field.type === 'number' ? 0 : ''; // Initialize with default values
-    return acc;
-  }, {} as Record<string, any>);
-
-  const [formData, setFormData] = useState(initialData);
+  useEffect(() => {
+    setFormData(initialData); // Update formData when initialData changes
+  }, [initialData]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -46,13 +44,20 @@ const ReusableForm: React.FC<ReusableFormProps> = ({ fields, onSubmit, entityNam
     event.preventDefault();
     try {
       const response = await onSubmit(formData);
-      const successMessage = response.message || `Successfully added ${entityName}`;
+      const successMessage = response.message || `Successfully updated ${entityName}`;
 
-      //showMessage(successMessage, 'success');
-      setFormData(initialState); // Reset form fields
+      // Only reset the form if it's an "Add" form, not "Edit"
+      if (entintyFunction.toLowerCase() === 'add') {
+        setFormData(fields.reduce((acc, field) => {
+          acc[field.name] = field.type === 'number' ? 0 : ''; // Initialize with default values
+          return acc;
+        }, {} as Record<string, any>));
+      }
+      
+      // showMessage(successMessage, 'success');
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || `Failed to add ${entityName}. Please try again.`;
-      //showMessage(errorMessage, 'error');
+      const errorMessage = error.response?.data?.message || `Failed to update ${entityName}. Please try again.`;
+      // showMessage(errorMessage, 'error');
     }
   };
 
@@ -96,7 +101,7 @@ const ReusableForm: React.FC<ReusableFormProps> = ({ fields, onSubmit, entityNam
                       label={field.label}
                       type={field.type}
                       sx={{ width: '95%' }} // Set width to 95%
-                      value={field.value ?? formData[field.name]} // Use field.value if available, fallback to formData
+                      value={formData[field.name] ?? ''} // Use formData for the value
                       onChange={field.onChange || handleChange} // Allow custom onChange if provided, else default
                       required={field.required}
                       disabled={field.disabled} // Add disabled support
