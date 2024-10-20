@@ -1,9 +1,11 @@
 import { Typography, Avatar, Grid } from '@mui/material';
 import { useTheme } from '@mui/material/styles';
+import { useAuth } from 'src/hooks/useAuth';
 
 function PageHeader() {
+  const { username } = useAuth(); // Use the hook inside the component
   const user = {
-    name: 'Catherine Pike',
+    name: username,
     avatar: '/static/images/avatars/1.jpg'
   };
   const theme = useTheme();

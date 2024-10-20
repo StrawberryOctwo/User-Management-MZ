@@ -1,7 +1,5 @@
 import { useRef, useState } from 'react';
-
-import { NavLink } from 'react-router-dom';
-
+import { NavLink, useNavigate } from 'react-router-dom';
 import {
   Avatar,
   Box,
@@ -22,6 +20,8 @@ import ExpandMoreTwoToneIcon from '@mui/icons-material/ExpandMoreTwoTone';
 import AccountBoxTwoToneIcon from '@mui/icons-material/AccountBoxTwoTone';
 import LockOpenTwoToneIcon from '@mui/icons-material/LockOpenTwoTone';
 import AccountTreeTwoToneIcon from '@mui/icons-material/AccountTreeTwoTone';
+
+import { useAuth } from '../../../../hooks/useAuth';
 
 const UserBoxButton = styled(Button)(
   ({ theme }) => `
@@ -59,14 +59,16 @@ const UserBoxDescription = styled(Typography)(
 );
 
 function HeaderUserbox() {
+  const { username, userRoles } = useAuth(); // Use the hook inside the component
   const user = {
-    name: 'Catherine Pike',
+    name: username || 'Guest', // Fallback to 'Guest' if no username is available
     avatar: '/static/images/avatars/1.jpg',
-    jobtitle: 'Project Manager'
+    jobtitle: userRoles?.join(', ') || 'No Role Assigned' // Fallback if no roles
   };
 
   const ref = useRef<any>(null);
   const [isOpen, setOpen] = useState<boolean>(false);
+  const navigate = useNavigate(); // useNavigate hook from react-router-dom
 
   const handleOpen = (): void => {
     setOpen(true);
@@ -74,6 +76,10 @@ function HeaderUserbox() {
 
   const handleClose = (): void => {
     setOpen(false);
+  };
+
+  const handleLogout = (): void => {
+    navigate('/logout'); // Redirect to /logout route
   };
 
   return (
@@ -135,7 +141,7 @@ function HeaderUserbox() {
         </List>
         <Divider />
         <Box sx={{ m: 1 }}>
-          <Button color="primary" fullWidth>
+          <Button color="primary" fullWidth onClick={handleLogout}>
             <LockOpenTwoToneIcon sx={{ mr: 1 }} />
             Sign out
           </Button>
