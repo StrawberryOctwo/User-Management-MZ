@@ -9,7 +9,6 @@ import {
     TableRow,
     TableContainer,
     Typography,
-    Checkbox,
     Box,
     Divider,
     CardHeader,
@@ -17,11 +16,8 @@ import {
     IconButton,
     useTheme,
     TableSortLabel,
-    Button,
     TextField,
-    Backdrop,
     CircularProgress,
-    Skeleton,
     InputAdornment,
 } from '@mui/material';
 import Label from 'src/components/Label';
@@ -109,18 +105,6 @@ export default function ReusableTable({
         };
     }, [searchQuery]);
 
-    const handleSelectAll = (event: ChangeEvent<HTMLInputElement>) => {
-        setSelectedRows(event.target.checked ? data.map((item) => item.id) : []);
-    };
-
-    const handleSelectOne = (
-        event: ChangeEvent<HTMLInputElement>,
-        id: any
-    ) => {
-        setSelectedRows((prev) =>
-            event.target.checked ? [...prev, id] : prev.filter((i) => i !== id)
-        );
-    };
 
     const handlePageChange = (_event: any, newPage: number) => {
         onPageChange(newPage);
@@ -199,43 +183,38 @@ export default function ReusableTable({
         }
 
         return sortedData.map((row) => (
-            <TableRow key={row.id} hover>
-                <TableCell padding="checkbox">
-                    <Checkbox
-                        color="primary"
-                        checked={selectedRows.includes(row.id)}
-                        onChange={(event) => handleSelectOne(event, row.id)}
-                    />
-                </TableCell>
-                {columns.map((column) => (
-                    <TableCell key={column.field}>
-                        {column.field === 'status' ? (
-                            getStatusLabel(row[column.field])
-                        ) : column.field === 'created_at' ? (
-                            <Typography
-                                variant="body2"
-                                color="text.secondary"
-                                noWrap
-                            >
-                                {column.render
-                                    ? column.render(row[column.field], row)
-                                    : row[column.field]}
-                            </Typography>
-                        ) : (
-                            <Typography
-                                variant="body1"
-                                fontWeight="bold"
-                                color="text.primary"
-                                gutterBottom
-                                noWrap
-                            >
-                                {column.render
-                                    ? column.render(row[column.field], row)
-                                    : row[column.field]}
-                            </Typography>
-                        )}
-                    </TableCell>
-                ))}
+            <TableRow key={row.id} hover sx={{ px: 4 }}>
+                {
+                    columns.map((column) => (
+                        <TableCell key={column.field}>
+                            {column.field === 'status' ? (
+                                getStatusLabel(row[column.field])
+                            ) : column.field === 'created_at' ? (
+                                <Typography
+                                    variant="body2"
+                                    color="text.secondary"
+                                    noWrap
+                                >
+                                    {column.render
+                                        ? column.render(row[column.field], row)
+                                        : row[column.field]}
+                                </Typography>
+                            ) : (
+                                <Typography
+                                    variant="body1"
+                                    fontWeight="bold"
+                                    color="text.primary"
+                                    gutterBottom
+                                    noWrap
+                                >
+                                    {column.render
+                                        ? column.render(row[column.field], row)
+                                        : row[column.field]}
+                                </Typography>
+                            )}
+                        </TableCell>
+                    ))
+                }
                 <TableCell align="right">
                     {onEdit && (
                         <Tooltip title="Edit" arrow>
@@ -286,7 +265,7 @@ export default function ReusableTable({
                         </Tooltip>
                     )}
                 </TableCell>
-            </TableRow>
+            </TableRow >
         ));
     };
 
@@ -353,13 +332,6 @@ export default function ReusableTable({
                 <Table>
                     <TableHead>
                         <TableRow>
-                            <TableCell padding="checkbox">
-                                <Checkbox
-                                    color="primary"
-                                    checked={allSelected}
-                                    onChange={handleSelectAll}
-                                />
-                            </TableCell>
                             {columns.map((column) => (
                                 <TableCell key={column.field}>
                                     <TableSortLabel
