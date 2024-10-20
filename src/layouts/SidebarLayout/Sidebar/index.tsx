@@ -81,7 +81,7 @@ function Sidebar() {
         />
         <Box p={2}>
           <Button
-            href="https://bloomui.com"
+            href="https://antrieb2punkt0.de"
             target="_blank"
             rel="noopener noreferrer"
             variant="contained"
@@ -89,7 +89,7 @@ function Sidebar() {
             size="small"
             fullWidth
           >
-            Upgrade to PRO
+            Support
           </Button>
         </Box>
       </SidebarWrapper>
