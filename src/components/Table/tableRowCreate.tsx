@@ -26,12 +26,21 @@ interface ReusableFormProps {
 
 const ReusableForm: React.FC<ReusableFormProps> = ({ fields, onSubmit, entityName, entintyFunction, initialData = {} }) => {
   
-  // Initialize formData state with initialData when it changes
-  const [formData, setFormData] = useState<Record<string, any>>(initialData);
+  // Initialize formData state with default values if initialData is empty (for create form)
+  const getInitialFormData = () => {
+    return fields.reduce((acc, field) => {
+      acc[field.name] = initialData[field.name] ?? (field.type === 'number' ? 0 : ''); // Handle number and string defaults
+      return acc;
+    }, {} as Record<string, any>);
+  };
+
+  const [formData, setFormData] = useState<Record<string, any>>(getInitialFormData());
 
   useEffect(() => {
-    setFormData(initialData); // Update formData when initialData changes
-  }, [initialData]);
+    if (Object.keys(initialData).length > 0) {
+      setFormData(getInitialFormData());
+    }
+  }, [initialData, fields]);
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     setFormData({
@@ -44,8 +53,6 @@ const ReusableForm: React.FC<ReusableFormProps> = ({ fields, onSubmit, entityNam
     event.preventDefault();
     try {
       const response = await onSubmit(formData);
-      const successMessage = response.message || `Successfully updated ${entityName}`;
-
       // Only reset the form if it's an "Add" form, not "Edit"
       if (entintyFunction.toLowerCase() === 'add') {
         setFormData(fields.reduce((acc, field) => {
