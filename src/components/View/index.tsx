@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Box, Typography, Grid, Paper, Divider, Link } from '@mui/material';
 import { DataGrid, GridColDef, GridToolbarColumnsButton, GridToolbarContainer, GridToolbarDensitySelector, GridToolbarExport, GridToolbarFilterButton, GridToolbarQuickFilter } from '@mui/x-data-grid';
 
@@ -21,6 +21,7 @@ interface ReusableDetailsProps {
 }
 
 const ReusableDetails: React.FC<ReusableDetailsProps> = ({ fields, data, entityName }) => {
+    const [pageSize, setPageSize] = useState(5); // State to manage page size
     const groupedFields = fields.reduce((acc, field) => {
         const sectionName = field.section || 'General';
         if (!acc[sectionName]) acc[sectionName] = [];
@@ -47,13 +48,34 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({ fields, data, entityN
                                             autoHeight
                                             rows={(data[field.name] as Array<any>).map((item, idx) => ({ id: idx, ...item }))}
                                             columns={field.columns as GridColDef[]}
-                                            initialState={{
-                                                ...data.initialState,
-                                                pagination: { paginationModel: { pageSize: 5 } },
-                                                density: 'compact'
+                                            pageSize={pageSize} // Set the page size
+                                            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)} // Handle page size change
+                                            rowsPerPageOptions={[5, 10, 25]} // Add the available page size options
+                                            pagination // Enable pagination
+                                            paginationMode="client" // Default client-side pagination
+                                            components={{ Toolbar: CustomToolbar }}
+                                            disableSelectionOnClick
+                                            sx={{
+                                                ml: 1,
+                                                '& .MuiDataGrid-main': {
+                                                    borderTop: '1px solid #ddd',
+                                                },
+                                                '& .MuiDataGrid-columnHeaderTitle': {
+                                                    fontWeight: 'bold',
+                                                },
+                                                '& .MuiDataGrid-columnHeader': {
+                                                    borderRight: '1px solid #ddd',
+                                                },
+                                                '& .MuiDataGrid-cell': {
+                                                    borderRight: '1px solid #ddd',
+                                                },
+                                                '& .MuiDataGrid-cell:focus': {
+                                                    outline: 'none',
+                                                },
+                                                '& .MuiDataGrid-cell:focus-within': {
+                                                    outline: 'none', // Removes the focus indicator within the cell as well
+                                                },
                                             }}
-                                            rowsPerPageOptions={[5, 10, 25]}
-                                 
                                         />
                                     ) : (
                                         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', ml: 1 }}>
@@ -69,7 +91,6 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({ fields, data, entityN
                                                 </Link>
                                             ))}
                                         </Box>
-
                                     )
                                 ) : typeof field.component === 'function' ? (
                                     field.component(data)
@@ -89,7 +110,6 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({ fields, data, entityN
         </Paper>
     );
 };
-
 
 function CustomToolbar() {
     return (
