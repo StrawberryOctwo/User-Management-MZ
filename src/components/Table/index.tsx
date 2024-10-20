@@ -26,6 +26,7 @@ import {
     Skeleton,
 } from '@mui/material';
 import Label from 'src/components/Label';
+import CloudDownloadIcon from '@mui/icons-material/CloudDownload';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
@@ -49,6 +50,11 @@ interface ReusableTableProps {
     onSearchChange?: (query: string) => void;
     loading: boolean;
     error?: boolean;
+    page: number;
+    limit: number;
+    onPageChange: (newPage: number) => void;
+    onLimitChange: (newLimit: number) => void;
+    totalCount: number;
 }
 
 const getStatusLabel = (status: string): JSX.Element => {
@@ -61,13 +67,7 @@ const getStatusLabel = (status: string): JSX.Element => {
     return <Label color={color}>{text}</Label>;
 };
 
-const applyPagination = (
-    data: any[],
-    page: number,
-    limit: number
-): any[] => data.slice(page * limit, page * limit + limit);
-
-const ReusableTable: FC<ReusableTableProps> = ({
+export default function ReusableTable({
     data = [],
     columns,
     title,
@@ -76,15 +76,17 @@ const ReusableTable: FC<ReusableTableProps> = ({
     onDelete,
     onSearchChange,
     loading = false,
-    error = false
-}) => {
+    error = false,
+    page,
+    limit,
+    onPageChange,
+    onLimitChange,
+    totalCount
+}: ReusableTableProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedRows, setSelectedRows] = useState<number[]>([]);
-    const [page, setPage] = useState<number>(0);
-    const [limit, setLimit] = useState<number>(5);
     const { order, orderBy, handleRequestSort, sortData } = useTableSort(columns[0]?.field || '');
     const sortedData = sortData(data);
-    const paginatedData = applyPagination(sortedData, page, limit);
     const allSelected = selectedRows.length === data.length;
     const debounceTimeout = React.useRef<NodeJS.Timeout | null>(null);
     const theme = useTheme();
@@ -120,9 +122,14 @@ const ReusableTable: FC<ReusableTableProps> = ({
         );
     };
 
-    const handlePageChange = (event: any, newPage: number) => setPage(newPage);
-    const handleLimitChange = (event: ChangeEvent<HTMLInputElement>) =>
-        setLimit(parseInt(event.target.value, 10));
+    const handlePageChange = (_event: any, newPage: number) => {
+        onPageChange(newPage);
+    };
+
+    const handleLimitChange = (event: ChangeEvent<HTMLInputElement>) => {
+        const newLimit = parseInt(event.target.value, 10);
+        onLimitChange(newLimit);
+    };
 
     const csvData = sortedData.map((row) =>
         columns.reduce((acc: any, column) => {
@@ -191,7 +198,7 @@ const ReusableTable: FC<ReusableTableProps> = ({
             );
         }
 
-        return paginatedData.map((row) => (
+        return data.map((row) => (
             <TableRow key={row.id} hover>
                 <TableCell padding="checkbox">
                     <Checkbox
@@ -296,9 +303,9 @@ const ReusableTable: FC<ReusableTableProps> = ({
                             size="small"
                         />
                         <CSVLink data={csvData} filename={`${title}-export.csv`}>
-                            <Button variant="contained" color="primary">
-                                Export to CSV
-                            </Button>
+                            <IconButton aria-label="delete" sx={{ margin: 1 }}>
+                                <CloudDownloadIcon fontSize="medium" />
+                            </IconButton>
                         </CSVLink>
                     </Box>
                 }
@@ -335,7 +342,7 @@ const ReusableTable: FC<ReusableTableProps> = ({
             <Box p={2}>
                 <TablePagination
                     component="div"
-                    count={data.length}
+                    count={totalCount}
                     page={page}
                     onPageChange={handlePageChange}
                     rowsPerPage={limit}
@@ -346,5 +353,3 @@ const ReusableTable: FC<ReusableTableProps> = ({
         </Card>
     );
 };
-
-export default ReusableTable;

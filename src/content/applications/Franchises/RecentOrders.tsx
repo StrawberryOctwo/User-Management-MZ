@@ -12,18 +12,24 @@ export default function ViewFranchisePage() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [totalCount, setTotalCount] = useState(0); // Track total count
+  const [page, setPage] = useState(0);
+  const [limit, setLimit] = useState(25);
+
   const { showMessage } = useSnackbar();
 
   useEffect(() => {
     loadFranchises();
-  }, []);
+  }, [limit, page]);
 
   const loadFranchises = async (searchQuery = '') => {
     setLoading(true);
     try {
-      const { data } = await fetchFranchises(1, 5, searchQuery);
-      setFranchises(data);
-    } catch {
+      const { data, total } = await fetchFranchises(page + 1, limit, searchQuery);
+      console.log('Fetched Data:', data); // Debug: Check if correct data is fetched
+      setFranchises([...data]);
+      setTotalCount(total);
+    } catch (error) {
       showMessage('Failed to load franchises.', 'error');
     } finally {
       setLoading(false);
@@ -69,7 +75,15 @@ export default function ViewFranchisePage() {
     setDialogOpen(true);
   };
 
-  /* if (!loading) return <div>Loading franchises...</div>; */
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleLimitChange = (newLimit: number) => {
+    setLimit(newLimit);
+    setPage(0);
+  };
+
   if (errorMessage) return <div>{errorMessage}</div>;
 
   return (
@@ -84,6 +98,11 @@ export default function ViewFranchisePage() {
         onSearchChange={loadFranchises}
         loading={loading}
         error={!!errorMessage}
+        page={page}
+        limit={limit}
+        totalCount={totalCount}
+        onPageChange={handlePageChange}
+        onLimitChange={handleLimitChange}
       />
 
       <ReusableDialog
