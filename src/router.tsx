@@ -8,6 +8,7 @@ import BaseLayout from 'src/layouts/BaseLayout';
 import SuspenseLoader from 'src/components/SuspenseLoader';
 import ProtectedRoute from './protectedRoute';
 import Login from './content/pages/Login/Login';
+import Logout from './components/Logout';
 
 const Loader = (Component) => (props) =>
 (
@@ -40,6 +41,9 @@ const Transactions = Loader(
 );
 const Franchises = Loader(
   lazy(() => import('src/content/applications/Franchises'))
+);
+const FranchiseCreate = Loader(
+  lazy(() => import('src/content/applications/Franchises/Create'))
 );
 const UserProfile = Loader(
   lazy(() => import('src/content/applications/Users/profile'))
@@ -140,7 +144,10 @@ const routes: RouteObject[] = [
     path: '',
     element: <ProtectedRoute />, // Protected routes wrapper
     children: [
+      {  path: 'logout',
+      element: <Logout />,},
       {
+     
         path: 'dashboard',
         element: <SidebarLayout />,
         children: [
@@ -195,6 +202,10 @@ const routes: RouteObject[] = [
           {
             path: 'franchises',
             element: <Franchises />
+          },
+          {
+            path: 'franchises/create',
+            element: <FranchiseCreate />
           },
           {
             path: 'profile',
