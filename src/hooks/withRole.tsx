@@ -10,7 +10,6 @@ const withRole = <P extends object>(Component: React.ComponentType<P>) => {
     const { userRoles } = useAuth();
 
     if (!userRoles || !allowedRoles.some(role => userRoles.includes(role))) {
-      // If none of the userRoles match the allowedRoles, don't render the component
       return null;
     }
 
