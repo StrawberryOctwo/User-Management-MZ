@@ -101,7 +101,7 @@ const ViewTeacherPage: React.FC = () => {
                         <Button
                             variant="text"
                             color="primary"
-                            onClick={() => window.open(`/dashboard/locations/view/${params.row.id}`, '_blank')}
+                            onClick={() => window.open(`/management/locations/view/${params.row.id}`, '_blank')}
                         >
                             {t('view_details')}
                         </Button>
@@ -151,7 +151,7 @@ const ViewTeacherPage: React.FC = () => {
                         <Button
                             variant="text"
                             color="primary"
-                            onClick={() => window.open(`/dashboard/class-sessions/view/${params.row.id}`, '_blank')}
+                            onClick={() => window.open(`/management/class-sessions/view/${params.row.id}`, '_blank')}
                         >
                             {t('view_details')}
                         </Button>

@@ -9,6 +9,8 @@ import {
   Button,
   ListItem
 } from '@mui/material';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+
 import { NavLink as RouterLink } from 'react-router-dom';
 import { SidebarContext } from 'src/contexts/SidebarContext';
 import EditCalendarIcon from '@mui/icons-material/CalendarMonth';
@@ -33,6 +35,7 @@ import WorkspacePremiumTwoToneIcon from '@mui/icons-material/WorkspacePremiumTwo
 import CameraFrontTwoToneIcon from '@mui/icons-material/CameraFrontTwoTone';
 import DisplaySettingsTwoToneIcon from '@mui/icons-material/DisplaySettingsTwoTone';
 import { GridFilterListIcon } from '@mui/x-data-grid';
+import { BusinessOutlined, FileUploadSharp, LocationCity, LocationOffRounded, Person, PersonAddAlt1Sharp } from '@mui/icons-material';
 
 const MenuWrapper = styled(Box)(
   ({ theme }) => `
@@ -272,29 +275,19 @@ function SidebarMenu() {
                   component={RouterLink}
                   onClick={closeSidebar}
                   to="/management/franchises"
-                  startIcon={<TableChartTwoToneIcon />}
+                  startIcon={<BusinessOutlined/>}
                 >
                   Franchises
                 </Button> 
               </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/management/files"
-                  startIcon={<GridFilterListIcon />}
-                >
-                  Files
-                </Button>
-              </ListItem>
+
               <ListItem component="div">
                 <Button
                   disableRipple
                   component={RouterLink}
                   onClick={closeSidebar}
                   to="/management/franchise-admins"
-                  startIcon={<GridFilterListIcon />}
+                  startIcon={<LocationOffRounded />}
                 >
                   Franchise Admins
                 </Button>
@@ -306,7 +299,7 @@ function SidebarMenu() {
                   component={RouterLink}
                   onClick={closeSidebar}
                   to="/management/locations"
-                  startIcon={<GridFilterListIcon />}
+                  startIcon={<LocationOnIcon />}
                 >
                   Locations
                 </Button>
@@ -319,7 +312,7 @@ function SidebarMenu() {
                   component={RouterLink}
                   onClick={closeSidebar}
                   to="/management/location-admins"
-                  startIcon={<GridFilterListIcon />}
+                  startIcon={<LocationCity />}
                 >
                   Location Admins
                 </Button>
@@ -333,7 +326,7 @@ function SidebarMenu() {
                   component={RouterLink}
                   onClick={closeSidebar}
                   to="/management/teachers"
-                  startIcon={<GridFilterListIcon />}
+                  startIcon={<Person />}
                 >
                   Teachers
                 </Button>
@@ -347,14 +340,23 @@ function SidebarMenu() {
                   component={RouterLink}
                   onClick={closeSidebar}
                   to="/management/students"
-                  startIcon={<GridFilterListIcon />}
+                  startIcon={<PersonAddAlt1Sharp />}
                 >
                   Students
                 </Button>
               </ListItem>
 
-
-
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={RouterLink}
+                  onClick={closeSidebar}
+                  to="/management/files"
+                  startIcon={<FileUploadSharp />}
+                >
+                  Files
+                </Button>
+              </ListItem>
             </List>
           </SubMenuWrapper>
         </List>

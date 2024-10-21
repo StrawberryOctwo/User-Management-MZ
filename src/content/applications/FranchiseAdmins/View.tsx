@@ -55,7 +55,7 @@ const ViewFranchiseAdmin: React.FC = () => {
                         <Button
                             variant="text"
                             color="primary"
-                            onClick={() => window.open(`/dashboard/franchises/view/${params.row.id}`, '_blank')}
+                            onClick={() => window.open(`/management/franchises/view/${params.row.id}`, '_blank')}
                         >
                             {t('view_details')}
                         </Button>

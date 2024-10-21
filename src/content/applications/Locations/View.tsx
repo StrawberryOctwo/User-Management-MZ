@@ -62,7 +62,7 @@ const ViewLocationPage: React.FC = () => {
                         <Button
                             variant="text"
                             color="primary"
-                            onClick={() => window.open(`/dashboard/location-admins/view/${params.row.id}`, '_blank')}
+                            onClick={() => window.open(`/management/location-admins/view/${params.row.id}`, '_blank')}
                         >
                             {t('view_details')}
                         </Button>
@@ -93,7 +93,7 @@ const ViewLocationPage: React.FC = () => {
                         <Button
                             variant="text"
                             color="primary"
-                            onClick={() => window.open(`/dashboard/teachers/view/${params.row.id}`, '_blank')}
+                            onClick={() => window.open(`/management/teachers/view/${params.row.id}`, '_blank')}
                         >
                             {t('view_details')}
                         </Button>
@@ -123,7 +123,7 @@ const ViewLocationPage: React.FC = () => {
                         <Button
                             variant="text"
                             color="primary"
-                            onClick={() => window.open(`/dashboard/students/view/${params.row.id}`, '_blank')}
+                            onClick={() => window.open(`/management/students/view/${params.row.id}`, '_blank')}
                         >
                             {t('view_details')}
                         </Button>

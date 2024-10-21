@@ -1,7 +1,6 @@
 import { Box, Typography } from "@mui/material";
 import { AppointmentStatusCode, EVENT_STATUS_COLORS } from "../../constants";
 import { Appointment } from "../../types";
-import { color } from "@chakra-ui/react";
 
 export default function AppointmentEvent({
   appointment,
