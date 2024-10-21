@@ -26,8 +26,6 @@ export default function EditFranchiseAdmin() {
         try {
             const fetchedData = await fetchFranchiseAdminById(Number(id));
 
-            console.log('Fetched Data:', fetchedData);
-
             if (!fetchedData) {
                 throw new Error('No data received for the franchise admin');
             }

@@ -28,27 +28,26 @@ api.interceptors.request.use(
   }
 );
 // Set up Axios interceptors globally
-export const useAxiosInterceptors = () => {
-  const { triggerSessionExpiration } = useSessionExpiration();
-  const { showMessage } = useSnackbar(); // Use Snackbar context
+// export const useAxiosInterceptors = () => {
+//   const { triggerSessionExpiration } = useSessionExpiration();
+//   const { showMessage } = useSnackbar();
 
-  // Response interceptor for handling success and errors globally
-  api.interceptors.response.use(
-    (response) => {
-      if (response.data?.message) {
-        showMessage(response.data.message, 'success'); // Show success snackbar
-      }
-      return response;
-    },
-    (error) => {
-      if (error.response?.data?.message?.includes('TokenExpiredError')) {
-        triggerSessionExpiration(); // Trigger the session expiration dialog
-      }
+//   api.interceptors.response.use(
+//     (response) => {
+//       console.log(response.data)
+//       if (response.data?.message) {
+//         showMessage(response.data.message, 'success');
+//       }
+//       return response;
+//     },
+//     (error) => {
+//       if (error.response?.data?.message?.includes('TokenExpiredError')) {
+//         triggerSessionExpiration();
+//       }
 
-      // Handle error responses and show error snackbar
-      const errorMessage = error.response?.data?.message || 'An error occurred';
-      showMessage(errorMessage, 'error');
-      return Promise.reject(error);
-    }
-  );
-};
+//       const errorMessage = error.response?.data?.message || 'An error occurred';
+//       // showMessage(errorMessage, 'error');
+//       return Promise.reject(error);
+//     }
+//   );
+// };

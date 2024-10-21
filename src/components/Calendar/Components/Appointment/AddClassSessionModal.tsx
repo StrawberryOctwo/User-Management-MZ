@@ -143,11 +143,8 @@ export default function AddClassSessionModal({
       let currentStartDate = new Date(newSession.sessionStartDate);
       let currentEndDate = new Date(newSession.sessionEndDate);
 
-      console.log('Repeating sessions:');
       // Loop to generate sessions until the repeat week
       while (moment(currentStartDate).isSameOrBefore(untilDate, 'week')) {
-        console.log(`Start: ${moment(currentStartDate).format('YYYY-MM-DD HH:mm')}`);
-        console.log(`End: ${moment(currentEndDate).format('YYYY-MM-DD HH:mm')}`);
 
         sessionArray.push({
           ...newSession,
@@ -165,8 +162,6 @@ export default function AddClassSessionModal({
         studentIds: validatedStudents.map((student) => student.id),
       });
     }
-
-    console.log('Final Sessions Array:', sessionArray);
 
     onSave(sessionArray);
 

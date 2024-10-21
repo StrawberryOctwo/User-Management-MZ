@@ -2,6 +2,7 @@ import React, { createContext, useState, useContext } from 'react';
 // import ReusableDialog from '../components/ReusableComponents/ReusableDialog';
 import Button from '@mui/material/Button';
 import { useNavigate } from 'react-router-dom';
+import ReusableDialog from 'src/content/pages/Components/Dialogs';
 
 interface SessionExpirationContextProps {
     triggerSessionExpiration: () => void;
@@ -35,18 +36,18 @@ export const SessionExpirationProvider: React.FC<{ children: React.ReactNode }> 
             {children}
 
             {/* Session Expired Dialog */}
-            {/* <ReusableDialog
+            <ReusableDialog
                 open={isDialogOpen}
                 title="Session Expired"
                 onClose={handleDialogClose} // Close dialog and navigate
                 actions={
                     <Button onClick={handleDialogClose} color="primary">
-                        Login Again
+                        Login
                     </Button>
                 }
             >
                 Your session has expired. Please log in again.
-            </ReusableDialog> */}
+            </ReusableDialog>
         </SessionExpirationContext.Provider>
     );
 };

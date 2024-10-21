@@ -35,7 +35,6 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                 setErrorMessage(null);
                 try {
                     const response = await fetchClassSessionById(appointmentId);
-                    console.log(response)
                     setClassSession(response);
                 } catch (error) {
                     setErrorMessage("Failed to load class session details.");

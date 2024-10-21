@@ -126,7 +126,6 @@ const CalendarContent: React.FC = () => {
           locationId: selectedLocation?.id,
         };
 
-        console.log(sessionPayload)
         await addClassSessions(sessionPayload);
       }
 

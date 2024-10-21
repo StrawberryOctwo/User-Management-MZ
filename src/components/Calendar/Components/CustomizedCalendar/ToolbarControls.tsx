@@ -52,7 +52,6 @@ export default function ToolbarControls({
 
   // Handler to save the new class session
   const handleSaveClassSession = (newSession: any) => {
-    console.log("New class session saved:", newSession);
     setIsAddModalOpen(false);
   };
 

@@ -46,12 +46,10 @@ export default function ViewFranchisePage() {
   ];
 
   const handleEdit = (id: any) => {
-    console.log('Edit franchise with ID:', id);
     navigate(`edit/${id}`);
   };
 
   const handleView = (id: any) => {
-    console.log('View franchise with ID:', id);
     navigate(`view/${id}`);
 
   };

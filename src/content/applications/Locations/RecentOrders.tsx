@@ -45,12 +45,10 @@ export default function ViewLocationPage() {
   ];
 
   const handleEdit = (id: any) => {
-    console.log('Edit location with ID:', id);
     navigate(`edit/${id}`);
   };
 
   const handleView = (id: any) => {
-    console.log('View location with ID:', id);
     navigate(`view/${id}`);
   };
 
