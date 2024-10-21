@@ -22,60 +22,17 @@ const LogoWrapper = styled(Link)(
 
 const LogoSignWrapper = styled(Box)(
   () => `
-        width: 52px;
-        height: 38px;
+        width: 230px;
+        height: 60px;
 `
 );
 
-const LogoSign = styled(Box)(
-  ({ theme }) => `
-        background: ${theme.general.reactFrameworkColor};
-        width: 18px;
-        height: 18px;
-        border-radius: ${theme.general.borderRadiusSm};
-        position: relative;
-        transform: rotate(45deg);
-        top: 3px;
-        left: 17px;
-
-        &:after, 
-        &:before {
-            content: "";
-            display: block;
-            width: 18px;
-            height: 18px;
-            position: absolute;
-            top: -1px;
-            right: -20px;
-            transform: rotate(0deg);
-            border-radius: ${theme.general.borderRadiusSm};
-        }
-
-        &:before {
-            background: ${theme.palette.primary.main};
-            right: auto;
-            left: 0;
-            top: 20px;
-        }
-
-        &:after {
-            background: ${theme.palette.secondary.main};
-        }
-`
-);
-
-const LogoSignInner = styled(Box)(
-  ({ theme }) => `
-        width: 16px;
-        height: 16px;
-        position: absolute;
-        top: 12px;
-        left: 12px;
-        z-index: 5;
-        border-radius: ${theme.general.borderRadiusSm};
-        background: ${theme.header.background};
-`
-);
+// Update LogoSign as a styled img tag
+const LogoSign = styled('img')`
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+`;
 
 const TooltipWrapper = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -99,10 +56,10 @@ function Logo() {
 
   return (
     <TooltipWrapper
-      title="User Management System"
+      title="Verwaltungssoftware" // Tooltip text in German
       arrow
     >
-      <LogoWrapper to="/dashboard">
+      <LogoWrapper to="/overview">
         <Badge
           sx={{
             '.MuiBadge-badge': {
@@ -113,13 +70,12 @@ function Logo() {
           }}
           overlap="circular"
           color="success"
-          badgeContent="2.0"
+          badgeContent="System" // Badge content
         >
           <LogoSignWrapper>
-            <LogoSign>
-              <LogoSignInner />
-            </LogoSign>
-          </LogoSignWrapper>
+            {/* Replace with your image */}
+            <LogoSign src="/logo.svg" alt="Logo" />
+            </LogoSignWrapper>
         </Badge>
       </LogoWrapper>
     </TooltipWrapper>

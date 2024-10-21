@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { NavLink as RouterLink } from 'react-router-dom';
 import { SidebarContext } from 'src/contexts/SidebarContext';
-
+import EditCalendarIcon from '@mui/icons-material/CalendarMonth';
 import DesignServicesTwoToneIcon from '@mui/icons-material/DesignServicesTwoTone';
 import BrightnessLowTwoToneIcon from '@mui/icons-material/BrightnessLowTwoTone';
 import CalendarMonthOutlined from '@mui/icons-material/CalendarMonthOutlined'
@@ -226,7 +226,7 @@ function SidebarMenu() {
                   component={RouterLink}
                   onClick={closeSidebar}
                   to="/dashboard/calendar"
-                  startIcon={<CalendarMonthOutlined />}
+                  startIcon={<EditCalendarIcon />}
                 >
                   Calendar
                 </Button>
@@ -275,7 +275,7 @@ function SidebarMenu() {
                   startIcon={<TableChartTwoToneIcon />}
                 >
                   Franchises
-                </Button>
+                </Button> 
               </ListItem>
               <ListItem component="div">
                 <Button
