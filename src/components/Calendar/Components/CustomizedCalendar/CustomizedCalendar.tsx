@@ -21,9 +21,8 @@ import ToolbarControls from "./ToolbarControls";
 import EditAppointmentModal from "../Appointment/EditAppointmentModal"; // Import the Edit Appointment Modal
 import AddClassSessionModal from "../Appointment/AddClassSessionModal";
 import ClassSessionDetailsModal from "../Modals/ClassSessionDetailsModal";
-
-const mapLines = (nthChild: string, width: number) =>
-  `.rbc-day-slot .rbc-time-slot:nth-child(${nthChild}):after {width: ${width}% !important;}`;
+import { getStrongestRoles } from 'src/hooks/roleUtils';
+import { useAuth } from "src/hooks/useAuth";
 
 export enum TimeSlotMinutes {
   Five = 5,
@@ -63,8 +62,6 @@ const timeSlotLinesMap = {
 
 type Keys = keyof typeof Views;
 
-const PRIMARY_COLOR = "#17405d";
-const SECONDARY_COLOR = "#246899";
 
 type DemoProps = {
   classSessionEvents: EventItem[]; // Accept classSessionEvents as a prop
@@ -93,6 +90,8 @@ export default function CustomizedCalendar({
   const [isModalOpen, setModalOpen] = useState(false);
   const [isDetailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
+  const { userRoles } = useAuth();
+  const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
 
   const onPrevClick = useCallback(() => {
     if (view === Views.DAY) {
@@ -218,6 +217,9 @@ export default function CustomizedCalendar({
   });
 
   const handleOpenAddModal = (start: Date, end: Date) => {
+    if (strongestRoles[0] == 'Teacher' || strongestRoles[0] == 'Student') {
+      return
+    }
     setSelectedRange({ start, end });
     setIsAddModalOpen(true);
   };

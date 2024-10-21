@@ -2,10 +2,12 @@ import { useEffect } from 'react';
 import { useSessionExpiration } from '../contexts/SessionExpirationContext';
 import { useSnackbar } from '../contexts/SnackbarContext';
 import { api } from './api';
+import { useNavigate } from 'react-router';
 
 export const AxiosInterceptorSetup = () => {
   const { triggerSessionExpiration } = useSessionExpiration();
   const { showMessage } = useSnackbar();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const requestInterceptor = api.interceptors.request.use(
@@ -24,7 +26,7 @@ export const AxiosInterceptorSetup = () => {
       },
       (error) => {
         if (error.response?.data?.message?.includes('Invalid Token: JsonWebTokenError: invalid token')) {
-          triggerSessionExpiration();
+          navigate('/logout');
         }
         if (error.response?.data?.message?.includes('TokenExpiredError')) {
           triggerSessionExpiration();

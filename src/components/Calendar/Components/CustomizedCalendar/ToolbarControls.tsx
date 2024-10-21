@@ -5,7 +5,8 @@ import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import moment from "moment";
 import { VIEW_OPTIONS } from "../../constants";
-import AddClassSessionModal from "../Appointment/AddClassSessionModal"; // Import the modal component
+import AddClassSessionModal from "../Appointment/AddClassSessionModal";
+import RoleBasedComponent from "src/components/ProtectedComponent";
 
 type ToolbarControlsProps = {
   date: Date;
@@ -18,7 +19,7 @@ type ToolbarControlsProps = {
   setView: any;
   view: string;
   dateText: any;
-  
+
 };
 
 
@@ -36,8 +37,6 @@ export default function ToolbarControls({
 }: ToolbarControlsProps) {
   const PRIMARY_COLOR = "#17405d";
   const SECONDARY_COLOR = "#246899";
-
-  // State to control the visibility of the modal
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   // Handler to open the modal
@@ -130,13 +129,16 @@ export default function ToolbarControls({
         ))}
       </Box>
 
-      <Button
-        variant="contained"
-        sx={{ ml: 2, bgcolor: PRIMARY_COLOR, '&:hover': { bgcolor: SECONDARY_COLOR } }}
-        onClick={handleOpenAddModal}
-      >
-        Add Class Session
-      </Button>
+
+      <RoleBasedComponent allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin']}>
+        <Button
+          variant="contained"
+          sx={{ ml: 2, bgcolor: PRIMARY_COLOR, '&:hover': { bgcolor: SECONDARY_COLOR } }}
+          onClick={handleOpenAddModal}
+        >
+          Add Class Session
+        </Button>
+      </RoleBasedComponent>
 
       {/* Render the Add Class Session Modal */}
       <AddClassSessionModal
