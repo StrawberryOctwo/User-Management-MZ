@@ -10,7 +10,7 @@ function ApplicationsFranchises() {
   return (
     <>
       <Helmet>
-        <title>Franchises - Applications</title>
+        <title>Teachers - Applications</title>
       </Helmet>
       <PageTitleWrapper>
         <PageHeader />

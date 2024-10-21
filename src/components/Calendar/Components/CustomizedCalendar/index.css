@@ -1,38 +1,69 @@
+/* Header (Days) */
 .rbc-header {
   color: white;
   font-size: 14px !important;
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 36px !important;
+  height: 40px !important;
   background: #17405d;
+  padding: 10px 0;
+  border-right: 1px solid #e0e0e0;
 }
 
-.rbc-allday-cell {
-  display: none;
+.rbc-header:last-child {
+  border-right: none;
 }
 
+/* Today Highlight */
 .rbc-time-header-cell .rbc-today {
   background-color: #04aa6d !important;
 }
 
+/* Time Slots */
 .rbc-time-slot {
   color: #74a4c3;
   z-index: 1;
+  height: 40px; /* Increase the height for readability */
 }
 
+/* Time Slot Background */
 .rbc-time-slot:not(.rbc-today .rbc-time-slot) {
   background-color: #eff4f7;
+  border-top: 1px solid #d1e0eb; /* Subtle border between time slots */
 }
 
-/*Event Styles*/
+.rbc-time-slot.rbc-now {
+  background-color: #eafaf1 !important; /* Highlight current time */
+}
+
+/* Timeslot Grid Lines */
+.rbc-day-slot .rbc-time-slot:after {
+  content: "";
+  width: 100%;
+  border-top: 1px solid #fbb3ec;
+  display: block;
+}
+
+/* Event Styles */
 .rbc-event,
 .rbc-background-event {
   z-index: 2;
-  padding: 0px !important;
+  padding: 4px 8px !important; /* Add padding for better readability */
+  border-radius: 4px; /* Round corners of the events */
   border: none !important;
+  background-color: #0288d1; /* Custom event color */
+  color: white;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
+  transition: background-color 0.2s ease-in-out;
 }
 
+/* Hover Effect on Events */
+.rbc-event:hover {
+  background-color: #0277bd;
+}
+
+/* Hide Event Labels (For cleaner design) */
 .rbc-event-label {
   display: none !important;
 }
@@ -41,10 +72,48 @@
   width: 100% !important;
 }
 
-/*Timeslots Customization*/
-.rbc-day-slot .rbc-time-slot:after {
-  content: "";
-  width: 100%;
-  border-top: 1px solid #fbb3ec;
-  display: block;
+/* Current Time Indicator */
+.rbc-current-time-indicator {
+  background-color: #d32f2f;
+  height: 2px;
+}
+
+/* All Day Cell */
+.rbc-allday-cell {
+  display: none;
+}
+
+/* Toolbar Customization */
+.rbc-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: #f0f0f0;
+  padding: 10px;
+  border-bottom: 1px solid #ddd;
+}
+
+.rbc-toolbar-label {
+  font-size: 18px;
+  font-weight: bold;
+  color: #333;
+}
+
+/* Toolbar Button Styles */
+.rbc-btn-group button {
+  background-color: #04aa6d;
+  color: white;
+  border: none;
+  padding: 6px 12px;
+  margin: 0 4px;
+  border-radius: 4px;
+  transition: background-color 0.3s ease;
+}
+
+.rbc-btn-group button:hover {
+  background-color: #0288d1;
+}
+
+.rbc-btn-group button:focus {
+  outline: none;
 }

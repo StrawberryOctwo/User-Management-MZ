@@ -6,7 +6,7 @@ function PageHeader() {
   const navigate = useNavigate(); // Initialize useNavigate
 
   const user = {
-    name: 'Catherine Pike',
+    name: '',
     avatar: '/static/images/avatars/1.jpg'
   };
 

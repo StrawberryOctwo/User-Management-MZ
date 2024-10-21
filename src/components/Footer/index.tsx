@@ -18,7 +18,7 @@ function Footer() {
       >
         <Box>
           <Typography variant="subtitle1">
-            &copy; 2024 - Bold Company Admin Dashboard
+            &copy; 2024 - User Management System
           </Typography>
         </Box>
         <Typography
@@ -29,11 +29,11 @@ function Footer() {
         >
           Crafted by{' '}
           <Link
-            href="https://devsmint.com"
+            href="https://antrieb2punkt0.de"
             target="_blank"
             rel="noopener noreferrer"
           >
-            DevsMint.com
+            antrieb2punkt0.de
           </Link>
         </Typography>
       </Box>

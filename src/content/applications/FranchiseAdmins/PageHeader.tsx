@@ -6,7 +6,7 @@ function PageHeader() {
   const navigate = useNavigate(); // Initialize useNavigate
 
   const user = {
-    name: 'Catherine Pike',
+    name: '',
     avatar: '/static/images/avatars/1.jpg'
   };
 
@@ -19,10 +19,10 @@ function PageHeader() {
     <Grid container justifyContent="space-between" alignItems="center">
       <Grid item>
         <Typography variant="h3" component="h3" gutterBottom>
-          Franchises
+          Franchise Admins
         </Typography>
         <Typography variant="subtitle2">
-          {user.name}, these are your recent franchises
+          {user.name}, these are your recent franchise admins
         </Typography>
       </Grid>
       <Grid item>
@@ -32,7 +32,7 @@ function PageHeader() {
           startIcon={<AddTwoToneIcon fontSize="small" />}
           onClick={handleCreateFranchise} // Add onClick handler
         >
-          Create franchise
+          Create franchise admin
         </Button>
       </Grid>
     </Grid>

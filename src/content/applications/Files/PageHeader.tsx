@@ -5,7 +5,7 @@ import { useNavigate } from 'react-router-dom'; // Import useNavigate
 function PageHeader() {
 
   const user = {
-    name: 'Catherine Pike',
+    name: '',
     avatar: '/static/images/avatars/1.jpg'
   };
 
@@ -14,7 +14,7 @@ function PageHeader() {
     <Grid container justifyContent="space-between" alignItems="center">
       <Grid item>
         <Typography variant="h3" component="h3" gutterBottom>
-          Franchises
+          Files
         </Typography>
         <Typography variant="subtitle2">
           {user.name}, these are your recent files
