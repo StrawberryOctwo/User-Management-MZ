@@ -52,3 +52,22 @@ export const updateClassSession = async (id: string, updatedData: any) => {
         throw error;
     }
 };
+export const getClassSessionReportsStatus = async (classSessionId: string) => {
+    try {
+        const response = await api.get(`/session-reports/status/class-session/${classSessionId}`);
+        return response.data;  // Access the data directly
+    } catch (error) {
+        console.error(`Error fetching session report status for class session ${classSessionId}:`, error);
+        throw error;
+    }
+};
+
+export const getStudentSessionReportStatus = async (classSessionId: string, studentId: string) => {
+    try {
+        const response = await api.get(`/session-reports/status/class-session/${classSessionId}/student/${studentId}`);
+        return response.data;  // Access the data directly
+    } catch (error) {
+        console.error(`Error fetching session report status for student ${studentId}:`, error);
+        throw error;
+    }
+};
