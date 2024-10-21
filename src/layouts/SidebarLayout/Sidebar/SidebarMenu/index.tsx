@@ -35,7 +35,7 @@ import WorkspacePremiumTwoToneIcon from '@mui/icons-material/WorkspacePremiumTwo
 import CameraFrontTwoToneIcon from '@mui/icons-material/CameraFrontTwoTone';
 import DisplaySettingsTwoToneIcon from '@mui/icons-material/DisplaySettingsTwoTone';
 import { GridFilterListIcon } from '@mui/x-data-grid';
-import { BusinessOutlined, FileUploadSharp, LocationCity, LocationOffRounded, Person, PersonAddAlt1Sharp } from '@mui/icons-material';
+import { BusinessOutlined, FileUploadSharp, LocationCity, LocationOffRounded, LocationOffSharp, LocationOn, LocationSearching, LocationSearchingTwoTone, Person, PersonAddAlt1Sharp } from '@mui/icons-material';
 
 const MenuWrapper = styled(Box)(
   ({ theme }) => `
@@ -287,7 +287,7 @@ function SidebarMenu() {
                   component={RouterLink}
                   onClick={closeSidebar}
                   to="/management/franchise-admins"
-                  startIcon={<LocationOffRounded />}
+                  startIcon={<LocationSearchingTwoTone />}
                 >
                   Franchise Admins
                 </Button>
@@ -312,7 +312,7 @@ function SidebarMenu() {
                   component={RouterLink}
                   onClick={closeSidebar}
                   to="/management/location-admins"
-                  startIcon={<LocationCity />}
+                  startIcon={<LocationSearching />}
                 >
                   Location Admins
                 </Button>
