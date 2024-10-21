@@ -184,7 +184,7 @@ function SidebarMenu() {
       <MenuWrapper>
         <List component="div">
           <SubMenuWrapper>
-            <List component="div">
+            {/* <List component="div">
               <ListItem component="div">
                 <Button
                   disableRipple
@@ -196,7 +196,7 @@ function SidebarMenu() {
                   Overview
                 </Button>
               </ListItem>
-            </List>
+            </List> */}
           </SubMenuWrapper>
         </List>
         <List
@@ -209,7 +209,7 @@ function SidebarMenu() {
         >
           <SubMenuWrapper>
             <List component="div">
-              <ListItem component="div">
+              {/* <ListItem component="div">
                 <Button
                   disableRipple
                   component={RouterLink}
@@ -219,7 +219,7 @@ function SidebarMenu() {
                 >
                   Cryptocurrency
                 </Button>
-              </ListItem>
+              </ListItem> */}
               <ListItem component="div">
                 <Button
                   disableRipple
@@ -231,7 +231,7 @@ function SidebarMenu() {
                   Calendar
                 </Button>
               </ListItem>
-              <ListItem component="div">
+              {/* <ListItem component="div">
                 <Button
                   disableRipple
                   component={RouterLink}
@@ -241,7 +241,7 @@ function SidebarMenu() {
                 >
                   Messenger
                 </Button>
-              </ListItem>
+              </ListItem> */}
             </List>
           </SubMenuWrapper>
         </List>
@@ -255,7 +255,7 @@ function SidebarMenu() {
         >
           <SubMenuWrapper>
             <List component="div">
-              <ListItem component="div">
+              {/* <ListItem component="div">
                 <Button
                   disableRipple
                   component={RouterLink}
@@ -265,7 +265,7 @@ function SidebarMenu() {
                 >
                   Transactions List
                 </Button>
-              </ListItem>
+              </ListItem> */}
               <ListItem component="div">
                 <Button
                   disableRipple
@@ -274,7 +274,7 @@ function SidebarMenu() {
                   to="/management/franchises"
                   startIcon={<TableChartTwoToneIcon />}
                 >
-                  Franchises List
+                  Franchises
                 </Button>
               </ListItem>
               <ListItem component="div">
@@ -358,7 +358,7 @@ function SidebarMenu() {
             </List>
           </SubMenuWrapper>
         </List>
-        <List
+        {/* <List
           component="div"
           subheader={
             <ListSubheader component="div" disableSticky>
@@ -559,9 +559,9 @@ function SidebarMenu() {
                   Maintenance
                 </Button>
               </ListItem>
-            </List>
-          </SubMenuWrapper>
-        </List>
+            </List> */}
+          {/* </SubMenuWrapper>
+        </List> */}
       </MenuWrapper>
     </>
   );

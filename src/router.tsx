@@ -197,10 +197,6 @@ const routes: RouteObject[] = [
         element: <Login />
       },
       {
-        path: 'overview',
-        element: <Navigate to="/" replace />
-      },
-      {
         path: 'status',
         children: [
           {
@@ -267,10 +263,6 @@ const routes: RouteObject[] = [
           {
             path: '',
             element: <Navigate to="transactions" replace />
-          },
-          {
-            path: 'transactions',
-            element: <Transactions />
           },
           {
             path: 'franchises',
