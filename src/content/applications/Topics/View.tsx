@@ -15,12 +15,19 @@ const ViewFranchisePage: React.FC = () => {
     // Function to load the franchise by ID
     const loadFranchise = async () => {
         setLoading(true);
+        setErrorMessage(null); // Clear previous errors
 
         try {
             const franchiseData = await fetchFranchiseById(Number(id));
             setFranchise(franchiseData);
         } catch (error: any) {
-        
+            if (error.response?.data?.message.includes('TokenExpiredError')) {
+                // Handle token expiration
+                setErrorMessage('Your session has expired. Please log in again.');
+            } else {
+                console.error('Failed to fetch franchise:', error);
+                setErrorMessage(t('failed_to_fetch_franchise')); // Set error message for retry mechanism
+            }
         } finally {
             setLoading(false);
         }

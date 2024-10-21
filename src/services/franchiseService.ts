@@ -1,24 +1,5 @@
-import { Cookies } from 'react-cookie';
 import { api } from './api';
 
-const cookies = new Cookies();
-
-const getToken = () => {
-  return cookies.get('token');
-};
-
-api.interceptors.request.use(
-  (config) => {
-    const token = getToken();
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`;
-    }
-    return config;
-  },
-  (error) => {
-    return Promise.reject(error);
-  }
-);
 
 export const fetchFranchises = async (page: number, limit: number, searchQuery: string = '') => {
   try {

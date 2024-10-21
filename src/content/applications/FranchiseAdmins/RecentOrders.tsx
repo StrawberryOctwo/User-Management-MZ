@@ -2,12 +2,12 @@ import { Box, Button, CircularProgress } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
-import { Franchise } from 'src/models/FranchiseModel';
-import { deleteFranchise, fetchFranchises } from 'src/services/franchiseService';
+import { deleteFranchiseAdmin, fetchFranchiseAdmins } from 'src/services/franchiseAdminService';
 import { useNavigate } from 'react-router-dom';
+import { FranchiseAdmin } from 'src/models/FranchiseAdminModel';
 
-export default function ViewFranchisePage() {
-  const [franchises, setFranchises] = useState<Franchise[]>([]);
+export default function FranchiseAdminsContent() {
+  const [admins, setAdmins] = useState<FranchiseAdmin[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -19,14 +19,14 @@ export default function ViewFranchisePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadFranchises();
+    loadAdmins();
   }, [limit, page]);
 
-  const loadFranchises = async (searchQuery = '') => {
+  const loadAdmins = async (searchQuery = '') => {
     setLoading(true);
     try {
-      const { data, total } = await fetchFranchises(page + 1, limit, searchQuery);
-      setFranchises([...data]);
+      const { data, total } = await fetchFranchiseAdmins(page + 1, limit, searchQuery);
+      setAdmins([...data]);
       setTotalCount(total);
     } catch (error) {
     } finally {
@@ -35,22 +35,38 @@ export default function ViewFranchisePage() {
   };
 
   const columns = [
-    { field: 'name', headerName: 'Franchise Name' },
-    { field: 'ownerName', headerName: 'Owner Name' },
-    { field: 'status', headerName: 'Status', render: (value: any) => (value === '1' ? '1' : '0') },
-    { field: 'totalEmployees', headerName: 'Total Employees' },
-    { field: 'created_at', headerName: 'Created At', render: (value: any) => new Date(value).toLocaleDateString() },
+    { field: 'firstName', headerName: 'First Name' },
+    { field: 'lastName', headerName: 'Last Name' },
+    {
+      field: 'franchiseNames',
+      headerName: 'Franchise Name',
+      render: (value: any) => {
+        if (Array.isArray(value)) {
+          return value.map((franchise: any) => franchise || franchise).join(', ');
+        }
+        return value; // In case it's not an array, return as is
+      }
+    },
+    { 
+      field: 'dob', 
+      headerName: 'DOB', 
+      render: (value: any) => new Date(value).toLocaleDateString() 
+    },
+    { field: 'email', headerName: 'Email' },
+    { field: 'address', headerName: 'Address' },
+    { field: 'postalCode', headerName: 'Postal Code' },
+    { field: 'phoneNumber', headerName: 'Phone Number' },
   ];
+  
 
   const handleEdit = (id: any) => {
-    console.log('Edit franchise with ID:', id);
+    console.log('Edit admin with ID:', id);
     navigate(`edit/${id}`);
   };
 
   const handleView = (id: any) => {
-    console.log('View franchise with ID:', id);
+    console.log('View admin with ID:', id);
     navigate(`view/${id}`);
-
   };
 
   const handleDelete = async () => {
@@ -58,8 +74,8 @@ export default function ViewFranchisePage() {
     setLoading(true);
 
     try {
-      const response = await deleteFranchise(selectedIds);
-      await loadFranchises();
+      const response = await deleteFranchiseAdmin(selectedIds);
+      await loadAdmins();
     } catch (error: any) {
     } finally {
       setLoading(false);
@@ -86,13 +102,13 @@ export default function ViewFranchisePage() {
   return (
     <Box>
       <ReusableTable
-        data={franchises}
+        data={admins}
         columns={columns}
-        title="Franchise List"
+        title="Franchise Admin List"
         onEdit={handleEdit}
         onView={handleView}
         onDelete={confirmDelete}
-        onSearchChange={loadFranchises}
+        onSearchChange={loadAdmins}
         loading={loading}
         page={page}
         limit={limit}
@@ -125,4 +141,4 @@ export default function ViewFranchisePage() {
       </ReusableDialog>
     </Box>
   );
-};
+}

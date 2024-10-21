@@ -2,12 +2,12 @@ import { Box, Button, CircularProgress } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
-import { Franchise } from 'src/models/FranchiseModel';
-import { deleteFranchise, fetchFranchises } from 'src/services/franchiseService';
+import { Location } from 'src/models/LocationModel'; // Assuming LocationModel is available
+import { fetchLocations, deleteLocation } from 'src/services/locationService';
 import { useNavigate } from 'react-router-dom';
 
-export default function ViewFranchisePage() {
-  const [franchises, setFranchises] = useState<Franchise[]>([]);
+export default function ViewLocationPage() {
+  const [locations, setLocations] = useState<Location[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -19,38 +19,39 @@ export default function ViewFranchisePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadFranchises();
+    loadLocations();
   }, [limit, page]);
 
-  const loadFranchises = async (searchQuery = '') => {
+  const loadLocations = async (searchQuery = '') => {
     setLoading(true);
     try {
-      const { data, total } = await fetchFranchises(page + 1, limit, searchQuery);
-      setFranchises([...data]);
+      const { data, total } = await fetchLocations(page + 1, limit, searchQuery);
+      setLocations([...data]);
       setTotalCount(total);
     } catch (error) {
+      setErrorMessage('Failed to load locations. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   const columns = [
-    { field: 'name', headerName: 'Franchise Name' },
-    { field: 'ownerName', headerName: 'Owner Name' },
-    { field: 'status', headerName: 'Status', render: (value: any) => (value === '1' ? '1' : '0') },
-    { field: 'totalEmployees', headerName: 'Total Employees' },
-    { field: 'created_at', headerName: 'Created At', render: (value: any) => new Date(value).toLocaleDateString() },
+    { field: 'name', headerName: 'Location Name' },
+    { field: 'address', headerName: 'Address' },
+    { field: 'postalCode', headerName: 'Postal Code' },
+    { field: 'franchiseName', headerName: 'Franchise Name' },
+    { field: 'totalTeachers', headerName: 'Total Teachers' },
+    { field: 'totalStudents', headerName: 'Total Students' },
   ];
 
   const handleEdit = (id: any) => {
-    console.log('Edit franchise with ID:', id);
+    console.log('Edit location with ID:', id);
     navigate(`edit/${id}`);
   };
 
   const handleView = (id: any) => {
-    console.log('View franchise with ID:', id);
+    console.log('View location with ID:', id);
     navigate(`view/${id}`);
-
   };
 
   const handleDelete = async () => {
@@ -58,9 +59,10 @@ export default function ViewFranchisePage() {
     setLoading(true);
 
     try {
-      const response = await deleteFranchise(selectedIds);
-      await loadFranchises();
+      const response = await deleteLocation(selectedIds);
+      await loadLocations();
     } catch (error: any) {
+      setErrorMessage('Failed to delete the location(s).');
     } finally {
       setLoading(false);
     }
@@ -86,13 +88,13 @@ export default function ViewFranchisePage() {
   return (
     <Box>
       <ReusableTable
-        data={franchises}
+        data={locations}
         columns={columns}
-        title="Franchise List"
+        title="Location List"
         onEdit={handleEdit}
         onView={handleView}
         onDelete={confirmDelete}
-        onSearchChange={loadFranchises}
+        onSearchChange={loadLocations}
         loading={loading}
         page={page}
         limit={limit}
@@ -121,8 +123,8 @@ export default function ViewFranchisePage() {
           </>
         }
       >
-        <p>Are you sure you want to delete the selected franchise admins?</p>
+        <p>Are you sure you want to delete the selected locations?</p>
       </ReusableDialog>
     </Box>
   );
-};
+}

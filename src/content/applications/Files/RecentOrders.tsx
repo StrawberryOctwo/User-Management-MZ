@@ -1,15 +1,13 @@
 import { Box, Button, CircularProgress } from '@mui/material';
 import React, { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
-import { Franchise } from 'src/models/FranchiseModel';
-import { deleteFranchise, fetchFranchises } from 'src/services/franchiseService';
-import { useNavigate } from 'react-router-dom';
+import { fetchFiles, deleteFiles } from 'src/services/fileUploadService';
 
-export default function ViewFranchisePage() {
-  const [franchises, setFranchises] = useState<Franchise[]>([]);
+export default function FileUploadContent() {
+  const [files, setFiles] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [totalCount, setTotalCount] = useState(0);
@@ -17,50 +15,61 @@ export default function ViewFranchisePage() {
   const [limit, setLimit] = useState(25);
 
   const navigate = useNavigate();
-
+  
   useEffect(() => {
-    loadFranchises();
+    loadFiles();
   }, [limit, page]);
 
-  const loadFranchises = async (searchQuery = '') => {
+  const loadFiles = async (searchQuery = '') => {
     setLoading(true);
     try {
-      const { data, total } = await fetchFranchises(page + 1, limit, searchQuery);
-      setFranchises([...data]);
+      const { data, total } = await fetchFiles(page + 1, limit, searchQuery);
+      setFiles([...data]);
       setTotalCount(total);
     } catch (error) {
+      console.error('Failed to load files.');
     } finally {
       setLoading(false);
     }
   };
 
   const columns = [
-    { field: 'name', headerName: 'Franchise Name' },
-    { field: 'ownerName', headerName: 'Owner Name' },
-    { field: 'status', headerName: 'Status', render: (value: any) => (value === '1' ? '1' : '0') },
-    { field: 'totalEmployees', headerName: 'Total Employees' },
-    { field: 'created_at', headerName: 'Created At', render: (value: any) => new Date(value).toLocaleDateString() },
+    { field: 'name', headerName: 'File Name' },
+    { field: 'type', headerName: 'File Type' },
+    {
+      field: 'user',
+      headerName: 'Uploaded By',
+      render: (rowData: any) => {
+        // Directly access firstName and lastName from rowData
+        const { firstName, lastName } = rowData;
+        if (firstName && lastName) {
+          return `${firstName} ${lastName}`;
+        }
+        return 'Unknown User';
+      }
+    },
+    {
+      field: 'created_at',
+      headerName: 'Created At',
+      render: (value: any) => new Date(value).toLocaleDateString()
+    }
   ];
+  
+  
+  
+  
 
-  const handleEdit = (id: any) => {
-    console.log('Edit franchise with ID:', id);
-    navigate(`edit/${id}`);
-  };
 
-  const handleView = (id: any) => {
-    console.log('View franchise with ID:', id);
-    navigate(`view/${id}`);
-
-  };
 
   const handleDelete = async () => {
     setDialogOpen(false);
     setLoading(true);
 
     try {
-      const response = await deleteFranchise(selectedIds);
-      await loadFranchises();
+      await deleteFiles(selectedIds);
+      await loadFiles();
     } catch (error: any) {
+      console.error('Failed to delete files.');
     } finally {
       setLoading(false);
     }
@@ -81,18 +90,14 @@ export default function ViewFranchisePage() {
     setPage(0);
   };
 
-  if (errorMessage) return <div>{errorMessage}</div>;
-
   return (
     <Box>
       <ReusableTable
-        data={franchises}
+        data={files}
         columns={columns}
-        title="Franchise List"
-        onEdit={handleEdit}
-        onView={handleView}
+        title="Files List"
         onDelete={confirmDelete}
-        onSearchChange={loadFranchises}
+        onSearchChange={loadFiles}
         loading={loading}
         page={page}
         limit={limit}
@@ -110,19 +115,14 @@ export default function ViewFranchisePage() {
             <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
               Cancel
             </Button>
-            <Button
-              onClick={handleDelete}
-              color="primary"
-              autoFocus
-              disabled={loading}
-            >
+            <Button onClick={handleDelete} color="primary" autoFocus disabled={loading}>
               {loading ? <CircularProgress size={24} /> : 'Confirm'}
             </Button>
           </>
         }
       >
-        <p>Are you sure you want to delete the selected franchise admins?</p>
+        <p>Are you sure you want to delete the selected files?</p>
       </ReusableDialog>
     </Box>
   );
-};
+}

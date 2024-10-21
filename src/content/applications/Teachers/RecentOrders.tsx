@@ -2,12 +2,12 @@ import { Box, Button, CircularProgress } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
-import { Franchise } from 'src/models/FranchiseModel';
-import { deleteFranchise, fetchFranchises } from 'src/services/franchiseService';
+import { fetchTeachers, deleteTeacher } from 'src/services/teacherService';
 import { useNavigate } from 'react-router-dom';
+import { format } from 'date-fns';
 
-export default function ViewFranchisePage() {
-  const [franchises, setFranchises] = useState<Franchise[]>([]);
+export default function TeachersContent() {
+  const [teachers, setTeachers] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -19,38 +19,51 @@ export default function ViewFranchisePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadFranchises();
+    loadTeachers();
   }, [limit, page]);
 
-  const loadFranchises = async (searchQuery = '') => {
+  const loadTeachers = async (searchQuery = '') => {
     setLoading(true);
+    setErrorMessage(null);
     try {
-      const { data, total } = await fetchFranchises(page + 1, limit, searchQuery);
-      setFranchises([...data]);
+      const { data, total } = await fetchTeachers(page + 1, limit, searchQuery);
+      const mappedTeachers = data.map((teacher: any) => ({
+        id: teacher.id,
+        employeeNumber: teacher.employeeNumber,
+        contractStartDate: format(new Date(teacher.contractStartDate), 'dd/MM/yyyy'),
+        contractEndDate: format(new Date(teacher.contractEndDate), 'dd/MM/yyyy'),
+        hourlyRate: teacher.hourlyRate,
+        firstName: teacher.firstName,
+        lastName: teacher.lastName,
+        email: teacher.email,
+        franchise: teacher.franchiseName,
+      }));
+      setTeachers(mappedTeachers);
       setTotalCount(total);
-    } catch (error) {
+    } catch (error: any) {
+      setErrorMessage('Failed to load teachers. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   const columns = [
-    { field: 'name', headerName: 'Franchise Name' },
-    { field: 'ownerName', headerName: 'Owner Name' },
-    { field: 'status', headerName: 'Status', render: (value: any) => (value === '1' ? '1' : '0') },
-    { field: 'totalEmployees', headerName: 'Total Employees' },
-    { field: 'created_at', headerName: 'Created At', render: (value: any) => new Date(value).toLocaleDateString() },
+    { field: 'firstName', headerName: 'First Name' },
+    { field: 'lastName', headerName: 'Last Name' },
+    { field: 'franchise', headerName: 'Franchise Name' },
+    { field: 'email', headerName: 'Email' },
+    { field: 'employeeNumber', headerName: 'Employee Number' },
+    { field: 'contractStartDate', headerName: 'Contract Start Date' },
+    { field: 'contractEndDate', headerName: 'Contract End Date' },
+    { field: 'hourlyRate', headerName: 'Hourly Rate' },
   ];
 
   const handleEdit = (id: any) => {
-    console.log('Edit franchise with ID:', id);
     navigate(`edit/${id}`);
   };
 
   const handleView = (id: any) => {
-    console.log('View franchise with ID:', id);
     navigate(`view/${id}`);
-
   };
 
   const handleDelete = async () => {
@@ -58,9 +71,10 @@ export default function ViewFranchisePage() {
     setLoading(true);
 
     try {
-      const response = await deleteFranchise(selectedIds);
-      await loadFranchises();
+      await deleteTeacher(selectedIds);
+      await loadTeachers();
     } catch (error: any) {
+      setErrorMessage('Failed to delete teachers.');
     } finally {
       setLoading(false);
     }
@@ -86,13 +100,13 @@ export default function ViewFranchisePage() {
   return (
     <Box>
       <ReusableTable
-        data={franchises}
+        data={teachers}
         columns={columns}
-        title="Franchise List"
+        title="Teacher List"
         onEdit={handleEdit}
         onView={handleView}
         onDelete={confirmDelete}
-        onSearchChange={loadFranchises}
+        onSearchChange={loadTeachers}
         loading={loading}
         page={page}
         limit={limit}
@@ -121,8 +135,8 @@ export default function ViewFranchisePage() {
           </>
         }
       >
-        <p>Are you sure you want to delete the selected franchise admins?</p>
+        <p>Are you sure you want to delete the selected teachers?</p>
       </ReusableDialog>
     </Box>
   );
-};
+}

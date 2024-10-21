@@ -32,6 +32,7 @@ import ChromeReaderModeTwoToneIcon from '@mui/icons-material/ChromeReaderModeTwo
 import WorkspacePremiumTwoToneIcon from '@mui/icons-material/WorkspacePremiumTwoTone';
 import CameraFrontTwoToneIcon from '@mui/icons-material/CameraFrontTwoTone';
 import DisplaySettingsTwoToneIcon from '@mui/icons-material/DisplaySettingsTwoTone';
+import { GridFilterListIcon } from '@mui/x-data-grid';
 
 const MenuWrapper = styled(Box)(
   ({ theme }) => `
@@ -276,6 +277,84 @@ function SidebarMenu() {
                   Franchises List
                 </Button>
               </ListItem>
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={RouterLink}
+                  onClick={closeSidebar}
+                  to="/management/files"
+                  startIcon={<GridFilterListIcon />}
+                >
+                  Files
+                </Button>
+              </ListItem>
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={RouterLink}
+                  onClick={closeSidebar}
+                  to="/management/franchise-admins"
+                  startIcon={<GridFilterListIcon />}
+                >
+                  Franchise Admins
+                </Button>
+              </ListItem>
+
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={RouterLink}
+                  onClick={closeSidebar}
+                  to="/management/locations"
+                  startIcon={<GridFilterListIcon />}
+                >
+                  Locations
+                </Button>
+              </ListItem>
+
+
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={RouterLink}
+                  onClick={closeSidebar}
+                  to="/management/location-admins"
+                  startIcon={<GridFilterListIcon />}
+                >
+                  Location Admins
+                </Button>
+              </ListItem>
+
+
+
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={RouterLink}
+                  onClick={closeSidebar}
+                  to="/management/teachers"
+                  startIcon={<GridFilterListIcon />}
+                >
+                  Teachers
+                </Button>
+              </ListItem>
+
+
+
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={RouterLink}
+                  onClick={closeSidebar}
+                  to="/management/students"
+                  startIcon={<GridFilterListIcon />}
+                >
+                  Students
+                </Button>
+              </ListItem>
+
+
+
             </List>
           </SubMenuWrapper>
         </List>

@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { useSessionExpiration } from '../contexts/SessionExpirationContext';
 import { useSnackbar } from '../contexts/SnackbarContext'; // Import Snackbar context
+import { Cookies } from 'react-cookie';
 
 // Create an Axios instance
 export const api = axios.create({
@@ -8,6 +9,24 @@ export const api = axios.create({
   withCredentials: true, // Allow sending cookies with requests
 });
 
+const cookies = new Cookies();
+
+const getToken = () => {
+  return cookies.get('token');
+};
+
+api.interceptors.request.use(
+  (config) => {
+    const token = getToken();
+    if (token) {
+      config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => {
+    return Promise.reject(error);
+  }
+);
 // Set up Axios interceptors globally
 export const useAxiosInterceptors = () => {
   const { triggerSessionExpiration } = useSessionExpiration();

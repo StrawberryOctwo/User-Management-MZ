@@ -8,21 +8,25 @@ type SnackbarContextType = {
 
 const SnackbarContext = createContext<SnackbarContextType | undefined>(undefined);
 
-// Custom styled Alert component with white icon and dynamic background color
-const CustomAlert = styled(Alert)<{ severity: 'success' | 'error' }>(({ theme, severity }) => ({
-  fontSize: '1.2rem', // Larger font size
-  fontWeight: 'bold', // Bold font
-  backgroundColor: severity === 'success' ? theme.palette.success.main : theme.palette.error.main, // Green for success, red for error
-  color: theme.palette.common.white, // White text for both cases
-  boxShadow: theme.shadows[4], // Add some shadow for depth
-  borderRadius: '8px', // Rounded corners
-  padding: theme.spacing(2), // Add padding for larger size
-  maxWidth: '600px', // Make the snackbar wider
-  textAlign: 'center', // Center text
-  '& .MuiAlert-icon': {
-    color: theme.palette.common.white, // Make the icon white regardless of severity
-  },
-}));
+const CustomAlert = styled(Alert)<{ severity: 'success' | 'error' }>(
+  ({ theme, severity }) => ({
+    fontSize: 16, 
+    fontWeight: 'regular',
+    backgroundColor: theme.palette[severity].main,
+    color: theme.palette.common.white,
+    boxShadow: theme.shadows[4],
+    borderRadius: 7,
+    padding: theme.spacing(1),
+    maxWidth: 400, // Maximum width
+    minWidth: 200, // Minimum width (for responsiveness)
+    maxHeight: 150, // Maximum height
+    minHeight:50,
+    textAlign: 'center',
+    '& .MuiAlert-icon': { color: theme.palette.common.white },
+  })
+);
+
+
 
 export const SnackbarProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [open, setOpen] = useState(false);

@@ -34,7 +34,93 @@ const Messenger = Loader(
 );
 const Transactions = Loader(
   lazy(() => import('src/content/applications/Transactions'))
+
 );
+
+
+const Files = Loader(
+  lazy(() => import('src/content/applications/Files'))
+);
+
+
+
+
+const FranchiseAdmins = Loader(
+  lazy(() => import('src/content/applications/FranchiseAdmins'))
+);
+
+const FranchiseAdminsCreate = Loader(
+  lazy(() => import('src/content/applications/FranchiseAdmins/Create'))
+);
+
+const FranchiseAdminsView = Loader(
+  lazy(() => import('src/content/applications/FranchiseAdmins/View'))
+);
+const FranchiseAdminsEdit = Loader(
+  lazy(() => import('src/content/applications/FranchiseAdmins/Edit'))
+);
+
+
+
+const Location = Loader(
+  lazy(() => import('src/content/applications/Locations'))
+);
+
+const LocationCreate = Loader(
+  lazy(() => import('src/content/applications/Locations/Create'))
+);
+
+const LocationView = Loader(
+  lazy(() => import('src/content/applications/Locations/View'))
+);
+const LocationEdit = Loader(
+  lazy(() => import('src/content/applications/Locations/Edit'))
+);
+
+
+const LocationAdmins = Loader(
+  lazy(() => import('src/content/applications/LocationAdmins'))
+);
+const LocationAdminsCreate = Loader(
+  lazy(() => import('src/content/applications/LocationAdmins/Create'))
+);
+const LocationAdminsEdit = Loader(
+  lazy(() => import('src/content/applications/LocationAdmins/Edit'))
+);
+
+const LocationAdminsView = Loader(
+  lazy(() => import('src/content/applications/LocationAdmins/View'))
+);
+
+
+
+const Teachers = Loader(
+  lazy(() => import('src/content/applications/Teachers'))
+);
+const TeachersCreate = Loader(
+  lazy(() => import('src/content/applications/Teachers/Create'))
+);
+const TeachersView = Loader(
+  lazy(() => import('src/content/applications/Teachers/View'))
+);
+const TeachersEdit = Loader(
+  lazy(() => import('src/content/applications/Teachers/Edit'))
+);
+
+const Students = Loader(
+  lazy(() => import('src/content/applications/Students'))
+);
+const StudentsCreate = Loader(
+  lazy(() => import('src/content/applications/Students/Create'))
+);
+const StudentsView = Loader(
+  lazy(() => import('src/content/applications/Students/View'))
+);
+const StudentsEdit = Loader(
+  lazy(() => import('src/content/applications/Students/Edit'))
+);
+
+
 const Franchises = Loader(
   lazy(() => import('src/content/applications/Franchises'))
 );
@@ -47,6 +133,8 @@ const FranchiseEdit = Loader(
 
 const FranchiseView = Loader(
   lazy(() => import('src/content/applications/Franchises/View'))
+
+
 );
 const UserProfile = Loader(
   lazy(() => import('src/content/applications/Users/profile'))
@@ -199,6 +287,96 @@ const routes: RouteObject[] = [
           {
             path: 'franchises/view/:id',
             element: <FranchiseView/>
+          },
+
+          {
+            path: 'files/',
+            element: <Files/>
+          },
+
+          {
+            path: 'franchise-admins/',
+            element: <FranchiseAdmins/>
+          },
+          {
+            path: 'franchise-admins/create',
+            element: <FranchiseAdminsCreate/>
+            },
+          {
+          path: 'franchise-admins/view/:id',
+          element: <FranchiseAdminsView/>
+          },
+          {
+            path: 'franchise-admins/edit/:id',
+            element: <FranchiseAdminsEdit/>
+            },
+
+          {
+            path: 'locations/',
+            element: <Location/>
+          },
+          {
+            path: 'locations/create',
+            element: <LocationCreate/>
+          },
+          {
+            path: 'locations/view/:id',
+            element: <LocationView/>
+          },
+          {
+            path: 'locations/edit/:id',
+            element: <LocationEdit/>
+          },
+
+          {
+            path: 'location-admins/',
+            element: <LocationAdmins/>
+          },
+          {
+            path: 'location-admins/create',
+            element: <LocationAdminsCreate/>
+          },
+          {
+            path: 'location-admins/view/:id',
+            element: <LocationAdminsView/>
+          },
+          {
+            path: 'location-admins/edit/:id',
+            element: <LocationAdminsEdit/>
+          },
+          {
+            path: 'teachers/',
+            element: <Teachers/>
+          },
+          {
+            path: 'teachers/create',
+            element: <TeachersCreate/>
+          },
+          {
+            path: 'teachers/view/:id',
+            element: <TeachersView/>
+          },
+          {
+            path: 'teachers/edit/:id',
+            element: <TeachersEdit/>
+          },
+
+          {
+            path: 'students/',
+            element: <Students/>
+          },
+          {
+            path: 'students/create',
+            element: <StudentsCreate/>
+          },
+
+          {
+            path: 'students/view/:id',
+            element: <StudentsView/>
+          },
+          {
+            path: 'students/edit/:id',
+            element: <StudentsEdit/>
           },
           {
             path: 'profile',

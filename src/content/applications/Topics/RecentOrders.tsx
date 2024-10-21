@@ -2,6 +2,7 @@ import { Box, Button, CircularProgress } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
+import { useSnackbar } from 'src/contexts/SnackbarContext';
 import { Franchise } from 'src/models/FranchiseModel';
 import { deleteFranchise, fetchFranchises } from 'src/services/franchiseService';
 import { useNavigate } from 'react-router-dom';
@@ -16,6 +17,7 @@ export default function ViewFranchisePage() {
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(25);
 
+  const { showMessage } = useSnackbar();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -29,6 +31,7 @@ export default function ViewFranchisePage() {
       setFranchises([...data]);
       setTotalCount(total);
     } catch (error) {
+      showMessage('Failed to load franchises.', 'error');
     } finally {
       setLoading(false);
     }
@@ -59,8 +62,11 @@ export default function ViewFranchisePage() {
 
     try {
       const response = await deleteFranchise(selectedIds);
+      showMessage(response.message, 'success');
       await loadFranchises();
     } catch (error: any) {
+      const errorMessage = error.response?.data?.message || 'Failed to delete franchises.';
+      showMessage(errorMessage, 'error');
     } finally {
       setLoading(false);
     }
@@ -94,6 +100,7 @@ export default function ViewFranchisePage() {
         onDelete={confirmDelete}
         onSearchChange={loadFranchises}
         loading={loading}
+        error={!!errorMessage}
         page={page}
         limit={limit}
         totalCount={totalCount}

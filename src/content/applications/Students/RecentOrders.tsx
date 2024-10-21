@@ -2,12 +2,11 @@ import { Box, Button, CircularProgress } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
-import { Franchise } from 'src/models/FranchiseModel';
-import { deleteFranchise, fetchFranchises } from 'src/services/franchiseService';
+import { fetchStudents, deleteStudent } from 'src/services/studentService';
 import { useNavigate } from 'react-router-dom';
 
-export default function ViewFranchisePage() {
-  const [franchises, setFranchises] = useState<Franchise[]>([]);
+export default function StudentsContent() {
+  const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -19,38 +18,41 @@ export default function ViewFranchisePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadFranchises();
+    loadStudents();
   }, [limit, page]);
 
-  const loadFranchises = async (searchQuery = '') => {
+  const loadStudents = async (searchQuery = '') => {
     setLoading(true);
+    setErrorMessage(null);
     try {
-      const { data, total } = await fetchFranchises(page + 1, limit, searchQuery);
-      setFranchises([...data]);
+      const { data, total } = await fetchStudents(page + 1, limit, searchQuery);
+      setStudents([...data]);
       setTotalCount(total);
-    } catch (error) {
+    } catch (error: any) {
+      if (error.response?.data?.message.includes('TokenExpiredError')) {
+      } else {
+        setErrorMessage('Failed to load students. Please try again.');
+      }
     } finally {
       setLoading(false);
     }
   };
 
   const columns = [
-    { field: 'name', headerName: 'Franchise Name' },
-    { field: 'ownerName', headerName: 'Owner Name' },
-    { field: 'status', headerName: 'Status', render: (value: any) => (value === '1' ? '1' : '0') },
-    { field: 'totalEmployees', headerName: 'Total Employees' },
-    { field: 'created_at', headerName: 'Created At', render: (value: any) => new Date(value).toLocaleDateString() },
+    { field: 'firstName', headerName: 'First Name' },
+    { field: 'lastName', headerName: 'Last Name' },
+    { field: 'email', headerName: 'Email' },
+    { field: 'gradeLevel', headerName: 'Grade Level' },
+    { field: 'status', headerName: 'Status' },
+    { field: 'payPerHour', headerName: 'Pay Per Hour' },
   ];
 
   const handleEdit = (id: any) => {
-    console.log('Edit franchise with ID:', id);
     navigate(`edit/${id}`);
   };
 
   const handleView = (id: any) => {
-    console.log('View franchise with ID:', id);
     navigate(`view/${id}`);
-
   };
 
   const handleDelete = async () => {
@@ -58,9 +60,10 @@ export default function ViewFranchisePage() {
     setLoading(true);
 
     try {
-      const response = await deleteFranchise(selectedIds);
-      await loadFranchises();
+      await deleteStudent(selectedIds);
+      await loadStudents();
     } catch (error: any) {
+      setErrorMessage('Failed to delete students.');
     } finally {
       setLoading(false);
     }
@@ -86,13 +89,13 @@ export default function ViewFranchisePage() {
   return (
     <Box>
       <ReusableTable
-        data={franchises}
+        data={students}
         columns={columns}
-        title="Franchise List"
+        title="Student List"
         onEdit={handleEdit}
         onView={handleView}
         onDelete={confirmDelete}
-        onSearchChange={loadFranchises}
+        onSearchChange={loadStudents}
         loading={loading}
         page={page}
         limit={limit}
@@ -121,8 +124,8 @@ export default function ViewFranchisePage() {
           </>
         }
       >
-        <p>Are you sure you want to delete the selected franchise admins?</p>
+        <p>Are you sure you want to delete the selected students?</p>
       </ReusableDialog>
     </Box>
   );
-};
+}
