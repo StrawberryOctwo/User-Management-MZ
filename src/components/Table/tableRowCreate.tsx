@@ -1,35 +1,52 @@
 import React, { useState, ReactNode, useEffect } from 'react';
-import { Button, TextField, Box, Grid, Paper, Typography, Divider } from '@mui/material';
+import {
+  Button,
+  TextField,
+  Box,
+  Grid,
+  Paper,
+  Typography,
+  Divider,
+  MenuItem,
+  Select,
+  InputLabel,
+  FormControl,
+  SelectChangeEvent
+} from '@mui/material';
 
 export interface FieldConfig {
   name: string;
   label: string;
   type: string;
   required?: boolean;
-  options?: { label: string; value: string | number }[]; // For select fields
-  section?: string; // New property to define the section
-  component?: ReactNode; // New property to define a custom component
-  xs?: number; // New property to define xs grid size
-  sm?: number; // New property to define sm grid size
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void; // Allow onChange handler
-  disabled?: boolean; // Add disabled support
-  value?: string | number; // Ensure value is supported
+  options?: { label: string; value: number | string }[]; // For select fields
+  section?: string;
+  component?: ReactNode;
+  xs?: number;
+  sm?: number;
+  onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
+  disabled?: boolean;
+  value?: string | number;
 }
 
 interface ReusableFormProps {
   fields: FieldConfig[];
-  onSubmit: (data: Record<string, any>) => Promise<{ message: string }>; // Expects a Promise that resolves to FormResponse
+  onSubmit: (data: Record<string, any>) => Promise<{ message: string }>;
   entityName: string;
   entintyFunction: string;
-  initialData?: Record<string, any>; // Add initialData prop
+  initialData?: Record<string, any>;
 }
 
-const ReusableForm: React.FC<ReusableFormProps> = ({ fields, onSubmit, entityName, entintyFunction, initialData = {} }) => {
-  
-  // Initialize formData state with default values if initialData is empty (for create form)
+const ReusableForm: React.FC<ReusableFormProps> = ({
+  fields,
+  onSubmit,
+  entityName,
+  entintyFunction,
+  initialData = {},
+}) => {
   const getInitialFormData = () => {
     return fields.reduce((acc, field) => {
-      acc[field.name] = initialData[field.name] ?? (field.type === 'number' ? 0 : ''); // Handle number and string defaults
+      acc[field.name] = initialData[field.name] ?? (field.name === 'status' ? 1 : field.type === 'number' ? 0 : ''); // Default status to 1
       return acc;
     }, {} as Record<string, any>);
   };
@@ -42,41 +59,35 @@ const ReusableForm: React.FC<ReusableFormProps> = ({ fields, onSubmit, entityNam
     }
   }, [initialData, fields]);
 
-  const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({
-      ...formData,
-      [event.target.name]: event.target.value,
-    });
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement> | SelectChangeEvent<any>
+  ) => {
+    const { name, value } = event.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name!]: value,
+    }));
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
     try {
       const response = await onSubmit(formData);
-      // Only reset the form if it's an "Add" form, not "Edit"
       if (entintyFunction.toLowerCase() === 'add') {
         setFormData(fields.reduce((acc, field) => {
-          acc[field.name] = field.type === 'number' ? 0 : ''; // Initialize with default values
+          acc[field.name] = field.type === 'number' ? 0 : '';
           return acc;
         }, {} as Record<string, any>));
       }
-      
-      // showMessage(successMessage, 'success');
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || `Failed to update ${entityName}. Please try again.`;
-      // showMessage(errorMessage, 'error');
+      console.error(`Failed to ${entintyFunction} ${entityName}:`, error);
     }
   };
 
-  // Group fields by sections
   const groupedFields = fields.reduce((acc, field) => {
-    if (field.section) {
-      if (!acc[field.section]) acc[field.section] = [];
-      acc[field.section].push(field);
-    } else {
-      if (!acc['Other']) acc['Other'] = [];
-      acc['Other'].push(field);
-    }
+    const section = field.section || 'Other';
+    if (!acc[section]) acc[section] = [];
+    acc[section].push(field);
     return acc;
   }, {} as Record<string, FieldConfig[]>);
 
@@ -96,22 +107,37 @@ const ReusableForm: React.FC<ReusableFormProps> = ({ fields, onSubmit, entityNam
                 <Grid
                   item
                   key={field.name}
-                  xs={field.xs || 12} // Default to xs={12} if not provided
-                  sm={field.sm || 6} // Default to sm={6} if not provided
+                  xs={field.xs || 12}
+                  sm={field.sm || 6}
                   sx={{ display: 'flex', justifyContent: 'center' }}
                 >
-                  {field.component ? (
+                  {field.name === 'status' ? (
+                    <FormControl fullWidth sx={{ width: '95%' }}>
+                      <InputLabel>{field.label}</InputLabel>
+                      <Select
+                        name={field.name}
+                        label={field.name}
+                        value={formData[field.name] ?? ''}
+                        onChange={handleChange} // Now correctly typed
+                        required={field.required}
+                        disabled={field.disabled}
+                      >
+                        <MenuItem value={1}>Active</MenuItem>
+                        <MenuItem value={0}>Inactive</MenuItem>
+                      </Select>
+                    </FormControl>
+                  ) : field.component ? (
                     field.component
                   ) : (
                     <TextField
                       name={field.name}
                       label={field.label}
                       type={field.type}
-                      sx={{ width: '95%' }} // Set width to 95%
-                      value={formData[field.name] ?? ''} // Use formData for the value
-                      onChange={field.onChange || handleChange} // Allow custom onChange if provided, else default
+                      sx={{ width: '95%' }}
+                      value={formData[field.name] ?? ''}
+                      onChange={field.onChange || handleChange}
                       required={field.required}
-                      disabled={field.disabled} // Add disabled support
+                      disabled={field.disabled}
                       InputLabelProps={field.type === 'date' ? { shrink: true } : undefined}
                     />
                   )}

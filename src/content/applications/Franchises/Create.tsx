@@ -41,7 +41,7 @@ const CreateFranchise = () => {
         { name: 'cardHolderName', label: t('card_holder_name'), type: 'text', required: true, section: 'Franchise Information' },
         { name: 'iban', label: t('iban'), type: 'text', required: true, section: 'Franchise Information' },
         { name: 'bic', label: t('bic'), type: 'text', required: true, section: 'Franchise Information' },
-        { name: 'status', label: t('status'), type: 'text', required: true, section: 'Franchise Information' }, // You may want to make this a dropdown for predefined statuses
+        { name: 'status', label: t('status'), type: 'text', required: true, section: 'Franchise Information' },
         { name: 'totalEmployees', label: t('total_employees'), type: 'number', required: true, section: 'Franchise Information' },
     ];
     return (
