@@ -4,6 +4,7 @@ import Typography from '@mui/material/Typography';
 import CustomizedCalendar from "./Components/CustomizedCalendar/CustomizedCalendar";
 import moment from "moment";
 import { EventItem } from './types';
+import 'react-big-calendar/lib/css/react-big-calendar.css';
 
 import { t } from 'i18next';
 import FilterToolbar from './Components/CustomizedCalendar/FilterToolbar';
@@ -72,7 +73,7 @@ const CalendarContent: React.FC = () => {
             studentCount: session.students.length,
             startTime: moment(session.sessionStartDate).format('HH:mm'),
             endTime: moment(session.sessionEndDate).format('HH:mm'),
-            
+
             sessionType: session.sessionType,
           }
         },
@@ -173,35 +174,35 @@ const CalendarContent: React.FC = () => {
         />
       )}
 
-  (
-        <Box sx={{ position: 'relative', height: '100%', overflow: 'hidden' }}>
-          <CustomizedCalendar
-            classSessionEvents={classSessionEvents}
-            onDateChange={handleDateChange}
-            handleSaveClassSession={handleSaveClassSession}
-            loadClassSessions={loadClassSessions}
-          />
-          {!selectedLocation && strongestRole !== 'Teacher' && strongestRole !== 'Student' && (
-            <Box
-              sx={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                height: '100%',
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 1000,
-              }}
-            >
-              <Typography variant="h6" color="white">
-                Please enter a franchise and location to view the calendar.
-              </Typography>
-            </Box>
-          )}
-        </Box>
+      (
+      <Box sx={{ position: 'relative', height: '100%', overflow: 'hidden' }}>
+        <CustomizedCalendar
+          classSessionEvents={classSessionEvents}
+          onDateChange={handleDateChange}
+          handleSaveClassSession={handleSaveClassSession}
+          loadClassSessions={loadClassSessions}
+        />
+        {!selectedLocation && strongestRole !== 'Teacher' && strongestRole !== 'Student' && (
+          <Box
+            sx={{
+              position: 'absolute',
+              top: 0,
+              left: 0,
+              width: '100%',
+              height: '100%',
+              backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              zIndex: 1000,
+            }}
+          >
+            <Typography variant="h6" color="white">
+              Please enter a franchise and location to view the calendar.
+            </Typography>
+          </Box>
+        )}
+      </Box>
       )
       <CalendarLegend />
     </Box>
