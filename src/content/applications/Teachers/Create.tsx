@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Box from '@mui/material/Box';
+import Button from '@mui/material/Button';
 import { t } from 'i18next';
 import UploadSection from 'src/components/Files/UploadDocuments';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
@@ -9,40 +10,24 @@ import { assignTeacherToLocations, fetchLocations } from 'src/services/locationS
 import { addTeacher } from 'src/services/teacherService';
 import { assignTeacherToTopics, fetchTopics } from 'src/services/topicService';
 import { generateEmployeeNumber } from 'src/utils/teacherUtils';
+import { TextField } from '@mui/material';
 
 const CreateTeacher = () => {
     const [selectedLocations, setSelectedLocations] = useState<any[]>([]);
     const [selectedTopics, setSelectedTopics] = useState<any[]>([]);
     const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
-    const [intervalId, setIntervalId] = useState<number | null>(null);
+    const [employeeNumber, setEmployeeNumber] = useState(''); // Only tracking employeeNumber
 
-    // New states for form fields
-    const [formData, setFormData] = useState({
-        firstName: '',
-        lastName: '',
-        dob: '',
-        employeeNumber: '', // Auto-generated employee number
-    });
-
-    // Function to start generating employee number every 1 second once fields are filled
-    useEffect(() => {
-        if (formData.firstName && formData.lastName && formData.dob && !intervalId) {
-            const id = window.setInterval(() => {
-                const generatedEmployeeNumber = generateEmployeeNumber(formData.firstName, formData.lastName, formData.dob);
-                setFormData((prevData) => ({ ...prevData, employeeNumber: generatedEmployeeNumber }));
-            }, 1000);
-            setIntervalId(id);
+    // Function to generate the employee number based on form data
+    const handleGenerateEmployeeNumber = (formData: { firstName: string; lastName: string; dob: string }) => {
+        if (formData.firstName && formData.lastName && formData.dob) {
+            const generatedEmployeeNumber = generateEmployeeNumber(formData.firstName, formData.lastName, formData.dob);
+            setEmployeeNumber(generatedEmployeeNumber); // Update the employeeNumber state
+        } else {
+            alert('Please fill in First Name, Last Name, and Date of Birth before generating the employee number.');
         }
-
-        // Clean up interval on unmount or when fields change
-        return () => {
-            if (intervalId) {
-                clearInterval(intervalId);
-                setIntervalId(null);
-            }
-        };
-    }, [formData.firstName, formData.lastName, formData.dob]);
+    };
 
     const handleLocationSelect = (selectedItems: any[]) => {
         setSelectedLocations(selectedItems);
@@ -56,14 +41,6 @@ const CreateTeacher = () => {
         setUploadedFiles(files);
     };
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const { name, value } = e.target;
-        setFormData((prevData) => ({
-            ...prevData,
-            [name]: value,
-        }));
-    };
-
     const handleTeacherSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
         setLoading(true);
         try {
@@ -72,9 +49,9 @@ const CreateTeacher = () => {
 
             const payload = {
                 user: {
-                    firstName: formData.firstName,
-                    lastName: formData.lastName,
-                    dob: formData.dob,
+                    firstName: data.firstName,  // Using the value entered in the form fields
+                    lastName: data.lastName,    // Using the value entered in the form fields
+                    dob: data.dob,              // Using the value entered in the form fields
                     email: data.email,
                     password: data.password,
                     address: data.address,
@@ -82,7 +59,7 @@ const CreateTeacher = () => {
                     phoneNumber: data.phoneNumber,
                 },
                 teacher: {
-                    employeeNumber: formData.employeeNumber, // Use the generated employee number
+                    employeeNumber: employeeNumber, // Use the generated employee number
                     idNumber: data.idNumber,
                     taxNumber: data.taxNumber,
                     contractStartDate: data.contractStartDate,
@@ -94,14 +71,10 @@ const CreateTeacher = () => {
                 }
             };
 
-            // Step 1: Create the teacher
             const response = await addTeacher(payload);
-
-            // Step 2: Assign the teacher to multiple locations and multiple topics
             await assignTeacherToLocations(response.teacherId, locationIds);
             await assignTeacherToTopics(response.teacherId, topicIds);
 
-            // Step 3: Upload documents for the created teacher
             const userId = response.userId;
             for (const file of uploadedFiles) {
                 const documentPayload = {
@@ -109,7 +82,6 @@ const CreateTeacher = () => {
                     customFileName: file.fileName,
                     userId: userId,
                 };
-
                 await addDocument(documentPayload, file.file);
             }
 
@@ -125,9 +97,9 @@ const CreateTeacher = () => {
     };
 
     const userFields: FieldConfig[] = [
-        { name: 'firstName', label: t('first_name'), type: 'text', required: true, section: 'User Information', onChange: handleInputChange },
-        { name: 'lastName', label: t('last_name'), type: 'text', required: true, section: 'User Information', onChange: handleInputChange },
-        { name: 'dob', label: t('dob'), type: 'date', required: true, section: 'User Information', onChange: handleInputChange },
+        { name: 'firstName', label: t('first_name'), type: 'text', required: true, section: 'User Information' },
+        { name: 'lastName', label: t('last_name'), type: 'text', required: true, section: 'User Information' },
+        { name: 'dob', label: t('dob'), type: 'date', required: true, section: 'User Information' },
         { name: 'email', label: t('email'), type: 'email', required: true, section: 'User Information' },
         { name: 'password', label: t('password'), type: 'password', required: true, section: 'User Information' },
         { name: 'address', label: t('address'), type: 'text', required: true, section: 'User Information' },
@@ -138,7 +110,39 @@ const CreateTeacher = () => {
     const teacherFields = [
         { name: 'hourlyRate', label: 'Hourly Rate', type: 'number', required: true, section: 'Teacher Information' },
         { name: 'taxNumber', label: 'Tax Number', type: 'text', required: true, section: 'Teacher Information' },
-        { name: 'employeeNumber', label: 'Employee Number', type: 'text', value: formData.employeeNumber, disabled: true, required: true, section: 'Teacher Information' }, // Disabled and auto-filled
+        {
+            name: 'employeeNumber',
+            label: 'Employee Number',
+            type: 'custom',
+            required: true,
+            section: 'Teacher Information',
+            component: (
+                <Box display="flex" alignItems="center" gap={1} sx={{ width: '95%' }}>
+                <TextField
+                    label="Employee Number"
+                    value={employeeNumber}
+                    variant="outlined"
+                    fullWidth
+                    InputProps={{
+                        readOnly: true,
+                    }}
+                />
+                <Button
+                    variant="contained"
+                    onClick={() =>
+                        handleGenerateEmployeeNumber({
+                            firstName: document.querySelector<HTMLInputElement>('[name="firstName"]')?.value || '',
+                            lastName: document.querySelector<HTMLInputElement>('[name="lastName"]')?.value || '',
+                            dob: document.querySelector<HTMLInputElement>('[name="dob"]')?.value || '',
+                        })
+                    }
+                    sx={{ height: '56px' }} // Matching the height of TextField for better alignment
+                >
+                    Generate
+                </Button>
+            </Box>
+            ),
+        },
         { name: 'idNumber', label: 'ID Number', type: 'text', required: false, section: 'Teacher Information' },
         { name: 'contractStartDate', label: 'Contract Start Date', type: 'date', required: true, section: 'Teacher Information' },
         { name: 'contractEndDate', label: 'Contract End Date', type: 'date', required: true, section: 'Teacher Information' },
@@ -149,7 +153,7 @@ const CreateTeacher = () => {
             name: 'locations',
             label: 'Locations',
             type: 'custom',
-            required: true, 
+            required: true,
             section: 'Teacher Assignment',
             component: (
                 <MultiSelectWithCheckboxes
@@ -181,7 +185,7 @@ const CreateTeacher = () => {
             label: 'Upload Documents',
             type: 'custom',
             section: 'Documents',
-            component: <UploadSection onUploadChange={handleFilesChange} />, // Pass the handler to capture uploaded files
+            component: <UploadSection onUploadChange={handleFilesChange} />,
             xs: 12,
             sm: 12,
         }
