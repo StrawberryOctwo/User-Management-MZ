@@ -14,6 +14,7 @@ import {
   Box,
   FormControlLabel,
   Typography,
+  Checkbox,
 } from '@mui/material';
 import moment from 'moment';
 
@@ -47,7 +48,7 @@ export default function AddClassSessionModal({
 }: {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (newSession: ClassSession) => void;
+  onSave: (newSession: any) => void;
   initialStartDate: Date;
   initialEndDate: Date;
 }) {
@@ -67,11 +68,16 @@ export default function AddClassSessionModal({
   const [selectedStudents, setSelectedStudents] = useState<any[]>([]);
   const [selectedTeacher, setSelectedTeacher] = useState<any | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<any | null>(null);
-  const [maxStudents, setMaxStudents] = useState(4); // Default max students for group sessions
+  const [maxStudents, setMaxStudents] = useState(4);
   const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string | null }>({});
   const [studentError, setStudentError] = useState<string | null>(null);
   const [startTimeError, setStartTimeError] = useState<string | null>(null);
   const [endTimeError, setEndTimeError] = useState<string | null>(null);
+
+  const [isRepeat, setIsRepeat] = useState(false);
+  const [repeatUntilDate, setRepeatUntilDate] = useState<Date | null>(null);
+  const [repeatUntilWeek, setRepeatUntilWeek] = useState<string | null>(null);
+
 
   const validateTime = (date: Date | null, type: 'start' | 'end'): boolean => {
     if (date) {
@@ -82,34 +88,35 @@ export default function AddClassSessionModal({
         } else {
           setEndTimeError(t('errors.invalidEndTime'));
         }
-        return false; // Indicates invalid time
+        return false;
       } else {
-        if (type === 'start') {
-          setStartTimeError(null);
-        } else {
-          setEndTimeError(null);
-        }
-        return true; // Indicates valid time
+        setStartTimeError(null);
+        setEndTimeError(null);
+        return true;
       }
     }
     return false;
   };
 
-
   const handleSave = () => {
-    // Validate all required fields
     const errors: { [key: string]: string | null } = {};
+    const sessionArray: ClassSession[] = [];
 
+    // Validate required fields
     if (!newSession.name.trim()) errors.name = t('errors.classNameRequired');
     if (!newSession.sessionStartDate) errors.sessionStartDate = t('errors.startTimeRequired');
     if (!newSession.sessionEndDate) errors.sessionEndDate = t('errors.endTimeRequired');
     if (!selectedTeacher) errors.teacherId = t('errors.teacherSelectionRequired');
     if (!selectedTopic) errors.topicId = t('errors.topicSelectionRequired');
 
-    // Validate student selection based on the session type
-    const { validatedStudents, error } = validateStudentSelection(newSession.sessionType, selectedStudents, maxStudents);
+    const { validatedStudents, error } = validateStudentSelection(
+      newSession.sessionType,
+      selectedStudents,
+      maxStudents
+    );
+
     if (error) {
-      setStudentError(error); // Set the student error if validation fails
+      setStudentError(error);
       errors.studentIds = error;
     } else {
       setStudentError(null);
@@ -117,35 +124,75 @@ export default function AddClassSessionModal({
 
     setFieldErrors(errors);
 
-    // Validate the time fields
     const isStartTimeValid = validateTime(new Date(newSession.sessionStartDate), 'start');
     const isEndTimeValid = validateTime(new Date(newSession.sessionEndDate), 'end');
 
-    // Check if there are any errors
+    // Check for any errors or invalid times
     if (
       Object.values(errors).some((error) => error !== null) ||
       !isStartTimeValid ||
       !isEndTimeValid
     ) {
-      return; // Exit if any errors exist or if times are invalid
+      return; // Exit if any validation fails
     }
-    setNewSession((prev) => ({
-      ...prev,
-      studentIds: validatedStudents.map((student) => student.id),
-    }));
-    onSave(newSession);
+
+    // Handle repeated sessions if applicable
+    if (isRepeat && repeatUntilWeek) {
+      const untilDate = parseWeekToDate(repeatUntilWeek);
+
+      let currentStartDate = new Date(newSession.sessionStartDate);
+      let currentEndDate = new Date(newSession.sessionEndDate);
+
+      console.log('Repeating sessions:');
+      // Loop to generate sessions until the repeat week
+      while (moment(currentStartDate).isSameOrBefore(untilDate, 'week')) {
+        console.log(`Start: ${moment(currentStartDate).format('YYYY-MM-DD HH:mm')}`);
+        console.log(`End: ${moment(currentEndDate).format('YYYY-MM-DD HH:mm')}`);
+
+        sessionArray.push({
+          ...newSession,
+          sessionStartDate: new Date(currentStartDate),
+          sessionEndDate: new Date(currentEndDate),
+          studentIds: validatedStudents.map((student) => student.id),
+        });
+
+        currentStartDate.setDate(currentStartDate.getDate() + 7);
+        currentEndDate.setDate(currentEndDate.getDate() + 7);
+      }
+    } else {
+      sessionArray.push({
+        ...newSession,
+        studentIds: validatedStudents.map((student) => student.id),
+      });
+    }
+
+    console.log('Final Sessions Array:', sessionArray);
+
+    onSave(sessionArray);
+
     clearForm();
     onClose();
   };
 
+  const parseWeekToDate = (weekString: string): Date => {
+    const [year, week] = weekString.split('-W').map(Number);
+    const firstDayOfYear = new Date(year, 0, 1);
+    const daysOffset = (week - 1) * 7;
 
-  // Handle the logic for 1-on-1 or group sessions
+    // Adjust to the correct day of the week (Monday)
+    const dayOffset = firstDayOfYear.getDay() <= 4
+      ? 1 - firstDayOfYear.getDay()
+      : 8 - firstDayOfYear.getDay();
+
+    return new Date(year, 0, 1 + dayOffset + daysOffset);
+  };
+
   useEffect(() => {
     if (newSession.sessionType === "1on1") {
-      setSelectedStudents((prev) => prev.slice(0, 1)); // Restrict to one student
+      setSelectedStudents((prev) => prev.slice(0, 1));
       setMaxStudents(1);
     } else {
-      setMaxStudents(4); // Default max for group sessions
+      setMaxStudents(4);
     }
   }, [newSession.sessionType]);
 
@@ -176,7 +223,7 @@ export default function AddClassSessionModal({
     setFieldErrors({});
   };
 
-  const validateStudentSelection = (sessionType: string, students: any[], maxGroupSize: number = 4): { validatedStudents: any[]; error: string | null } => {
+  const validateStudentSelection = (sessionType: string, students: any[], maxGroupSize: number = 4) => {
     if (sessionType === "1on1" && students.length !== 1) {
       return {
         validatedStudents: students.slice(0, 1),
@@ -188,11 +235,7 @@ export default function AddClassSessionModal({
         error: `You can select up to ${maxGroupSize} students for a group session.`,
       };
     }
-    // For 'Online' or valid 'Group' session, no restriction
-    return {
-      validatedStudents: students,
-      error: null,
-    };
+    return { validatedStudents: students, error: null };
   };
 
 
@@ -266,31 +309,53 @@ export default function AddClassSessionModal({
           />
         </Box>
 
-        <FormControlLabel
-          control={
-            <Switch
-              checked={newSession.isActive}
-              onChange={(e) =>
-                setNewSession({ ...newSession, isActive: e.target.checked })
-              }
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 2 }}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={isRepeat}
+                onChange={(e) => setIsRepeat(e.target.checked)}
+              />
+            }
+            label="Repeat Weekly Until"
+          />
+          {isRepeat && (
+            <TextField
+              type="week"
+              fullWidth
+              value={repeatUntilWeek || ''}
+              onChange={(e) => setRepeatUntilWeek(e.target.value)}
+              sx={{ mb: 2 }}
             />
-          }
-          label="Is Active"
-          sx={{ mb: 2 }}
-        />
+          )}
 
-        <FormControlLabel
-          control={
-            <Switch
-              checked={newSession.isHolidayCourse}
-              onChange={(e) =>
-                setNewSession({ ...newSession, isHolidayCourse: e.target.checked })
+          <Box>
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={newSession.isActive}
+                  onChange={(e) =>
+                    setNewSession({ ...newSession, isActive: e.target.checked })
+                  }
+                />
               }
+              label="Is Active"
             />
-          }
-          label="Is Holiday Course"
-          sx={{ mb: 2 }}
-        />
+
+            <FormControlLabel
+              control={
+                <Switch
+                  checked={newSession.isHolidayCourse}
+                  onChange={(e) =>
+                    setNewSession({ ...newSession, isHolidayCourse: e.target.checked })
+                  }
+                />
+              }
+              label="Is Holiday Course"
+            />
+          </Box>
+        </Box>
+
 
         <Box sx={{ mb: 2 }}>
           <SingleSelectWithAutocomplete

@@ -13,8 +13,6 @@ export default function AppointmentEvent({
     location,
     topic,
     status,
-    resource,
-    address,
     className,
     teacher,
     studentCount,

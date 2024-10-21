@@ -120,16 +120,19 @@ const CalendarContent: React.FC = () => {
 
   const handleSaveClassSession = async (newSession: any, callback?: () => void) => {
     try {
-      const sessionPayload = {
-        ...newSession,
-        locationId: selectedLocation?.id,
-      };
+      for (const session of newSession) {
+        const sessionPayload = {
+          ...session,
+          locationId: selectedLocation?.id,
+        };
 
-      await addClassSessions(sessionPayload);
-      if (callback) callback(); // Execute callback if provided
-      loadClassSessions();
+        console.log(sessionPayload)
+        await addClassSessions(sessionPayload);
+      }
+
+      loadClassSessions(); // Reload sessions after adding
     } catch (error) {
-      console.error("Failed to add class session:", error);
+      console.error('Failed to add class sessions:', error);
     }
   };
 
