@@ -5,6 +5,7 @@ import { t } from 'i18next'; // Import the translation hook
 import { format } from 'date-fns';
 import { fetchStudentById, fetchStudentDocumentsById } from 'src/services/studentService';
 import ReusableDetails from 'src/components/View';
+import FileActions from 'src/components/Files/FileActions';
 
 const ViewStudentPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -102,6 +103,15 @@ const ViewStudentPage: React.FC = () => {
                 { field: 'type', headerName: t('type'), flex: 1 },
                 { field: 'path', headerName: t('path'), flex: 1 },
 
+                {
+                    field: 'actions',
+                    headerName: t('actions'),
+                    renderCell: (params: { row: { id: any, name: string, path: string } }) => (
+                        <FileActions fileId={params.row.id} fileName={params.row.name} />
+                    ),
+                    sortable: false,
+                    width: 200,
+                },
             ],
         },
     ];

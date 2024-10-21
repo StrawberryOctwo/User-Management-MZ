@@ -7,6 +7,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
 import { fetchTeacherById, fetchTeacherDocumentsById } from 'src/services/teacherService';
 import ReusableDetails from 'src/components/View';
+import FileActions from 'src/components/Files/FileActions';
 
 const ViewTeacherPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -169,6 +170,15 @@ const ViewTeacherPage: React.FC = () => {
                 { field: 'name', headerName: t('name'), flex: 1 },
                 { field: 'type', headerName: t('type'), flex: 1 },
                 { field: 'path', headerName: t('path'), flex: 1 },
+                {
+                    field: 'actions',
+                    headerName: t('actions'),
+                    renderCell: (params: { row: { id: any, name: string, path: string } }) => (
+                        <FileActions fileId={params.row.id} fileName={params.row.name} />
+                    ),
+                    sortable: false,
+                    width: 200,
+                },
             ],
         },
     ];
