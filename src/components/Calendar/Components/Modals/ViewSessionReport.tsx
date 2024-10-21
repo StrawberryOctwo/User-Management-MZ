@@ -30,8 +30,8 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                 setLoading(true);
                 try {
                     const report = await getSessionReportById(reportId);  // Fetch the report by ID
-                    setReportType(report.reportType);  // Set fetched report type
-                    setComments(report.comments);      // Set fetched comments
+                    setReportType(report.data.reportType);  // Set fetched report type
+                    setComments(report.data.comments);      // Set fetched comments
                 } catch (error) {
                     console.error('Error fetching session report:', error);
                 } finally {
