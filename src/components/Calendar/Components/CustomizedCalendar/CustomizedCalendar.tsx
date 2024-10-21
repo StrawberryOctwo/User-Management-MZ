@@ -187,10 +187,6 @@ export default function CustomizedCalendar({
     }
   };
 
-  const handleSave = (updatedAppointment: any) => {
-    setModalOpen(false); // Close the modal after saving
-  };
-
   const calculateStartEndDates = useCallback(() => {
     let startDate = moment(); // Initialize with a default value
     let endDate = moment(); // Initialize with a default value

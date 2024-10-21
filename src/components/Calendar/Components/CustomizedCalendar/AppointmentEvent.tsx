@@ -1,6 +1,7 @@
 import { Box, Typography } from "@mui/material";
 import { AppointmentStatusCode, EVENT_STATUS_COLORS } from "../../constants";
 import { Appointment } from "../../types";
+import { color } from "@chakra-ui/react";
 
 export default function AppointmentEvent({
   appointment,
@@ -35,36 +36,45 @@ export default function AppointmentEvent({
     (isEventStatusOrType(status) && EVENT_STATUS_COLORS[status]) ||
     "#ffffff"; // Default color if none matches
 
+  const borderColor =
+    (sessionType === "Online" && "#c17ab7") || // Stronger lavender
+    (sessionType === "Group" && "#ffb74d") || // Stronger peach
+    (sessionType === "1on1" && "#81c784") || // Stronger green
+    "#000000"; // Default to black if no match
+
   return (
     <Box
       sx={{
-        backgroundColor: background,
+        backgroundColor: background, // Maintain original background color
+        border: `2px solid ${borderColor}`, // Add border with strong color
+        borderRadius: "4px", // Optional: Rounded corners
         padding: 1,
         height: "100%",
+        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", // Optional: Subtle shadow
         color: "black",
-        ...(isMonthView ? { overflow: "hidden", height: 56 } : {}), // 7 * 8px = 56px for height
+        ...(isMonthView ? { overflow: "hidden", height: 56 } : {}),
       }}
     >
       <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-        <Typography variant="subtitle2" fontWeight="bold">
-          {startTime} - {endTime}
-        </Typography>
-        {/* Add location name below the time */}
-        {location && (
-          <Typography variant="caption" mt={1}>
-            Location: {location}
-          </Typography>
-        )}
-        <Typography variant="caption" mt={1}>
+        <Typography fontSize={15} variant="subtitle2" fontWeight="bold">
           {topic} - {className}
         </Typography>
-        <Typography variant="caption" mt={1}>
-          Teacher: {teacher ? teacher : "Unknown Teacher"}
+        <Typography fontSize={14} variant="caption">
+          {startTime} - {endTime}
         </Typography>
-        <Typography variant="caption" mt={1}>
-          Session Type: {sessionType ? sessionType : "Unknown Type"}
+
+        <Typography fontSize={13} variant="caption" mt={1} fontWeight="bold">
+          {teacher ? teacher : "Unknown Teacher"}
         </Typography>
-        <Typography variant="caption" mt="auto">
+        {location && (
+          <Typography variant="caption">
+            {location}
+          </Typography>
+        )}
+        {/* <Typography variant="caption"to">
+          Students: {studentCount}
+        </Typography> */}
+        <Typography fontSize={13} variant="caption">
           Students: {studentCount}
         </Typography>
       </Box>

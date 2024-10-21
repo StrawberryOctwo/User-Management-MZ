@@ -39,7 +39,7 @@
 
 /* Timeslot Grid Lines */
 .rbc-day-slot .rbc-time-slot:after {
-  content: "";
+  content: '';
   width: 100%;
   border-top: 1px solid #fbb3ec;
   display: block;
@@ -49,10 +49,9 @@
 .rbc-event,
 .rbc-background-event {
   z-index: 2;
-  padding: 4px 8px !important; /* Add padding for better readability */
+  padding: 0px 0px !important; /* Add padding for better readability */
   border-radius: 4px; /* Round corners of the events */
   border: none !important;
-  background-color: #0288d1; /* Custom event color */
   color: white;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Subtle shadow for depth */
   transition: background-color 0.2s ease-in-out;

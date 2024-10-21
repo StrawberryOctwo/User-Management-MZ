@@ -174,7 +174,7 @@ const CalendarContent: React.FC = () => {
         />
       )}
 
-      (
+
       <Box sx={{ position: 'relative', height: '100%', overflow: 'hidden' }}>
         <CustomizedCalendar
           classSessionEvents={classSessionEvents}
@@ -203,7 +203,7 @@ const CalendarContent: React.FC = () => {
           </Box>
         )}
       </Box>
-      )
+
       <CalendarLegend />
     </Box>
   );

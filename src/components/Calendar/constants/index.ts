@@ -16,10 +16,9 @@ export enum AppointmentStatusCode {
 type EventStatusOrType = AppointmentStatusCode | "Online" | "Group" | "1on1";
 
 export const EVENT_STATUS_COLORS: Record<EventStatusOrType, string> = {
-  P: "#bee2fa",
-  CI: "#c7edca",
-  Online: "#e1bee7", // Color for Online sessions
-  Group: "#ffecb3",  // Color for Group sessions
-  "1on1": "#c8e6c9", // Color for 1on1 sessions
+  P: "#f2f8fd",      // Light pastel blue for Pending
+  CI: "#eaf8ea",     // Light pastel green for Checked In
+  Online: "#f6edf7", // Very light lavender for Online sessions
+  Group: "#fff6e5",  // Soft peach for Group sessions
+  "1on1": "#ecf8ec", // Pale green for 1-on-1 sessions
 };
-
