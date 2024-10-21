@@ -36,6 +36,7 @@ import CameraFrontTwoToneIcon from '@mui/icons-material/CameraFrontTwoTone';
 import DisplaySettingsTwoToneIcon from '@mui/icons-material/DisplaySettingsTwoTone';
 import { GridFilterListIcon } from '@mui/x-data-grid';
 import { BusinessOutlined, FileUploadSharp, LocationCity, LocationOffRounded, LocationOffSharp, LocationOn, LocationSearching, LocationSearchingTwoTone, Person, PersonAddAlt1Sharp } from '@mui/icons-material';
+import withRole from 'src/hooks/withRole';
 
 const MenuWrapper = styled(Box)(
   ({ theme }) => `
@@ -187,19 +188,6 @@ function SidebarMenu() {
       <MenuWrapper>
         <List component="div">
           <SubMenuWrapper>
-            {/* <List component="div">
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/overview"
-                  startIcon={<DesignServicesTwoToneIcon />}
-                >
-                  Overview
-                </Button>
-              </ListItem>
-            </List> */}
           </SubMenuWrapper>
         </List>
         <List
@@ -212,39 +200,21 @@ function SidebarMenu() {
         >
           <SubMenuWrapper>
             <List component="div">
-              {/* <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/dashboard/crypto"
-                  startIcon={<BrightnessLowTwoToneIcon />}
-                >
-                  Cryptocurrency
-                </Button>
-              </ListItem> */}
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/dashboard/calendar"
-                  startIcon={<EditCalendarIcon />}
-                >
-                  Calendar
-                </Button>
-              </ListItem>
-              {/* <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/dashboard/messenger"
-                  startIcon={<MmsTwoToneIcon />}
-                >
-                  Messenger
-                </Button>
-              </ListItem> */}
+              <ProtectedListItem
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'Teacher', 'Student', 'LocationAdmin']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/dashboard/calendar"
+                    startIcon={<EditCalendarIcon />}
+                  >
+                    Calendar
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
             </List>
           </SubMenuWrapper>
         </List>
@@ -258,315 +228,125 @@ function SidebarMenu() {
         >
           <SubMenuWrapper>
             <List component="div">
-              {/* <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/management/transactions"
-                  startIcon={<TableChartTwoToneIcon />}
-                >
-                  Transactions List
-                </Button>
-              </ListItem> */}
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/management/franchises"
-                  startIcon={<BusinessOutlined/>}
-                >
-                  Franchises
-                </Button> 
-              </ListItem>
+              <ProtectedListItem
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/management/franchises"
+                    startIcon={<BusinessOutlined />}
+                  >
+                    Franchises
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
 
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/management/franchise-admins"
-                  startIcon={<LocationSearchingTwoTone />}
-                >
-                  Franchise Admins
-                </Button>
-              </ListItem>
+              <ProtectedListItem
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/management/locations"
+                    startIcon={<LocationOnIcon />}
+                  >
+                    Locations
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
 
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/management/locations"
-                  startIcon={<LocationOnIcon />}
-                >
-                  Locations
-                </Button>
-              </ListItem>
+              <ProtectedListItem
+                allowedRoles={['SuperAdmin']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/management/franchise-admins"
+                    startIcon={<LocationSearchingTwoTone />}
+                  >
+                    Franchise Admins
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
 
+              <ProtectedListItem
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/management/location-admins"
+                    startIcon={<LocationSearching />}
+                  >
+                    Location Admins
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
 
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/management/location-admins"
-                  startIcon={<LocationSearching />}
-                >
-                  Location Admins
-                </Button>
-              </ListItem>
+              <ProtectedListItem
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/management/teachers"
+                    startIcon={<Person />}
+                  >
+                    Teachers
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
 
+              <ProtectedListItem
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/management/students"
+                    startIcon={<PersonAddAlt1Sharp />}
+                  >
+                    Students
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
 
-
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/management/teachers"
-                  startIcon={<Person />}
-                >
-                  Teachers
-                </Button>
-              </ListItem>
-
-
-
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/management/students"
-                  startIcon={<PersonAddAlt1Sharp />}
-                >
-                  Students
-                </Button>
-              </ListItem>
-
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/management/files"
-                  startIcon={<FileUploadSharp />}
-                >
-                  Files
-                </Button>
-              </ListItem>
+              <ProtectedListItem
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/management/files"
+                    startIcon={<FileUploadSharp />}
+                  >
+                    Files
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
             </List>
           </SubMenuWrapper>
         </List>
-        {/* <List
-          component="div"
-          subheader={
-            <ListSubheader component="div" disableSticky>
-              Accounts
-            </ListSubheader>
-          }
-        >
-          <SubMenuWrapper>
-            <List component="div">
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/management/profile/details"
-                  startIcon={<AccountCircleTwoToneIcon />}
-                >
-                  User Profile
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/management/profile/settings"
-                  startIcon={<DisplaySettingsTwoToneIcon />}
-                >
-                  Account Settings
-                </Button>
-              </ListItem>
-            </List>
-          </SubMenuWrapper>
-        </List>
-        <List
-          component="div"
-          subheader={
-            <ListSubheader component="div" disableSticky>
-              Components
-            </ListSubheader>
-          }
-        >
-          <SubMenuWrapper>
-            <List component="div">
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/components/buttons"
-                  startIcon={<BallotTwoToneIcon />}
-                >
-                  Buttons
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/components/modals"
-                  startIcon={<BeachAccessTwoToneIcon />}
-                >
-                  Modals
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/components/accordions"
-                  startIcon={<EmojiEventsTwoToneIcon />}
-                >
-                  Accordions
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/components/tabs"
-                  startIcon={<FilterVintageTwoToneIcon />}
-                >
-                  Tabs
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/components/badges"
-                  startIcon={<HowToVoteTwoToneIcon />}
-                >
-                  Badges
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/components/tooltips"
-                  startIcon={<LocalPharmacyTwoToneIcon />}
-                >
-                  Tooltips
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/components/avatars"
-                  startIcon={<RedeemTwoToneIcon />}
-                >
-                  Avatars
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/components/cards"
-                  startIcon={<SettingsTwoToneIcon />}
-                >
-                  Cards
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/components/forms"
-                  startIcon={<TrafficTwoToneIcon />}
-                >
-                  Forms
-                </Button>
-              </ListItem>
-            </List>
-          </SubMenuWrapper>
-        </List>
-        <List
-          component="div"
-          subheader={
-            <ListSubheader component="div" disableSticky>
-              Extra Pages
-            </ListSubheader>
-          }
-        >
-          <SubMenuWrapper>
-            <List component="div">
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/status/404"
-                  startIcon={<CheckBoxTwoToneIcon />}
-                >
-                  Error 404
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/status/500"
-                  startIcon={<CameraFrontTwoToneIcon />}
-                >
-                  Error 500
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/status/coming-soon"
-                  startIcon={<ChromeReaderModeTwoToneIcon />}
-                >
-                  Coming Soon
-                </Button>
-              </ListItem>
-              <ListItem component="div">
-                <Button
-                  disableRipple
-                  component={RouterLink}
-                  onClick={closeSidebar}
-                  to="/status/maintenance"
-                  startIcon={<WorkspacePremiumTwoToneIcon />}
-                >
-                  Maintenance
-                </Button>
-              </ListItem>
-            </List> */}
-          {/* </SubMenuWrapper>
-        </List> */}
       </MenuWrapper>
     </>
   );
 }
+
+const ProtectedListItem = withRole(ListItem);
 
 export default SidebarMenu;
