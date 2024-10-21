@@ -190,7 +190,7 @@ const routes: RouteObject[] = [
     children: [
       {
         path: '/',
-        element: <Overview /> // This remains unprotected
+        element: <Navigate to="login" replace />
       },
       {
         path: 'login',
@@ -240,7 +240,7 @@ const routes: RouteObject[] = [
         children: [
           {
             path: '',
-            element: <Navigate to="crypto" replace />
+            element: <Navigate to="calendar" replace />
           },
           {
             path: 'calendar',
