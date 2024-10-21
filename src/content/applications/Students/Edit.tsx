@@ -10,6 +10,7 @@ import { addDocument } from 'src/services/fileUploadService';
 import { fetchLocations } from 'src/services/locationService';
 import { fetchStudentById, fetchStudentDocumentsById, updateStudent } from 'src/services/studentService';
 import { assignStudentToTopics, fetchTopics } from 'src/services/topicService';
+import { useSnackbar } from 'src/contexts/SnackbarContext';
 
 const EditStudent = () => {
     const { id } = useParams<{ id: string }>();
@@ -18,6 +19,7 @@ const EditStudent = () => {
     const [selectedTopics, setSelectedTopics] = useState<any[]>([]);
     const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
+    const { showMessage } = useSnackbar();
 
     // Fetch student data and documents by ID on component mount
     const fetchStudent = async () => {
@@ -84,10 +86,20 @@ const EditStudent = () => {
 
     const formatDateForInput = (date: string) => {
         const d = new Date(date);
+        console.log(date)
+        console.log(d.toISOString().split('T')[0])
         return d.toISOString().split('T')[0]; // Returns YYYY-MM-DD format
     };
 
     const handleStudentSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
+        if (selectedLocation == null) {
+            showMessage("Location field is required", 'error')
+            return
+        }
+        if (selectedTopics.length == 0) {
+            showMessage("Topics field can't be empty", 'error')
+            return
+        }
         setLoading(true);
         try {
             const topicIds = selectedTopics.map(topic => topic.id);

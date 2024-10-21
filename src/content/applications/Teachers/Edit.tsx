@@ -10,6 +10,7 @@ import { addDocument } from 'src/services/fileUploadService';
 import { assignTeacherToLocations, fetchLocations } from 'src/services/locationService';
 import { fetchTeacherById, fetchTeacherDocumentsById, updateTeacher } from 'src/services/teacherService';
 import { assignTeacherToTopics, fetchTopics } from 'src/services/topicService';
+import { useSnackbar } from 'src/contexts/SnackbarContext';
 
 const EditTeacher = () => {
     const { id } = useParams<{ id: string }>();
@@ -18,6 +19,7 @@ const EditTeacher = () => {
     const [selectedTopics, setSelectedTopics] = useState<any[]>([]);
     const [uploadedFiles, setUploadedFiles] = useState<any[]>([]); // For storing uploaded files
     const [loading, setLoading] = useState(true);
+    const { showMessage } = useSnackbar();
 
     // Fetch teacher data and documents by ID on component mount
     const fetchTeacher = async () => {
@@ -83,6 +85,14 @@ const EditTeacher = () => {
     };
 
     const handleTeacherSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
+        if (selectedLocations.length == 0) {
+            showMessage("Locations field is required", 'error')
+            return
+        }
+        if (selectedTopics.length == 0) {
+            showMessage("Topics field can't be empty", 'error')
+            return
+        }
         setLoading(true);
         try {
             const locationIds = selectedLocations.map(location => location.id);

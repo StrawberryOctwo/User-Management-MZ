@@ -11,6 +11,7 @@ import { fetchLocations } from 'src/services/locationService';
 import { addStudent } from 'src/services/studentService';
 import { assignStudentToTopics, fetchTopics } from 'src/services/topicService';
 import UploadSection from 'src/components/Files/UploadDocuments';
+import { useSnackbar } from 'src/contexts/SnackbarContext';
 
 export default function CreateStudent() {
     const [selectedLocationId, setSelectedLocationId] = useState<number | null>(null);
@@ -19,6 +20,7 @@ export default function CreateStudent() {
     const [uploadedFiles, setUploadedFiles] = useState<any[]>([]); // State for uploaded files
     const [loading, setLoading] = useState(false);
     const dropdownRef = useRef<any>(null);
+    const { showMessage } = useSnackbar();
 
     const handleLocationSelect = (location: any) => {
         if (!location) {
@@ -39,6 +41,15 @@ export default function CreateStudent() {
     };
 
     const handleStudentSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
+
+        if (selectedLocationId == null) {
+            showMessage("Location field is required", 'error')
+            return
+        }
+        if (selectedTopics.length == 0) {
+            showMessage("Topics field can't be empty", 'error')
+            return
+        }
         setLoading(true);
         try {
 

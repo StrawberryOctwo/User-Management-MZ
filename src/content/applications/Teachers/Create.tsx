@@ -11,6 +11,7 @@ import { addTeacher } from 'src/services/teacherService';
 import { assignTeacherToTopics, fetchTopics } from 'src/services/topicService';
 import { generateEmployeeNumber } from 'src/utils/teacherUtils';
 import { TextField } from '@mui/material';
+import { useSnackbar } from 'src/contexts/SnackbarContext';
 
 const CreateTeacher = () => {
     const [selectedLocations, setSelectedLocations] = useState<any[]>([]);
@@ -18,6 +19,7 @@ const CreateTeacher = () => {
     const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
     const [employeeNumber, setEmployeeNumber] = useState(''); // Only tracking employeeNumber
+    const { showMessage } = useSnackbar();
 
     // Function to generate the employee number based on form data
     const handleGenerateEmployeeNumber = (formData: { firstName: string; lastName: string; dob: string }) => {
@@ -42,6 +44,15 @@ const CreateTeacher = () => {
     };
 
     const handleTeacherSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
+
+        if (selectedLocations.length == 0) {
+            showMessage("Locations field is required", 'error')
+            return
+        }
+        if (selectedTopics.length == 0) {
+            showMessage("Topics field can't be empty", 'error')
+            return
+        }
         setLoading(true);
         try {
             const locationIds = selectedLocations.map(location => location.id);
@@ -118,29 +129,29 @@ const CreateTeacher = () => {
             section: 'Teacher Information',
             component: (
                 <Box display="flex" alignItems="center" gap={1} sx={{ width: '95%' }}>
-                <TextField
-                    label="Employee Number"
-                    value={employeeNumber}
-                    variant="outlined"
-                    fullWidth
-                    InputProps={{
-                        readOnly: true,
-                    }}
-                />
-                <Button
-                    variant="contained"
-                    onClick={() =>
-                        handleGenerateEmployeeNumber({
-                            firstName: document.querySelector<HTMLInputElement>('[name="firstName"]')?.value || '',
-                            lastName: document.querySelector<HTMLInputElement>('[name="lastName"]')?.value || '',
-                            dob: document.querySelector<HTMLInputElement>('[name="dob"]')?.value || '',
-                        })
-                    }
-                    sx={{ height: '56px' }} // Matching the height of TextField for better alignment
-                >
-                    Generate
-                </Button>
-            </Box>
+                    <TextField
+                        label="Employee Number *"
+                        value={employeeNumber}
+                        variant="outlined"
+                        fullWidth
+                        InputProps={{
+                            readOnly: true,
+                        }}
+                    />
+                    <Button
+                        variant="contained"
+                        onClick={() =>
+                            handleGenerateEmployeeNumber({
+                                firstName: document.querySelector<HTMLInputElement>('[name="firstName"]')?.value || '',
+                                lastName: document.querySelector<HTMLInputElement>('[name="lastName"]')?.value || '',
+                                dob: document.querySelector<HTMLInputElement>('[name="dob"]')?.value || '',
+                            })
+                        }
+                        sx={{ height: '50px' }} // Matching the height of TextField for better alignment
+                    >
+                        Generate
+                    </Button>
+                </Box>
             ),
         },
         { name: 'idNumber', label: 'ID Number', type: 'text', required: false, section: 'Teacher Information' },

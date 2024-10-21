@@ -12,36 +12,34 @@ interface StudentDetailCardProps {
 
 const StudentDetailCard: React.FC<StudentDetailCardProps> = ({ student, reportCompleted, onAddReport, onViewReport }) => {
     return (
-        <Card variant="outlined" sx={{ mb: 2 }}>
-            <CardContent>
-                <Box display="flex" justifyContent="space-between" alignItems="center">
-                    <Box>
-                        <Typography variant="subtitle1">
-                            <Link to={`/management/students/view/${student.id}`}>
-                                {student.user.firstName} {student.user.lastName}
-                            </Link>
-                        </Typography>
-                    </Box>
-                    <Box display="flex" alignItems="center">
-                        {/* If report is completed, show View Report, else show Add Report */}
-                        {reportCompleted ? (
-                            <Button variant="contained" color="primary" onClick={onViewReport} sx={{ mr: 1 }}>
-                                View Report
-                            </Button>
-                        ) : (
-                            <Button variant="contained" color="primary" onClick={onAddReport} sx={{ mr: 1 }}>
-                                Add Report
-                            </Button>
-                        )}
-                        <Button variant="contained" color="secondary" disabled sx={{ mr: 1 }}>
-                            View Payment
-                        </Button>
-                        <IconButton>
-                            <CircleIcon sx={{ color: reportCompleted ? 'green' : 'red' }} />
-                        </IconButton>
-                    </Box>
+        <Card variant="outlined" sx={{ mb: 2, mt: 1 }}>
+            <Box display="flex" justifyContent="space-between" alignItems="center" padding={1.5}>
+                <Box>
+                    <Typography variant="subtitle1">
+                        <Link to={`/management/students/view/${student.id}`} style={{ textDecoration: 'none' }} title="View student details">
+                            {student.user.firstName} {student.user.lastName}
+                        </Link>
+                    </Typography>
                 </Box>
-            </CardContent>
+                <Box display="flex" alignItems="center">
+                    {/* If report is completed, show View Report, else show Add Report */}
+                    {reportCompleted ? (
+                        <Button variant="contained" color="primary" onClick={onViewReport} sx={{ mr: 1 }}>
+                            View Report
+                        </Button>
+                    ) : (
+                        <Button variant="contained" color="primary" onClick={onAddReport} sx={{ mr: 1 }}>
+                            Add Report
+                        </Button>
+                    )}
+                    <Button variant="contained" color="secondary" disabled sx={{ mr: 1 }}>
+                        View Payment
+                    </Button>
+                    <IconButton disabled={true}>
+                        <CircleIcon sx={{ color: reportCompleted ? 'green' : 'red' }} />
+                    </IconButton>
+                </Box>
+            </Box>
         </Card>
     );
 };
