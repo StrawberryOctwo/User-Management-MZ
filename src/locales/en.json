@@ -63,7 +63,7 @@
   "contract_type": "Contract Type",
   "failed_to_fetch_location": "Failed to fetch location details",
   "failed_to_fetch_teacher": "Failed to fetch teacher details",
-  "failed_to_fetch_student": "Failed to fetch student details",
+  "failed_to_fetch_student": "Failed to fetch student details ",
   "location_not_found": "Location not found.",
   "loading_location_data": "Loading location data...",
   "loading_teacher_data": "Loading teacher data...",
