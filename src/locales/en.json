@@ -114,7 +114,9 @@
   "confidentiality_agreement": "Confidentiality Agreement",
   "non_compete_agreement": "Non-Compete Agreement",
   "contract": "Contract",
-  "absence": "Absence"
+  "absence": "Absence",
+  "report_type":"Report Type",
+  "session_date":"Session Date"
 
 
 }

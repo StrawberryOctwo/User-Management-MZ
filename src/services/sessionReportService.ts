@@ -1,7 +1,8 @@
+import { SessionReportData } from "src/components/Calendar/Components/Modals/SessionReportData";
 import { api } from "./api";
 
 // Add a new session report
-export const addSessionReport = async (reportData: { reportType: string, comments: string, classSessionId: string, studentId: string }) => {
+export const addSessionReport = async (reportData:SessionReportData) => {
     try {
         const response = await api.post('/session-reports', reportData);
         return response.data;
@@ -40,6 +41,16 @@ export const deleteSessionReport = async (reportId: string) => {
         return response.data;
     } catch (error) {
         console.error(`Error deleting session report with id ${reportId}:`, error);
+        throw error;
+    }
+};
+
+export const getSessionReportsForStudent = async (studentId: string) => {
+    try {
+        const response = await api.get(`/students/${studentId}/session-reports`);
+        return response.data.sessionReports; // Return session reports
+    } catch (error) {
+        console.error('Error fetching session reports:', error);
         throw error;
     }
 };
