@@ -73,6 +73,7 @@ export default function CreateStudent() {
                 },
                 student: {
                     payPerHour: data['payPerHour'],
+                    individualPayPerHour: data['individualPayPerHour'],
                     status: data['status'],
                     gradeLevel: data['gradeLevel'],
                     contractType: data['contractType'],
@@ -138,6 +139,7 @@ export default function CreateStudent() {
 
     const studentFields = [
         { name: 'payPerHour', label: t('pay_per_hour'), type: 'number', required: true, section: 'Student Information' },
+        { name: 'individualPayPerHour', label: t('ind_pay_per_her'), type: 'number', required: true, section: 'Student Information' },
         { name: 'status', label: t('status'), type: 'text', required: true, section: 'Student Information' },
         { name: 'gradeLevel', label: t('grade_level'), type: 'number', required: true, section: 'Student Information' },
         { name: 'contractType', label: t('contract_type'), type: 'text', required: true, section: 'Student Information' },
