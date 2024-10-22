@@ -86,7 +86,7 @@ const ViewStudentPage: React.FC = () => {
                         </TableRow>
                     </TableHead>
                     <TableBody>
-                        {sessionReports.length > 0 ? (
+                        {sessionReports ? (
                             sessionReports.map((report) => (
                                 <TableRow key={report.id}>
                                     <TableCell>{report.reportType}</TableCell>
