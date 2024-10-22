@@ -12,9 +12,10 @@ import {
 } from '@mui/material';
 import moment from 'moment';
 import { fetchClassSessionById, getClassSessionReportsStatus, getStudentSessionReportStatus } from 'src/services/classSessionService';
-import AddSessionReportForm from './AddSessionReportForm';  // Import the Add Session Report form component
-import StudentDetailCard from './StudentDetailCArd';
+import AddSessionReportForm from './AddSessionReportForm';
 import ViewSessionReportForm from './ViewSessionReport';
+import ViewPaymentDetails from './ViewPaymentDetails';  // New Component for payment view
+import StudentDetailCard from './StudentDetailCArd';
 
 interface ClassSessionDetailsModalProps {
     isOpen: boolean;
@@ -34,37 +35,33 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [reportStatus, setReportStatus] = useState<{ [studentId: string]: { reportCompleted: boolean, reportId: string | null } }>({});
     const [allReportsCompleted, setAllReportsCompleted] = useState<boolean>(false);
-    const [isReportFormOpen, setReportFormOpen] = useState<boolean>(false);  // State for session report form
-    const [isViewReportFormOpen, setViewReportFormOpen] = useState<boolean>(false);  // State for view/edit report form
-    const [selectedStudent, setSelectedStudent] = useState<any>(null);  // Store the selected student for report
-    const [selectedReportId, setSelectedReportId] = useState<string | null>(null);  // Store the report ID to view/edit
+    const [isReportFormOpen, setReportFormOpen] = useState<boolean>(false);
+    const [isViewReportFormOpen, setViewReportFormOpen] = useState<boolean>(false);
+    const [isViewPaymentModalOpen, setViewPaymentModalOpen] = useState<boolean>(false);  // State for payment modal
+    const [selectedStudent, setSelectedStudent] = useState<any>(null);  
+    const [selectedReportId, setSelectedReportId] = useState<string | null>(null);  
 
     // Fetch class session details
     const loadClassSession = async () => {
         setLoading(true);
         setErrorMessage(null);
         try {
-            // Fetch class session details by ID
             const response = await fetchClassSessionById(appointmentId);
             setClassSession(response);
 
-            // Fetch session report status for the entire class session
             const reportResponse = await getClassSessionReportsStatus(appointmentId);
             setAllReportsCompleted(reportResponse.allReportsCompleted);
 
-            // Fetch report status for each student and store reportCompleted + reportId
             const studentReportsStatus: { [studentId: string]: { reportCompleted: boolean, reportId: string | null } } = {};
             for (const student of response.students) {
                 const studentReport = await getStudentSessionReportStatus(appointmentId, student.id);
                 studentReportsStatus[student.id] = {
                     reportCompleted: studentReport.reportCompleted,
-                    reportId: studentReport.reportId,  // Include reportId in the status
+                    reportId: studentReport.reportId,
                 };
             }
 
-            // Update the state with the reports' status
             setReportStatus(studentReportsStatus);
-
         } catch (error) {
             setErrorMessage('Failed to load class session details.');
             console.error('Error fetching class session details:', error);
@@ -73,22 +70,8 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
         }
     };
 
-    // Call `loadClassSession` when the modal is opened or `appointmentId` changes
     useEffect(() => {
         if (isOpen && appointmentId) {
-            const loadClassSession = async () => {
-                setLoading(true);
-                setErrorMessage(null);
-                try {
-                    const response = await fetchClassSessionById(appointmentId);
-                    setClassSession(response);
-                } catch (error) {
-                    setErrorMessage("Failed to load class session details.");
-                } finally {
-                    setLoading(false);
-                }
-            };
-
             loadClassSession();
         }
     }, [isOpen, appointmentId]);
@@ -102,27 +85,30 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
         const reportData = reportStatus[student.id];
         if (reportData && reportData.reportId) {
             setSelectedStudent(student);
-            setSelectedReportId(reportData.reportId);  // Set the correct reportId
-            setViewReportFormOpen(true);  // Open the view report form
+            setSelectedReportId(reportData.reportId);  
+            setViewReportFormOpen(true);  
         } else {
             console.log('No report available for this student');
         }
     };
 
-    // Refresh class session data after adding or editing a report
+    const handleViewPayment = (student: any) => {
+        setSelectedStudent(student);
+        setViewPaymentModalOpen(true);  // Open payment modal for selected student
+    };
+
     const refreshClassSessionData = async () => {
-        await loadClassSession();  // Re-fetch class session details and report statuses
+        await loadClassSession();  
     };
 
     const handleSaveReport = async (newReport: any) => {
-        // After saving, refresh the class session data
         refreshClassSessionData();
         setReportFormOpen(false);
     };
 
     const handleCloseReportForm = () => {
         setViewReportFormOpen(false);
-        refreshClassSessionData();  // Refresh data after closing view/edit form
+        refreshClassSessionData();  
     };
 
     return (
@@ -161,30 +147,45 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                                 <StudentDetailCard
                                     key={student.id}
                                     student={student}
-                                    reportCompleted={reportStatus[student.id]?.reportCompleted}  // Use report status to determine if the report is completed
-                                    onAddReport={() => handleAddReport(student)}  // Open the Add Report form
-                                    onViewReport={() => handleViewReport(student)}  // Pass report ID and student to view report
+                                    reportCompleted={reportStatus[student.id]?.reportCompleted}
+                                    onAddReport={() => handleAddReport(student)}
+                                    onViewReport={() => handleViewReport(student)}
+                                    onViewPayment={() => handleViewPayment(student)}  
                                 />
                             ))
                         ) : (
                             <Typography variant="body2">No students enrolled.</Typography>
                         )}
 
-                        {/* Display "Paid" in green if all session reports are completed */}
                         {allReportsCompleted && (
-                            <Typography variant="h6" color="green" sx={{ mt: 2 }}>
-                                Paid
-                            </Typography>
+                            <Box display="flex" justifyContent="center" alignItems="center" mt={3}>
+                                <Typography 
+                                    variant="h5" 
+                                    color="green" 
+                                    sx={{ 
+                                        fontWeight: 'bold', 
+                                        textAlign: 'center', 
+                                        backgroundColor: '#e0f2f1', 
+                                        padding: '10px', 
+                                        borderRadius: '5px', 
+                                        border: '1px solid green' 
+                                    }}
+                                >
+                                    Session Reports Submitted
+                                </Typography>
+                            </Box>
                         )}
+
 
                         {/* Add Session Report Form Dialog */}
                         <AddSessionReportForm
                             isOpen={isReportFormOpen}
                             onClose={() => setReportFormOpen(false)}
-                            onSave={handleSaveReport}  // Save report and refresh data
+                            onSave={handleSaveReport}
                             studentName={selectedStudent ? `${selectedStudent.user.firstName} ${selectedStudent.user.lastName}` : ''}
                             classSessionId={appointmentId}
                             studentId={selectedStudent ? selectedStudent.id : ''}
+                            userId={selectedStudent ? selectedStudent.user.id : ''}
                         />
 
                         {/* View Session Report Form Dialog */}
@@ -192,10 +193,21 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                             <ViewSessionReportForm
                                 isOpen={isViewReportFormOpen}
                                 onClose={handleCloseReportForm}
-                                reportId={selectedReportId} // Pass the report ID
+                                reportId={selectedReportId}
                                 student={selectedStudent}
                                 classSessionId={appointmentId}
-                                onDelete={handleCloseReportForm}  // Call refresh after deletion
+                                onDelete={handleCloseReportForm}
+                            />
+                        )}
+
+                        {/* View Payment Details Modal */}
+                        {selectedStudent && (
+                            <ViewPaymentDetails
+                                isOpen={isViewPaymentModalOpen}
+                                onClose={() => setViewPaymentModalOpen(false)}
+                                userId={selectedStudent.user.id}
+                                studentName={`${selectedStudent.user.firstName} ${selectedStudent.user.lastName}`}
+                                sessionId={classSession.id}
                             />
                         )}
                     </Box>

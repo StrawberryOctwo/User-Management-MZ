@@ -5,12 +5,19 @@ import CircleIcon from '@mui/icons-material/Circle';
 
 interface StudentDetailCardProps {
     student: any; // Define more precise types based on your data model
-    reportCompleted: boolean; // Add this to track if the report is completed
+    reportCompleted: boolean; // Track if the report is completed
     onAddReport: () => void;
     onViewReport: () => void;
+    onViewPayment: () => void;  // Add handler to view payment
 }
 
-const StudentDetailCard: React.FC<StudentDetailCardProps> = ({ student, reportCompleted, onAddReport, onViewReport }) => {
+const StudentDetailCard: React.FC<StudentDetailCardProps> = ({
+    student,
+    reportCompleted,
+    onAddReport,
+    onViewReport,
+    onViewPayment  // New prop for viewing payment
+}) => {
     return (
         <Card variant="outlined" sx={{ mb: 2, mt: 1 }}>
             <Box display="flex" justifyContent="space-between" alignItems="center" padding={1.5}>
@@ -32,7 +39,14 @@ const StudentDetailCard: React.FC<StudentDetailCardProps> = ({ student, reportCo
                             Add Report
                         </Button>
                     )}
-                    <Button variant="contained" color="secondary" disabled sx={{ mr: 1 }}>
+                    {/* Enable View Payment button if report is completed */}
+                    <Button
+                        variant="contained"
+                        color="secondary"
+                        onClick={onViewPayment}  // Trigger view payment handler
+                        disabled={!reportCompleted}  // Enable only if report is completed
+                        sx={{ mr: 1 }}
+                    >
                         View Payment
                     </Button>
                     <IconButton disabled={true}>
