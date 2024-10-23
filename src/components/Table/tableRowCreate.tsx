@@ -11,8 +11,11 @@ import {
   Select,
   InputLabel,
   FormControl,
-  SelectChangeEvent
+  SelectChangeEvent,
+  InputAdornment,
+  IconButton
 } from '@mui/material';
+import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 export interface FieldConfig {
   name: string;
@@ -52,6 +55,11 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
   };
 
   const [formData, setFormData] = useState<Record<string, any>>(getInitialFormData());
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+  const [passwordVisibility, setPasswordVisibility] = useState<Record<string, boolean>>({});
+
+  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword((prev) => !prev);
 
   useEffect(() => {
     if (Object.keys(initialData).length > 0) {
@@ -83,6 +91,14 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
       console.error(`Failed to ${entintyFunction} ${entityName}:`, error);
     }
   };
+
+  const togglePasswordVisibility = (fieldName: string) => {
+    setPasswordVisibility((prev) => ({
+      ...prev,
+      [fieldName]: !prev[fieldName],
+    }));
+  };
+
 
   const groupedFields = fields.reduce((acc, field) => {
     const section = field.section || 'Other';
@@ -132,14 +148,37 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
                     <TextField
                       name={field.name}
                       label={field.label}
-                      type={field.type}
+                      type={
+                        field.type === 'password'
+                          ? passwordVisibility[field.name]
+                            ? 'text'
+                            : 'password'
+                          : field.type
+                      }
                       sx={{ width: '95%' }}
                       value={formData[field.name] ?? ''}
                       onChange={field.onChange || handleChange}
                       required={field.required}
                       disabled={field.disabled}
                       InputLabelProps={field.type === 'date' ? { shrink: true } : undefined}
+                      InputProps={
+                        field.type === 'password'
+                          ? {
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <IconButton
+                                  onClick={() => togglePasswordVisibility(field.name)}
+                                  edge="end"
+                                >
+                                  {passwordVisibility[field.name] ? <VisibilityOff /> : <Visibility />}
+                                </IconButton>
+                              </InputAdornment>
+                            ),
+                          }
+                          : undefined
+                      }
                     />
+
                   )}
                 </Grid>
               ))}

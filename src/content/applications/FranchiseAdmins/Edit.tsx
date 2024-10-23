@@ -8,6 +8,7 @@ import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWith
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
 import { fetchFranchiseAdminById, updateFranchiseAdmin } from 'src/services/franchiseAdminService';
 import { fetchFranchises } from 'src/services/franchiseService';
+import { useSnackbar } from 'src/contexts/SnackbarContext';
 
 export default function EditFranchiseAdmin() {
     const { id } = useParams<{ id: string }>(); // Get the franchise admin ID from the URL
@@ -15,6 +16,8 @@ export default function EditFranchiseAdmin() {
     const [selectedFranchises, setSelectedFranchises] = useState<any[]>([]); // Store selected franchises
     const dropdownRef = useRef<any>(null); // Ref to access the reset method in MultiSelectWithCheckboxes
     const [loading, setLoading] = useState(false); // Unified loading state
+    const { showMessage } = useSnackbar();
+    const franchiseRef = useRef<any>(null); // Ref for accessing selected franchises
 
     const formatDateForInput = (date: string) => {
         const d = new Date(date);
@@ -62,13 +65,21 @@ export default function EditFranchiseAdmin() {
     };
 
     const handleAdminSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
+        if (data.password && data.password !== data.confirmPassword) {
+            showMessage("Passwords do not match", 'error');
+            return;
+        }
+
         setLoading(true);
         try {
+            const franchiseIds = franchiseRef.current?.selectedItems?.map(
+                (franchise: { id: any }) => franchise.id
+            ) || [];
+
             if (selectedFranchises.length === 0) {
                 throw new Error('Please select at least one franchise.');
             }
 
-            const franchiseIds = selectedFranchises.map(franchise => franchise.id);
 
             const payload = {
                 firstName: data.firstName,
@@ -79,6 +90,7 @@ export default function EditFranchiseAdmin() {
                 postalCode: data.postalCode,
                 phoneNumber: data.phoneNumber,
                 franchiseIds, // Include selected franchise IDs
+                password: data.password
             };
 
             const response = await updateFranchiseAdmin(Number(id), payload); // Call the API service with the structured payload
@@ -108,6 +120,8 @@ export default function EditFranchiseAdmin() {
         { name: 'address', label: t('address'), type: 'text', required: true, section: 'User Information' },
         { name: 'postalCode', label: t('postal_code'), type: 'text', required: true, section: 'User Information' },
         { name: 'phoneNumber', label: t('phone_number'), type: 'text', required: true, section: 'User Information' },
+        { name: 'password', label: t('new_password'), type: 'password', required: false, section: 'Change Password' },
+        { name: 'confirmPassword', label: t('confirm_password'), type: 'password', required: false, section: 'Change Password' },
     ];
 
     const otherFields = [
@@ -118,7 +132,7 @@ export default function EditFranchiseAdmin() {
             section: 'Franchise Admin Assignment',
             component: (
                 <MultiSelectWithCheckboxes
-                    ref={dropdownRef} // Attach the ref to the MultiSelectWithCheckboxes
+                    ref={franchiseRef} // Attach the ref to the MultiSelectWithCheckboxes
                     label={t('Search_and_assign_franchises')}
                     fetchData={(query) => fetchFranchises(1, 5, query).then((data) => data.data)}
                     onSelect={handleFranchiseSelect}

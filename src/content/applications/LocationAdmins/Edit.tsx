@@ -7,6 +7,7 @@ import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWith
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
 import { fetchLocationAdminById, updateLocationAdmin } from 'src/services/locationAdminService';
 import { fetchLocations } from 'src/services/locationService';
+import { useSnackbar } from 'src/contexts/SnackbarContext';
 
 
 const EditLocationAdmin = () => {
@@ -15,6 +16,7 @@ const EditLocationAdmin = () => {
     const [selectedLocations, setSelectedLocations] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const locationRef = useRef<any>(null); // Reference to access the location component
+    const { showMessage } = useSnackbar();
 
     // Fetch the LocationAdmin data by ID on component mount
     const fetchLocationAdmin = async () => {
@@ -31,7 +33,7 @@ const EditLocationAdmin = () => {
                 address: fetchedData.address,
                 postalCode: fetchedData.postalCode,
                 phoneNumber: fetchedData.phoneNumber,
-                password: '', // Keep password blank for editing
+                password: '',
             };
 
             setLocationAdminData(flattenedData);
@@ -52,6 +54,11 @@ const EditLocationAdmin = () => {
     };
 
     const handleSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
+        if (data.password && data.password !== data.confirmPassword) {
+            showMessage("Passwords do not match", 'error');
+            return;
+        }
+
         setLoading(true);
         try {
             const locationIds = locationRef.current?.selectedItems?.map((location: { id: any }) => location.id) || [];
@@ -93,10 +100,11 @@ const EditLocationAdmin = () => {
         { name: 'lastName', label: t('last_name'), type: 'text', required: true, section: 'User Information' },
         { name: 'dob', label: t('dob'), type: 'date', required: true, section: 'User Information' },
         { name: 'email', label: t('email'), type: 'email', required: true, section: 'User Information' },
-        { name: 'password', label: t('password'), type: 'password', required: false, section: 'User Information' }, // Optional in edit mode
         { name: 'address', label: t('address'), type: 'text', required: true, section: 'User Information' },
         { name: 'postalCode', label: t('postal_code'), type: 'text', required: true, section: 'User Information' },
         { name: 'phoneNumber', label: t('phone_number'), type: 'text', required: true, section: 'User Information' },
+        { name: 'password', label: t('new_password'), type: 'password', required: false, section: 'Change Password' },
+        { name: 'confirmPassword', label: t('confirm_password'), type: 'password', required: false, section: 'Change Password' },
     ];
 
     // Other Data fields (Locations and any additional info)

@@ -85,6 +85,11 @@ const EditTeacher = () => {
     };
 
     const handleTeacherSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
+        if (data.password && data.password !== data.confirmPassword) {
+            showMessage("Passwords do not match", 'error');
+            return;
+        }
+
         if (selectedLocations.length == 0) {
             showMessage("Locations field is required", 'error')
             return
@@ -107,6 +112,7 @@ const EditTeacher = () => {
                 address: data.address,
                 postalCode: data.postalCode,
                 phoneNumber: data.phoneNumber,
+                password: data.password
             };
 
             const teacherData = {
@@ -162,6 +168,8 @@ const EditTeacher = () => {
         { name: 'address', label: t('address'), type: 'text', required: true, section: 'User Information' },
         { name: 'postalCode', label: t('postal_code'), type: 'text', required: true, section: 'User Information' },
         { name: 'phoneNumber', label: t('phone_number'), type: 'text', required: true, section: 'User Information' },
+        { name: 'password', label: t('new_password'), type: 'password', required: false, section: 'Change Password' },
+        { name: 'confirmPassword', label: t('confirm_password'), type: 'password', required: false, section: 'Change Password' },
     ];
 
     const teacherFields = [
