@@ -22,6 +22,7 @@ interface ClassSessionDetailsModalProps {
     onClose: () => void;
     appointmentId: string;
     onEdit: () => void;
+    canEdit: boolean;
 }
 
 const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
@@ -29,6 +30,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     onClose,
     appointmentId,
     onEdit,
+    canEdit
 }) => {
     const [classSession, setClassSession] = useState<any>(null);
     const [loading, setLoading] = useState<boolean>(true);
@@ -38,8 +40,8 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     const [isReportFormOpen, setReportFormOpen] = useState<boolean>(false);
     const [isViewReportFormOpen, setViewReportFormOpen] = useState<boolean>(false);
     const [isViewPaymentModalOpen, setViewPaymentModalOpen] = useState<boolean>(false);  // State for payment modal
-    const [selectedStudent, setSelectedStudent] = useState<any>(null);  
-    const [selectedReportId, setSelectedReportId] = useState<string | null>(null);  
+    const [selectedStudent, setSelectedStudent] = useState<any>(null);
+    const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
 
     // Fetch class session details
     const loadClassSession = async () => {
@@ -85,8 +87,8 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
         const reportData = reportStatus[student.id];
         if (reportData && reportData.reportId) {
             setSelectedStudent(student);
-            setSelectedReportId(reportData.reportId);  
-            setViewReportFormOpen(true);  
+            setSelectedReportId(reportData.reportId);
+            setViewReportFormOpen(true);
         } else {
             console.log('No report available for this student');
         }
@@ -98,7 +100,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     };
 
     const refreshClassSessionData = async () => {
-        await loadClassSession();  
+        await loadClassSession();
     };
 
     const handleSaveReport = async (newReport: any) => {
@@ -108,7 +110,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
 
     const handleCloseReportForm = () => {
         setViewReportFormOpen(false);
-        refreshClassSessionData();  
+        refreshClassSessionData();
     };
 
     return (
@@ -150,7 +152,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                                     reportCompleted={reportStatus[student.id]?.reportCompleted}
                                     onAddReport={() => handleAddReport(student)}
                                     onViewReport={() => handleViewReport(student)}
-                                    onViewPayment={() => handleViewPayment(student)}  
+                                    onViewPayment={() => handleViewPayment(student)}
                                 />
                             ))
                         ) : (
@@ -159,16 +161,16 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
 
                         {allReportsCompleted && (
                             <Box display="flex" justifyContent="center" alignItems="center" mt={3}>
-                                <Typography 
-                                    variant="h5" 
-                                    color="green" 
-                                    sx={{ 
-                                        fontWeight: 'bold', 
-                                        textAlign: 'center', 
-                                        backgroundColor: '#e0f2f1', 
-                                        padding: '10px', 
-                                        borderRadius: '5px', 
-                                        border: '1px solid green' 
+                                <Typography
+                                    variant="h5"
+                                    color="green"
+                                    sx={{
+                                        fontWeight: 'bold',
+                                        textAlign: 'center',
+                                        backgroundColor: '#e0f2f1',
+                                        padding: '10px',
+                                        borderRadius: '5px',
+                                        border: '1px solid green'
                                     }}
                                 >
                                     Session Reports Submitted
@@ -219,9 +221,11 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                 <Button onClick={onClose} color="secondary">
                     Close
                 </Button>
-                <Button onClick={onEdit} color="primary" variant="contained">
-                    Edit
-                </Button>
+                {canEdit && (
+                    <Button onClick={onEdit} color="primary" variant="contained">
+                        Edit
+                    </Button>
+                )}
             </DialogActions>
         </Dialog>
     );

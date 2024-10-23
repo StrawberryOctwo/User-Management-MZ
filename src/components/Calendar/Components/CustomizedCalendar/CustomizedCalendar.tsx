@@ -90,6 +90,7 @@ export default function CustomizedCalendar({
   const [isModalOpen, setModalOpen] = useState(false);
   const [isDetailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
+  const [canEditSession, setCanEditSession] = useState<boolean | null>(true);
   const { userRoles } = useAuth();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
 
@@ -167,6 +168,9 @@ export default function CustomizedCalendar({
 
   // Function to handle event selection
   const handleEventClick = (event: any) => {
+    if (strongestRoles[0] == 'Teacher' || strongestRoles[0] == 'Student') {
+      setCanEditSession(false)
+    }
     const appointmentId = event.data?.appointment?.id;
     if (appointmentId) {
       setSelectedAppointmentId(appointmentId);
@@ -177,6 +181,9 @@ export default function CustomizedCalendar({
   };
 
   const handleEditClassSession = () => {
+    if (strongestRoles[0] == 'Teacher' || strongestRoles[0] == 'Student') {
+      return
+    }
     if (selectedAppointmentId) {
       setSelectedAppointment(selectedAppointmentId);
       setDetailsModalOpen(false);
@@ -217,7 +224,7 @@ export default function CustomizedCalendar({
   });
 
   const handleOpenAddModal = (start: Date, end: Date) => {
-    if (strongestRoles[0] == 'Teacher' || strongestRoles[0] == 'Student') {
+    if (strongestRoles[0] == 'Student') {
       return
     }
     setSelectedRange({ start, end });
@@ -303,6 +310,7 @@ export default function CustomizedCalendar({
         onClose={() => setDetailsModalOpen(false)}
         appointmentId={selectedAppointmentId!}
         onEdit={handleEditClassSession}
+        canEdit={canEditSession}
       />
     </Box>
   );

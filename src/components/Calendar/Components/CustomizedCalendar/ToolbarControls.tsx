@@ -130,7 +130,7 @@ export default function ToolbarControls({
       </Box>
 
 
-      <RoleBasedComponent allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin']}>
+      <RoleBasedComponent allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher']}>
         <Button
           variant="contained"
           sx={{ ml: 2, bgcolor: PRIMARY_COLOR, '&:hover': { bgcolor: SECONDARY_COLOR } }}
