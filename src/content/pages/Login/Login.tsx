@@ -11,10 +11,8 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { login } from 'src/services/authService';
-import useAuthRedirect from 'src/hooks/useAuthRedirect';
 
 const Login: React.FC = () => {
-  useAuthRedirect(); // Automatically redirects if authenticated
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');

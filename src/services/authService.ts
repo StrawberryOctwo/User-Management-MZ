@@ -29,6 +29,7 @@ export const logout = () => {
   cookies.remove('token', { path: '/' });
 };
 
-export const isAuthenticated = (): boolean => {
-  return !!cookies.get('token');
+export const isAuthenticated = (): any => {
+  console.log(!!cookies.get('token'))
+  // return !!cookies.get('token');
 };
