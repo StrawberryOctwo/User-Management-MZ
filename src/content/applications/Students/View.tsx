@@ -70,108 +70,49 @@ const ViewStudentPage: React.FC = () => {
         { name: 'notes', label: t('notes'), section: t('student_details') },
         { name: 'availableDates', label: t('available_dates'), section: t('student_details') },
         { name: 'created_at', label: t('created_date'), section: t('student_details') },
+        {
+            name: 'sessionReports',
+            label: t('session_reports'),
+            section: t('session_reports'),
+            isArray: true,
+            columns: [
+                { field: 'report_type', headerName: t('report_type') },
+                { field: 'comments', headerName: t('comments') },
+                { field: 'session_date', headerName: t('session_date'), format: 'yyyy-MM-dd' },
+            ],
+        },
+        {
+            name: 'payments',
+            label: t('payments'),
+            section: t('payments_section'),
+            isArray: true,
+            columns: [
+                { field: 'amount', headerName: t('amount') },
+                { field: 'paymentStatus', headerName: t('status') },
+                { field: 'paymentDate', headerName: t('date'), format: 'yyyy-MM-dd' },
+            ],
+        },
+        {
+            name: 'documents',
+            label: t('documents'),
+            section: t('documents'),
+            isArray: true, // Treat documents as an array
+            columns: [
+                { field: 'name', headerName: t('name'), flex: 1 },
+                { field: 'type', headerName: t('type'), flex: 1 },
+                { field: 'path', headerName: t('path'), flex: 1 },
+                {
+                    field: 'actions',
+                    headerName: t('actions'),
+                    renderCell: (params: { row: { id: any; name: string } }) => (
+                        <FileActions fileId={params.row.id} fileName={params.row.name} />
+                    ),
+                    sortable: false,
+                    width: 200,
+                },
+            ],
+        },
     ];
-
-    // Table for session reports
-    const renderSessionReportsTable = () => (
-        <Box mt={4}>
-            <Typography variant="h6">{t('session_reports')}</Typography>
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>{t('report_type')}</TableCell>
-                            <TableCell>{t('comments')}</TableCell>
-                            <TableCell>{t('session_date')}</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {sessionReports ? (
-                            sessionReports.map((report) => (
-                                <TableRow key={report.id}>
-                                    <TableCell>{report.reportType}</TableCell>
-                                    <TableCell>{report.comments}</TableCell>
-                                    <TableCell>{format(new Date(report.session.sessionStartDate), 'yyyy-MM-dd')}</TableCell>
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={3}>{t('no_reports_available')}</TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </Box>
-    );
-
-    // Table for payments
-    const renderPaymentsTable = () => (
-        <Box mt={4}>
-            <Typography variant="h6">{t('payments')}</Typography>
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>{t('Amount')}</TableCell>
-                            <TableCell>{t('Status')}</TableCell>
-                            <TableCell>{t('Date')}</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {payments.length > 0 ? (
-                            payments.map((payment) => (
-                                <TableRow key={payment.id}>
-                                    <TableCell>{payment.amount}</TableCell>
-                                    <TableCell>{payment.paymentStatus}</TableCell>
-                                    <TableCell>{format(new Date(payment.paymentDate), 'yyyy-MM-dd')}</TableCell>
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={3}>{t('no_payments_available')}</TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </Box>
-    );
-
-    // Table for documents
-    const renderDocumentsTable = () => (
-        <Box mt={4}>
-            <Typography variant="h6">{t('documents')}</Typography>
-            <TableContainer component={Paper}>
-                <Table>
-                    <TableHead>
-                        <TableRow>
-                            <TableCell>{t('Name')}</TableCell>
-                            <TableCell>{t('Type')}</TableCell>
-                            <TableCell>{t('Actions')}</TableCell>
-                        </TableRow>
-                    </TableHead>
-                    <TableBody>
-                        {documents.length > 0 ? (
-                            documents.map((doc) => (
-                                <TableRow key={doc.id}>
-                                    <TableCell>{doc.name}</TableCell>
-                                    <TableCell>{doc.type}</TableCell>
-                                    <TableCell>
-                                        <FileActions fileId={doc.id} fileName={doc.name} />
-                                    </TableCell>
-                                </TableRow>
-                            ))
-                        ) : (
-                            <TableRow>
-                                <TableCell colSpan={3}>{t('no_documents_available')}</TableCell>
-                            </TableRow>
-                        )}
-                    </TableBody>
-                </Table>
-            </TableContainer>
-        </Box>
-    );
 
     return (
         <Box sx={{ position: 'relative', padding: 4 }}>
@@ -186,9 +127,6 @@ const ViewStudentPage: React.FC = () => {
                         data={student}
                         entityName={`${student.user.firstName} ${student.user.lastName}`}
                     />
-                    {renderSessionReportsTable()}
-                    {renderPaymentsTable()}
-                    {renderDocumentsTable()}
                 </>
             ) : (
                 <Typography variant="h6">{t('no_student_data_available')}</Typography>

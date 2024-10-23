@@ -116,7 +116,10 @@
   "contract": "Contract",
   "absence": "Absence",
   "report_type":"Report Type",
-  "session_date":"Session Date"
+  "session_date":"Session Date",
 
 
+
+  "session_reports": "Session Reports",
+  "payments_section": "Payments Section"
 }

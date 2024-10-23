@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { useSessionExpiration } from '../contexts/SessionExpirationContext';
 import { useSnackbar } from '../contexts/SnackbarContext'; // Import Snackbar context
 import { Cookies } from 'react-cookie';
 
@@ -29,7 +28,6 @@ api.interceptors.request.use(
 );
 // Set up Axios interceptors globally
 // export const useAxiosInterceptors = () => {
-//   const { triggerSessionExpiration } = useSessionExpiration();
 //   const { showMessage } = useSnackbar();
 
 //   api.interceptors.response.use(

@@ -1,5 +1,5 @@
 import { Box, Button, CircularProgress } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { fetchStudents, deleteStudent } from 'src/services/studentService';
@@ -15,37 +15,39 @@ export default function StudentsContent() {
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(25);
 
+  const isMounted = useRef(true);
   const navigate = useNavigate();
 
   useEffect(() => {
+    isMounted.current = true;
+
     loadStudents();
-  }, [limit, page]);
+
+    return () => {
+      isMounted.current = false;
+    };
+  }, [page, limit]);
 
   const loadStudents = async (searchQuery = '') => {
     setLoading(true);
     setErrorMessage(null);
     try {
       const { data, total } = await fetchStudents(page + 1, limit, searchQuery);
-      setStudents([...data]);
-      setTotalCount(total);
+      if (isMounted.current) {
+        setStudents(data);
+        setTotalCount(total);
+      }
     } catch (error: any) {
-      if (error.response?.data?.message.includes('TokenExpiredError')) {
-      } else {
-        setErrorMessage('Failed to load students. Please try again.');
+      if (isMounted.current) {
+        if (error.response?.data?.message.includes('TokenExpiredError')) {
+        } else {
+          setErrorMessage('Failed to load students. Please try again.');
+        }
       }
     } finally {
-      setLoading(false);
+      if (isMounted.current) setLoading(false);
     }
   };
-
-  const columns = [
-    { field: 'firstName', headerName: 'First Name' },
-    { field: 'lastName', headerName: 'Last Name' },
-    { field: 'email', headerName: 'Email' },
-    { field: 'gradeLevel', headerName: 'Grade Level' },
-    { field: 'status', headerName: 'Status' },
-    { field: 'payPerHour', headerName: 'Pay Per Hour' },
-  ];
 
   const handleEdit = (id: any) => {
     navigate(`edit/${id}`);
@@ -63,9 +65,9 @@ export default function StudentsContent() {
       await deleteStudent(selectedIds);
       await loadStudents();
     } catch (error: any) {
-      setErrorMessage('Failed to delete students.');
+      if (isMounted.current) setErrorMessage('Failed to delete students.');
     } finally {
-      setLoading(false);
+      if (isMounted.current) setLoading(false);
     }
   };
 
@@ -90,7 +92,14 @@ export default function StudentsContent() {
     <Box>
       <ReusableTable
         data={students}
-        columns={columns}
+        columns={[
+          { field: 'firstName', headerName: 'First Name' },
+          { field: 'lastName', headerName: 'Last Name' },
+          { field: 'email', headerName: 'Email' },
+          { field: 'gradeLevel', headerName: 'Grade Level' },
+          { field: 'status', headerName: 'Status' },
+          { field: 'payPerHour', headerName: 'Pay Per Hour' },
+        ]}
         title="Student List"
         onEdit={handleEdit}
         onView={handleView}

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Box,
@@ -21,6 +21,15 @@ const Login: React.FC = () => {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const isMounted = useRef(true); // Track if component is mounted
+
+  useEffect(() => {
+    isMounted.current = true; // Mark as mounted when the component is mounted
+
+    return () => {
+      isMounted.current = false; // Cleanup: mark as unmounted on component unmount
+    };
+  }, []);
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,15 +38,17 @@ const Login: React.FC = () => {
 
     try {
       const response = await login(email, password);
-      if (response?.status === 200) {
-        navigate('/dashboard'); // Only navigate if login is successful
-      } else {
-        setError('Invalid credentials');
+      if (isMounted.current) {
+        if (response?.status === 200) {
+          navigate('/dashboard'); // Only navigate if login is successful
+        } else {
+          setError('Invalid credentials');
+        }
       }
     } catch (err) {
-      setError('Invalid credentials');
+      if (isMounted.current) setError('Invalid credentials');
     } finally {
-      setLoading(false);
+      if (isMounted.current) setLoading(false); // Avoid state update if unmounted
     }
   };
 
@@ -51,7 +62,7 @@ const Login: React.FC = () => {
         alignItems: 'center',
       }}
     >
-      <Paper elevation={1} variant="outlined" sx={{ padding: 4, width: '100%' }}>
+      <Paper variant="outlined" sx={{ padding: 4, width: '100%' }}>
         <Typography variant="h4" align="left" gutterBottom>
           Login
         </Typography>

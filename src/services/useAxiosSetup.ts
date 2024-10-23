@@ -1,11 +1,9 @@
 import { useEffect } from 'react';
-import { useSessionExpiration } from '../contexts/SessionExpirationContext';
 import { useSnackbar } from '../contexts/SnackbarContext';
 import { api } from './api';
 import { useNavigate } from 'react-router';
 
 export const AxiosInterceptorSetup = () => {
-  const { triggerSessionExpiration } = useSessionExpiration();
   const { showMessage } = useSnackbar();
   const navigate = useNavigate();
 
@@ -29,7 +27,7 @@ export const AxiosInterceptorSetup = () => {
           navigate('/logout');
         }
         if (error.response?.data?.message?.includes('TokenExpiredError')) {
-          triggerSessionExpiration();
+          navigate('/logout');
         }
         const errorMessage = error.response?.data?.message || 'An error occurred';
         showMessage(errorMessage, 'error');
@@ -41,7 +39,7 @@ export const AxiosInterceptorSetup = () => {
       api.interceptors.request.eject(requestInterceptor);
       api.interceptors.response.eject(responseInterceptor);
     };
-  }, [triggerSessionExpiration, showMessage]);
+  }, [showMessage]);
 
   return null;
 };

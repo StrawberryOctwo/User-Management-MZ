@@ -36,47 +36,46 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({ fields, data, entityN
             </Typography>
             {Object.entries(groupedFields).map(([section, fields], index, arr) => (
                 <Box key={section} sx={{ mb: 4 }}>
-                    <Typography variant="subtitle1" gutterBottom sx={{ mb: 1, ml: 1 }}>
+                    <Typography variant="subtitle1" gutterBottom sx={{ mb: 2, ml: 1 }}>
                         <strong>{section}</strong>
                     </Typography>
                     <Grid container spacing={2}>
                         {fields.map((field) => (
                             <Grid item xs={12} key={field.name}>
                                 {field.isArray ? (
-                                    field.isTable !== false ? ( // Default to table view
+                                    field.isTable !== false ? (
                                         <DataGrid
                                             autoHeight
-                                            rows={(data[field.name] as Array<any>).map((item, idx) => ({ id: idx, ...item }))}
+                                            rows={data[field.name] || []}
                                             columns={field.columns as GridColDef[]}
-                                            pageSize={pageSize} // Set the page size
-                                            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)} // Handle page size change
-                                            rowsPerPageOptions={[5, 10, 25]} // Add the available page size options
-                                            pagination // Enable pagination
-                                            paginationMode="client" // Default client-side pagination
-                                            components={{ Toolbar: CustomToolbar }}
+                                            pageSize={pageSize}
+                                            onPageSizeChange={(newPageSize) => setPageSize(newPageSize)}
+                                            rowsPerPageOptions={[5, 10, 25]}
+                                            pagination
+                                            components={{
+                                                Toolbar: CustomToolbar
+                                            }}
+                                            componentsProps={{
+                                                noRowsOverlay: {
+                                                    children: (
+                                                        <Typography variant="body2" sx={{ mt: 1 }}>
+                                                            No results found.
+                                                        </Typography>
+                                                    ),
+                                                },
+                                            }}
                                             disableSelectionOnClick
                                             sx={{
                                                 ml: 1,
-                                                '& .MuiDataGrid-main': {
-                                                    borderTop: '1px solid #ddd',
-                                                },
-                                                '& .MuiDataGrid-columnHeaderTitle': {
-                                                    fontWeight: 'bold',
-                                                },
-                                                '& .MuiDataGrid-columnHeader': {
-                                                    borderRight: '1px solid #ddd',
-                                                },
-                                                '& .MuiDataGrid-cell': {
-                                                    borderRight: '1px solid #ddd',
-                                                },
-                                                '& .MuiDataGrid-cell:focus': {
-                                                    outline: 'none',
-                                                },
-                                                '& .MuiDataGrid-cell:focus-within': {
-                                                    outline: 'none', // Removes the focus indicator within the cell as well
-                                                },
+                                                '& .MuiDataGrid-main': { borderTop: '1px solid #ddd' },
+                                                '& .MuiDataGrid-columnHeaderTitle': { fontWeight: 'bold' },
+                                                '& .MuiDataGrid-columnHeader': { borderRight: '1px solid #ddd' },
+                                                '& .MuiDataGrid-cell': { borderRight: '1px solid #ddd' },
+                                                '& .MuiDataGrid-cell:focus': { outline: 'none' },
+                                                '& .MuiDataGrid-cell:focus-within': { outline: 'none' },
                                             }}
                                         />
+
                                     ) : (
                                         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', ml: 1 }}>
                                             {(data[field.name] as Array<any>).map((item) => (
