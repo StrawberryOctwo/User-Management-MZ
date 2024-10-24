@@ -25,7 +25,7 @@ export const AxiosInterceptorSetup = () => {
       (error) => {
         const errorMessage = error.response?.data?.message || 'An error occurred';
       
-        if (errorMessage.includes('JsonWebTokenError: invalid token')) {
+        if (errorMessage.includes('JsonWebTokenError: invalid token') || errorMessage.includes('Invalid Token')) {
           // Handle invalid token
           showMessage('Invalid Token', 'error');
           navigate('/logout'); // Redirect to logout

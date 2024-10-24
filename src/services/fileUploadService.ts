@@ -1,26 +1,5 @@
 import { api } from './api';
-import { Cookies } from 'react-cookie';
 
-// Create an instance of Cookies
-const cookies = new Cookies();
-
-// Function to get the token from cookies
-const getToken = () => {
-    return cookies.get('token');
-};
-
-api.interceptors.request.use(
-    (config) => {
-        const token = getToken(); // Get token from cookies
-        if (token) {
-            config.headers['Authorization'] = `Bearer ${token}`; // Set Authorization header
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
 
 // Fetch uploaded files
 export const fetchFiles = async (page: number, limit: number, searchQuery: string = '') => {

@@ -1,27 +1,5 @@
-import { Cookies } from 'react-cookie';
 import { api } from './api';
 
-// Create an instance of Cookies
-const cookies = new Cookies();
-
-// Function to get the token from cookies
-const getToken = () => {
-    return cookies.get('token');
-};
-
-// Add a request interceptor to include the Authorization header
-api.interceptors.request.use(
-    (config) => {
-        const token = getToken(); // Get token from cookies
-        if (token) {
-            config.headers['Authorization'] = `Bearer ${token}`; // Set Authorization header
-        }
-        return config;
-    },
-    (error) => {
-        return Promise.reject(error);
-    }
-);
 
 
 export const fetchStudents = async (page: number, limit: number, searchQuery: string = '') => {
