@@ -1,5 +1,5 @@
 import { Box, Button, CircularProgress } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { fetchTeachers, deleteTeacher } from 'src/services/teacherService';
@@ -15,11 +15,16 @@ export default function TeachersContent() {
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(25);
+  const isMounted = useRef(false);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadTeachers();
+    if (isMounted.current) {
+      loadTeachers();
+    } else {
+      isMounted.current = true;
+    }
   }, [limit, page]);
 
   const loadTeachers = async (searchQuery = '') => {

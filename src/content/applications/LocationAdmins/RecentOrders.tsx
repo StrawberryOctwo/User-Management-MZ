@@ -1,5 +1,5 @@
 import { Box, Button, CircularProgress } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { deleteLocationAdmins, fetchLocationAdmins } from 'src/services/locationAdminService';
@@ -15,11 +15,16 @@ export default function LocationAdminsContent() {
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(25);
+  const isMounted = useRef(false);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadAdmins();
+    if (isMounted.current) {
+      loadAdmins();
+    } else {
+      isMounted.current = true;
+    }
   }, [limit, page]);
 
   const loadAdmins = async (searchQuery = '') => {
@@ -48,10 +53,10 @@ export default function LocationAdminsContent() {
         return value; // In case it's not an array, return as is
       }
     },
-    { 
-      field: 'dob', 
-      headerName: 'DOB', 
-      render: (value: any) => new Date(value).toLocaleDateString() 
+    {
+      field: 'dob',
+      headerName: 'DOB',
+      render: (value: any) => new Date(value).toLocaleDateString()
     },
     { field: 'email', headerName: 'Email' },
     { field: 'address', headerName: 'Address' },

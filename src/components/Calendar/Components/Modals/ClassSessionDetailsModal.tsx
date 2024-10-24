@@ -126,13 +126,19 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                         <Card variant="outlined" sx={{ mb: 3 }}>
                             <CardContent>
                                 <Typography variant="subtitle1">
-                                    <strong>Name:</strong> {classSession.name}
+                                    <strong>Session Name:</strong> {classSession.name}
                                 </Typography>
                                 <Typography variant="subtitle1">
                                     <strong>Teacher:</strong> {classSession.teacher?.user?.firstName} {classSession.teacher?.user?.lastName}
                                 </Typography>
                                 <Typography variant="subtitle1">
                                     <strong>Topic:</strong> {classSession.topic?.name}
+                                </Typography>
+                                <Typography variant="subtitle1">
+                                    <strong>Location:</strong> {classSession.location.name}
+                                </Typography>
+                                <Typography variant="subtitle1">
+                                    <strong>Session Type:</strong> {classSession.sessionType}
                                 </Typography>
                                 <Typography variant="subtitle1">
                                     <strong>Start Time:</strong> {moment(classSession.sessionStartDate).format('LLL')}

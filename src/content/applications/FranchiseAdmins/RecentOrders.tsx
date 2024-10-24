@@ -1,5 +1,5 @@
 import { Box, Button, CircularProgress } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { deleteFranchiseAdmin, fetchFranchiseAdmins } from 'src/services/franchiseAdminService';
@@ -15,11 +15,15 @@ export default function FranchiseAdminsContent() {
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(25);
-
+  const isMounted = useRef(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadAdmins();
+    if (isMounted.current) {
+      loadAdmins();
+    } else {
+      isMounted.current = true;
+    }
   }, [limit, page]);
 
   const loadAdmins = async (searchQuery = '') => {
@@ -29,10 +33,12 @@ export default function FranchiseAdminsContent() {
       setAdmins([...data]);
       setTotalCount(total);
     } catch (error) {
+      console.error('Error fetching admins:', error);
     } finally {
       setLoading(false);
     }
   };
+
 
   const columns = [
     { field: 'firstName', headerName: 'First Name' },
@@ -47,17 +53,17 @@ export default function FranchiseAdminsContent() {
         return value; // In case it's not an array, return as is
       }
     },
-    { 
-      field: 'dob', 
-      headerName: 'DOB', 
-      render: (value: any) => new Date(value).toLocaleDateString() 
+    {
+      field: 'dob',
+      headerName: 'DOB',
+      render: (value: any) => new Date(value).toLocaleDateString()
     },
     { field: 'email', headerName: 'Email' },
     { field: 'address', headerName: 'Address' },
     { field: 'postalCode', headerName: 'Postal Code' },
     { field: 'phoneNumber', headerName: 'Phone Number' },
   ];
-  
+
 
   const handleEdit = (id: any) => {
     navigate(`edit/${id}`);

@@ -15,17 +15,15 @@ export default function StudentsContent() {
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(25);
 
-  const isMounted = useRef(true);
+  const isMounted = useRef(false);
   const navigate = useNavigate();
 
   useEffect(() => {
-    isMounted.current = true;
-
-    loadStudents();
-
-    return () => {
-      isMounted.current = false;
-    };
+    if (isMounted.current) {
+      loadStudents();
+    } else {
+      isMounted.current = true;
+    }
   }, [page, limit]);
 
   const loadStudents = async (searchQuery = '') => {

@@ -1,5 +1,5 @@
 import { Box, Button, CircularProgress } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { Franchise } from 'src/models/FranchiseModel';
@@ -15,11 +15,16 @@ export default function ViewFranchisePage() {
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(25);
+  const isMounted = useRef(false);
 
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadFranchises();
+    if (isMounted.current) {
+      loadFranchises();
+    } else {
+      isMounted.current = true;
+    }
   }, [limit, page]);
 
   const loadFranchises = async (searchQuery = '') => {
@@ -29,6 +34,7 @@ export default function ViewFranchisePage() {
       setFranchises([...data]);
       setTotalCount(total);
     } catch (error) {
+      console.error('Error fetching franchises:', error);
     } finally {
       setLoading(false);
     }
