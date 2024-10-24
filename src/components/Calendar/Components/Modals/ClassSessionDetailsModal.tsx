@@ -16,6 +16,7 @@ import AddSessionReportForm from './AddSessionReportForm';
 import ViewSessionReportForm from './ViewSessionReport';
 import ViewPaymentDetails from './ViewPaymentDetails';  // New Component for payment view
 import StudentDetailCard from './StudentDetailCArd';
+import { createPaymentForUser, getPaymentsForUserByClassSession } from 'src/services/paymentService.'; // Fix the path if needed
 
 interface ClassSessionDetailsModalProps {
     isOpen: boolean;
@@ -41,7 +42,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     const [allReportsCompleted, setAllReportsCompleted] = useState<boolean>(false);
     const [isReportFormOpen, setReportFormOpen] = useState<boolean>(false);
     const [isViewReportFormOpen, setViewReportFormOpen] = useState<boolean>(false);
-    const [isViewPaymentModalOpen, setViewPaymentModalOpen] = useState<boolean>(false);  // State for payment modal
+    const [isViewPaymentModalOpen, setViewPaymentModalOpen] = useState<boolean>(false);
     const [selectedStudent, setSelectedStudent] = useState<any>(null);
     const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
 
@@ -49,6 +50,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     const loadClassSession = async () => {
         setLoading(true);
         setErrorMessage(null);
+
         try {
             const response = await fetchClassSessionById(appointmentId);
             setClassSession(response);
@@ -66,6 +68,32 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
             }
 
             setReportStatus(studentReportsStatus);
+
+            // Now check if all reports are completed
+            const allReportsComplete = Object.values(studentReportsStatus).every(status => status.reportCompleted);
+            setAllReportsCompleted(allReportsComplete);
+
+
+            // If all reports are completed, check if payment was already made
+            if (allReportsComplete) {
+                const paymentStatusResponse = await getPaymentsForUserByClassSession(response.teacher.user.id, response.id)
+                console.log(paymentStatusResponse);
+                if (paymentStatusResponse) {
+                    console.log('Payment already sent, skipping payment creation');
+                } else {
+                    try {
+                        // Payment not sent, create the payment
+                        await createPaymentForUser({
+                            amount: response.teacher.hourlyRate,
+                            userId: response.teacher.user.id,
+                            classSessionId: response.id,
+                        });
+                        console.log('Payment successfully sent');
+                    } catch (paymentError) {
+                        console.error('Error creating payment:', paymentError);
+                    }
+                }
+            }
         } catch (error) {
             setErrorMessage('Failed to load class session details.');
             console.error('Error fetching class session details:', error);
@@ -98,7 +126,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
 
     const handleViewPayment = (student: any) => {
         setSelectedStudent(student);
-        setViewPaymentModalOpen(true);  // Open payment modal for selected student
+        setViewPaymentModalOpen(true);
     };
 
     const refreshClassSessionData = async () => {
@@ -185,7 +213,6 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                                 </Typography>
                             </Box>
                         )}
-
 
                         {/* Add Session Report Form Dialog */}
                         <AddSessionReportForm
