@@ -27,6 +27,7 @@ import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelect
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import { useAuth } from 'src/hooks/useAuth';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
+import { fetchLocations } from 'src/services/locationService';
 
 interface ClassSession {
   name: string;
@@ -75,6 +76,7 @@ export default function AddClassSessionModal({
   const [studentError, setStudentError] = useState<string | null>(null);
   const [startTimeError, setStartTimeError] = useState<string | null>(null);
   const [endTimeError, setEndTimeError] = useState<string | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<any | null>(null); // Location state
 
   const [isRepeat, setIsRepeat] = useState(false);
   const [repeatUntilDate, setRepeatUntilDate] = useState<Date | null>(null);
@@ -112,6 +114,9 @@ export default function AddClassSessionModal({
     if (!newSession.sessionEndDate) errors.sessionEndDate = t('errors.endTimeRequired');
     if (!selectedTeacher) errors.teacherId = t('errors.teacherSelectionRequired');
     if (!selectedTopic) errors.topicId = t('errors.topicSelectionRequired');
+    if (strongestRoles.includes('Teacher') && !selectedLocation) {
+      errors.locationId = t('errors.locationSelectionRequired'); // Add error if location is not selected
+    }
 
     const { validatedStudents, error } = validateStudentSelection(
       newSession.sessionType,
@@ -167,7 +172,16 @@ export default function AddClassSessionModal({
       });
     }
 
-    onSave(sessionArray);
+    if (isRepeat && repeatUntilWeek) {
+      onSave(sessionArray); // Pass the array of repeated sessions
+    } else {
+      onSave([{
+        ...newSession,
+        studentIds: selectedStudents.map((student) => student.id),
+        locationId: selectedLocation ? selectedLocation.id : 0,
+      }]); // Wrap single session in an array
+    }
+
 
     clearForm();
     onClose();
@@ -207,6 +221,7 @@ export default function AddClassSessionModal({
     setSelectedStudents([]);
     setSelectedTeacher(null);
     setSelectedTopic(null);
+    setSelectedLocation(null);
     setNewSession({
       name: '',
       sessionStartDate: initialStartDate,
@@ -355,6 +370,27 @@ export default function AddClassSessionModal({
           </Box>
         </Box>
 
+
+        {strongestRoles[0] === 'Teacher' && (
+          <Box sx={{ mb: 2 }}>
+            <SingleSelectWithAutocomplete
+              label="Select Location"
+              fetchData={(query) =>
+                fetchLocations(1, 5, query).then((data) => data.data)
+              }
+              onSelect={(location) => setSelectedLocation(location)}
+              displayProperty="name"
+              placeholder="Search Location"
+              initialValue={selectedLocation}
+              width="100%"
+            />
+            {fieldErrors.locationId && (
+              <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                {fieldErrors.locationId}
+              </Typography>
+            )}
+          </Box>
+        )}
 
         <Box sx={{ mb: 2 }}>
           <SingleSelectWithAutocomplete

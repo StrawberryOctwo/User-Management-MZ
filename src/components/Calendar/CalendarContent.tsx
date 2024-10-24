@@ -118,14 +118,17 @@ const CalendarContent: React.FC = () => {
     setEndDate(newEndDate);
   };
 
-  const handleSaveClassSession = async (newSession: any, callback?: () => void) => {
+  const handleSaveClassSession = async (newSessionArray: any[], callback?: () => void) => {
     try {
-      for (const session of newSession) {
+      for (const session of newSessionArray) {
+        // Ensure locationId is directly from the session object
         const sessionPayload = {
           ...session,
-          locationId: selectedLocation?.id,
+          locationId: session.locationId || selectedLocation?.id || 0, // Use session location or fallback to selectedLocation
         };
 
+        console.log('Original Session:', session);
+        console.log('Session Payload:', sessionPayload);
         await addClassSessions(sessionPayload);
       }
 
@@ -134,6 +137,7 @@ const CalendarContent: React.FC = () => {
       console.error('Failed to add class sessions:', error);
     }
   };
+
 
   const handleFranchiseChange = (franchise: any) => {
     setSelectedFranchise(franchise);
