@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Button, Typography, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from '@mui/material';
-import { t } from 'i18next'; // Import the translation hook
+import { Box, Typography } from '@mui/material';
+import { t } from 'i18next';
 import { format } from 'date-fns';
 import { fetchStudentById, fetchStudentDocumentsById } from 'src/services/studentService';
 import ReusableDetails from 'src/components/View';
@@ -13,15 +13,15 @@ const ViewStudentPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [student, setStudent] = useState<Record<string, any> | null>(null);
     const [loading, setLoading] = useState(true);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null); // Error state for the page
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [documents, setDocuments] = useState<any[]>([]);
-    const [sessionReports, setSessionReports] = useState<any[]>([]); // Store session reports
-    const [payments, setPayments] = useState<any[]>([]); // Store payments
+    const [sessionReports, setSessionReports] = useState<any[]>([]);
+    const [payments, setPayments] = useState<any[]>([]);
 
     // Function to load the student and associated data
     const loadStudentData = async () => {
         setLoading(true);
-        setErrorMessage(null); // Clear previous errors
+        setErrorMessage(null); 
 
         try {
             const studentData = await fetchStudentById(Number(id));
@@ -33,11 +33,11 @@ const ViewStudentPage: React.FC = () => {
             const reports = await getSessionReportsForStudent(id);
             setSessionReports(reports);
 
-            const userPayments = await getPaymentsForUser(studentData.user.id);
+            const userPayments = await getPaymentsForUser(studentData.user?.id);
             setPayments(userPayments);
         } catch (error: any) {
             console.error('Failed to fetch student data:', error);
-            setErrorMessage(t('failed_to_fetch_student')); // Set error message for retry mechanism
+            setErrorMessage(t('failed_to_fetch_student'));
         } finally {
             setLoading(false);
         }
@@ -45,23 +45,35 @@ const ViewStudentPage: React.FC = () => {
 
     useEffect(() => {
         if (id) {
-            loadStudentData(); // Fetch student data on component mount
+            loadStudentData();
         }
-    }, [id, t]);
-
-    const formattedCreatedAt = student ? format(new Date(student.created_at), 'PPpp') : '';
-    const formattedContractEndDate = student ? format(new Date(student.contractEndDate), 'yyyy-MM-dd') : '';
-    const formattedDob = student ? format(new Date(student.user.dob), 'yyyy-MM-dd') : '';
-
-    // Define fields for the ReusableDetails component
+    }, [id]);
+    const flattenedData = {
+        ...student, // Spread original student data
+        sessionReports, // Include sessionReports
+        documents, // Include documents
+        payments, // Include payments
+        firstName: student?.user?.firstName || '', // Flatten user fields
+        lastName: student?.user?.lastName || '',
+        dob: student?.user?.dob || '',
+        email: student?.user?.email || '',
+        address: student?.user?.address || '',
+        postalCode: student?.user?.postalCode || '',
+        phoneNumber: student?.user?.phoneNumber || '',
+    };
+    
+    
+    // Ensure the user data is fetched correctly
+    const user = student?.user || {}; // Use a default empty object if user is undefined
+    // Define fields for ReusableDetails
     const Fields = [
-        { name: 'user.firstName', label: t('first_name'), section: t('user_details') },
-        { name: 'user.lastName', label: t('last_name'), section: t('user_details') },
-        { name: 'user.dob', label: t('dob'), section: t('user_details') },
-        { name: 'user.email', label: t('email'), section: t('user_details') },
-        { name: 'user.address', label: t('address'), section: t('user_details') },
-        { name: 'user.postalCode', label: t('postal_code'), section: t('user_details') },
-        { name: 'user.phoneNumber', label: t('phone_Number'), section: t('user_details') },
+        { name: 'firstName', label: t('first_name'), section: t('user_details') },
+        { name: 'lastName', label: t('last_name'), section: t('user_details') },
+        { name: 'dob', label: t('dob'), section: t('user_details') },
+        { name: 'email', label: t('email'), section: t('user_details') },
+        { name: 'address', label: t('address'), section: t('user_details') },
+        { name: 'postalCode', label: t('postal_code'), section: t('user_details') },
+        { name: 'phoneNumber', label: t('phone_number'), section: t('user_details') },
         { name: 'payPerHour', label: t('pay_per_hour'), section: t('student_details') },
         { name: 'status', label: t('status'), section: t('student_details') },
         { name: 'gradeLevel', label: t('grade_level'), section: t('student_details') },
@@ -76,9 +88,9 @@ const ViewStudentPage: React.FC = () => {
             section: t('session_reports'),
             isArray: true,
             columns: [
-                { field: 'report_type', headerName: t('report_type') },
-                { field: 'comments', headerName: t('comments') },
-                { field: 'session_date', headerName: t('session_date'), format: 'yyyy-MM-dd' },
+                { field: 'lessonTopic', headerName: t('lesson_topic') },
+                { field: 'activeParticipation', headerName: t('active_participation') },
+                { field: 'tutorRemarks', headerName: t('tutor_remarks') },
             ],
         },
         {
@@ -96,11 +108,11 @@ const ViewStudentPage: React.FC = () => {
             name: 'documents',
             label: t('documents'),
             section: t('documents'),
-            isArray: true, // Treat documents as an array
+            isArray: true,
             columns: [
-                { field: 'name', headerName: t('name'), flex: 1 },
-                { field: 'type', headerName: t('type'), flex: 1 },
-                { field: 'path', headerName: t('path'), flex: 1 },
+                { field: 'name', headerName: t('name') },
+                { field: 'type', headerName: t('type') },
+                { field: 'path', headerName: t('path') },
                 {
                     field: 'actions',
                     headerName: t('actions'),
@@ -121,13 +133,11 @@ const ViewStudentPage: React.FC = () => {
             ) : errorMessage ? (
                 <Typography variant="h6" color="error">{errorMessage}</Typography>
             ) : student ? (
-                <>
-                    <ReusableDetails
-                        fields={Fields}
-                        data={student}
-                        entityName={`${student.user.firstName} ${student.user.lastName}`}
-                    />
-                </>
+                <ReusableDetails
+                    fields={Fields}
+                    data={flattenedData}
+                    entityName={`${user.firstName || ''} ${user.lastName || ''}`}
+                />
             ) : (
                 <Typography variant="h6">{t('no_student_data_available')}</Typography>
             )}
