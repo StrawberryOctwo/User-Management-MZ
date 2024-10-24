@@ -11,9 +11,9 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { login } from 'src/services/authService';
+import { isAuthenticated } from 'src/services/authService'; // Check token logic
 
 const Login: React.FC = () => {
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -24,10 +24,15 @@ const Login: React.FC = () => {
   useEffect(() => {
     isMounted.current = true; // Mark as mounted when the component is mounted
 
+    // Check if the user is already authenticated
+    if (isAuthenticated()) {
+      navigate('/dashboard'); // Redirect to dashboard if token is valid
+    }
+
     return () => {
       isMounted.current = false; // Cleanup: mark as unmounted on component unmount
     };
-  }, []);
+  }, [navigate]); // `navigate` is a dependency here to avoid stale references
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,12 +44,10 @@ const Login: React.FC = () => {
       if (isMounted.current) {
         if (response?.status === 200) {
           navigate('/dashboard'); // Only navigate if login is successful
-        } else {
-          setError('Invalid credentials');
         }
       }
     } catch (err) {
-      if (isMounted.current) setError('Invalid credentials');
+      if (isMounted.current) setError('Error during login');
     } finally {
       if (isMounted.current) setLoading(false); // Avoid state update if unmounted
     }

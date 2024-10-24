@@ -23,16 +23,24 @@ export const AxiosInterceptorSetup = () => {
         return response;
       },
       (error) => {
-        if (error.response?.data?.message?.includes('Invalid Token: JsonWebTokenError: invalid token')) {
-          navigate('/logout');
-        }
-        if (error.response?.data?.message?.includes('TokenExpiredError')) {
-          navigate('/logout');
-        }
         const errorMessage = error.response?.data?.message || 'An error occurred';
-        showMessage(errorMessage, 'error');
+      
+        if (errorMessage.includes('JsonWebTokenError: invalid token')) {
+          // Handle invalid token
+          showMessage('Invalid Token', 'error');
+          navigate('/logout'); // Redirect to logout
+        } else if (errorMessage.includes('TokenExpiredError')) {
+          // Handle expired token
+          showMessage('Token has expired', 'error');
+          navigate('/logout'); // Redirect to logout
+        } else {
+          // Handle generic error
+          showMessage(errorMessage, 'error');
+        }
+      
         return Promise.reject(error);
       }
+      
     );
 
     return () => {
