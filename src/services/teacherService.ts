@@ -86,6 +86,15 @@ export const fetchTeacherById = async (id: number) => {
     }
 };
 
+export const fetchTeacherByUserId = async (id: number) => {
+    try {
+        const response = await api.get(`/teacher/user/${id}`);
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching teacher details:', error);
+        throw error;
+    }
+};
 
 export const fetchTeacherDocumentsById = async (id: number) => {
     try {

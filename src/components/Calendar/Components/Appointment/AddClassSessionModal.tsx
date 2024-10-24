@@ -22,9 +22,11 @@ import moment from 'moment';
 import { t } from 'i18next';
 import { fetchStudents } from 'src/services/studentService';
 import { fetchTopics } from 'src/services/topicService';
-import { fetchTeachers } from 'src/services/teacherService';
+import { fetchTeacherByUserId, fetchTeachers } from 'src/services/teacherService';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
+import { useAuth } from 'src/hooks/useAuth';
+import { getStrongestRoles } from 'src/hooks/roleUtils';
 
 interface ClassSession {
   name: string;
@@ -78,6 +80,8 @@ export default function AddClassSessionModal({
   const [repeatUntilDate, setRepeatUntilDate] = useState<Date | null>(null);
   const [repeatUntilWeek, setRepeatUntilWeek] = useState<string | null>(null);
 
+  const { userId, userRoles } = useAuth();
+  const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
 
   const validateTime = (date: Date | null, type: 'start' | 'end'): boolean => {
     if (date) {
@@ -375,14 +379,25 @@ export default function AddClassSessionModal({
         <Box sx={{ mb: 2 }}>
           <SingleSelectWithAutocomplete
             label="Search Teacher"
-            fetchData={(query: string | undefined) =>
-              fetchTeachers(1, 5, query).then((data) =>
-                data.data.map((teacher: any) => ({
-                  ...teacher,
-                  fullName: `${teacher.firstName} ${teacher.lastName}`
-                }))
-              )
-            }
+            fetchData={(query: string | undefined) => {
+              if (strongestRoles.includes('Teacher')) {
+                // If the user is a Teacher, fetch the teacher data by userId
+                return fetchTeacherByUserId(userId).then((teacher) => [
+                  {
+                    ...teacher,
+                    fullName: `${teacher.user.firstName} ${teacher.user.lastName}`,
+                  },
+                ]);
+              } else {
+                // If the user is not a Teacher, allow them to search for teachers
+                return fetchTeachers(1, 5, query).then((data) =>
+                  data.data.map((teacher: any) => ({
+                    ...teacher,
+                    fullName: `${teacher.firstName} ${teacher.lastName}`,
+                  }))
+                );
+              }
+            }}
             onSelect={(teacher) => {
               setSelectedTeacher(teacher);
               setNewSession({ ...newSession, teacherId: teacher?.id });
@@ -398,6 +413,7 @@ export default function AddClassSessionModal({
             </Typography>
           )}
         </Box>
+
 
         <Box sx={{ mb: 2 }}>
           <MultiSelectWithCheckboxes
