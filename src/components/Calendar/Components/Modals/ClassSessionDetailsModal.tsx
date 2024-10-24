@@ -9,13 +9,15 @@ import {
     Box,
     Card,
     CardContent,
+    CircularProgress,
 } from '@mui/material';
 import moment from 'moment';
-import { fetchClassSessionById, getClassSessionReportsStatus, getStudentSessionReportStatus } from 'src/services/classSessionService';
+import { deleteClassSession, fetchClassSessionById, getClassSessionReportsStatus, getStudentSessionReportStatus } from 'src/services/classSessionService';
 import AddSessionReportForm from './AddSessionReportForm';
 import ViewSessionReportForm from './ViewSessionReport';
 import ViewPaymentDetails from './ViewPaymentDetails';  // New Component for payment view
 import StudentDetailCard from './StudentDetailCArd';
+import ReusableDialog from 'src/content/pages/Components/Dialogs';
 
 interface ClassSessionDetailsModalProps {
     isOpen: boolean;
@@ -44,6 +46,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     const [isViewPaymentModalOpen, setViewPaymentModalOpen] = useState<boolean>(false);  // State for payment modal
     const [selectedStudent, setSelectedStudent] = useState<any>(null);
     const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
+    const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 
     // Fetch class session details
     const loadClassSession = async () => {
@@ -113,6 +116,10 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     const handleCloseReportForm = () => {
         setViewReportFormOpen(false);
         refreshClassSessionData();
+    };
+
+    const handleDelete = async () => {
+        setDeleteDialogOpen(true);
     };
 
     return (
@@ -229,7 +236,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                 <Box sx={{ flexGrow: 1, paddingLeft: 2 }}>
                     {canEdit && (
                         <Button
-                            onClick={onDelete}
+                            onClick={handleDelete}
                             style={{ color: 'white', backgroundColor: 'red', padding: '8px 16px' }}
                             variant="contained"
                         >
@@ -238,7 +245,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                     )}
                 </Box>
                 <Box sx={{ paddingRight: 2 }}>
-                    <Button onClick={onClose} color="secondary" style={{ padding: '8px 16px' }}>
+                    <Button onClick={onClose} color="secondary" style={{ padding: '8px 16px' }} sx={{ marginRight: 1 }}>
                         Close
                     </Button>
                     {canEdit && (
@@ -253,6 +260,30 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                     )}
                 </Box>
             </DialogActions>
+
+
+            <ReusableDialog
+                open={deleteDialogOpen}
+                title="Confirm Deletion"
+                onClose={() => setDeleteDialogOpen(false)}
+                actions={
+                    <>
+                        <Button onClick={() => setDeleteDialogOpen(false)} color="inherit" disabled={loading}>
+                            Cancel
+                        </Button>
+                        <Button
+                            onClick={onDelete}
+                            color="primary"
+                            autoFocus
+                            disabled={loading}
+                        >
+                            {loading ? <CircularProgress size={24} /> : 'Confirm'}
+                        </Button>
+                    </>
+                }
+            >
+                <p>Are you sure you want to delete the selected class session?</p>
+            </ReusableDialog>
 
         </Dialog>
     );
