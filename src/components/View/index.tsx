@@ -31,7 +31,7 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({ fields, data, entityN
 
     return (
         <Paper elevation={3} sx={{ p: 3 }}>
-            <Typography variant="h5" gutterBottom sx={{ mb: 4, mt: 2, textAlign: 'center' }}>
+            <Typography variant="h4" gutterBottom sx={{ mb: 4, mt: 2, textAlign: 'center' }}>
                 {entityName} Details
             </Typography>
             {Object.entries(groupedFields).map(([section, fields], index, arr) => (

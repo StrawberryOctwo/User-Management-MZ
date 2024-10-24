@@ -121,5 +121,8 @@
 
 
   "session_reports": "Session Reports",
-  "payments_section": "Payments Section"
+  "payments_section": "Payments Section",
+  "lesson_topic": "Lesson Topic",
+  "active_participation": "Active Participation",
+  "tutor_remarks": "Tutor Remarks"
 }

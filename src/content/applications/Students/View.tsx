@@ -21,7 +21,7 @@ const ViewStudentPage: React.FC = () => {
     // Function to load the student and associated data
     const loadStudentData = async () => {
         setLoading(true);
-        setErrorMessage(null); 
+        setErrorMessage(null);
 
         try {
             const studentData = await fetchStudentById(Number(id));
@@ -61,8 +61,8 @@ const ViewStudentPage: React.FC = () => {
         postalCode: student?.user?.postalCode || '',
         phoneNumber: student?.user?.phoneNumber || '',
     };
-    
-    
+
+
     // Ensure the user data is fetched correctly
     const user = student?.user || {}; // Use a default empty object if user is undefined
     // Define fields for ReusableDetails
@@ -88,9 +88,9 @@ const ViewStudentPage: React.FC = () => {
             section: t('session_reports'),
             isArray: true,
             columns: [
-                { field: 'lessonTopic', headerName: t('lesson_topic') },
-                { field: 'activeParticipation', headerName: t('active_participation') },
-                { field: 'tutorRemarks', headerName: t('tutor_remarks') },
+                { field: 'lessonTopic', headerName: t('lesson_topic'), flex: 1 },
+                { field: 'activeParticipation', headerName: t('active_participation'), flex: 1 },
+                { field: 'tutorRemarks', headerName: t('tutor_remarks'), flex: 1 },
             ],
         },
         {
@@ -99,9 +99,9 @@ const ViewStudentPage: React.FC = () => {
             section: t('payments_section'),
             isArray: true,
             columns: [
-                { field: 'amount', headerName: t('amount') },
-                { field: 'paymentStatus', headerName: t('status') },
-                { field: 'paymentDate', headerName: t('date'), format: 'yyyy-MM-dd' },
+                { field: 'amount', headerName: t('amount'), flex: 1 },
+                { field: 'paymentStatus', headerName: t('status'), flex: 1 },
+                { field: 'paymentDate', headerName: t('date'), format: 'yyyy-MM-dd', flex: 1 },
             ],
         },
         {
@@ -110,9 +110,9 @@ const ViewStudentPage: React.FC = () => {
             section: t('documents'),
             isArray: true,
             columns: [
-                { field: 'name', headerName: t('name') },
-                { field: 'type', headerName: t('type') },
-                { field: 'path', headerName: t('path') },
+                { field: 'name', headerName: t('name'), flex: 1 },
+                { field: 'type', headerName: t('type'), flex: 1 },
+                { field: 'path', headerName: t('path'), flex: 1 },
                 {
                     field: 'actions',
                     headerName: t('actions'),
