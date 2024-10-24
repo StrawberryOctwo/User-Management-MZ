@@ -31,13 +31,21 @@ export default function StudentsContent() {
     setErrorMessage(null);
     try {
       const { data, total } = await fetchStudents(page + 1, limit, searchQuery);
+
       if (isMounted.current) {
-        setStudents(data);
+        // Merge firstName and lastName into fullName
+        const mergedData = data.map((student: any) => ({
+          ...student,
+          fullName: `${student.firstName} ${student.lastName}`.trim(),
+        }));
+
+        setStudents(mergedData);
         setTotalCount(total);
       }
     } catch (error: any) {
       if (isMounted.current) {
         if (error.response?.data?.message.includes('TokenExpiredError')) {
+          // Handle token expiration
         } else {
           setErrorMessage('Failed to load students. Please try again.');
         }
@@ -46,6 +54,7 @@ export default function StudentsContent() {
       if (isMounted.current) setLoading(false);
     }
   };
+
 
   const handleEdit = (id: any) => {
     navigate(`edit/${id}`);
@@ -91,8 +100,7 @@ export default function StudentsContent() {
       <ReusableTable
         data={students}
         columns={[
-          { field: 'firstName', headerName: 'First Name' },
-          { field: 'lastName', headerName: 'Last Name' },
+          { field: 'fullName', headerName: 'Full Name' },
           { field: 'email', headerName: 'Email' },
           { field: 'gradeLevel', headerName: 'Grade Level' },
           { field: 'status', headerName: 'Status' },

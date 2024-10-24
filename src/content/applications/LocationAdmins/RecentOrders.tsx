@@ -31,7 +31,13 @@ export default function LocationAdminsContent() {
     setLoading(true);
     try {
       const { data, total } = await fetchLocationAdmins(page + 1, limit, searchQuery);
-      setAdmins([...data]);
+
+      const mappedAdmins = data.map((admin: LocationAdmin) => ({
+        ...admin,
+        fullName: `${admin.firstName} ${admin.lastName}`.trim(),
+      }));
+
+      setAdmins(mappedAdmins);
       setTotalCount(total);
     } catch (error) {
       setErrorMessage('Failed to load location admins.');
@@ -40,9 +46,18 @@ export default function LocationAdminsContent() {
     }
   };
 
+
   const columns = [
-    { field: 'firstName', headerName: 'First Name' },
-    { field: 'lastName', headerName: 'Last Name' },
+    { field: 'fullName', headerName: 'Full Name' },
+    /* {
+      field: 'dob',
+      headerName: 'DOB',
+      render: (value: any) => new Date(value).toLocaleDateString()
+    }, */
+    { field: 'email', headerName: 'Email' },
+    /* { field: 'address', headerName: 'Address' },
+    { field: 'postalCode', headerName: 'Postal Code' }, */
+    { field: 'phoneNumber', headerName: 'Phone Number' },
     {
       field: 'locationNames',
       headerName: 'Locations',
@@ -53,15 +68,6 @@ export default function LocationAdminsContent() {
         return value; // In case it's not an array, return as is
       }
     },
-    {
-      field: 'dob',
-      headerName: 'DOB',
-      render: (value: any) => new Date(value).toLocaleDateString()
-    },
-    { field: 'email', headerName: 'Email' },
-    { field: 'address', headerName: 'Address' },
-    { field: 'postalCode', headerName: 'Postal Code' },
-    { field: 'phoneNumber', headerName: 'Phone Number' },
   ];
 
   const handleEdit = (id: any) => {
@@ -108,7 +114,7 @@ export default function LocationAdminsContent() {
       <ReusableTable
         data={admins}
         columns={columns}
-        title="Location Admin List"
+        title="Location Admins List"
         onEdit={handleEdit}
         onView={handleView}
         onDelete={confirmDelete}

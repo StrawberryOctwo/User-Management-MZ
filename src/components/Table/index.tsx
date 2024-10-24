@@ -105,7 +105,6 @@ export default function ReusableTable({
         };
     }, [searchQuery]);
 
-
     const handlePageChange = (_event: any, newPage: number) => {
         onPageChange(newPage);
     };
@@ -123,6 +122,7 @@ export default function ReusableTable({
     );
 
     const renderTableBody = () => {
+
         if (loading) {
             return (
                 <TableRow>
@@ -163,7 +163,7 @@ export default function ReusableTable({
             );
         }
 
-        if (sortData.length === 0) {
+        if (!sortedData || sortedData.length === 0) {
             return (
                 <TableRow>
                     <TableCell colSpan={columns.length + 2}>

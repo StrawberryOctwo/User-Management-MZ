@@ -1,7 +1,7 @@
 import { Helmet } from 'react-helmet-async';
 import PageHeader from './PageHeader';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
-import { Grid, Container } from '@mui/material';
+import { Grid, Container, Box } from '@mui/material';
 import Footer from 'src/components/Footer';
 
 import RecentOrders from './RecentOrders';
@@ -15,19 +15,20 @@ function ApplicationsFranchises() {
       <PageTitleWrapper>
         <PageHeader />
       </PageTitleWrapper>
-      <Container maxWidth="lg">
+      <Box sx={{ mx: 15, px: 0 }}>
         <Grid
           container
           direction="row"
           justifyContent="center"
           alignItems="stretch"
           spacing={3}
+          sx={{ mx: 0 }}
         >
           <Grid item xs={12}>
             <RecentOrders />
           </Grid>
         </Grid>
-      </Container>
+      </Box >
       <Footer />
     </>
   );

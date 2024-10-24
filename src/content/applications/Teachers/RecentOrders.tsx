@@ -32,17 +32,19 @@ export default function TeachersContent() {
     setErrorMessage(null);
     try {
       const { data, total } = await fetchTeachers(page + 1, limit, searchQuery);
+
       const mappedTeachers = data.map((teacher: any) => ({
         id: teacher.id,
+        fullName: `${teacher.firstName} ${teacher.lastName}`.trim(), // Merged full name
         employeeNumber: teacher.employeeNumber,
         contractStartDate: format(new Date(teacher.contractStartDate), 'dd/MM/yyyy'),
         contractEndDate: format(new Date(teacher.contractEndDate), 'dd/MM/yyyy'),
+        contractPeriod: `${format(new Date(teacher.contractStartDate), 'dd/MM/yyyy')} - ${format(new Date(teacher.contractEndDate), 'dd/MM/yyyy')}`,
         hourlyRate: teacher.hourlyRate,
-        firstName: teacher.firstName,
-        lastName: teacher.lastName,
         email: teacher.email,
         franchise: teacher.franchiseName,
       }));
+
       setTeachers(mappedTeachers);
       setTotalCount(total);
     } catch (error: any) {
@@ -52,14 +54,19 @@ export default function TeachersContent() {
     }
   };
 
+
+
   const columns = [
-    { field: 'firstName', headerName: 'First Name' },
-    { field: 'lastName', headerName: 'Last Name' },
+    { field: 'fullName', headerName: 'Full Name' },
     { field: 'franchise', headerName: 'Franchise Name' },
     { field: 'email', headerName: 'Email' },
     { field: 'employeeNumber', headerName: 'Employee Number' },
-    { field: 'contractStartDate', headerName: 'Contract Start Date' },
-    { field: 'contractEndDate', headerName: 'Contract End Date' },
+    {
+      field: 'contractPeriod',
+      headerName: 'Contract Period',
+      render: (value: any, row: any) =>
+        `${row.contractStartDate} - ${row.contractEndDate}`,
+    },
     { field: 'hourlyRate', headerName: 'Hourly Rate' },
   ];
 

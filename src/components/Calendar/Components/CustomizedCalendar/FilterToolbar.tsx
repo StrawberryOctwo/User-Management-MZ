@@ -50,38 +50,38 @@ const FilterToolbar: React.FC<FilterToolbarProps> = ({
   }
 
   return (
-<Box sx={{ mb: 2, mt: 3 }}>
-  <Grid container spacing={2}>
-    {hasFranchiseAccess && ( // Conditionally show Franchise field
-      <Grid item xs={12} sm={2} sx={{ ml: 2 }}> {/* Add margin-left here */}
-        <SingleSelectWithAutocomplete
-          label="Select Franchise"
-          fetchData={(query) => fetchFranchises(1, 5, query).then((data) => data.data)}
-          onSelect={handleFranchiseChange}
-          displayProperty="name"
-          placeholder="Search Franchise"
-          initialValue={selectedFranchise}
-        />
+    <Box sx={{ mb: 2, mt: 3 }}>
+      <Grid container spacing={2}>
+        {hasFranchiseAccess && ( // Conditionally show Franchise field
+          <Grid item xs={12} sm={2} sx={{ ml: 2 }}> {/* Add margin-left here */}
+            <SingleSelectWithAutocomplete
+              label="Select Franchise"
+              fetchData={(query) => fetchFranchises(1, 5, query).then((data) => data.data)}
+              onSelect={handleFranchiseChange}
+              displayProperty="name"
+              placeholder="Search Franchise"
+              initialValue={selectedFranchise}
+            />
+          </Grid>
+        )}
+        <Grid item xs={12} sm={2} sx={{ ml: 0 }}> {/* Add margin-left here */}
+          <SingleSelectWithAutocomplete
+            label="Select Location"
+            fetchData={(query) => {
+              if (hasFranchiseAccess && franchiseId) {
+                return fetchLocationsByFranchise(franchiseId, query).then((data) => data);
+              } else {
+                return fetchLocations(1, 5, query).then((response) => response.data);
+              }
+            }}
+            onSelect={handleLocationChange}
+            displayProperty="name"
+            placeholder="Search Location"
+            initialValue={selectedLocation}
+          />
+        </Grid>
       </Grid>
-    )}
-    <Grid item xs={12} sm={2} sx={{ ml: 2 }}> {/* Add margin-left here */}
-      <SingleSelectWithAutocomplete
-        label="Select Location"
-        fetchData={(query) => {
-          if (hasFranchiseAccess && franchiseId) {
-            return fetchLocationsByFranchise(franchiseId, query).then((data) => data);
-          } else {
-            return fetchLocations(1, 5, query).then((response) => response.data);
-          }
-        }}
-        onSelect={handleLocationChange}
-        displayProperty="name"
-        placeholder="Search Location"
-        initialValue={selectedLocation}
-      />
-    </Grid>
-  </Grid>
-</Box>
+    </Box>
 
   );
 };

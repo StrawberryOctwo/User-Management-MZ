@@ -30,7 +30,13 @@ export default function FranchiseAdminsContent() {
     setLoading(true);
     try {
       const { data, total } = await fetchFranchiseAdmins(page + 1, limit, searchQuery);
-      setAdmins([...data]);
+
+      const mappedAdmins = data.map((admin: FranchiseAdmin) => ({
+        ...admin,
+        fullName: `${admin.firstName} ${admin.lastName}`.trim(),
+      }));
+
+      setAdmins(mappedAdmins);
       setTotalCount(total);
     } catch (error) {
       console.error('Error fetching admins:', error);
@@ -40,9 +46,9 @@ export default function FranchiseAdminsContent() {
   };
 
 
+
   const columns = [
-    { field: 'firstName', headerName: 'First Name' },
-    { field: 'lastName', headerName: 'Last Name' },
+    { field: 'fullName', headerName: 'Full Name' },
     {
       field: 'franchiseNames',
       headerName: 'Franchise Name',
@@ -53,14 +59,14 @@ export default function FranchiseAdminsContent() {
         return value; // In case it's not an array, return as is
       }
     },
-    {
+    /* {
       field: 'dob',
       headerName: 'DOB',
       render: (value: any) => new Date(value).toLocaleDateString()
-    },
+    }, */
     { field: 'email', headerName: 'Email' },
-    { field: 'address', headerName: 'Address' },
-    { field: 'postalCode', headerName: 'Postal Code' },
+    /* { field: 'address', headerName: 'Address' },
+    { field: 'postalCode', headerName: 'Postal Code' }, */
     { field: 'phoneNumber', headerName: 'Phone Number' },
   ];
 
