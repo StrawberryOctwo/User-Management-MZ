@@ -22,6 +22,7 @@ interface ClassSessionDetailsModalProps {
     onClose: () => void;
     appointmentId: string;
     onEdit: () => void;
+    onDelete: () => void;
     canEdit: boolean;
 }
 
@@ -30,6 +31,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     onClose,
     appointmentId,
     onEdit,
+    onDelete,
     canEdit
 }) => {
     const [classSession, setClassSession] = useState<any>(null);
@@ -223,16 +225,35 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                     <Typography>No class session details available.</Typography>
                 )}
             </DialogContent>
-            <DialogActions>
-                <Button onClick={onClose} color="secondary">
-                    Close
-                </Button>
-                {canEdit && (
-                    <Button onClick={onEdit} color="primary" variant="contained">
-                        Edit
+            <DialogActions sx={{ marginBottom: 2 }}>
+                <Box sx={{ flexGrow: 1, paddingLeft: 2 }}>
+                    {canEdit && (
+                        <Button
+                            onClick={onDelete}
+                            style={{ color: 'white', backgroundColor: 'red', padding: '8px 16px' }}
+                            variant="contained"
+                        >
+                            Delete
+                        </Button>
+                    )}
+                </Box>
+                <Box sx={{ paddingRight: 2 }}>
+                    <Button onClick={onClose} color="secondary" style={{ padding: '8px 16px' }}>
+                        Close
                     </Button>
-                )}
+                    {canEdit && (
+                        <Button
+                            onClick={onEdit}
+                            color="primary"
+                            variant="contained"
+                            style={{ padding: '8px 16px' }}
+                        >
+                            Edit
+                        </Button>
+                    )}
+                </Box>
             </DialogActions>
+
         </Dialog>
     );
 };

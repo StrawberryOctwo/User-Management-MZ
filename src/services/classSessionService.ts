@@ -71,3 +71,15 @@ export const getStudentSessionReportStatus = async (classSessionId: string, stud
         throw error;
     }
 };
+
+export const deleteClassSession = async (classSessionId: number[]) => {
+    try {
+        const response = await api.post('/class-sessions/delete', {
+            ids: classSessionId  // Send `ids` directly in the request body
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error deleting Class Session:', error);
+        throw error;
+    }
+};

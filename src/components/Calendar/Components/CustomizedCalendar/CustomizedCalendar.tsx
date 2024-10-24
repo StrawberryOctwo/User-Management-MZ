@@ -23,6 +23,7 @@ import AddClassSessionModal from "../Appointment/AddClassSessionModal";
 import ClassSessionDetailsModal from "../Modals/ClassSessionDetailsModal";
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import { useAuth } from "src/hooks/useAuth";
+import { deleteClassSession } from "src/services/classSessionService";
 
 export enum TimeSlotMinutes {
   Five = 5,
@@ -193,6 +194,18 @@ export default function CustomizedCalendar({
     }
   };
 
+  const handleDeleteClassSession = () => {
+    if (strongestRoles[0] == 'Teacher' || strongestRoles[0] == 'Student') {
+      return
+    }
+    if (selectedAppointmentId) {
+      deleteClassSession([Number(selectedAppointmentId)]);
+      setDetailsModalOpen(false);
+    } else {
+      console.error("Error deleting Class Session.");
+    }
+  }
+
   const calculateStartEndDates = useCallback(() => {
     let startDate = moment(); // Initialize with a default value
     let endDate = moment(); // Initialize with a default value
@@ -310,6 +323,7 @@ export default function CustomizedCalendar({
         onClose={() => setDetailsModalOpen(false)}
         appointmentId={selectedAppointmentId!}
         onEdit={handleEditClassSession}
+        onDelete={handleDeleteClassSession}
         canEdit={canEditSession}
       />
     </Box>
