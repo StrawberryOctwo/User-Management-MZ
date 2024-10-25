@@ -8,6 +8,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { fetchTeacherById, fetchTeacherDocumentsById } from 'src/services/teacherService';
 import ReusableDetails from 'src/components/View';
 import FileActions from 'src/components/Files/FileActions';
+import { getPaymentsForUser } from 'src/services/paymentService.';
 
 const ViewTeacherPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -15,6 +16,7 @@ const ViewTeacherPage: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [documents, setDocuments] = useState<any[]>([]);
+    const [payments, setPayments] = useState<any[]>([]);
 
     const loadTeacher = async () => {
         setLoading(true);
@@ -26,6 +28,9 @@ const ViewTeacherPage: React.FC = () => {
 
             const teacherDocuments = await fetchTeacherDocumentsById(Number(id));
             setDocuments(teacherDocuments.documents);
+
+            const userPayments = await getPaymentsForUser(teacherData.user?.id);
+            setPayments(userPayments);
         } catch (error: any) {
             console.error('Failed to fetch teacher:', error);
             setErrorMessage(t('failed_to_fetch_teacher'));
@@ -112,55 +117,17 @@ const ViewTeacherPage: React.FC = () => {
             ],
         },
         {
-            name: 'classSessions',
-            label: t('classSessions'),
-            section: t('classSessions'),
+            name: 'payments',
+            label: t('payments'),
+            section: t('payments_section'),
             isArray: true,
             columns: [
-                { field: 'name', headerName: t('name'), flex: 1 },
-                { field: 'topic_name', headerName: t('topic_name'), flex: 1 },
-                { field: 'location_name', headerName: t('location_name'), flex: 1 },
-                { field: 'schedule', headerName: t('schedule'), flex: 1 },
-                { field: 'sessionType', headerName: t('sessionType'), flex: 1 },
-                {
-                    field: 'isActive',
-                    headerName: t('isActive'),
-                    flex: 1,
-                    renderCell: (params: { row: { isActive: boolean } }) => (
-                        <Box
-                            sx={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                width: '100%',
-                                height: '100%',
-                            }}
-                        >
-                            {params.row.isActive ? (
-                                <CheckIcon color="success" />
-                            ) : (
-                                <CloseIcon color="error" />
-                            )}
-                        </Box>
-                    ),
-                },
-                { field: 'created_at', headerName: t('created_date'), flex: 1 },
-                {
-                    field: 'actions',
-                    headerName: t('actions'),
-                    renderCell: (params: { row: { id: any } }) => (
-                        <Button
-                            variant="text"
-                            color="primary"
-                            onClick={() => window.open(`/management/class-sessions/view/${params.row.id}`, '_blank')}
-                        >
-                            {t('view_details')}
-                        </Button>
-                    ),
-                    sortable: false,
-                    width: 150,
-                },
+                { field: 'amount', headerName: t('amount'), flex: 1 },
+                { field: 'paymentStatus', headerName: t('status'), flex: 1 },
+                { field: 'paymentDate', headerName: t('date'), format: 'yyyy-MM-dd', flex: 1 },
             ],
         },
+    
         {
             name: 'documents',
             label: t('documents'),
@@ -186,6 +153,7 @@ const ViewTeacherPage: React.FC = () => {
     // Transform data to support nested field access
     const transformedData = {
         ...teacher,
+        payments,
         'user.firstName': teacher?.user?.firstName,
         'user.lastName': teacher?.user?.lastName,
         'user.dob': formattedDob,
