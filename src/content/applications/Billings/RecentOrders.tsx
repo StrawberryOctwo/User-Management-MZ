@@ -46,7 +46,7 @@ export default function ViewBillingsPage() {
     {
       field: 'franchiseName',
       headerName: 'Franchise Name',
-      render: (value: any, row: any) => row.franchise?.name || 'N/A', // Handle nested field access
+      render: (value: any, row: any) => row.franchise?.name || 'N/A',
     },
     {
       field: 'isPaid',
@@ -72,13 +72,18 @@ export default function ViewBillingsPage() {
 
   const handleTogglePaid = async (id: number, checked: boolean) => {
     try {
-      // Pseudo API call to update billing status
       await confirmBillingAsPaid(id, checked);
-      await loadBillings(); // Reload the data to reflect the change
+  
+      setBillings((prevBillings) =>
+        prevBillings.map((billing) =>
+          billing.id === id ? { ...billing, isPaid: checked } : billing
+        )
+      );
     } catch (error) {
       console.error('Failed to update billing status', error);
     }
   };
+  
 
   // const handleDelete = async () => {
   //   setDialogOpen(false);

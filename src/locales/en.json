@@ -124,5 +124,8 @@
   "payments_section": "Payments Section",
   "lesson_topic": "Lesson Topic",
   "active_participation": "Active Participation",
-  "tutor_remarks": "Tutor Remarks"
+  "tutor_remarks": "Tutor Remarks",
+  "amount": "Amount",
+  "payment_date": "Payment Date",
+  "payment_status": "Payment Status"
 }
