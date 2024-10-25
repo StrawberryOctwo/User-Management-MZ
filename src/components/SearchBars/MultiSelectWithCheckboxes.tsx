@@ -1,16 +1,16 @@
-import React, { useState, useEffect, useImperativeHandle, forwardRef, useCallback } from 'react';
+import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
 import { Checkbox, TextField, Autocomplete, CircularProgress } from '@mui/material';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 
 interface MultiSelectWithCheckboxesProps {
     label: string;
-    fetchData: (query?: string) => Promise<any[]>; // Make query optional for default data fetch
-    onSelect: (selectedItems: any[]) => void;
-    displayProperty: string;
-    placeholder?: string;
-    initialValue?: any[];
-    width?: string | number;
+    fetchData: (query: string) => Promise<any[]>; // Function to fetch data based on the query
+    onSelect: (selectedItems: any[]) => void; // Callback when items are selected
+    displayProperty: string; // Property to display in the options
+    placeholder?: string; // Placeholder text
+    initialValue?: any[]; // Initial selected values for edit or pre-filled forms
+    width?: string | number; // Optional width prop for dynamic width
 }
 
 const MultiSelectWithCheckboxes = forwardRef(({
@@ -27,76 +27,68 @@ const MultiSelectWithCheckboxes = forwardRef(({
     const [selectedItems, setSelectedItems] = useState<any[]>(initialValue || []);
     const [loading, setLoading] = useState(false);
 
-    // Debounce function to limit the frequency of API calls
-    const debounce = (func: Function, delay: number) => {
-        let timeoutId: NodeJS.Timeout;
-        return (...args: any[]) => {
-            clearTimeout(timeoutId);
-            timeoutId = setTimeout(() => func(...args), delay);
-        };
-    };
-
-    // Fetch options with debounce to limit excessive API calls
-    const fetchOptions = useCallback(
-        debounce(async (query: string) => {
-            setLoading(true);
-            try {
-                const data = await fetchData(query);
-                const mergedOptions = [
-                    ...selectedItems,
-                    ...data.filter((item) => !selectedItems.some((selected) => selected.id === item.id)),
-                ];
-                setOptions(mergedOptions);
-            } catch (error) {
-                console.error('Error fetching options:', error);
-                setOptions([]);
-            } finally {
-                setLoading(false);
-            }
-        }, 300), [fetchData, selectedItems]
-    );
-
-    // Fetch default options when the input is focused
-    const handleInputFocus = async () => {
-        if (options.length === 0) {
-            setLoading(true);
-            try {
-                const data = await fetchData(); // Fetch default data without a query
-                setOptions(data);
-            } catch (error) {
-                console.error('Error fetching default options:', error);
-                setOptions([]);
-            } finally {
-                setLoading(false);
-            }
-        }
-    };
-
-    useEffect(() => {
-        setSelectedItems(initialValue); // Sync selected items with initial value
-    }, [initialValue]);
-
     useImperativeHandle(ref, () => ({
         reset: () => {
             setQuery('');
             setSelectedItems([]);
             setOptions([]);
         },
-        selectedItems, // Expose selectedItems state
+        selectedItems, // Expose selectedItems
     }));
 
-    const handleInputChange = (event: any, newInputValue: string) => {
-        setQuery(newInputValue);
-        fetchOptions(newInputValue); // Fetch options with debounced input
-    };
+
+    useEffect(() => {
+        if (initialValue.length > 0) {
+            setOptions(initialValue);
+            setSelectedItems(initialValue);
+        }
+    }, [initialValue]);
+
+    useEffect(() => {
+        let active = true;
+
+        const fetchOptions = async () => {
+            if (query.length >= 0) {
+                setLoading(true);
+                try {
+                    const data = await fetchData(query);
+                    if (active) {
+                        const mergedOptions = [
+                            ...selectedItems,
+                            ...data.filter(item => !selectedItems.some(selected => selected.id === item.id)),
+                        ];
+                        setOptions(mergedOptions);
+                    }
+                } catch (error) {
+                    console.error('Error fetching options:', error);
+                } finally {
+                    if (active) {
+                        setLoading(false);
+                    }
+                }
+            } else if (query.length === 0 && initialValue.length === 0) {
+                setOptions([]);
+            }
+        };
+
+        if (query.length >= 2 || query === '') {
+            fetchOptions();
+        }
+
+        return () => {
+            active = false;
+        };
+    }, [query, fetchData, selectedItems, displayProperty]);
 
     const handleChange = (event: any, value: any[]) => {
         setSelectedItems(value);
         onSelect(value);
     };
 
-    const getNestedProperty = (option: any, path: string) =>
-        path.split('.').reduce((acc, part) => acc && acc[part], option);
+    // Helper function to get the nested property value
+    const getNestedProperty = (option: any, path: string) => {
+        return path.split('.').reduce((acc, part) => acc && acc[part], option);
+    };
 
     return (
         <Autocomplete
@@ -106,21 +98,23 @@ const MultiSelectWithCheckboxes = forwardRef(({
             disableCloseOnSelect
             getOptionLabel={(option) => getNestedProperty(option, displayProperty) || ''}
             onChange={handleChange}
-            onInputChange={handleInputChange}
-            onFocus={handleInputFocus} // Fetch default data on focus
+            onInputChange={(event, newInputValue) => setQuery(newInputValue)}
             loading={loading}
             isOptionEqualToValue={(option, value) => option.id === value.id}
-            renderOption={(props, option, { selected }) => (
-                <li {...props} key={option.id}>
-                    <Checkbox
-                        icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
-                        checkedIcon={<CheckBoxIcon fontSize="small" />}
-                        style={{ marginRight: 8 }}
-                        checked={selected}
-                    />
-                    {getNestedProperty(option, displayProperty)}
-                </li>
-            )}
+            renderOption={(props, option, { selected }) => {
+                // Remove destructuring of 'key'
+                return (
+                    <li {...props} key={option.id}> {/* Assign key using a unique identifier like option.id */}
+                        <Checkbox
+                            icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+                            checkedIcon={<CheckBoxIcon fontSize="small" />}
+                            style={{ marginRight: 8 }}
+                            checked={selected}
+                        />
+                        {getNestedProperty(option, displayProperty)}
+                    </li>
+                );
+            }}
             renderInput={(params) => (
                 <TextField
                     {...params}
@@ -140,6 +134,7 @@ const MultiSelectWithCheckboxes = forwardRef(({
             style={{ width }}
         />
     );
+
 });
 
 export default MultiSelectWithCheckboxes;
