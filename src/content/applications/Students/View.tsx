@@ -7,6 +7,7 @@ import { getSessionReportsForStudent } from 'src/services/sessionReportService';
 import ReusableDetails from 'src/components/View';
 import FileActions from 'src/components/Files/FileActions';
 import { getPaymentsForUser, updatePaymentStatus } from 'src/services/paymentService.';
+import ViewSessionReportForm from 'src/components/Calendar/Components/Modals/ViewSessionReport';
 
 const ViewStudentPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -19,7 +20,9 @@ const ViewStudentPage: React.FC = () => {
     const [selectedPaymentId, setSelectedPaymentId] = useState<number | null>(null);
     const [newStatus, setNewStatus] = useState<string>('Pending');
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-
+    const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
+    const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
+    
     // Function to load the student and associated data
     const loadStudentData = async () => {
         setLoading(true);
@@ -94,7 +97,20 @@ const ViewStudentPage: React.FC = () => {
 
     // Ensure the user data is fetched correctly
     const user = student?.user || {}; // Use a default empty object if user is undefined
-    // Define fields for ReusableDetails
+
+        // Open the session report dialog
+        const openReportDialog = (reportId: string) => {
+            setSelectedReportId(reportId);
+            setIsReportDialogOpen(true);
+        };
+    
+        // Close the session report dialog and reload data if needed
+        const closeReportDialog = () => {
+            setIsReportDialogOpen(false);
+            setSelectedReportId(null);
+            loadStudentData(); // Optionally refresh data
+        };
+
     const Fields = [
         { name: 'firstName', label: t('first_name'), section: t('user_details') },
         { name: 'lastName', label: t('last_name'), section: t('user_details') },
@@ -120,6 +136,21 @@ const ViewStudentPage: React.FC = () => {
                 { field: 'lessonTopic', headerName: t('lesson_topic'), flex: 1 },
                 { field: 'activeParticipation', headerName: t('active_participation'), flex: 1 },
                 { field: 'tutorRemarks', headerName: t('tutor_remarks'), flex: 1 },
+                {
+                    field: 'actions',
+                    headerName: t('actions'),
+                    renderCell: (params: { row: { id: string } }) => (
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => openReportDialog(params.row.id)}
+                        >
+                            {t('view_report')}
+                        </Button>
+                    ),
+                    sortable: false,
+                    width: 150,
+                },
             ],
         },
         {
@@ -209,6 +240,17 @@ const ViewStudentPage: React.FC = () => {
                     </Button>
                 </DialogActions>
             </Dialog>
+                       {/* View Session Report Dialog */}
+                       {selectedReportId && (
+                <ViewSessionReportForm
+                    isOpen={isReportDialogOpen}
+                    reportId={selectedReportId}
+                    onClose={closeReportDialog}
+                    onDelete={closeReportDialog} // Close and refresh list on delete
+                    student={student}
+                    classSessionId={id || ''}
+                />
+            )}
         </Box>
     );
 };
