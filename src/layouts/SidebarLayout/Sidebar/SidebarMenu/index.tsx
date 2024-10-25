@@ -35,7 +35,7 @@ import WorkspacePremiumTwoToneIcon from '@mui/icons-material/WorkspacePremiumTwo
 import CameraFrontTwoToneIcon from '@mui/icons-material/CameraFrontTwoTone';
 import DisplaySettingsTwoToneIcon from '@mui/icons-material/DisplaySettingsTwoTone';
 import { GridFilterListIcon } from '@mui/x-data-grid';
-import { BusinessOutlined, FileUploadSharp, LocationCity, LocationOffRounded, LocationOffSharp, LocationOn, LocationSearching, LocationSearchingTwoTone, Person, PersonAddAlt1Sharp } from '@mui/icons-material';
+import { BusinessOutlined, FileUploadSharp, LocationCity, LocationOffRounded, LocationOffSharp, LocationOn, LocationSearching, LocationSearchingTwoTone, Person, PersonAddAlt1Sharp, Topic } from '@mui/icons-material';
 import withRole from 'src/hooks/withRole';
 
 const MenuWrapper = styled(Box)(
@@ -336,6 +336,22 @@ function SidebarMenu() {
                     startIcon={<FileUploadSharp />}
                   >
                     Files
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
+
+              <ProtectedListItem
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/management/topics"
+                    startIcon={<Topic />}
+                  >
+                    Topics
                   </Button>
                 </ListItem>
               </ProtectedListItem>

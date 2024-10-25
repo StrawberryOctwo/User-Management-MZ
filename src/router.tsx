@@ -133,9 +133,16 @@ const FranchiseEdit = Loader(
 
 const FranchiseView = Loader(
   lazy(() => import('src/content/applications/Franchises/View'))
-
-
 );
+
+const Topics = Loader(
+  lazy(() => import('src/content/applications/Topics'))
+);
+
+const TopicCreate = Loader(
+  lazy(() => import('src/content/applications/Topics/Create'))
+);
+
 const UserProfile = Loader(
   lazy(() => import('src/content/applications/Users/profile'))
 );
@@ -369,6 +376,14 @@ const routes: RouteObject[] = [
           {
             path: 'students/edit/:id',
             element: <StudentsEdit/>
+          },
+          {
+            path: 'topics',
+            element: <Topics/>
+          },
+          {
+            path: 'topics/create',
+            element: <TopicCreate/>
           },
           {
             path: 'profile',

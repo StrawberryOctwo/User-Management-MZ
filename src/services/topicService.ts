@@ -74,10 +74,10 @@ export const fetchTopicById = async (id: number) => {
 };
 
 
-export const deleteTopic = async (topicIds: number[]) => {
+export const deleteTopic = async (topicIds: number) => {
     try {
         const response = await api.post('/topic/delete', {
-            ids: topicIds, // Directly sending ids without additional data wrapper
+            id: topicIds, // Directly sending ids without additional data wrapper
         });
         return response.data;
     } catch (error) {
