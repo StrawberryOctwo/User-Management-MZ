@@ -2,22 +2,22 @@ import { api } from './api'; // Assuming you have an API instance
 
 // Fetch all billings with pagination
 export const fetchAllBillings = async (page: number, limit: number, searchQuery: string = '') => {
-    try {
-      const response = await api.get('/billings', {
-        params: { page, limit, searchQuery },
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Error fetching billings:', error);
-      throw error;
-    }
-  };
-  
+  try {
+    const response = await api.get('/billings', {
+      params: { page, limit, searchQuery },
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching billings:', error);
+    throw error;
+  }
+};
+
 
 // Confirm billing as paid
-export const confirmBillingAsPaid = async (billingId: number, paidAmount: string) => {
+export const confirmBillingAsPaid = async (billingId: number, isPaid: boolean) => {
   try {
-    const response = await api.post(`/billings/confirm`, { billingId, paidAmount });
+    const response = await api.post(`/billings/confirm`, { billingId, isPaid });
     return response.data;
   } catch (error) {
     console.error('Error confirming billing as paid:', error);
