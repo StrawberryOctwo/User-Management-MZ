@@ -1,13 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Button, MenuItem, Select, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { t } from 'i18next';
-import { format } from 'date-fns';
 import { fetchStudentById, fetchStudentDocumentsById } from 'src/services/studentService';
+import { getSessionReportsForStudent } from 'src/services/sessionReportService';
 import ReusableDetails from 'src/components/View';
 import FileActions from 'src/components/Files/FileActions';
-import { getSessionReportsForStudent } from 'src/services/sessionReportService';
-import { getPaymentsForUser } from 'src/services/paymentService.';
+import { getPaymentsForUser, updatePaymentStatus } from 'src/services/paymentService.';
 
 const ViewStudentPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -17,6 +16,9 @@ const ViewStudentPage: React.FC = () => {
     const [documents, setDocuments] = useState<any[]>([]);
     const [sessionReports, setSessionReports] = useState<any[]>([]);
     const [payments, setPayments] = useState<any[]>([]);
+    const [selectedPaymentId, setSelectedPaymentId] = useState<number | null>(null);
+    const [newStatus, setNewStatus] = useState<string>('Pending');
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     // Function to load the student and associated data
     const loadStudentData = async () => {
@@ -43,17 +45,45 @@ const ViewStudentPage: React.FC = () => {
         }
     };
 
+    // Handle opening the dialog
+    const handleOpenDialog = (paymentId: number, currentStatus: string) => {
+        setSelectedPaymentId(paymentId);
+        setNewStatus(currentStatus);
+        setIsDialogOpen(true);
+    };
+
+    // Handle closing the dialog
+    const handleCloseDialog = () => {
+        setIsDialogOpen(false);
+        setSelectedPaymentId(null);
+    };
+
+    // Handle updating the payment status
+    const handleUpdateStatus = async () => {
+        if (selectedPaymentId) {
+            try {
+                await updatePaymentStatus(selectedPaymentId, newStatus);
+                loadStudentData(); // Refresh the data
+            } catch (error) {
+                console.error('Failed to update payment status:', error);
+            } finally {
+                handleCloseDialog();
+            }
+        }
+    };
+
     useEffect(() => {
         if (id) {
             loadStudentData();
         }
     }, [id]);
+
     const flattenedData = {
-        ...student, // Spread original student data
-        sessionReports, // Include sessionReports
-        documents, // Include documents
-        payments, // Include payments
-        firstName: student?.user?.firstName || '', // Flatten user fields
+        ...student,
+        sessionReports,
+        documents,
+        payments,
+        firstName: student?.user?.firstName || '',
         lastName: student?.user?.lastName || '',
         dob: student?.user?.dob || '',
         email: student?.user?.email || '',
@@ -61,7 +91,6 @@ const ViewStudentPage: React.FC = () => {
         postalCode: student?.user?.postalCode || '',
         phoneNumber: student?.user?.phoneNumber || '',
     };
-
 
     // Ensure the user data is fetched correctly
     const user = student?.user || {}; // Use a default empty object if user is undefined
@@ -102,6 +131,21 @@ const ViewStudentPage: React.FC = () => {
                 { field: 'amount', headerName: t('amount'), flex: 1 },
                 { field: 'paymentStatus', headerName: t('status'), flex: 1 },
                 { field: 'paymentDate', headerName: t('date'), format: 'yyyy-MM-dd', flex: 1 },
+                {
+                    field: 'actions',
+                    headerName: t('actions'),
+                    renderCell: (params: { row: { id: number; paymentStatus: string } }) => (
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => handleOpenDialog(params.row.id, params.row.paymentStatus)}
+                        >
+                            {t('update_status')}
+                        </Button>
+                    ),
+                    sortable: false,
+                    width: 150,
+                },
             ],
         },
         {
@@ -141,6 +185,30 @@ const ViewStudentPage: React.FC = () => {
             ) : (
                 <Typography variant="h6">{t('no_student_data_available')}</Typography>
             )}
+
+            {/* Payment Status Update Dialog */}
+            <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
+                <DialogTitle>{t('update_payment_status')}</DialogTitle>
+                <DialogContent>
+                    <Select
+                        value={newStatus}
+                        onChange={(e) => setNewStatus(e.target.value)}
+                        fullWidth
+                    >
+                        <MenuItem value="Pending">{t('pending')}</MenuItem>
+                        <MenuItem value="Paid">{t('paid')}</MenuItem>
+                        <MenuItem value="Cancelled">{t('cancelled')}</MenuItem>
+                    </Select>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog} color="secondary">
+                        {t('cancel')}
+                    </Button>
+                    <Button onClick={handleUpdateStatus} color="primary">
+                        {t('submit')}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
     );
 };

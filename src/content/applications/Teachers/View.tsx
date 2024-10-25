@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Button, Typography } from '@mui/material';
+import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Select, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { format } from 'date-fns';
 import CheckIcon from '@mui/icons-material/Check';
@@ -8,7 +8,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { fetchTeacherById, fetchTeacherDocumentsById } from 'src/services/teacherService';
 import ReusableDetails from 'src/components/View';
 import FileActions from 'src/components/Files/FileActions';
-import { getPaymentsForUser } from 'src/services/paymentService.';
+import { getPaymentsForUser, updatePaymentStatus } from 'src/services/paymentService.';
 
 const ViewTeacherPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -17,6 +17,9 @@ const ViewTeacherPage: React.FC = () => {
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [documents, setDocuments] = useState<any[]>([]);
     const [payments, setPayments] = useState<any[]>([]);
+    const [selectedPaymentId, setSelectedPaymentId] = useState<number | null>(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
+    const [newStatus, setNewStatus] = useState<string>('Pending');
 
     const loadTeacher = async () => {
         setLoading(true);
@@ -44,7 +47,28 @@ const ViewTeacherPage: React.FC = () => {
             loadTeacher();
         }
     }, [id, t]);
-
+    const handleCloseDialog = () => {
+        setIsDialogOpen(false);
+        setSelectedPaymentId(null);
+    };
+    const handleOpenDialog = (paymentId: number, currentStatus: string) => {
+        setSelectedPaymentId(paymentId);
+        setNewStatus(currentStatus);
+        setIsDialogOpen(true);
+    };
+        // Handle updating the payment status
+        const handleUpdateStatus = async () => {
+            if (selectedPaymentId) {
+                try {
+                    await updatePaymentStatus(selectedPaymentId, newStatus);
+                    loadTeacher(); // Refresh the data
+                } catch (error) {
+                    console.error('Failed to update payment status:', error);
+                } finally {
+                    handleCloseDialog();
+                }
+            }
+        };
     const formattedContractStartDate = teacher ? format(new Date(teacher.contractStartDate), 'PP') : '';
     const formattedContractEndDate = teacher ? format(new Date(teacher.contractEndDate), 'PP') : '';
     const formattedDob = teacher ? format(new Date(teacher.user.dob), 'PP') : '';
@@ -125,6 +149,21 @@ const ViewTeacherPage: React.FC = () => {
                 { field: 'amount', headerName: t('amount'), flex: 1 },
                 { field: 'paymentStatus', headerName: t('status'), flex: 1 },
                 { field: 'paymentDate', headerName: t('date'), format: 'yyyy-MM-dd', flex: 1 },
+                {
+                    field: 'actions',
+                    headerName: t('actions'),
+                    renderCell: (params: { row: { id: number; paymentStatus: string } }) => (
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => handleOpenDialog(params.row.id, params.row.paymentStatus)}
+                        >
+                            {t('update_status')}
+                        </Button>
+                    ),
+                    sortable: false,
+                    width: 150,
+                },
             ],
         },
     
@@ -191,7 +230,30 @@ const ViewTeacherPage: React.FC = () => {
                     />
                 )
             )}
+                       <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
+                <DialogTitle>{t('update_payment_status')}</DialogTitle>
+                <DialogContent>
+                    <Select
+                        value={newStatus}
+                        onChange={(e) => setNewStatus(e.target.value)}
+                        fullWidth
+                    >
+                        <MenuItem value="Pending">{t('pending')}</MenuItem>
+                        <MenuItem value="Paid">{t('paid')}</MenuItem>
+                        <MenuItem value="Cancelled">{t('cancelled')}</MenuItem>
+                    </Select>
+                </DialogContent>
+                <DialogActions>
+                    <Button onClick={handleCloseDialog} color="secondary">
+                        {t('cancel')}
+                    </Button>
+                    <Button onClick={handleUpdateStatus} color="primary">
+                        {t('submit')}
+                    </Button>
+                </DialogActions>
+            </Dialog>
         </Box>
+
     );
 };
 
