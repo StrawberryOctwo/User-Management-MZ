@@ -24,6 +24,7 @@ const CreateFranchise = () => {
                 bic: data.bic,
                 status: data.status,
                 totalEmployees: data.totalEmployees,
+                percentage:data.percentage
             };
             const response = await addFranchise(payload);
             return response
@@ -43,6 +44,8 @@ const CreateFranchise = () => {
         { name: 'bic', label: t('bic'), type: 'text', required: true, section: 'Franchise Information' },
         { name: 'status', label: t('status'), type: 'text', required: true, section: 'Franchise Information' },
         { name: 'totalEmployees', label: t('total_employees'), type: 'number', required: true, section: 'Franchise Information' },
+        { name: 'percentage', label: t('percentage'), type: 'number', required: true, section: 'Franchise Information' },
+
     ];
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
