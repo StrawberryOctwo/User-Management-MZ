@@ -40,6 +40,8 @@ const EditFranchise = () => {
                 bic: data.bic,
                 status: data.status,
                 totalEmployees: data.totalEmployees,
+                percentage:data.percentage
+
             };
             const response = await updateFranchise(Number(id), payload); // Update franchise
             return response; // Don't fetch again to prevent re-rendering
@@ -60,6 +62,8 @@ const EditFranchise = () => {
         { name: 'bic', label: t('bic'), type: 'text', required: true, section: 'Franchise Information' },
         { name: 'status', label: t('status'), type: 'text', required: true, section: 'Franchise Information' }, // Optionally make this a dropdown
         { name: 'totalEmployees', label: t('total_employees'), type: 'number', required: true, section: 'Franchise Information' },
+        { name: 'percentage', label: t('percentage'), type: 'number', required: true, section: 'Franchise Information' },
+
     ];
 
     return (
