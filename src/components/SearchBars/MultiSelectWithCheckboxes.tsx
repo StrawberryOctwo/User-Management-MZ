@@ -134,7 +134,7 @@ const MultiSelectWithCheckboxes = forwardRef(({
             style={{ width }}
         />
     );
-    
+
 });
 
 export default MultiSelectWithCheckboxes;

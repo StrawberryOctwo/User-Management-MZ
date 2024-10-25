@@ -97,7 +97,7 @@ const CalendarContent: React.FC = () => {
         case 'FranchiseAdmin':
         case 'LocationAdmin':
           if (!selectedLocation) return; // Ensure location is selected
-          response = await fetchClassSessions(startDate, endDate, selectedLocation.name);
+          response = await fetchClassSessions(startDate, endDate, selectedLocation.id);
           break;
         default:
           throw new Error('Invalid role');
