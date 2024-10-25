@@ -5,7 +5,6 @@ import CustomizedCalendar from "./Components/CustomizedCalendar/CustomizedCalend
 import moment from "moment";
 import { EventItem } from './types';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-
 import { t } from 'i18next';
 import FilterToolbar from './Components/CustomizedCalendar/FilterToolbar';
 import CalendarLegend from './Components/CalendarLegend';
@@ -20,12 +19,11 @@ const CalendarContent: React.FC = () => {
   const [startDate, setStartDate] = useState<string>(moment().startOf('month').format('YYYY-MM-DD'));
   const [endDate, setEndDate] = useState<string>(moment().endOf('month').format('YYYY-MM-DD'));
   const [selectedFranchise, setSelectedFranchise] = useState<any | null>(null);
-  const [selectedLocation, setSelectedLocation] = useState<any | null>(null);
+  const [selectedLocations, setSelectedLocations] = useState<any[]>([]); // Updated to array
 
   const { userId, userRoles } = useAuth();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
 
-  // Determine the strongest role to drive the logic
   const strongestRole = strongestRoles.includes('SuperAdmin')
     ? 'SuperAdmin'
     : strongestRoles.includes('FranchiseAdmin')
@@ -40,13 +38,13 @@ const CalendarContent: React.FC = () => {
 
   useEffect(() => {
     const savedFranchise = localStorage.getItem('selectedFranchise');
-    const savedLocation = localStorage.getItem('selectedLocation');
+    const savedLocations = localStorage.getItem('selectedLocations'); // Updated to locations
 
     if (savedFranchise) {
       setSelectedFranchise(JSON.parse(savedFranchise));
     }
-    if (savedLocation) {
-      setSelectedLocation(JSON.parse(savedLocation));
+    if (savedLocations) {
+      setSelectedLocations(JSON.parse(savedLocations));
     }
   }, []);
 
@@ -73,7 +71,6 @@ const CalendarContent: React.FC = () => {
             studentCount: session.students.length,
             startTime: moment(session.sessionStartDate).format('HH:mm'),
             endTime: moment(session.sessionEndDate).format('HH:mm'),
-
             sessionType: session.sessionType,
           }
         },
@@ -88,6 +85,8 @@ const CalendarContent: React.FC = () => {
 
     try {
       let response;
+      const locationIds = selectedLocations.map(location => location.id); // Pass as array
+
       switch (strongestRole) {
         case 'Teacher':
         case 'Student':
@@ -96,8 +95,8 @@ const CalendarContent: React.FC = () => {
         case 'SuperAdmin':
         case 'FranchiseAdmin':
         case 'LocationAdmin':
-          if (!selectedLocation) return; // Ensure location is selected
-          response = await fetchClassSessions(startDate, endDate, selectedLocation.id);
+          if (selectedLocations.length === 0) return;
+          response = await fetchClassSessions(startDate, endDate, locationIds);
           break;
         default:
           throw new Error('Invalid role');
@@ -121,65 +120,56 @@ const CalendarContent: React.FC = () => {
   const handleSaveClassSession = async (newSessionArray: any[], callback?: () => void) => {
     try {
       for (const session of newSessionArray) {
-        // Ensure locationId is directly from the session object
         const sessionPayload = {
           ...session,
-          locationId: session.locationId || selectedLocation?.id || 0, // Use session location or fallback to selectedLocation
+          locationId: session.locationId || selectedLocations[0]?.id || 0,
         };
-
-        console.log('Original Session:', session);
-        console.log('Session Payload:', sessionPayload);
         await addClassSessions(sessionPayload);
       }
-
-      loadClassSessions(); // Reload sessions after adding
+      loadClassSessions();
     } catch (error) {
       console.error('Failed to add class sessions:', error);
     }
   };
 
-
   const handleFranchiseChange = (franchise: any) => {
     setSelectedFranchise(franchise);
-    setSelectedLocation(null);
+    setSelectedLocations([]);
     setClassSessionEvents([]);
-
     if (franchise) {
       localStorage.setItem('selectedFranchise', JSON.stringify(franchise));
     } else {
       localStorage.removeItem('selectedFranchise');
-      localStorage.removeItem('selectedLocation');
+      localStorage.removeItem('selectedLocations');
     }
   };
 
-  const handleLocationChange = (location: any) => {
-    setSelectedLocation(location);
+  const handleLocationsChange = (locations: any[]) => { // Updated to multiple locations
+    setSelectedLocations(locations);
     setClassSessionEvents([]);
-
-    if (location) {
-      localStorage.setItem('selectedLocation', JSON.stringify(location));
+    if (locations.length > 0) {
+      localStorage.setItem('selectedLocations', JSON.stringify(locations));
     } else {
-      localStorage.removeItem('selectedLocation');
+      localStorage.removeItem('selectedLocations');
     }
   };
 
   useEffect(() => {
-    if (strongestRole && (strongestRole !== 'SuperAdmin' || selectedLocation)) {
-      loadClassSessions(); // Load sessions if role is valid and location is selected (for admins)
+    if (strongestRole && (strongestRole !== 'SuperAdmin' || selectedLocations.length > 0)) {
+      loadClassSessions();
     }
-  }, [startDate, endDate, selectedFranchise, selectedLocation]);
+  }, [startDate, endDate, selectedFranchise, selectedLocations]);
 
   return (
     <Box sx={{ position: 'relative', height: '78vh' }}>
       {['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin'].includes(strongestRole || '') && (
         <FilterToolbar
           onFranchiseChange={handleFranchiseChange}
-          onLocationChange={handleLocationChange}
+          onLocationsChange={handleLocationsChange} // Updated to onLocationsChange
           selectedFranchise={selectedFranchise}
-          selectedLocation={selectedLocation}
+          selectedLocations={selectedLocations} // Updated to pass multiple locations
         />
       )}
-
 
       <Box sx={{ position: 'relative', height: '100%', overflow: 'hidden' }}>
         <CustomizedCalendar
@@ -188,7 +178,7 @@ const CalendarContent: React.FC = () => {
           handleSaveClassSession={handleSaveClassSession}
           loadClassSessions={loadClassSessions}
         />
-        {!selectedLocation && strongestRole !== 'Teacher' && strongestRole !== 'Student' && (
+        {selectedLocations.length === 0 && strongestRole !== 'Teacher' && strongestRole !== 'Student' && (
           <Box
             sx={{
               position: 'absolute',
@@ -204,7 +194,7 @@ const CalendarContent: React.FC = () => {
             }}
           >
             <Typography variant="h6" color="white">
-              Please enter a franchise and location to view the calendar.
+              Please enter a franchise and select locations to view the calendar.
             </Typography>
           </Box>
         )}

@@ -1,17 +1,21 @@
 import { api } from "./api";
 
-export const fetchClassSessions = async (startDate: string, endDate: string, locationId: number) => {
+export const fetchClassSessions = async (startDate: string, endDate: string, locationIds: number | number[]) => {
     try {
-        const response = await api.get(`/class-sessions`, {
-            params: { startDate, endDate, locationId },
-        });
-        return response.data;
+      const response = await api.get(`/class-sessions`, {
+        params: { 
+          startDate, 
+          endDate, 
+          locationId: Array.isArray(locationIds) ? locationIds.join(',') : locationIds 
+        },
+      });
+      return response.data;
     } catch (error) {
-        console.error('Error fetching class sessions:', error);
-        throw error;
+      console.error('Error fetching class sessions:', error);
+      throw error;
     }
-};
-
+  };
+  
 export const fetchUserClassSessions = async (id: string, startDate: string, endDate: string) => {
     try {
         const response = await api.get(`/user/${id}/class-sessions`, {
