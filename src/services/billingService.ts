@@ -13,6 +13,17 @@ export const fetchAllBillings = async (page: number, limit: number, searchQuery:
   }
 };
 
+// Submit a new billing
+export const submitBilling = async (payload: { revenue: number; franchiseId: number }) => {
+  try {
+    const response = await api.post('/billings/submit', payload);
+    return response.data;
+  } catch (error) {
+    console.error('Error submitting billing:', error);
+    throw error;
+  }
+};
+
 
 // Confirm billing as paid
 export const confirmBillingAsPaid = async (billingId: number, isPaid: boolean) => {

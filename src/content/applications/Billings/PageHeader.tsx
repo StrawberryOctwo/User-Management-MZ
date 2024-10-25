@@ -19,10 +19,10 @@ function PageHeader() {
     <Grid container justifyContent="space-between" alignItems="center">
       <Grid item>
         <Typography variant="h3" component="h3" gutterBottom>
-          Billings
+          Bills
         </Typography>
         <Typography variant="subtitle2">
-          {user.name}, these are your recent franchises
+          {user.name}, these are your recent bills
         </Typography>
       </Grid>
       <Grid item>
@@ -32,7 +32,7 @@ function PageHeader() {
           startIcon={<AddTwoToneIcon fontSize="small" />}
           onClick={handleCreateFranchise} // Add onClick handler
         >
-          Create franchise
+          Create bill
         </Button>
       </Grid>
     </Grid>

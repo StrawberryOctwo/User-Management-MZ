@@ -155,6 +155,11 @@ const Billings = Loader(
   lazy(() => import('src/content/applications/Billings'))
 );
 
+const CreateBill = Loader(
+  lazy(() => import('src/content/applications/Billings/Create'))
+);
+
+
 // Components
 
 const Buttons = Loader(
@@ -299,7 +304,10 @@ const routes: RouteObject[] = [
             path: 'billings',
             element: <Billings />
           },
-
+          {
+            path: 'billings/create',
+            element: <CreateBill />
+          },
           {
             path: 'files/',
             element: <Files />

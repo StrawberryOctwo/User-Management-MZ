@@ -1,60 +1,77 @@
-import React, { useState } from 'react';
-import { FieldConfig } from 'src/components/Table/tableRowCreate'; // Import FieldConfig type from the correct path
-import { Box } from '@mui/material';
+import React, { useState, useRef } from 'react';
+import Box from '@mui/material/Box';
 import { t } from 'i18next';
-import { addFranchise } from 'src/services/franchiseService';
+import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
 import ReusableForm from 'src/components/Table/tableRowCreate';
+import { fetchFranchises } from 'src/services/franchiseService';
+import { submitBilling } from 'src/services/billingService';
 
-// Separate configurations for franchise fields
+export default function CreateBilling() {
+    const [selectedFranchise, setSelectedFranchise] = useState<any>(null); // Store selected franchise
+    const [loading, setLoading] = useState(false); // Loading state for submission
+    const franchiseRef = useRef<any>(null); // Ref to reset franchise select input
 
+    const handleFranchiseSelect = (selectedItem: any) => {
+        setSelectedFranchise(selectedItem); // Set the selected franchise
+    };
 
-const CreateFranchise = () => {
-    const [loading, setLoading] = useState(false); // Unified loading state for both fetching and deleting
-
-    const handleFranchiseSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
+    const handleBillingSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
         setLoading(true);
 
-        // Structure the data as required by the API
         try {
+            if (!selectedFranchise) {
+                throw new Error('Please select a franchise.');
+            }
+
             const payload = {
-                name: data.name,
-                ownerName: data.ownerName,
-                cardHolderName: data.cardHolderName,
-                iban: data.iban,
-                bic: data.bic,
-                status: data.status,
-                totalEmployees: data.totalEmployees,
+                revenue: data['revenue'],
+                franchiseId: selectedFranchise.id, // Use selected franchise ID
             };
-            const response = await addFranchise(payload);
-            return response
-        }
-        catch (error: any) {
-            console.error("Error adding Franchise:", error);
+
+            const response = await submitBilling(payload); // Call your API service with the payload
+
+            // Reset form fields
+            setSelectedFranchise(null);
+            if (franchiseRef.current) {
+                franchiseRef.current.reset(); // Reset franchise autocomplete
+            }
+            return response;
+        } catch (error: any) {
+            console.error("Error submitting Billing:", error);
             throw error;
         } finally {
             setLoading(false);
         }
     };
-    const franchiseFields: FieldConfig[] = [
-        { name: 'name', label: t('franchise_name'), type: 'text', required: true, section: 'Franchise Information' },
-        { name: 'ownerName', label: t('owner_name'), type: 'text', required: true, section: 'Franchise Information' },
-        { name: 'cardHolderName', label: t('card_holder_name'), type: 'text', required: true, section: 'Franchise Information' },
-        { name: 'iban', label: t('iban'), type: 'text', required: true, section: 'Franchise Information' },
-        { name: 'bic', label: t('bic'), type: 'text', required: true, section: 'Franchise Information' },
-        { name: 'status', label: t('status'), type: 'text', required: true, section: 'Franchise Information' },
-        { name: 'totalEmployees', label: t('total_employees'), type: 'number', required: true, section: 'Franchise Information' },
+
+    const billingFields = [
+        { name: 'revenue', label: t('revenue'), type: 'number', required: true, section: 'Billing Information' },
+        {
+            name: 'franchise',
+            label: 'Franchise',
+            type: 'custom',
+            section: 'Franchise Assignment',
+            component: (
+                <SingleSelectWithAutocomplete
+                    ref={franchiseRef} // Attach the ref to reset if needed
+                    label={t("Search_and_assign_franchises")}
+                    fetchData={(query) => fetchFranchises(1, 5, query).then((data) => data.data)}
+                    onSelect={handleFranchiseSelect}
+                    displayProperty="name"
+                    placeholder="Type to search franchises"
+                />
+            ),
+        },
     ];
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-
             <ReusableForm
-                fields={franchiseFields} // Use franchise fields array
-                onSubmit={handleFranchiseSubmit}
-                entityName="Franchise"
-                entintyFunction="Add"
+                fields={billingFields}
+                onSubmit={handleBillingSubmit}
+                entityName="Billing"
+                entintyFunction="Submit"
             />
         </Box>
     );
-};
-
-export default CreateFranchise;
+}
