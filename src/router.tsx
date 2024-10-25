@@ -150,6 +150,11 @@ const UserSettings = Loader(
   lazy(() => import('src/content/applications/Users/settings'))
 );
 
+
+const Billings = Loader(
+  lazy(() => import('src/content/applications/Billings'))
+);
+
 // Components
 
 const Buttons = Loader(
@@ -238,10 +243,12 @@ const routes: RouteObject[] = [
     path: '',
     element: <ProtectedRoute />, // Protected routes wrapper
     children: [
-      {  path: 'logout',
-      element: <Logout />,},
       {
-     
+        path: 'logout',
+        element: <Logout />,
+      },
+      {
+
         path: 'dashboard',
         element: <SidebarLayout />,
         children: [
@@ -285,105 +292,110 @@ const routes: RouteObject[] = [
           },
           {
             path: 'franchises/view/:id',
-            element: <FranchiseView/>
+            element: <FranchiseView />
+          },
+
+          {
+            path: 'billings',
+            element: <Billings />
           },
 
           {
             path: 'files/',
-            element: <Files/>
+            element: <Files />
           },
 
           {
             path: 'franchise-admins/',
-            element: <FranchiseAdmins/>
+            element: <FranchiseAdmins />
           },
           {
             path: 'franchise-admins/create',
-            element: <FranchiseAdminsCreate/>
-            },
+            element: <FranchiseAdminsCreate />
+          },
           {
-          path: 'franchise-admins/view/:id',
-          element: <FranchiseAdminsView/>
+            path: 'franchise-admins/view/:id',
+            element: <FranchiseAdminsView />
           },
           {
             path: 'franchise-admins/edit/:id',
-            element: <FranchiseAdminsEdit/>
-            },
+            element: <FranchiseAdminsEdit />
+          },
 
           {
             path: 'locations/',
-            element: <Location/>
+            element: <Location />
           },
           {
             path: 'locations/create',
-            element: <LocationCreate/>
+            element: <LocationCreate />
           },
           {
             path: 'locations/view/:id',
-            element: <LocationView/>
+            element: <LocationView />
           },
           {
             path: 'locations/edit/:id',
-            element: <LocationEdit/>
+            element: <LocationEdit />
           },
 
           {
             path: 'location-admins/',
-            element: <LocationAdmins/>
+            element: <LocationAdmins />
           },
           {
             path: 'location-admins/create',
-            element: <LocationAdminsCreate/>
+            element: <LocationAdminsCreate />
           },
           {
             path: 'location-admins/view/:id',
-            element: <LocationAdminsView/>
+            element: <LocationAdminsView />
           },
           {
             path: 'location-admins/edit/:id',
-            element: <LocationAdminsEdit/>
+            element: <LocationAdminsEdit />
           },
           {
             path: 'teachers/',
-            element: <Teachers/>
+            element: <Teachers />
           },
           {
             path: 'teachers/create',
-            element: <TeachersCreate/>
+            element: <TeachersCreate />
           },
           {
             path: 'teachers/view/:id',
-            element: <TeachersView/>
+            element: <TeachersView />
           },
           {
             path: 'teachers/edit/:id',
-            element: <TeachersEdit/>
+            element: <TeachersEdit />
           },
 
           {
             path: 'students/',
-            element: <Students/>
+            element: <Students />
           },
           {
             path: 'students/create',
-            element: <StudentsCreate/>
+            element: <StudentsCreate />
           },
 
           {
             path: 'students/view/:id',
-            element: <StudentsView/>
+            element: <StudentsView />
           },
           {
             path: 'students/edit/:id',
-            element: <StudentsEdit/>
+            element: <StudentsEdit />
           },
           {
             path: 'topics',
-            element: <Topics/>
+            element: <Topics />
           },
           {
             path: 'topics/create',
-            element: <TopicCreate/>
+            element: <TopicCreate />
           },
           {
             path: 'profile',
