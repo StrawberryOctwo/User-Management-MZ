@@ -1,9 +1,9 @@
-import { Box, Button, CircularProgress } from '@mui/material';
+import { Box, Button, CircularProgress, Switch } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { useNavigate } from 'react-router-dom';
-import { fetchAllBillings } from 'src/services/billingService';
+import { confirmBillingAsPaid, fetchAllBillings } from 'src/services/billingService';
 
 export default function ViewBillingsPage() {
   const [billings, setBillings] = useState<any[]>([]);
@@ -43,7 +43,22 @@ export default function ViewBillingsPage() {
     { field: 'revenue', headerName: 'Revenue' },
     { field: 'amountDue', headerName: 'Amount Due' },
     { field: 'amountPaid', headerName: 'Amount Paid' },
-    { field: 'isPaid', headerName: 'Paid', render: (value: any) => (value === '1' ? '1' : '0') },
+    {
+      field: 'franchiseName',
+      headerName: 'Franchise Name',
+      render: (value: any, row: any) => row.franchise?.name || 'N/A', // Handle nested field access
+    },
+    {
+      field: 'isPaid',
+      headerName: 'Paid',
+      render: (value: any, row: any) => (
+        <Switch
+          checked={row.isPaid}
+          onChange={(event) => handleTogglePaid(row.id, event.target.checked)}
+          color="primary"
+        />
+      ),
+    },
   ];
 
   const handleEdit = (id: any) => {
@@ -53,6 +68,16 @@ export default function ViewBillingsPage() {
   const handleView = (id: any) => {
     navigate(`view/${id}`);
 
+  };
+
+  const handleTogglePaid = async (id: number, checked: boolean) => {
+    try {
+      // Pseudo API call to update billing status
+      await confirmBillingAsPaid(id, checked);
+      await loadBillings(); // Reload the data to reflect the change
+    } catch (error) {
+      console.error('Failed to update billing status', error);
+    }
   };
 
   // const handleDelete = async () => {
