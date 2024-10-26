@@ -32,17 +32,20 @@ export const getStudentPaymentDetails = async (studentId: string) => {
     }
 };
 
-// Fetch payments for a student
-export const getPaymentsForUser = async (userId) => {
-    try {
-        const response = await api.get(`/payments/user/${userId}`);
-        return response.data;
-    } catch (error) {
-        console.error('Error fetching payments for user:', error);
-        throw error;
-    }
-};
 
+// Fetch payments for a user with pagination
+export const getPaymentsForUser = async (userId:number, page = 1, limit = 10) => {
+    try {
+      const response = await api.get(`/payments/user/${userId}`, {
+        params: { page, limit }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching payments for user:', error);
+      throw error;
+    }
+  };
+  
 // Fetch payments for a student
 export const getPaymentsForUserByClassSession = async (userId,classSessionId) => {
     try {

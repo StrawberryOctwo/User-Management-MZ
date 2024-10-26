@@ -8,7 +8,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import { fetchTeacherById, fetchTeacherDocumentsById } from 'src/services/teacherService';
 import ReusableDetails from 'src/components/View';
 import FileActions from 'src/components/Files/FileActions';
-import { getPaymentsForUser, updatePaymentStatus } from 'src/services/paymentService.';
+import { getPaymentsForUser, updatePaymentStatus } from 'src/services/paymentService';
 
 const ViewTeacherPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();

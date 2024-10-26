@@ -6,7 +6,7 @@ import { fetchStudentById, fetchStudentDocumentsById } from 'src/services/studen
 import { getSessionReportsForStudent } from 'src/services/sessionReportService';
 import ReusableDetails from 'src/components/View';
 import FileActions from 'src/components/Files/FileActions';
-import { getPaymentsForUser, updatePaymentStatus } from 'src/services/paymentService.';
+import { getPaymentsForUser, updatePaymentStatus } from 'src/services/paymentService';
 import ViewSessionReportForm from 'src/components/Calendar/Components/Modals/ViewSessionReport';
 
 const ViewStudentPage: React.FC = () => {

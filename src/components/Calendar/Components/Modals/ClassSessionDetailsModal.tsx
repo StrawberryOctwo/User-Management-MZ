@@ -18,7 +18,7 @@ import ViewSessionReportForm from './ViewSessionReport';
 import ViewPaymentDetails from './ViewPaymentDetails';  // New Component for payment view
 import StudentDetailCard from './StudentDetailCArd';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
-import { createPaymentForUser, getPaymentsForUserByClassSession } from 'src/services/paymentService.'; // Fix the path if needed
+import { createPaymentForUser, getPaymentsForUserByClassSession } from 'src/services/paymentService'; // Fix the path if needed
 
 interface ClassSessionDetailsModalProps {
     isOpen: boolean;
