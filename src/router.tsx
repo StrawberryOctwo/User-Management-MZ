@@ -78,6 +78,22 @@ const LocationEdit = Loader(
 );
 
 
+const Parent = Loader(
+  lazy(() => import('src/content/applications/Parents'))
+);
+
+const ParentCreate = Loader(
+  lazy(() => import('src/content/applications/Parents/Create'))
+);
+
+const ParentView = Loader(
+  lazy(() => import('src/content/applications/Parents/View'))
+);
+const ParentEdit = Loader(
+  lazy(() => import('src/content/applications/Parents/Edit'))
+);
+
+
 const LocationAdmins = Loader(
   lazy(() => import('src/content/applications/LocationAdmins'))
 );
@@ -388,7 +404,22 @@ const routes: RouteObject[] = [
             path: 'teachers/edit/:id',
             element: <TeachersEdit />
           },
-
+          {
+            path: 'parents/',
+            element: <Parent />
+          },
+          {
+            path: 'parents/create',
+            element: <ParentCreate />
+          },
+          {
+            path: 'parents/view/:id',
+            element: <ParentView />
+          },
+          {
+            path: 'parents/edit/:id',
+            element: <ParentEdit />
+          },
           {
             path: 'students/',
             element: <Students />

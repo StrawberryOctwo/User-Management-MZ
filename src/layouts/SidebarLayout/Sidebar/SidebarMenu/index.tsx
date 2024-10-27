@@ -332,6 +332,22 @@ function SidebarMenu() {
                     disableRipple
                     component={RouterLink}
                     onClick={closeSidebar}
+                    to="/management/parents"
+                    startIcon={<PersonAddAlt1Sharp />}
+                  >
+                    Parents
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
+
+              <ProtectedListItem
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
                     to="/management/students"
                     startIcon={<PersonAddAlt1Sharp />}
                   >
