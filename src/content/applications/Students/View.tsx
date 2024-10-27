@@ -36,7 +36,7 @@ const ViewStudentPage: React.FC = () => {
             setSessionReports(reports);
 
             const userPayments = await getPaymentsForUser(studentData.user?.id);
-            setPayments(userPayments);
+            setPayments(userPayments.data);
         } catch (error: any) {
             console.error('Failed to fetch student data:', error);
             setErrorMessage(t('failed_to_fetch_student'));

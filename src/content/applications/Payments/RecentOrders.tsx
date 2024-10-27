@@ -5,6 +5,9 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from 'src/hooks/useAuth';
 import { getPaymentsForUser } from 'src/services/paymentService';
+import PaymentPDF from './PaymentPDF';
+import { jsPDF } from 'jspdf';
+import generatePDF from './PaymentPDF';
 
 export default function ViewPaymentsPage() {
   const [payments, setPayments] = useState<any[]>([]);
@@ -19,7 +22,7 @@ export default function ViewPaymentsPage() {
 
 
   const navigate = useNavigate();
-  const {userId} = useAuth();
+  const { userId } = useAuth();
 
   useEffect(() => {
     if (userId) {
@@ -35,7 +38,7 @@ export default function ViewPaymentsPage() {
       console.warn("User ID is null, skipping API call");
       return;
     }
-  
+
     setLoading(true);
     try {
       const { data, total } = await getPaymentsForUser(userId, page + 1, limit);
@@ -48,8 +51,8 @@ export default function ViewPaymentsPage() {
       setLoading(false);
     }
   };
-  
-  
+
+
 
   const columns = [
     { field: 'amount', headerName: 'Amount' },
@@ -76,6 +79,12 @@ export default function ViewPaymentsPage() {
     setPage(0);
   };
 
+  const handleDownload = (payment) => {
+    generatePDF(payment);
+  };
+
+
+
   if (errorMessage) return <div>{errorMessage}</div>;
 
   return (
@@ -87,6 +96,7 @@ export default function ViewPaymentsPage() {
         onEdit={handleEdit}
         onView={handleView}
         onSearchChange={loadPayments}
+        onDownload={handleDownload}
         loading={loading}
         page={page}
         limit={limit}

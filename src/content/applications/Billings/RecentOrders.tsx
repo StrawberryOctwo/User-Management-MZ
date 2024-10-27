@@ -42,7 +42,7 @@ export default function ViewBillingsPage() {
   const columns = [
     { field: 'revenue', headerName: 'Revenue' },
     { field: 'amountDue', headerName: 'Amount Due' },
-    { field: 'billingDate', headerName: 'Billing Date',render: (value: any) => new Date(value).toLocaleDateString() },
+    { field: 'billingDate', headerName: 'Billing Date', render: (value: any) => new Date(value).toLocaleDateString() },
     {
       field: 'franchiseName',
       headerName: 'Franchise Name',
@@ -55,7 +55,7 @@ export default function ViewBillingsPage() {
         <Switch
           checked={row.isPaid}
           onChange={(event) => handleTogglePaid(row.id, event.target.checked)}
-          color="primary"
+          color="success"
         />
       ),
     },
@@ -73,7 +73,7 @@ export default function ViewBillingsPage() {
   const handleTogglePaid = async (id: number, checked: boolean) => {
     try {
       await confirmBillingAsPaid(id, checked);
-  
+
       setBillings((prevBillings) =>
         prevBillings.map((billing) =>
           billing.id === id ? { ...billing, isPaid: checked } : billing
@@ -83,7 +83,7 @@ export default function ViewBillingsPage() {
       console.error('Failed to update billing status', error);
     }
   };
-  
+
 
   // const handleDelete = async () => {
   //   setDialogOpen(false);
