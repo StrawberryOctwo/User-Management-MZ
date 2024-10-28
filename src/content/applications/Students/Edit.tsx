@@ -16,9 +16,8 @@ import { assignOrUpdateParentStudents, fetchParents } from 'src/services/parentS
 const EditStudent = () => {
     const { id } = useParams<{ id: string }>();
     const [studentData, setStudentData] = useState<Record<string, any> | null>(null);
-    const [selectedLocation, setSelectedLocation] = useState<any | null>(null);
+    const [selectedLocations, setSelectedLocations] = useState<any[]>([]); // Changed to an array for multiple locations
     const [selectedParentId, setSelectedParentId] = useState<number | null>(null);
-
     const [selectedTopics, setSelectedTopics] = useState<any[]>([]);
     const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -29,41 +28,42 @@ const EditStudent = () => {
         setLoading(true);
         try {
             const fetchedData = await fetchStudentById(Number(id));
-            const studentDocuments = await fetchStudentDocumentsById(Number(id)); // Fetch student documents
+            const studentDocuments = await fetchStudentDocumentsById(Number(id));
 
             if (fetchedData && fetchedData.user && fetchedData.parent) {
-                // Flatten the user and parent fields for the form
                 const flattenedData = {
                     ...fetchedData,
                     firstName: fetchedData.user.firstName,
                     lastName: fetchedData.user.lastName,
-                    dob: formatDateForInput(fetchedData.user.dob), // Format date for input
+                    dob: formatDateForInput(fetchedData.user.dob),
                     email: fetchedData.user.email,
                     address: fetchedData.user.address,
                     postalCode: fetchedData.user.postalCode,
                     phoneNumber: fetchedData.user.phoneNumber,
-                    contractEndDate: fetchedData.contractEndDate ? formatDateForInput(fetchedData.contractEndDate) : '', // Safe check for contractEndDate
-                    // Flatten parent data for the form
-                    accountHolder: fetchedData.parent.accountHolder,
-                    iban: fetchedData.parent.iban,
-                    bic: fetchedData.parent.bic,
+                    contractEndDate: fetchedData.contractEndDate ? formatDateForInput(fetchedData.contractEndDate) : '',
+                    parent: [
+                        {
+                            firstName: fetchedData.parent.user.firstName,
+                            lastName: fetchedData.parent.user.lastName,
+                        },
+                    ],
                 };
-
+                
                 setStudentData(flattenedData);
-                setSelectedLocation(fetchedData.location || null); // Set selected location
-                setSelectedTopics(fetchedData.topics || []); // Set selected topics
+                setSelectedLocations(fetchedData.locations || []); // Set multiple locations
+                setSelectedParentId(fetchedData.parent.id);
+                setSelectedTopics(fetchedData.topics || []);
             }
 
-            // Map the documents retrieved from the API to the format needed for the UploadSection
-            const formattedDocuments = studentDocuments.documents.map((doc: { id: any, name: any; type: any; path: any; }) => ({
+            const formattedDocuments = studentDocuments.documents.map((doc) => ({
                 id: doc.id,
                 fileName: doc.name,
                 fileType: doc.type,
-                file: null, // No actual file data, just the metadata
-                path: doc.path, // You can use this to display a link to the file
+                file: null,
+                path: doc.path,
             }));
 
-            setUploadedFiles(formattedDocuments); // Set initial documents in state
+            setUploadedFiles(formattedDocuments);
         } catch (error) {
             console.error('Error fetching student:', error);
         } finally {
@@ -75,30 +75,28 @@ const EditStudent = () => {
         fetchStudent();
     }, [id]);
 
-    const handleLocationSelect = (selectedItem: any) => {
-        setSelectedLocation(selectedItem); // Capture selected location
+    const handleLocationSelect = (locations: any[]) => {
+        setSelectedLocations(locations); // Capture selected locations as an array
     };
 
-    const handleTopicSelect = (selectedItems: any[]) => {
-        setSelectedTopics(selectedItems); // Capture selected topics
-    };
     const handleParentSelect = (parent: any) => {
         setSelectedParentId(parent ? parent.id : null);
     };
 
+    const handleTopicSelect = (selectedItems: any[]) => {
+        setSelectedTopics(selectedItems);
+    };
+
     const handleFilesChange = (files: any[]) => {
-        setUploadedFiles(files); // Capture uploaded files
+        setUploadedFiles(files);
     };
 
     const formatDateForInput = (date: string) => {
         const d = new Date(date);
-        console.log(date)
-        console.log(d.toISOString().split('T')[0])
-        return d.toISOString().split('T')[0]; // Returns YYYY-MM-DD format
+        return d.toISOString().split('T')[0];
     };
 
     const handleStudentSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
-
         if (data.password && data.password !== data.confirmPassword) {
             showMessage("Passwords do not match", 'error');
             return;
@@ -107,17 +105,19 @@ const EditStudent = () => {
             showMessage("Parent field is required", 'error');
             return;
         }
-        if (selectedLocation == null) {
-            showMessage("Location field is required", 'error')
-            return
+        if (selectedLocations.length === 0) {
+            showMessage("At least one location must be selected", 'error');
+            return;
         }
-        if (selectedTopics.length == 0) {
-            showMessage("Topics field can't be empty", 'error')
-            return
+        if (selectedTopics.length === 0) {
+            showMessage("Topics field can't be empty", 'error');
+            return;
         }
+
         setLoading(true);
         try {
             const topicIds = selectedTopics.map(topic => topic.id);
+            const locationIds = selectedLocations.map(location => location.id);
 
             const userPayload = {
                 firstName: data.firstName,
@@ -139,17 +139,13 @@ const EditStudent = () => {
                 contractEndDate: data.contractEndDate,
                 notes: data.notes,
                 availableDates: data.availableDates,
-                locationId: selectedLocation ? selectedLocation.id : null, // Handle null case here
+                locationIds, // Updated to send multiple location IDs
             };
 
-            // Update student and user data together
             const response = await updateStudent(Number(id), userPayload, studentPayload);
-
-            // Assign the student to multiple topics
             await assignStudentToTopics(Number(id), topicIds);
             await assignOrUpdateParentStudents(selectedParentId, [response.studentId]);
 
-            // Upload documents for the student
             const userId = response.userId;
             for (const file of uploadedFiles) {
                 const documentPayload = {
@@ -158,22 +154,19 @@ const EditStudent = () => {
                     userId: String(userId),
                 };
                 if (file.file) {
-                    await addDocument(documentPayload, file.file); // Upload file only if it's new
+                    await addDocument(documentPayload, file.file);
                 }
             }
 
-            // Refetch student data after successful update
             await fetchStudent();
-
             return response;
-        } catch (error: any) {
+        } catch (error) {
             console.error('Error updating student:', error);
             throw error;
         } finally {
             setLoading(false);
         }
     };
-
 
     const parentSelectionField = {
         name: 'parent',
@@ -185,11 +178,13 @@ const EditStudent = () => {
                 label="Search Parent"
                 fetchData={(query) => fetchParents(1, 5, query).then((data) => data.data)}
                 onSelect={handleParentSelect}
-                displayProperty="accountHolder"
+                displayProperty="firstName"
                 placeholder="Type to search parent"
+                initialValue={selectedParentId}
             />
         ),
     };
+
     const userFields: FieldConfig[] = [
         { name: 'firstName', label: t('first_name'), type: 'text', required: true, section: 'User Information' },
         { name: 'lastName', label: t('last_name'), type: 'text', required: true, section: 'User Information' },
@@ -214,17 +209,17 @@ const EditStudent = () => {
         parentSelectionField,
         {
             name: 'locations',
-            label: 'Location',
+            label: 'Locations',
             type: 'custom',
             section: 'Student Assignment',
             component: (
-                <SingleSelectWithAutocomplete
+                <MultiSelectWithCheckboxes
                     label="Search Location"
                     fetchData={(query) => fetchLocations(1, 5, query).then((data) => data.data)}
                     onSelect={handleLocationSelect}
                     displayProperty="name"
                     placeholder="Type to search location"
-                    initialValue={selectedLocation}
+                    initialValue={selectedLocations}
                 />
             ),
         },
@@ -239,7 +234,7 @@ const EditStudent = () => {
                     fetchData={(query) => fetchTopics(1, 5, query, 'name').then((data) => data.data)}
                     onSelect={handleTopicSelect}
                     displayProperty="name"
-                    initialValue={selectedTopics} // Pre-fill selected topics
+                    initialValue={selectedTopics}
                 />
             ),
         },
@@ -248,7 +243,7 @@ const EditStudent = () => {
             label: 'Uploaded Documents',
             type: 'custom',
             section: 'Documents',
-            component: <UploadSection onUploadChange={handleFilesChange} initialDocuments={uploadedFiles} />, // Pass initial documents
+            component: <UploadSection onUploadChange={handleFilesChange} initialDocuments={uploadedFiles} />,
             xs: 12,
             sm: 12,
         },
@@ -258,10 +253,10 @@ const EditStudent = () => {
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {!loading && studentData && (
                 <ReusableForm
-                    key={studentData.id} // Add key to force re-render when studentData changes
-                    fields={[ ...userFields, ...studentFields]}
+                    key={studentData.id}
+                    fields={[...userFields, ...studentFields]}
                     onSubmit={handleStudentSubmit}
-                    initialData={studentData} // Pre-fill form with student data
+                    initialData={studentData}
                     entityName="Student"
                     entintyFunction="Edit"
                 />

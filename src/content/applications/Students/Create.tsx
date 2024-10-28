@@ -13,7 +13,7 @@ import UploadSection from 'src/components/Files/UploadDocuments';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
 
 export default function CreateStudent() {
-    const [selectedLocationId, setSelectedLocationId] = useState<number | null>(null);
+    const [selectedLocationIds, setSelectedLocationIds] = useState<number[]>([]); // Update to handle multiple IDs
     const [selectedParentId, setSelectedParentId] = useState<number | null>(null);
     const [selectedTopics, setSelectedTopics] = useState<any[]>([]);
     const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
@@ -21,8 +21,8 @@ export default function CreateStudent() {
     const dropdownRef = useRef<any>(null);
     const { showMessage } = useSnackbar();
 
-    const handleLocationSelect = (location: any) => {
-        setSelectedLocationId(location ? location.id : null);
+    const handleLocationSelect = (locations: any[]) => {
+        setSelectedLocationIds(locations.map(location => location.id));
     };
 
     const handleParentSelect = (parent: any) => {
@@ -38,7 +38,7 @@ export default function CreateStudent() {
     };
 
     const handleStudentSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
-        if (!selectedLocationId) {
+        if (selectedLocationIds.length === 0) {
             showMessage("Location field is required", 'error');
             return;
         }
@@ -65,7 +65,7 @@ export default function CreateStudent() {
                     contractEndDate: data['contractEndDate'],
                     notes: data['notes'],
                     availableDates: data['availableDates'],
-                    locationId: selectedLocationId,
+                    locationIds: selectedLocationIds, // Updated to send multiple location IDs
                     parentId: selectedParentId, // Link the student to the selected parent
                 },
                 user: {
@@ -94,8 +94,7 @@ export default function CreateStudent() {
                 await addDocument(documentPayload, file.file);
             }
 
-            setSelectedLocationId(null);
-            setSelectedParentId(null);
+            setSelectedLocationIds([]);            setSelectedParentId(null);
             setSelectedTopics([]);
             setUploadedFiles([]);
             if (dropdownRef.current) dropdownRef.current.reset();
@@ -131,7 +130,7 @@ export default function CreateStudent() {
         type: 'custom',
         section: 'Student Assignment',
         component: (
-            <SingleSelectWithAutocomplete
+            <MultiSelectWithCheckboxes
                 label="Search Location"
                 fetchData={(query) => fetchLocations(1, 5, query).then((data) => data.data)}
                 onSelect={handleLocationSelect}
