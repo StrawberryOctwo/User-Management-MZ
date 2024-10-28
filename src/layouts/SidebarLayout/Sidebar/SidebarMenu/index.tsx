@@ -201,7 +201,7 @@ function SidebarMenu() {
           <SubMenuWrapper>
             <List component="div">
               <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'Teacher', 'Student', 'Parent','LocationAdmin']}
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'Teacher', 'Student', 'Parent', 'LocationAdmin']}
               >
                 <ListItem component="div">
                   <Button
@@ -388,7 +388,22 @@ function SidebarMenu() {
                 </ListItem>
               </ProtectedListItem>
               <ProtectedListItem
-                allowedRoles={['Teacher','Parent']}
+                allowedRoles={['Teacher', 'Parent']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/management/parent-session-reports"
+                    startIcon={<AttachMoney />}
+                  >
+                    Session Reports
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
+              <ProtectedListItem
+                allowedRoles={['Teacher', 'Parent']}
               >
                 <ListItem component="div">
                   <Button

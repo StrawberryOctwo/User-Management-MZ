@@ -37,23 +37,23 @@ export const fetchParents = async (page: number, limit: number, searchQuery: str
 
 // Function to assign students to a parent
 export const assignOrUpdateParentStudents = async (parentId: number, studentIds: number[]) => {
-    try {
-      const response = await api.post('/parent/assign-students', {
-        parentId,
-        studentIds,
-      });
-      return response.data;
-    } catch (error) {
-      console.error('Error assigning students to parent:', error);
-      throw error;
-    }
-  };
-
-  export const fetchStudentsByParent = async (parentId: number, page: number = 1, limit: number = 10, search: string = '') => {
-    const response = await api.get(`/parent/${parentId}/students`, {
-        params: { page, limit, search },
+  try {
+    const response = await api.post('/parent/assign-students', {
+      parentId,
+      studentIds,
     });
     return response.data;
+  } catch (error) {
+    console.error('Error assigning students to parent:', error);
+    throw error;
+  }
+};
+
+export const fetchStudentsByParent = async (parentId: number, page: number = 1, limit: number = 10, search: string = '') => {
+  const response = await api.get(`/parent/${parentId}/students`, {
+    params: { page, limit, search },
+  });
+  return response.data;
 };
 
 // Function to delete multiple parents
@@ -78,4 +78,11 @@ export const fetchParentById = async (id: number) => {
     console.error('Error fetching parent details:', error);
     throw error;
   }
+};
+
+export const fetchParentSessionReports = async (id: number, page: number = 1, limit: number = 10, search: string = '') => {
+  const response = await api.get(`/parent/${id}/session-reports`, {
+    params: { page, limit, search },
+  });
+  return response.data;
 };

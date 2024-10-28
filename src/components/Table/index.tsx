@@ -53,6 +53,7 @@ interface ReusableTableProps {
     onPageChange: (newPage: number) => void;
     onLimitChange: (newLimit: number) => void;
     totalCount: number;
+    showDefaultActions?: boolean;
 }
 
 const getStatusLabel = (status: string): JSX.Element => {
@@ -80,7 +81,8 @@ export default function ReusableTable({
     limit,
     onPageChange,
     onLimitChange,
-    totalCount
+    totalCount,
+    showDefaultActions = true
 }: ReusableTableProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedRows, setSelectedRows] = useState<number[]>([]);
@@ -219,22 +221,6 @@ export default function ReusableTable({
                     ))
                 }
                 <TableCell align="right">
-                    {onEdit && (
-                        <Tooltip title="Edit" arrow>
-                            <IconButton
-                                onClick={() => onEdit(row.id)}
-                                sx={{
-                                    '&:hover': {
-                                        background: theme.colors.primary.lighter,
-                                    },
-                                    color: theme.palette.primary.main,
-                                }}
-                                size="small"
-                            >
-                                <EditTwoToneIcon fontSize="small" />
-                            </IconButton>
-                        </Tooltip>
-                    )}
                     {onView && (
                         <Tooltip title="View" arrow>
                             <IconButton
@@ -248,6 +234,22 @@ export default function ReusableTable({
                                 size="small"
                             >
                                 <VisibilityTwoToneIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                    )}
+                    {onEdit && (
+                        <Tooltip title="Edit" arrow>
+                            <IconButton
+                                onClick={() => onEdit(row.id)}
+                                sx={{
+                                    '&:hover': {
+                                        background: theme.colors.primary.lighter,
+                                    },
+                                    color: theme.palette.primary.main,
+                                }}
+                                size="small"
+                            >
+                                <EditTwoToneIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>
                     )}
@@ -365,7 +367,10 @@ export default function ReusableTable({
                                     </TableSortLabel>
                                 </TableCell>
                             ))}
-                            <TableCell align="right">Actions</TableCell>
+                            {/* Conditionally render the Actions column */}
+                            {showDefaultActions && (
+                                <TableCell align="right">Actions</TableCell>
+                            )}
                         </TableRow>
                     </TableHead>
                     <TableBody>{renderTableBody()}</TableBody>
@@ -384,4 +389,5 @@ export default function ReusableTable({
             </Box>
         </Card>
     );
+
 };

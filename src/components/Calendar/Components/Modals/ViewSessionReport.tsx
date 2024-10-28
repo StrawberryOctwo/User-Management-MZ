@@ -7,9 +7,7 @@ interface ViewSessionReportFormProps {
     isOpen: boolean;
     reportId: string;
     onClose: () => void;
-    onDelete: () => void;  // Remove refresh logic here
-    student: any;
-    classSessionId: string;
+    onDelete: () => void;
 }
 
 const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
@@ -17,22 +15,20 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
     onClose,
     reportId,
     onDelete,
-    student,
-    classSessionId,
 }) => {
-    const [lessonTopic, setLessonTopic] = useState<string>(''); 
-    const [coveredMaterials, setCoveredMaterials] = useState<string>(''); 
-    const [progress, setProgress] = useState<string>(''); 
-    const [learningAssessment, setLearningAssessment] = useState<string>(''); 
+    const [lessonTopic, setLessonTopic] = useState<string>('');
+    const [coveredMaterials, setCoveredMaterials] = useState<string>('');
+    const [progress, setProgress] = useState<string>('');
+    const [learningAssessment, setLearningAssessment] = useState<string>('');
     const [activeParticipation, setActiveParticipation] = useState<boolean>(false);
     const [concentration, setConcentration] = useState<boolean>(false);
     const [worksIndependently, setWorksIndependently] = useState<boolean>(false);
     const [cooperation, setCooperation] = useState<boolean>(false);
     const [previousHomeworkCompleted, setPreviousHomeworkCompleted] = useState<boolean>(false);
-    const [nextHomework, setNextHomework] = useState<string>(''); 
-    const [tutorRemarks, setTutorRemarks] = useState<string>(''); 
-    const [sessionDate, setSessionDate] = useState<string>(''); 
-    const [studentName, setStudentName] = useState<string>(''); 
+    const [nextHomework, setNextHomework] = useState<string>('');
+    const [tutorRemarks, setTutorRemarks] = useState<string>('');
+    const [sessionDate, setSessionDate] = useState<string>('');
+    const [studentName, setStudentName] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(true);  // Track loading state for the form data
 
     // Fetch the session report when the dialog opens
@@ -42,9 +38,9 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                 setLoading(true);
                 try {
                     const report = await getSessionReportById(reportId);  // Fetch the report by ID
-                    
+
                     // Set all fields to the values from the fetched report
-        
+
                     setLessonTopic(report.data.lessonTopic || '');
                     setCoveredMaterials(report.data.coveredMaterials || '');
                     setProgress(report.data.progress || '');
@@ -91,19 +87,19 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
 
     const handleSave = async () => {
         try {
-            await updateSessionReport(reportId, { 
+            await updateSessionReport(reportId, {
 
-                lessonTopic, 
-                coveredMaterials, 
-                progress, 
-                learningAssessment, 
-                activeParticipation, 
-                concentration, 
-                worksIndependently, 
-                cooperation, 
-                previousHomeworkCompleted, 
-                nextHomework, 
-                tutorRemarks 
+                lessonTopic,
+                coveredMaterials,
+                progress,
+                learningAssessment,
+                activeParticipation,
+                concentration,
+                worksIndependently,
+                cooperation,
+                previousHomeworkCompleted,
+                nextHomework,
+                tutorRemarks
             });
             onClose();   // Close the dialog after saving
         } catch (error) {
@@ -131,7 +127,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                     </Box>
                 ) : (
                     <Box display="flex" flexDirection="column" gap={2} mt={2}>
-                        
+
                         {/* Read-Only Fields */}
                         <TextField
                             label="Student Name"
@@ -139,14 +135,14 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                             fullWidth
                             InputProps={{ readOnly: true }}
                         />
-                        
+
                         <TextField
                             label="Session Date"
                             value={sessionDate}
                             fullWidth
                             InputProps={{ readOnly: true }}
                         />
-                        
+
                         <TextField
                             label="Lesson Topic"
                             value={lessonTopic}
@@ -255,7 +251,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                 )}
             </DialogContent>
             <DialogActions>
-                <Button onClick={handleDelete} color="secondary">
+                <Button onClick={handleDelete} color="error">
                     Delete Report
                 </Button>
                 <Button onClick={handleSave} color="primary" variant="contained">

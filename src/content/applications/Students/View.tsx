@@ -218,9 +218,7 @@ const ViewStudentPage: React.FC = () => {
                     isOpen={isReportDialogOpen}
                     reportId={selectedReportId}
                     onClose={closeReportDialog}
-                    onDelete={closeReportDialog} // Close and refresh list on delete
-                    student={student}
-                    classSessionId={id || ''}
+                    onDelete={closeReportDialog}
                 />
             )}
         </Box>

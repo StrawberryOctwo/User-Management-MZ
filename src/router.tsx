@@ -173,6 +173,9 @@ const Billings = Loader(
 const Payments = Loader(
   lazy(() => import('src/content/applications/Payments'))
 );
+const SessionReports = Loader(
+  lazy(() => import('src/content/applications/SessionReports'))
+);
 const CreateBill = Loader(
   lazy(() => import('src/content/applications/Billings/Create'))
 );
@@ -326,6 +329,12 @@ const routes: RouteObject[] = [
             path: 'billings/create',
             element: <CreateBill />
           },
+
+          {
+            path: 'parent-session-reports',
+            element: <SessionReports />
+          },
+
 
           {
             path: 'payments',

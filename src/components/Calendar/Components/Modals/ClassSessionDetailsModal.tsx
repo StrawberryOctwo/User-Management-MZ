@@ -90,7 +90,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                         await createPaymentForUser({
                             userId: response.teacher.user.id,
                             classSessionId: response.id,
-                            sessionType:sessionTypeFunc(classSession.sessionType)
+                            sessionType: sessionTypeFunc(classSession.sessionType)
 
                         });
                         console.log('Payment successfully sent');
@@ -240,8 +240,6 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                                 isOpen={isViewReportFormOpen}
                                 onClose={handleCloseReportForm}
                                 reportId={selectedReportId}
-                                student={selectedStudent}
-                                classSessionId={appointmentId}
                                 onDelete={handleCloseReportForm}
                             />
                         )}
