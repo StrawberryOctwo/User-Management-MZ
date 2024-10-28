@@ -80,6 +80,7 @@ const EditStudent = () => {
     };
 
     const handleParentSelect = (parent: any) => {
+        console.log(parent)
         setSelectedParentId(parent ? parent.id : null);
     };
 
@@ -178,7 +179,7 @@ const EditStudent = () => {
                 label="Search Parent"
                 fetchData={(query) => fetchParents(1, 5, query).then((data) => data.data)}
                 onSelect={handleParentSelect}
-                displayProperty="firstName"
+                displayProperty="accountHolder"
                 placeholder="Type to search parent"
                 initialValue={selectedParentId}
             />

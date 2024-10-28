@@ -201,7 +201,7 @@ function SidebarMenu() {
           <SubMenuWrapper>
             <List component="div">
               <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'Teacher', 'Student', 'LocationAdmin']}
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'Teacher', 'Student', 'Parent','LocationAdmin']}
               >
                 <ListItem component="div">
                   <Button
@@ -388,7 +388,7 @@ function SidebarMenu() {
                 </ListItem>
               </ProtectedListItem>
               <ProtectedListItem
-                allowedRoles={['Teacher', 'Student']}
+                allowedRoles={['Teacher','Parent']}
               >
                 <ListItem component="div">
                   <Button
@@ -398,7 +398,7 @@ function SidebarMenu() {
                     to="/management/payments"
                     startIcon={<AttachMoney />}
                   >
-                    Payments
+                    Session Payments
                   </Button>
                 </ListItem>
               </ProtectedListItem>

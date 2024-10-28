@@ -10,7 +10,7 @@ import FilterToolbar from './Components/CustomizedCalendar/FilterToolbar';
 import CalendarLegend from './Components/CalendarLegend';
 import { useAuth } from 'src/hooks/useAuth';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
-import { addClassSessions, fetchClassSessions, fetchUserClassSessions } from 'src/services/classSessionService';
+import { addClassSessions, fetchClassSessions, fetchParentClassSessions, fetchUserClassSessions } from 'src/services/classSessionService';
 
 const CalendarContent: React.FC = () => {
   const [classSessionEvents, setClassSessionEvents] = useState<EventItem[]>([]);
@@ -23,7 +23,7 @@ const CalendarContent: React.FC = () => {
 
   const { userId, userRoles } = useAuth();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
-
+  console.log(strongestRoles)
   const strongestRole = strongestRoles.includes('SuperAdmin')
     ? 'SuperAdmin'
     : strongestRoles.includes('FranchiseAdmin')
@@ -32,6 +32,8 @@ const CalendarContent: React.FC = () => {
         ? 'LocationAdmin'
         : strongestRoles.includes('Teacher')
           ? 'Teacher'
+            : strongestRoles.includes('Parent')
+            ? 'Parent'
           : strongestRoles.includes('Student')
             ? 'Student'
             : null;
@@ -92,7 +94,11 @@ const CalendarContent: React.FC = () => {
         case 'Student':
           response = await fetchUserClassSessions(userId?.toString() || '', startDate, endDate);
           break;
+        case 'Parent':  
+          response = await fetchParentClassSessions(userId?.toString() || '', startDate, endDate);
+          break;
         case 'SuperAdmin':
+ 
         case 'FranchiseAdmin':
         case 'LocationAdmin':
           if (selectedLocations.length === 0) return;

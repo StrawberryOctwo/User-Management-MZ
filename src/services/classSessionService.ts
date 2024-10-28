@@ -27,6 +27,19 @@ export const fetchUserClassSessions = async (id: string, startDate: string, endD
         throw error;
     }
 };
+
+export const fetchParentClassSessions = async (parentUserId: string, startDate?: string, endDate?: string) => {
+    try {
+        const response = await api.get(`/parent/${parentUserId}/class-sessions`, {
+            params: { startDate, endDate },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching Parent class sessions:', error);
+        throw error;
+    }
+};
+
 export const addClassSessions = async (classData: any) => {
     try {
         const response = await api.post('/class-session', classData)
