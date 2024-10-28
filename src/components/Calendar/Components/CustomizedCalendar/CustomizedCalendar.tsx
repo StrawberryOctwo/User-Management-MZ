@@ -169,7 +169,7 @@ export default function CustomizedCalendar({
 
   // Function to handle event selection
   const handleEventClick = (event: any) => {
-    if (strongestRoles[0] == 'Teacher' || strongestRoles[0] == 'Student') {
+    if (strongestRoles[0] == 'Teacher' || strongestRoles[0] == 'Parent' || strongestRoles[0] == 'Student') {
       setCanEditSession(false)
     }
     const appointmentId = event.data?.appointment?.id;
