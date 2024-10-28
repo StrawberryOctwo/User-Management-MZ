@@ -11,11 +11,14 @@ import { fetchLocations } from 'src/services/locationService';
 import { fetchStudentById, fetchStudentDocumentsById, updateStudent } from 'src/services/studentService';
 import { assignStudentToTopics, fetchTopics } from 'src/services/topicService';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
+import { assignOrUpdateParentStudents, fetchParents } from 'src/services/parentService';
 
 const EditStudent = () => {
     const { id } = useParams<{ id: string }>();
     const [studentData, setStudentData] = useState<Record<string, any> | null>(null);
     const [selectedLocation, setSelectedLocation] = useState<any | null>(null);
+    const [selectedParentId, setSelectedParentId] = useState<number | null>(null);
+
     const [selectedTopics, setSelectedTopics] = useState<any[]>([]);
     const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -79,6 +82,9 @@ const EditStudent = () => {
     const handleTopicSelect = (selectedItems: any[]) => {
         setSelectedTopics(selectedItems); // Capture selected topics
     };
+    const handleParentSelect = (parent: any) => {
+        setSelectedParentId(parent ? parent.id : null);
+    };
 
     const handleFilesChange = (files: any[]) => {
         setUploadedFiles(files); // Capture uploaded files
@@ -97,7 +103,10 @@ const EditStudent = () => {
             showMessage("Passwords do not match", 'error');
             return;
         }
-
+        if (!selectedParentId) {
+            showMessage("Parent field is required", 'error');
+            return;
+        }
         if (selectedLocation == null) {
             showMessage("Location field is required", 'error')
             return
@@ -109,12 +118,6 @@ const EditStudent = () => {
         setLoading(true);
         try {
             const topicIds = selectedTopics.map(topic => topic.id);
-
-            const parentPayload = {
-                accountHolder: data.accountHolder,
-                iban: data.iban,
-                bic: data.bic,
-            };
 
             const userPayload = {
                 firstName: data.firstName,
@@ -140,10 +143,11 @@ const EditStudent = () => {
             };
 
             // Update student and user data together
-            const response = await updateStudent(Number(id), parentPayload, userPayload, studentPayload);
+            const response = await updateStudent(Number(id), userPayload, studentPayload);
 
             // Assign the student to multiple topics
             await assignStudentToTopics(Number(id), topicIds);
+            await assignOrUpdateParentStudents(selectedParentId, [response.studentId]);
 
             // Upload documents for the student
             const userId = response.userId;
@@ -170,13 +174,22 @@ const EditStudent = () => {
         }
     };
 
-    // Define fields for the form
-    const parentFields: FieldConfig[] = [
-        { name: 'accountHolder', label: t('parent_account_holder'), type: 'text', required: true, section: 'Parent Information' },
-        { name: 'iban', label: t('parent_iban'), type: 'text', required: true, section: 'Parent Information' },
-        { name: 'bic', label: t('parent_bic'), type: 'text', required: false, section: 'Parent Information' },
-    ];
 
+    const parentSelectionField = {
+        name: 'parent',
+        label: 'Select Parent',
+        type: 'custom',
+        section: 'Student Assignment',
+        component: (
+            <SingleSelectWithAutocomplete
+                label="Search Parent"
+                fetchData={(query) => fetchParents(1, 5, query).then((data) => data.data)}
+                onSelect={handleParentSelect}
+                displayProperty="accountHolder"
+                placeholder="Type to search parent"
+            />
+        ),
+    };
     const userFields: FieldConfig[] = [
         { name: 'firstName', label: t('first_name'), type: 'text', required: true, section: 'User Information' },
         { name: 'lastName', label: t('last_name'), type: 'text', required: true, section: 'User Information' },
@@ -198,6 +211,7 @@ const EditStudent = () => {
         { name: 'contractEndDate', label: t('contract_end_date'), type: 'date', required: true, section: 'Student Information' },
         { name: 'notes', label: t('notes'), type: 'text', required: false, section: 'Student Information' },
         { name: 'availableDates', label: t('available_dates'), type: 'text', required: true, section: 'Student Information' },
+        parentSelectionField,
         {
             name: 'locations',
             label: 'Location',
@@ -245,7 +259,7 @@ const EditStudent = () => {
             {!loading && studentData && (
                 <ReusableForm
                     key={studentData.id} // Add key to force re-render when studentData changes
-                    fields={[...parentFields, ...userFields, ...studentFields]}
+                    fields={[ ...userFields, ...studentFields]}
                     onSubmit={handleStudentSubmit}
                     initialData={studentData} // Pre-fill form with student data
                     entityName="Student"

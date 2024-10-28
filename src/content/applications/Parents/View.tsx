@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { format } from 'date-fns';
 import { fetchParentById } from 'src/services/parentService';
@@ -20,7 +20,7 @@ const ViewParent: React.FC = () => {
         try {
             const parentData = await fetchParentById(Number(id));
 
-            // Flatten user data into the parent object
+            // Flatten user data into the parent object and student user data
             const flattenedData = {
                 ...parentData,
                 firstName: parentData.user?.firstName,
@@ -30,6 +30,11 @@ const ViewParent: React.FC = () => {
                 address: parentData.user?.address,
                 postalCode: parentData.user?.postalCode,
                 phoneNumber: parentData.user?.phoneNumber,
+                students: parentData.students.map((student: any) => ({
+                    ...student,
+                    firstName: student.user?.firstName,
+                    lastName: student.user?.lastName,
+                })),
             };
 
             setParent(flattenedData);
@@ -47,6 +52,8 @@ const ViewParent: React.FC = () => {
         }
     }, [id, t]);
 
+    const formattedDob = parent ? format(new Date(parent.dob), 'PP') : '';
+
     // Define fields for the ReusableDetails component
     const Fields = [
         { name: 'firstName', label: t('first_name'), section: t('parent_details') },
@@ -59,7 +66,40 @@ const ViewParent: React.FC = () => {
         { name: 'accountHolder', label: t('account_holder'), section: t('banking_details') },
         { name: 'iban', label: t('iban'), section: t('banking_details') },
         { name: 'bic', label: t('bic'), section: t('banking_details') },
+        {
+            name: 'students',
+            label: t('students'),
+            section: t('student_details'),
+            isArray: true,
+            columns: [
+                { field: 'firstName', headerName: t('first_name'), flex: 1 },
+                { field: 'lastName', headerName: t('last_name'), flex: 1 },
+                { field: 'gradeLevel', headerName: t('grade_level'), flex: 1 },
+                { field: 'status', headerName: t('status'), flex: 1 },
+                {
+                    field: 'actions',
+                    headerName: t('actions'),
+                    renderCell: (params: { row: { id: any } }) => (
+                        <Button
+                            variant="text"
+                            color="primary"
+                            onClick={() => window.open(`/management/students/view/${params.row.id}`, '_blank')}
+                        >
+                            {t('view_details')}
+                        </Button>
+                    ),
+                    sortable: false,
+                    width: 150,
+                },
+            ],
+        },
     ];
+
+    // Transform data for ReusableDetails
+    const transformedData = {
+        ...parent,
+        dob: formattedDob,
+    };
 
     return (
         <Box sx={{ position: 'relative', padding: 4 }}>
@@ -70,7 +110,7 @@ const ViewParent: React.FC = () => {
             ) : parent ? (
                 <ReusableDetails
                     fields={Fields}
-                    data={parent}
+                    data={transformedData}
                     entityName={`${parent.firstName} ${parent.lastName}`}
                 />
             ) : (

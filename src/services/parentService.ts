@@ -36,18 +36,24 @@ export const fetchParents = async (page: number, limit: number, searchQuery: str
 };
 
 // Function to assign students to a parent
-export const assignStudentsToParent = async (parentId: number, studentIds: number[]) => {
-  const payload = {
-    parentId: parentId,
-    studentIds: studentIds,
+export const assignOrUpdateParentStudents = async (parentId: number, studentIds: number[]) => {
+    try {
+      const response = await api.post('/parent/assign-students', {
+        parentId,
+        studentIds,
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error assigning students to parent:', error);
+      throw error;
+    }
   };
-  try {
-    const response = await api.post(`/parent/assign-students`, payload);
+
+  export const fetchStudentsByParent = async (parentId: number, page: number = 1, limit: number = 10, search: string = '') => {
+    const response = await api.get(`/parent/${parentId}/students`, {
+        params: { page, limit, search },
+    });
     return response.data;
-  } catch (error) {
-    console.error('Error assigning students to parent:', error);
-    throw error;
-  }
 };
 
 // Function to delete multiple parents
