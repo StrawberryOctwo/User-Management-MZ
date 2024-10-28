@@ -19,6 +19,7 @@ import ViewPaymentDetails from './ViewPaymentDetails';  // New Component for pay
 import StudentDetailCard from './StudentDetailCArd';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { createPaymentForUser, getPaymentsForUserByClassSession } from 'src/services/paymentService'; // Fix the path if needed
+import { sessionTypeFunc } from 'src/utils/sessionType';
 
 interface ClassSessionDetailsModalProps {
     isOpen: boolean;
@@ -87,9 +88,10 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                     try {
                         // Payment not sent, create the payment
                         await createPaymentForUser({
-                            amount: response.teacher.hourlyRate,
                             userId: response.teacher.user.id,
                             classSessionId: response.id,
+                            sessionType:sessionTypeFunc(classSession.sessionType)
+
                         });
                         console.log('Payment successfully sent');
                     } catch (paymentError) {

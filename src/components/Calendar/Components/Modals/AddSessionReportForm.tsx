@@ -4,7 +4,7 @@ import { useTranslation } from 'react-i18next'; // Import translation hook
 import { addSessionReport } from 'src/services/sessionReportService';
 import { fetchClassSessionById } from 'src/services/classSessionService';
 import { createPaymentForUser, getStudentPaymentDetails } from 'src/services/paymentService';
-
+import { sessionTypeFunc } from 'src/utils/sessionType'
 interface AddSessionReportFormProps {
     isOpen: boolean;
     onClose: () => void;
@@ -41,7 +41,7 @@ const AddSessionReportForm: React.FC<AddSessionReportFormProps> = ({ isOpen, onC
                 // Fetch session details (including session type)
                 const sessionDetails = await fetchClassSessionById(classSessionId);
                 setSessionType(sessionDetails.sessionType);  // Set session type (e.g., "1on1", "group")
-
+ 
                 // Fetch payment details for the student
                 const paymentDetails = await getStudentPaymentDetails(studentId);
                 setGroupSessionPrice(paymentDetails.groupSessionPrice);
@@ -60,10 +60,6 @@ const AddSessionReportForm: React.FC<AddSessionReportFormProps> = ({ isOpen, onC
     }, [isOpen, classSessionId, studentId]);
 
     // Function to calculate payment amount based on session type
-    const calculatePaymentAmount = () => {
-        const translated1on1 = t('1on1');  // Fetch "1on1" from locale
-        return sessionType === translated1on1 ? individualSessionPrice : groupSessionPrice;
-    };
 
     const handleSave = async () => {
  
@@ -87,14 +83,14 @@ const AddSessionReportForm: React.FC<AddSessionReportFormProps> = ({ isOpen, onC
                 });
 
                 onSave(newReport);  // Pass the newly created report to the parent to refresh UI
+  
 
                 // Try to create payment after report submission, but don't stop if it fails
-                const paymentAmount = calculatePaymentAmount();
                 try {
                     await createPaymentForUser({
-                        amount: paymentAmount,
                         userId,
                         classSessionId,
+                        sessionType:sessionTypeFunc(sessionType)
                     });
                 } catch (paymentError) {
                     console.error('Payment creation failed, but session report saved:', paymentError);

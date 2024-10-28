@@ -1,9 +1,9 @@
 import { api } from "./api";
 
 // Create payment for student when session report is completed
-export const createPaymentForUser = async ({ amount, userId, classSessionId }) => {
+export const createPaymentForUser = async ({ userId, classSessionId,sessionType }) => {
     try {
-        const response = await api.post('/payments/', { amount, userId, classSessionId });
+        const response = await api.post('/payments/', {  userId, classSessionId,sessionType });
         return response.data;
     } catch (error) {
         console.error('Error creating payment for user:', error);
