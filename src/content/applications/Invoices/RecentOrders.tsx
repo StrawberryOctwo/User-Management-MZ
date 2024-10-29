@@ -1,53 +1,69 @@
-import { Box, Button, CircularProgress } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
+import { Box, Button } from '@mui/material';
 import ReusableTable from 'src/components/Table';
-import ReusableDialog from 'src/content/pages/Components/Dialogs';
-import { useNavigate } from 'react-router-dom';
+import { fetchInvoiceById, fetchUserInvoices } from 'src/services/invoiceService';
 import { useAuth } from 'src/hooks/useAuth';
-import { fetchUserInvoices } from 'src/services/invoiceService';
 import ViewInvoiceDetails from 'src/components/Invoices/ViewInvoiceDetails';
+import generateTeacherInvoicePDF from './teacherInvoice';
+import { fetchTeacherById, fetchTeacherByUserId } from 'src/services/teacherService';
 
 export default function ViewInvoices() {
   const [invoices, setInvoices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [dialogOpen, setDialogOpen] = useState(false);
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(25);
   const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null);
-
   const { userId } = useAuth();
+  const isMounted = useRef(false); // Check if component is mounted
 
+  // Handle component mount and unmount
   useEffect(() => {
     if (userId) {
+      console.log(userId)
       loadUserInvoices();
     }
-  }, [userId, limit, page]);
-
-  const loadUserInvoices = async () => {
-    if (!userId) {
-      console.warn("User ID is null, skipping API call");
-      return;
+    else {
+      isMounted.current = true;
     }
 
+ 
+  }, [userId, page, limit]);
+
+  const loadUserInvoices = async () => {
+    if (!isMounted.current) return; // Prevent action if unmounted
     setLoading(true);
+
     try {
-      const { data, total } = await fetchUserInvoices(String(userId), page + 1, limit);
-      setInvoices(data);
-      setTotalCount(total);
+      const { data, total } = await fetchUserInvoices(userId, page + 1, limit);
+      if (isMounted.current) {
+        setInvoices(data);
+        setTotalCount(total);
+      }
     } catch (error) {
-      setErrorMessage('Failed to load invoices. Please try again.');
+      if (isMounted.current) {
+        setErrorMessage('Failed to load invoices. Please try again.');
+      }
     } finally {
-      setLoading(false);
+      if (isMounted.current) setLoading(false);
+    }
+  };
+
+  const handleDownloadPDF = async (invoiceId: number) => {
+    try {
+      const invoiceData = await fetchInvoiceById(invoiceId, userId);
+      const teacherData = await fetchTeacherByUserId(userId)
+      if (isMounted.current) generateTeacherInvoicePDF(invoiceData,teacherData,true);
+    } catch (error) {
+      console.error('Error generating invoice PDF:', error);
     }
   };
 
   const columns = [
     { field: 'invoiceId', headerName: 'Invoice ID' },
     { field: 'totalAmount', headerName: 'Total Amount' },
-    { field: 'extraAmount', headerName: 'Extra Amount'},
     { field: 'status', headerName: 'Status' },
     {
       field: 'created_at',
@@ -58,37 +74,30 @@ export default function ViewInvoices() {
       field: 'actions',
       headerName: 'Actions',
       render: (value: any, row: any) => (
-        <Button
-          variant="outlined"
-          color="primary"
-          size="small"
-          onClick={() => handleView(row.invoiceId)}
-        >
-          View Details
-        </Button>
+        <div>
+
+          <Button
+            variant="outlined"
+            color="secondary"
+            size="small"
+            onClick={() => handleDownloadPDF(row.id)}
+          >
+            Download PDF
+          </Button>
+        </div>
       ),
     },
   ];
 
-  const handleView = (invoiceId: any) => {
-    setSelectedInvoiceId(invoiceId);
-    setIsInvoiceDialogOpen(true);
-  };
 
-  const handlePageChange = (newPage: number) => {
-    setPage(newPage);
-  };
 
+  const handlePageChange = (newPage: number) => setPage(newPage);
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit);
     setPage(0);
   };
 
-  const closeInvoiceDialog = () => {
-    setIsInvoiceDialogOpen(false);
-    setSelectedInvoiceId(null);
-    loadUserInvoices();
-  };
+
 
   if (errorMessage) return <div>{errorMessage}</div>;
 
@@ -98,7 +107,6 @@ export default function ViewInvoices() {
         data={invoices}
         columns={columns}
         title="Invoices List"
-        onSearchChange={loadUserInvoices}
         loading={loading}
         page={page}
         limit={limit}
@@ -108,14 +116,7 @@ export default function ViewInvoices() {
         showDefaultActions={false}
       />
 
-      {selectedInvoiceId && (
-        <ViewInvoiceDetails
-          isOpen={isInvoiceDialogOpen}
-          invoiceId={selectedInvoiceId}
-          userId={String(userId)}
-          onClose={closeInvoiceDialog}
-        />
-      )}
+  
     </Box>
   );
 }

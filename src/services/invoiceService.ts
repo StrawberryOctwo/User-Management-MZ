@@ -2,7 +2,7 @@ import { api } from "./api";
 
 
 // Fetch all invoices for a specific user
-export const fetchUserInvoices = async (userId: string, page: number, limit: number) => {
+export const fetchUserInvoices = async (userId: number, page: number, limit: number) => {
   try {
     const response = await api.get(`/invoices/user/${userId}`, {
       params: { page, limit },
@@ -15,7 +15,7 @@ export const fetchUserInvoices = async (userId: string, page: number, limit: num
 };
 
 // Fetch a single invoice by its ID
-export const fetchInvoiceById = async (invoiceId: string, userId: string) => {
+export const fetchInvoiceById = async (invoiceId: number, userId: number) => {
   try {
     const response = await api.get(`/invoices/${invoiceId}/user/${userId}`);
     return response.data;

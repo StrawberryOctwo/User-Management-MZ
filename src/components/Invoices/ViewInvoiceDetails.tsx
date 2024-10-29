@@ -4,8 +4,8 @@ import { fetchInvoiceById } from 'src/services/invoiceService';
 
 interface ViewInvoiceDetailsProps {
   isOpen: boolean;
-  invoiceId: string;
-  userId: string;
+  invoiceId: number;
+  userId: number;
   onClose: () => void;
 }
 
