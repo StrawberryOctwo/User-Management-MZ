@@ -6,6 +6,7 @@ import { useAuth } from 'src/hooks/useAuth';
 import ViewInvoiceDetails from 'src/components/Invoices/ViewInvoiceDetails';
 import generateTeacherInvoicePDF from './teacherInvoice';
 import { fetchTeacherById, fetchTeacherByUserId } from 'src/services/teacherService';
+import generateParentInvoicePDF from './parentInvoice';
 
 export default function ViewInvoices() {
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -16,7 +17,7 @@ export default function ViewInvoices() {
   const [limit, setLimit] = useState(25);
   const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null);
-  const { userId } = useAuth();
+  const { userId,userRoles } = useAuth();
   const isMounted = useRef(false); // Check if component is mounted
 
   // Handle component mount and unmount
@@ -54,9 +55,13 @@ export default function ViewInvoices() {
   const handleDownloadPDF = async (invoiceId: number) => {
     try {
       const invoiceData = await fetchInvoiceById(invoiceId, userId);
-      const teacherData = await fetchTeacherByUserId(userId)
-      if (isMounted.current) generateTeacherInvoicePDF(invoiceData,teacherData,true);
-    } catch (error) {
+      if (userRoles.includes('Parent')) {
+        if (isMounted.current) generateParentInvoicePDF(invoiceData,true);
+      } else {
+        // Fetch additional teacher data if not a parent
+        const teacherData = await fetchTeacherByUserId(userId);
+        if (isMounted.current) generateTeacherInvoicePDF(invoiceData, teacherData,true);
+      }  } catch (error) {
       console.error('Error generating invoice PDF:', error);
     }
   };

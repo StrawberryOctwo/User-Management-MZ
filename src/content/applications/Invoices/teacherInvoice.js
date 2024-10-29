@@ -14,7 +14,7 @@ const generateTeacherInvoicePDF = async (invoice, teacher, preview = false) => {
         <h1 style="text-align: center;">Honorarabrechnung Vorlage</h1>
         
         <p style="text-align: right;">
-          Steuernummer: ____________________________
+          Steuernummer: ${teacher.taxNumber}
         </p>
         
         <p><strong>Name:</strong> ${teacher.user.firstName} ${teacher.user.lastName}</p>
