@@ -183,7 +183,7 @@ const CalendarContent: React.FC = () => {
           handleSaveClassSession={handleSaveClassSession}
           loadClassSessions={loadClassSessions}
         />
-        {selectedLocations.length === 0 && strongestRole !== 'Teacher' && strongestRole !== 'Student' && (
+        {selectedLocations.length === 0 && strongestRole !== 'Teacher' && strongestRole !== 'Student' && strongestRole !== 'Parent' && (
           <Box
             sx={{
               position: 'absolute',

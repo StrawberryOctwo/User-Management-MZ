@@ -8,6 +8,8 @@ interface ViewSessionReportFormProps {
     reportId: string;
     onClose: () => void;
     onDelete: () => void;
+    readOnly?: boolean; 
+
 }
 
 const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
@@ -15,6 +17,8 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
     onClose,
     reportId,
     onDelete,
+    readOnly = false 
+
 }) => {
     const [lessonTopic, setLessonTopic] = useState<string>('');
     const [coveredMaterials, setCoveredMaterials] = useState<string>('');
@@ -119,7 +123,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
 
     return (
         <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle>View/Edit Session Report for {studentName}</DialogTitle>
+            <DialogTitle>{readOnly ? 'View' : 'View/Edit'} Session Report for {studentName}</DialogTitle>
             <DialogContent>
                 {loading ? (
                     <Box display="flex" justifyContent="center" mt={2}>
@@ -148,6 +152,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                             value={lessonTopic}
                             onChange={(e) => setLessonTopic(e.target.value)}
                             fullWidth
+                            InputProps={{ readOnly }}
                         />
 
                         <TextField
@@ -155,6 +160,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                             value={coveredMaterials}
                             onChange={(e) => setCoveredMaterials(e.target.value)}
                             fullWidth
+                            InputProps={{ readOnly }}
                         />
 
                         <TextField
@@ -162,6 +168,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                             value={progress}
                             onChange={(e) => setProgress(e.target.value)}
                             fullWidth
+                            InputProps={{ readOnly }}
                         />
 
                         <TextField
@@ -169,6 +176,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                             value={learningAssessment}
                             onChange={(e) => setLearningAssessment(e.target.value)}
                             fullWidth
+                            InputProps={{ readOnly }}
                         />
 
                         <TextField
@@ -176,6 +184,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                             value={nextHomework}
                             onChange={(e) => setNextHomework(e.target.value)}
                             fullWidth
+                            InputProps={{ readOnly }}
                         />
 
                         <TextField
@@ -183,6 +192,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                             value={tutorRemarks}
                             onChange={(e) => setTutorRemarks(e.target.value)}
                             fullWidth
+                            InputProps={{ readOnly }}
                         />
 
                         {/* Boolean fields */}
@@ -193,6 +203,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                                 value={activeParticipation ? 'Yes' : 'No'}
                                 onChange={(e) => setActiveParticipation(e.target.value === 'Yes')}
                                 fullWidth
+                                InputProps={{ readOnly }}
                             >
                                 <MenuItem value="Yes">Yes</MenuItem>
                                 <MenuItem value="No">No</MenuItem>
@@ -204,6 +215,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                                 value={concentration ? 'Yes' : 'No'}
                                 onChange={(e) => setConcentration(e.target.value === 'Yes')}
                                 fullWidth
+                                InputProps={{ readOnly }}
                             >
                                 <MenuItem value="Yes">Yes</MenuItem>
                                 <MenuItem value="No">No</MenuItem>
@@ -217,6 +229,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                                 value={worksIndependently ? 'Yes' : 'No'}
                                 onChange={(e) => setWorksIndependently(e.target.value === 'Yes')}
                                 fullWidth
+                                InputProps={{ readOnly }}
                             >
                                 <MenuItem value="Yes">Yes</MenuItem>
                                 <MenuItem value="No">No</MenuItem>
@@ -228,6 +241,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                                 value={cooperation ? 'Yes' : 'No'}
                                 onChange={(e) => setCooperation(e.target.value === 'Yes')}
                                 fullWidth
+                                InputProps={{ readOnly }}
                             >
                                 <MenuItem value="Yes">Yes</MenuItem>
                                 <MenuItem value="No">No</MenuItem>
@@ -241,6 +255,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                                 value={previousHomeworkCompleted ? 'Yes' : 'No'}
                                 onChange={(e) => setPreviousHomeworkCompleted(e.target.value === 'Yes')}
                                 fullWidth
+                                InputProps={{ readOnly }}
                             >
                                 <MenuItem value="Yes">Yes</MenuItem>
                                 <MenuItem value="No">No</MenuItem>
@@ -250,14 +265,16 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                     </Box>
                 )}
             </DialogContent>
-            <DialogActions>
-                <Button onClick={handleDelete} color="error">
-                    Delete Report
-                </Button>
-                <Button onClick={handleSave} color="primary" variant="contained">
-                    Save Report
-                </Button>
-            </DialogActions>
+            {!readOnly && (
+                <DialogActions>
+                    <Button onClick={handleDelete} color="error">
+                        Delete Report
+                    </Button>
+                    <Button onClick={handleSave} color="primary" variant="contained">
+                        Save Report
+                    </Button>
+                </DialogActions>
+            )}
         </Dialog>
     );
 };

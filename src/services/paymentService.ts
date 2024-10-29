@@ -32,6 +32,17 @@ export const getStudentPaymentDetails = async (studentId: string) => {
     }
 };
 
+export const getParentPayments = async (userId:number,page = 1, limit = 10,  search: string = '',) => {
+    try {
+        const response = await api.get(`/parent-payments/${userId}`, {
+            params: { page, limit,search }
+          });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching parent payment details:', error);
+        throw error;
+    }
+};
 
 // Fetch payments for a user with pagination
 export const getPaymentsForUser = async (userId:number, page = 1, limit = 10) => {
