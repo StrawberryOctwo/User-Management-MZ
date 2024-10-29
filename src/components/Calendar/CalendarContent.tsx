@@ -23,7 +23,6 @@ const CalendarContent: React.FC = () => {
 
   const { userId, userRoles } = useAuth();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
-  console.log(strongestRoles)
   const strongestRole = strongestRoles.includes('SuperAdmin')
     ? 'SuperAdmin'
     : strongestRoles.includes('FranchiseAdmin')
@@ -32,11 +31,11 @@ const CalendarContent: React.FC = () => {
         ? 'LocationAdmin'
         : strongestRoles.includes('Teacher')
           ? 'Teacher'
-            : strongestRoles.includes('Parent')
+          : strongestRoles.includes('Parent')
             ? 'Parent'
-          : strongestRoles.includes('Student')
-            ? 'Student'
-            : null;
+            : strongestRoles.includes('Student')
+              ? 'Student'
+              : null;
 
   useEffect(() => {
     const savedFranchise = localStorage.getItem('selectedFranchise');
@@ -94,11 +93,11 @@ const CalendarContent: React.FC = () => {
         case 'Student':
           response = await fetchUserClassSessions(userId?.toString() || '', startDate, endDate);
           break;
-        case 'Parent':  
+        case 'Parent':
           response = await fetchParentClassSessions(userId?.toString() || '', startDate, endDate);
           break;
         case 'SuperAdmin':
- 
+
         case 'FranchiseAdmin':
         case 'LocationAdmin':
           if (selectedLocations.length === 0) return;

@@ -54,7 +54,7 @@ const FilterToolbar: React.FC<FilterToolbarProps> = ({
     <Box sx={{ mb: 2, mt: 3 }}>
       <Grid container spacing={2}>
         {hasFranchiseAccess && (
-          <Grid item xs={12} sm={2} sx={{ ml: 2 }}>
+          <Grid item xs={12} sm={12} md={3} sx={{ ml: 2 }}>
             <SingleSelectWithAutocomplete
               label="Select Franchise"
               fetchData={(query) => fetchFranchises(1, 5, query).then((data) => data.data)}
@@ -65,7 +65,7 @@ const FilterToolbar: React.FC<FilterToolbarProps> = ({
             />
           </Grid>
         )}
-        <Grid item xs={12} sm={2} sx={{ ml: 0 }}>
+        <Grid item xs={12} sm={12} md={3} sx={{ ml: 1, mr: 2, pl: 0 }}>
           <MultiSelectWithCheckboxes
             label={t('Search_and_assign_locations')}
             fetchData={(query) => {

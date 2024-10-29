@@ -182,7 +182,6 @@ export default function AddClassSessionModal({
       }]); // Wrap single session in an array
     }
 
-
     clearForm();
     onClose();
   };
@@ -252,9 +251,13 @@ export default function AddClassSessionModal({
     return { validatedStudents: students, error: null };
   };
 
+  const handleClose = () => {
+    clearForm();
+    onClose();
+  };
 
   return (
-    <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={isOpen} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>Add Class Session</DialogTitle>
       <DialogContent>
         <Box sx={{ mb: 2, mt: 2 }}>
@@ -323,7 +326,7 @@ export default function AddClassSessionModal({
           />
         </Box>
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 2 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3, ml: 1 }}>
           <FormControlLabel
             control={
               <Checkbox
@@ -371,26 +374,24 @@ export default function AddClassSessionModal({
         </Box>
 
 
-        {strongestRoles[0] === 'Teacher' && (
-          <Box sx={{ mb: 2 }}>
-            <SingleSelectWithAutocomplete
-              label="Select Location"
-              fetchData={(query) =>
-                fetchLocations(1, 5, query).then((data) => data.data)
-              }
-              onSelect={(location) => setSelectedLocation(location)}
-              displayProperty="name"
-              placeholder="Search Location"
-              initialValue={selectedLocation}
-              width="100%"
-            />
-            {fieldErrors.locationId && (
-              <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-                {fieldErrors.locationId}
-              </Typography>
-            )}
-          </Box>
-        )}
+        <Box sx={{ mb: 2 }}>
+          <SingleSelectWithAutocomplete
+            label="Select Location"
+            fetchData={(query) =>
+              fetchLocations(1, 5, query).then((data) => data.data)
+            }
+            onSelect={(location) => setSelectedLocation(location)}
+            displayProperty="name"
+            placeholder="Search Location"
+            initialValue={selectedLocation}
+            width="100%"
+          />
+          {fieldErrors.locationId && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              {fieldErrors.locationId}
+            </Typography>
+          )}
+        </Box>
 
         <Box sx={{ mb: 2 }}>
           <SingleSelectWithAutocomplete
@@ -480,7 +481,7 @@ export default function AddClassSessionModal({
 
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="secondary">
+        <Button onClick={handleClose} color="secondary">
           Cancel
         </Button>
         <Button onClick={handleSave} color="primary" variant="contained">
