@@ -1,40 +1,32 @@
-import { Box, Button, CircularProgress, Switch } from '@mui/material';
+import { Box, Button, CircularProgress } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from 'src/hooks/useAuth';
-import { fetchParentSessionReports } from 'src/services/parentService';
-import ViewSessionReportForm from 'src/components/Calendar/Components/Modals/ViewSessionReport';
+import { fetchUserInvoices } from 'src/services/invoiceService';
+import ViewInvoiceDetails from 'src/components/Invoices/ViewInvoiceDetails';
 
-export default function ViewSessionReports() {
-  const [payments, setPayments] = useState<any[]>([]);
+export default function ViewInvoices() {
+  const [invoices, setInvoices] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
-  const [selectedIds, setSelectedIds] = useState<number[]>([]);
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(25);
-  const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
-  const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
+  const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false);
+  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null);
 
-  const isMounted = useRef(false);
-
-
-  const navigate = useNavigate();
   const { userId } = useAuth();
 
   useEffect(() => {
     if (userId) {
-      console.log(userId)
-      loadSessionReports();
-    } else {
-      isMounted.current = true;
+      loadUserInvoices();
     }
   }, [userId, limit, page]);
 
-  const loadSessionReports = async (searchQuery = '') => {
+  const loadUserInvoices = async () => {
     if (!userId) {
       console.warn("User ID is null, skipping API call");
       return;
@@ -42,38 +34,26 @@ export default function ViewSessionReports() {
 
     setLoading(true);
     try {
-      const { data, total } = await fetchParentSessionReports(userId, page + 1, limit);
-      setPayments(data);
+      const { data, total } = await fetchUserInvoices(String(userId), page + 1, limit);
+      setInvoices(data);
       setTotalCount(total);
     } catch (error) {
-      console.error('Error fetching payments:', error);
-      setErrorMessage('Failed to load payments. Please try again.');
+      setErrorMessage('Failed to load invoices. Please try again.');
     } finally {
       setLoading(false);
     }
   };
 
   const columns = [
-    { field: 'studentName', headerName: 'Name' },
+    { field: 'invoiceId', headerName: 'Invoice ID' },
+    { field: 'totalAmount', headerName: 'Total Amount' },
+    { field: 'extraAmount', headerName: 'Extra Amount'},
+    { field: 'status', headerName: 'Status' },
     {
-      field: 'sessionStartDate',
-      headerName: 'Session Start Date',
-      render: (value: any) =>
-        formatDateTime(value)
+      field: 'created_at',
+      headerName: 'Created At',
+      render: (value: any) => new Date(value).toLocaleString(),
     },
-    {
-      field: 'sessionEndDate',
-      headerName: 'Session End Date',
-      render: (value: any) =>
-        formatDateTime(value)
-    },
-    {
-      field: 'reportDate',
-      headerName: 'Report Date',
-      render: (value: any) =>
-        formatDateTime(value)
-    },
-    { field: 'lessonTopic', headerName: 'Lesson Topic' },
     {
       field: 'actions',
       headerName: 'Actions',
@@ -81,42 +61,19 @@ export default function ViewSessionReports() {
         <Button
           variant="outlined"
           color="primary"
-          size='small'
-          onClick={() => handleView(row.id)}
+          size="small"
+          onClick={() => handleView(row.invoiceId)}
         >
-          View Report
+          View Details
         </Button>
       ),
     },
   ];
 
-  const formatDateTime = (date: string | Date): string => {
-    const parsedDate = new Date(date);
-    return `${parsedDate.toLocaleDateString('en-GB', {
-      day: '2-digit',
-      month: '2-digit',
-      year: 'numeric'
-    })} - ${parsedDate.toLocaleTimeString('en-GB', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: false
-    })}`;
+  const handleView = (invoiceId: any) => {
+    setSelectedInvoiceId(invoiceId);
+    setIsInvoiceDialogOpen(true);
   };
-
-
-  const handleEdit = (id: any) => {
-    openReportDialog(id)
-  };
-
-  const openReportDialog = (reportId: string) => {
-    setSelectedReportId(reportId);
-    setIsReportDialogOpen(true);
-  };
-
-  const handleView = (id: any) => {
-    openReportDialog(id)
-  };
-
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -127,10 +84,10 @@ export default function ViewSessionReports() {
     setPage(0);
   };
 
-  const closeReportDialog = () => {
-    setIsReportDialogOpen(false);
-    setSelectedReportId(null);
-    loadSessionReports()
+  const closeInvoiceDialog = () => {
+    setIsInvoiceDialogOpen(false);
+    setSelectedInvoiceId(null);
+    loadUserInvoices();
   };
 
   if (errorMessage) return <div>{errorMessage}</div>;
@@ -138,10 +95,10 @@ export default function ViewSessionReports() {
   return (
     <Box>
       <ReusableTable
-        data={payments}
+        data={invoices}
         columns={columns}
-        title="Session Reports List"
-        onSearchChange={loadSessionReports}
+        title="Invoices List"
+        onSearchChange={loadUserInvoices}
         loading={loading}
         page={page}
         limit={limit}
@@ -151,38 +108,14 @@ export default function ViewSessionReports() {
         showDefaultActions={false}
       />
 
-      <ReusableDialog
-        open={dialogOpen}
-        title="Confirm Deletion"
-        onClose={() => setDialogOpen(false)}
-        actions={
-          <>
-            <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
-              Cancel
-            </Button>
-            <Button
-              // onClick={handleDelete} Uncomment if delete function is implemented
-              color="primary"
-              autoFocus
-              disabled={loading}
-            >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
-            </Button>
-          </>
-        }
-      >
-        <p>Are you sure you want to delete the selected payment?</p>
-      </ReusableDialog>
-
-      {selectedReportId && (
-        <ViewSessionReportForm
-          isOpen={isReportDialogOpen}
-          reportId={selectedReportId}
-          onClose={closeReportDialog}
-          onDelete={closeReportDialog}
-          readOnly={true}
+      {selectedInvoiceId && (
+        <ViewInvoiceDetails
+          isOpen={isInvoiceDialogOpen}
+          invoiceId={selectedInvoiceId}
+          userId={String(userId)}
+          onClose={closeInvoiceDialog}
         />
       )}
     </Box>
   );
-};
+}
