@@ -10,6 +10,8 @@ import {
     Card,
     CardContent,
     CircularProgress,
+    Tabs,
+    Tab,
 } from '@mui/material';
 import moment from 'moment';
 import { deleteClassSession, fetchClassSessionById, getClassSessionReportsStatus, getStudentSessionReportStatus } from 'src/services/classSessionService';
@@ -20,6 +22,8 @@ import StudentDetailCard from './StudentDetailCArd';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { createPaymentForUser, getPaymentsForUserByClassSession } from 'src/services/paymentService'; // Fix the path if needed
 import { sessionTypeFunc } from 'src/utils/sessionType';
+import AbsenceForm from './AbsenceTab';
+import AbsenceTab from './AbsenceTab';
 
 interface ClassSessionDetailsModalProps {
     isOpen: boolean;
@@ -51,6 +55,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     const [selectedStudent, setSelectedStudent] = useState<any>(null);
     const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [tabIndex, setTabIndex] = useState(0);
 
     // Fetch class session details
     const loadClassSession = async () => {
@@ -154,108 +159,135 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
         setDeleteDialogOpen(true);
     };
 
+    const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+        setTabIndex(newValue);
+    };
+
     return (
-        <Dialog open={isOpen} onClose={onClose} maxWidth="md" fullWidth>
+        <Dialog
+            open={isOpen}
+            onClose={onClose}
+            fullWidth
+            maxWidth={false}
+            sx={{ '& .MuiDialog-paper': { width: '700px', maxWidth: '700px' } }} // Set the custom width
+
+        >
             <DialogTitle>Class Session Details</DialogTitle>
-            <DialogContent>
+            <DialogContent sx={{ minHeight: '370px' }} className='djfhjdf'>
+
+                <Tabs value={tabIndex} onChange={handleTabChange} indicatorColor="primary" textColor="primary" sx={{ mb: 2 }}>
+                    <Tab label="Session Details" />
+                    <Tab label="Students Enrolled" />
+                    <Tab label="Add Absences" />
+                </Tabs>
+
                 {loading ? (
                     <Typography>Loading...</Typography>
                 ) : errorMessage ? (
                     <Typography color="error">{errorMessage}</Typography>
                 ) : classSession ? (
-                    <Box>
-                        <Card variant="outlined" sx={{ mb: 3 }}>
-                            <CardContent>
-                                <Typography variant="subtitle1">
-                                    <strong>Session Name:</strong> {classSession.name}
-                                </Typography>
-                                <Typography variant="subtitle1">
-                                    <strong>Teacher:</strong> {classSession.teacher?.user?.firstName} {classSession.teacher?.user?.lastName}
-                                </Typography>
-                                <Typography variant="subtitle1">
-                                    <strong>Topic:</strong> {classSession.topic?.name}
-                                </Typography>
-                                <Typography variant="subtitle1">
-                                    <strong>Location:</strong> {classSession.location.name}
-                                </Typography>
-                                <Typography variant="subtitle1">
-                                    <strong>Session Type:</strong> {classSession.sessionType}
-                                </Typography>
-                                <Typography variant="subtitle1">
-                                    <strong>Start Time:</strong> {moment(classSession.sessionStartDate).format('LLL')}
-                                </Typography>
-                                <Typography variant="subtitle1">
-                                    <strong>End Time:</strong> {moment(classSession.sessionEndDate).format('LLL')}
-                                </Typography>
-                            </CardContent>
-                        </Card>
+                    <Box sx={{ px: 1 }} >
+                        {tabIndex === 0 && (
+                            <Card variant="outlined" sx={{ mb: 3 }}>
+                                <CardContent>
+                                    <Typography variant="subtitle1">
+                                        <strong>Session Name:</strong> {classSession.name}
+                                    </Typography>
+                                    <Typography variant="subtitle1">
+                                        <strong>Teacher:</strong> {classSession.teacher?.user?.firstName} {classSession.teacher?.user?.lastName}
+                                    </Typography>
+                                    <Typography variant="subtitle1">
+                                        <strong>Topic:</strong> {classSession.topic?.name}
+                                    </Typography>
+                                    <Typography variant="subtitle1">
+                                        <strong>Location:</strong> {classSession.location.name}
+                                    </Typography>
+                                    <Typography variant="subtitle1">
+                                        <strong>Session Type:</strong> {classSession.sessionType}
+                                    </Typography>
+                                    <Typography variant="subtitle1">
+                                        <strong>Start Time:</strong> {moment(classSession.sessionStartDate).format('LLL')}
+                                    </Typography>
+                                    <Typography variant="subtitle1">
+                                        <strong>End Time:</strong> {moment(classSession.sessionEndDate).format('LLL')}
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        )}
 
-                        <Typography variant="subtitle1"><strong>Students Enrolled:</strong></Typography>
-                        {classSession.students?.length > 0 ? (
-                            classSession.students.map((student: any) => (
-                                <StudentDetailCard
-                                    key={student.id}
-                                    student={student}
-                                    canAddReport={canAddReport}
-                                    reportCompleted={reportStatus[student.id]?.reportCompleted}
-                                    onAddReport={() => handleAddReport(student)}
-                                    onViewReport={() => handleViewReport(student)}
-                                    onViewPayment={() => handleViewPayment(student)}
+                        {tabIndex === 1 && (
+                            <>
+                                {classSession.students?.length > 0 ? (
+                                    classSession.students.map((student: any) => (
+                                        <StudentDetailCard
+                                            key={student.id}
+                                            student={student}
+                                            canAddReport={canAddReport}
+                                            reportCompleted={reportStatus[student.id]?.reportCompleted}
+                                            onAddReport={() => handleAddReport(student)}
+                                            onViewReport={() => handleViewReport(student)}
+                                            onViewPayment={() => handleViewPayment(student)}
+                                        />
+                                    ))
+                                ) : (
+                                    <Typography variant="body2">No students enrolled.</Typography>
+                                )}
+
+                                {allReportsCompleted && (
+                                    <Box display="flex" justifyContent="center" alignItems="center" mt={3}>
+                                        <Typography
+                                            variant="h5"
+                                            color="green"
+                                            sx={{
+                                                fontWeight: 'bold',
+                                                textAlign: 'center',
+                                                backgroundColor: '#e0f2f1',
+                                                padding: '10px',
+                                                borderRadius: '5px',
+                                                border: '1px solid green'
+                                            }}
+                                        >
+                                            Session Reports Submitted
+                                        </Typography>
+                                    </Box>
+                                )}
+
+                                {/* Add Session Report Form Dialog */}
+                                <AddSessionReportForm
+                                    isOpen={isReportFormOpen}
+                                    onClose={() => setReportFormOpen(false)}
+                                    onSave={handleSaveReport}
+                                    studentName={selectedStudent ? `${selectedStudent.user.firstName} ${selectedStudent.user.lastName}` : ''}
+                                    classSessionId={appointmentId}
+                                    studentId={selectedStudent ? selectedStudent.id : ''}
+                                    userId={selectedStudent ? selectedStudent.user.id : ''}
                                 />
-                            ))
-                        ) : (
-                            <Typography variant="body2">No students enrolled.</Typography>
+
+                                {/* View Session Report Form Dialog */}
+                                {selectedStudent && selectedReportId && (
+                                    <ViewSessionReportForm
+                                        isOpen={isViewReportFormOpen}
+                                        onClose={handleCloseReportForm}
+                                        reportId={selectedReportId}
+                                        onDelete={handleCloseReportForm}
+                                    />
+                                )}
+
+                                {/* View Payment Details Modal */}
+                                {selectedStudent && (
+                                    <ViewPaymentDetails
+                                        isOpen={isViewPaymentModalOpen}
+                                        onClose={() => setViewPaymentModalOpen(false)}
+                                        userId={selectedStudent.user.id}
+                                        studentName={`${selectedStudent.user.firstName} ${selectedStudent.user.lastName}`}
+                                        sessionId={classSession.id}
+                                    />
+                                )}
+                            </>
                         )}
 
-                        {allReportsCompleted && (
-                            <Box display="flex" justifyContent="center" alignItems="center" mt={3}>
-                                <Typography
-                                    variant="h5"
-                                    color="green"
-                                    sx={{
-                                        fontWeight: 'bold',
-                                        textAlign: 'center',
-                                        backgroundColor: '#e0f2f1',
-                                        padding: '10px',
-                                        borderRadius: '5px',
-                                        border: '1px solid green'
-                                    }}
-                                >
-                                    Session Reports Submitted
-                                </Typography>
-                            </Box>
-                        )}
-
-                        {/* Add Session Report Form Dialog */}
-                        <AddSessionReportForm
-                            isOpen={isReportFormOpen}
-                            onClose={() => setReportFormOpen(false)}
-                            onSave={handleSaveReport}
-                            studentName={selectedStudent ? `${selectedStudent.user.firstName} ${selectedStudent.user.lastName}` : ''}
-                            classSessionId={appointmentId}
-                            studentId={selectedStudent ? selectedStudent.id : ''}
-                            userId={selectedStudent ? selectedStudent.user.id : ''}
-                        />
-
-                        {/* View Session Report Form Dialog */}
-                        {selectedStudent && selectedReportId && (
-                            <ViewSessionReportForm
-                                isOpen={isViewReportFormOpen}
-                                onClose={handleCloseReportForm}
-                                reportId={selectedReportId}
-                                onDelete={handleCloseReportForm}
-                            />
-                        )}
-
-                        {/* View Payment Details Modal */}
-                        {selectedStudent && (
-                            <ViewPaymentDetails
-                                isOpen={isViewPaymentModalOpen}
-                                onClose={() => setViewPaymentModalOpen(false)}
-                                userId={selectedStudent.user.id}
-                                studentName={`${selectedStudent.user.firstName} ${selectedStudent.user.lastName}`}
-                                sessionId={classSession.id}
-                            />
+                        {tabIndex === 2 && (
+                            <AbsenceTab classSessionId={appointmentId} />
                         )}
                     </Box>
                 ) : (

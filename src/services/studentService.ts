@@ -25,6 +25,7 @@ export const addStudent = async (studentData: any) => {
 };
 
 
+
 export const deleteStudent = async (studentIds: number[]) => {
     try {
         const response = await api.post('/students/delete', {
