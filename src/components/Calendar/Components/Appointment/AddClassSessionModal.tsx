@@ -145,60 +145,55 @@ export default function AddClassSessionModal({
       return; // Exit if any validation fails
     }
 
-    // Handle repeated sessions if applicable
-    if (isRepeat && repeatUntilWeek) {
-      const untilDate = parseWeekToDate(repeatUntilWeek);
-
-      let currentStartDate = new Date(newSession.sessionStartDate);
-      let currentEndDate = new Date(newSession.sessionEndDate);
-
-      // Loop to generate sessions until the repeat week
-      while (moment(currentStartDate).isSameOrBefore(untilDate, 'week')) {
-
-        sessionArray.push({
-          ...newSession,
-          sessionStartDate: new Date(currentStartDate),
-          sessionEndDate: new Date(currentEndDate),
-          studentIds: validatedStudents.map((student) => student.id),
-        });
-
-        currentStartDate.setDate(currentStartDate.getDate() + 7);
-        currentEndDate.setDate(currentEndDate.getDate() + 7);
-      }
+    if (isRepeat && repeatUntilDate) {
+      const generatedSessions = generateRepeatedSessions(
+        new Date(newSession.sessionStartDate),
+        new Date(newSession.sessionEndDate),
+        repeatUntilDate
+      );
+      console.log(generatedSessions)
+      onSave(generatedSessions);
     } else {
-      sessionArray.push({
-        ...newSession,
-        studentIds: validatedStudents.map((student) => student.id),
-      });
+      onSave([newSession]);
     }
-
-    if (isRepeat && repeatUntilWeek) {
-      onSave(sessionArray); // Pass the array of repeated sessions
-    } else {
-      onSave([{
-        ...newSession,
-        studentIds: selectedStudents.map((student) => student.id),
-        locationId: selectedLocation ? selectedLocation.id : 0,
-      }]); // Wrap single session in an array
-    }
-
 
     clearForm();
     onClose();
   };
 
-  const parseWeekToDate = (weekString: string): Date => {
-    const [year, week] = weekString.split('-W').map(Number);
-    const firstDayOfYear = new Date(year, 0, 1);
-    const daysOffset = (week - 1) * 7;
+  const generateRepeatedSessions = (
+    startDate: Date,
+    endDate: Date,
+    untilDate: Date
+  ) => {
+    const sessions = [];
+    let currentStart = new Date(startDate);
+    let currentEnd = new Date(endDate);
 
-    // Adjust to the correct day of the week (Monday)
-    const dayOffset = firstDayOfYear.getDay() <= 4
-      ? 1 - firstDayOfYear.getDay()
-      : 8 - firstDayOfYear.getDay();
+    // Ensure the date comparison ignores time by resetting the time to midnight
+    function stripTime(date: Date) {
+      const newDate = new Date(date);
+      newDate.setHours(0, 0, 0, 0); // Set time to midnight
+      return newDate;
+    }
 
-    return new Date(year, 0, 1 + dayOffset + daysOffset);
+    const strippedUntilDate = stripTime(untilDate);
+
+    while (stripTime(currentStart) <= strippedUntilDate) {
+      sessions.push({
+        ...newSession,
+        sessionStartDate: new Date(currentStart),
+        sessionEndDate: new Date(currentEnd),
+      });
+
+      // Move to the same weekday next week
+      currentStart.setDate(currentStart.getDate() + 7);
+      currentEnd.setDate(currentEnd.getDate() + 7);
+    }
+
+    return sessions;
   };
+
 
   useEffect(() => {
     if (newSession.sessionType === "1on1") {
@@ -252,6 +247,11 @@ export default function AddClassSessionModal({
     return { validatedStudents: students, error: null };
   };
 
+  const handleClose = () => {
+    clearForm();
+    onClose();
+  };
+
   const handleRepeatDateChange = (selectedDate: string) => {
     const newRepeatDate = new Date(selectedDate);
     const sessionStartDate = newSession.sessionStartDate;
@@ -269,8 +269,9 @@ export default function AddClassSessionModal({
     }
   };
 
+
   return (
-    <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
+    <Dialog open={isOpen} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>Add Class Session</DialogTitle>
       <DialogContent>
         <Box sx={{ mb: 2, mt: 2 }}>
@@ -388,26 +389,24 @@ export default function AddClassSessionModal({
         </Box>
 
 
-        {strongestRoles[0] === 'Teacher' && (
-          <Box sx={{ mb: 2 }}>
-            <SingleSelectWithAutocomplete
-              label="Select Location"
-              fetchData={(query) =>
-                fetchLocations(1, 5, query).then((data) => data.data)
-              }
-              onSelect={(location) => setSelectedLocation(location)}
-              displayProperty="name"
-              placeholder="Search Location"
-              initialValue={selectedLocation}
-              width="100%"
-            />
-            {fieldErrors.locationId && (
-              <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-                {fieldErrors.locationId}
-              </Typography>
-            )}
-          </Box>
-        )}
+        <Box sx={{ mb: 2 }}>
+          <SingleSelectWithAutocomplete
+            label="Select Location"
+            fetchData={(query) =>
+              fetchLocations(1, 5, query).then((data) => data.data)
+            }
+            onSelect={(location) => setSelectedLocation(location)}
+            displayProperty="name"
+            placeholder="Search Location"
+            initialValue={selectedLocation}
+            width="100%"
+          />
+          {fieldErrors.locationId && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              {fieldErrors.locationId}
+            </Typography>
+          )}
+        </Box>
 
         <Box sx={{ mb: 2 }}>
           <SingleSelectWithAutocomplete
@@ -497,7 +496,7 @@ export default function AddClassSessionModal({
 
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose} color="secondary">
+        <Button onClick={handleClose} color="secondary">
           Cancel
         </Button>
         <Button onClick={handleSave} color="primary" variant="contained">
