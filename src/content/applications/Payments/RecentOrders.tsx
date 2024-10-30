@@ -4,7 +4,7 @@ import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from 'src/hooks/useAuth';
-import { getPaymentsForUser } from 'src/services/paymentService';
+import { getParentPayments, getPaymentsForUser } from 'src/services/paymentService';
 import PaymentPDF from './PaymentPDF';
 import { jsPDF } from 'jspdf';
 import generatePDF from './PaymentPDF';
@@ -22,7 +22,7 @@ export default function ViewPaymentsPage() {
 
 
   const navigate = useNavigate();
-  const { userId } = useAuth();
+  const { userId,userRoles } = useAuth();
 
   useEffect(() => {
     if (userId) {
@@ -41,7 +41,10 @@ export default function ViewPaymentsPage() {
 
     setLoading(true);
     try {
-      const { data, total } = await getPaymentsForUser(userId, page + 1, limit);
+      const isParent = userRoles.includes('Parent');
+      const { data, total } = isParent 
+        ? await getParentPayments(userId, page + 1, limit)
+        : await getPaymentsForUser(userId, page + 1, limit);
       setPayments(data);
       setTotalCount(total);
     } catch (error) {

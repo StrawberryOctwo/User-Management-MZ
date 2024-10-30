@@ -417,6 +417,21 @@ function SidebarMenu() {
                   </Button>
                 </ListItem>
               </ProtectedListItem>
+              <ProtectedListItem
+                allowedRoles={['Teacher', 'Parent']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/management/invoices"
+                    startIcon={<AttachMoney />}
+                  >
+                    Monthly Invoices
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
             </List>
           </SubMenuWrapper>
         </List>

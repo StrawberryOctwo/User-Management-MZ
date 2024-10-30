@@ -173,6 +173,10 @@ const Billings = Loader(
 const Payments = Loader(
   lazy(() => import('src/content/applications/Payments'))
 );
+
+const Invoices = Loader(
+  lazy(() => import('src/content/applications/Invoices'))
+);
 const SessionReports = Loader(
   lazy(() => import('src/content/applications/SessionReports'))
 );
@@ -339,6 +343,10 @@ const routes: RouteObject[] = [
           {
             path: 'payments',
             element: <Payments />
+          },
+          {
+            path: 'invoices',
+            element: <Invoices />
           },
 
 
