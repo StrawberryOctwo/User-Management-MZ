@@ -46,7 +46,7 @@ const FilterToolbar: React.FC<FilterToolbarProps> = ({
     onLocationsChange(locations); // Passes selected locations array to the parent
   };
 
-  if (userRole === 'Teacher' || userRole === 'Student') {
+  if (userRole === 'Teacher' || userRole === 'Student' || userRole === 'Parent') {
     return null;
   }
 
