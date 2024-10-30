@@ -252,6 +252,22 @@ export default function AddClassSessionModal({
     return { validatedStudents: students, error: null };
   };
 
+  const handleRepeatDateChange = (selectedDate: string) => {
+    const newRepeatDate = new Date(selectedDate);
+    const sessionStartDate = newSession.sessionStartDate;
+
+    if (newRepeatDate < sessionStartDate) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        repeatDate: t('errors.invalidRepeatDate', {
+          day: moment(sessionStartDate).format('YYYY-MM-DD')
+        }),
+      }));
+    } else {
+      setFieldErrors((prev) => ({ ...prev, repeatDate: null }));
+      setRepeatUntilDate(newRepeatDate);
+    }
+  };
 
   return (
     <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
@@ -323,7 +339,7 @@ export default function AddClassSessionModal({
           />
         </Box>
 
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 2 }}>
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3, ml: 1 }}>
           <FormControlLabel
             control={
               <Checkbox
@@ -335,11 +351,12 @@ export default function AddClassSessionModal({
           />
           {isRepeat && (
             <TextField
-              type="week"
+              type="date"
               fullWidth
-              value={repeatUntilWeek || ''}
-              onChange={(e) => setRepeatUntilWeek(e.target.value)}
-              sx={{ mb: 2 }}
+              value={repeatUntilDate ? moment(repeatUntilDate).format('YYYY-MM-DD') : ''}
+              onChange={(e) => handleRepeatDateChange(e.target.value)}
+              error={!!fieldErrors.repeatDate}
+              helperText={fieldErrors.repeatDate}
             />
           )}
 
