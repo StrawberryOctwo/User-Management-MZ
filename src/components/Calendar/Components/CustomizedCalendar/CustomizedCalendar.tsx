@@ -86,12 +86,17 @@ export default function CustomizedCalendar({
     resourceId: number;
   }>();
 
+  const STEP = 15;
+  const TIME_SLOTS = 60 / STEP;
+
   // State for managing selected event and modal visibility
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isDetailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
   const [canEditSession, setCanEditSession] = useState<boolean | null>(true);
+  const [zoom, setZoom] = useState<number>(4); // Now it's a single number, not an array
+
   const { userRoles } = useAuth();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
 
@@ -114,8 +119,6 @@ export default function CustomizedCalendar({
       setDate(moment(date).add(1, "M").toDate());
     }
   }, [view, date]);
-
-  const [zoom, setZoom] = useState<number>(4); // Now it's a single number, not an array
 
   const dateText = useMemo(() => {
     if (view === Views.DAY) return moment(date).format("dddd, MMMM DD");
@@ -164,17 +167,25 @@ export default function CustomizedCalendar({
     setDate(moment().toDate());
   }, []);
 
-  const STEP = 15;
-  const TIME_SLOTS = 60 / STEP;
-
-  // Function to handle event selection
   const handleEventClick = (event: any) => {
-    if (strongestRoles[0] == 'Parent' || strongestRoles[0] == 'Student') {
-      return
+    const eventEndDate = new Date(event.end);
+    const currentDate = new Date();
+
+    if (currentDate > eventEndDate) {
+      console.warn("This event has already ended.");
+      setCanEditSession(false);
     }
-    if (strongestRoles[0] == 'Teacher' || strongestRoles[0] == 'Parent' || strongestRoles[0] == 'Student') {
-      setCanEditSession(false)
+
+    if (strongestRoles[0] === 'Parent' || strongestRoles[0] === 'Student') {
+      return;
     }
+
+    if (
+      strongestRoles[0] === 'Teacher' || strongestRoles[0] === 'Parent' || strongestRoles[0] === 'Student'
+    ) {
+      setCanEditSession(false);
+    }
+
     const appointmentId = event.data?.appointment?.id;
     if (appointmentId) {
       setSelectedAppointmentId(appointmentId);
@@ -183,6 +194,7 @@ export default function CustomizedCalendar({
       console.error("Event ID is undefined or not available.");
     }
   };
+
 
   const handleEditClassSession = () => {
     if (strongestRoles[0] == 'Teacher' || strongestRoles[0] == 'Student') {

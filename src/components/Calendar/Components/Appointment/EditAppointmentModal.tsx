@@ -174,13 +174,13 @@ export default function EditAppointmentModal({
       const isStartTimeValid = validateTime(new Date(editedAppointment.sessionStartDate), 'start');
       const isEndTimeValid = validateTime(new Date(editedAppointment.sessionEndDate), 'end');
 
-      if (
-        Object.values(errors).some((error) => error !== null) ||
-        !isStartTimeValid ||
-        !isEndTimeValid
-      ) {
-        return; // Exit if any errors exist or if times are invalid
-      }
+      // if (
+      //   Object.values(errors).some((error) => error !== null) ||
+      //   !isStartTimeValid ||
+      //   !isEndTimeValid
+      // ) {
+      //   return; // Exit if any errors exist or if times are invalid
+      // }
 
       const { teacher, topic, students, ...restAppointment } = editedAppointment;
 
