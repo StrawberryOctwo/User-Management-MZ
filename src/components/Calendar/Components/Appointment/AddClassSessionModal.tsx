@@ -145,59 +145,55 @@ export default function AddClassSessionModal({
       return; // Exit if any validation fails
     }
 
-    // Handle repeated sessions if applicable
-    if (isRepeat && repeatUntilWeek) {
-      const untilDate = parseWeekToDate(repeatUntilWeek);
-
-      let currentStartDate = new Date(newSession.sessionStartDate);
-      let currentEndDate = new Date(newSession.sessionEndDate);
-
-      // Loop to generate sessions until the repeat week
-      while (moment(currentStartDate).isSameOrBefore(untilDate, 'week')) {
-
-        sessionArray.push({
-          ...newSession,
-          sessionStartDate: new Date(currentStartDate),
-          sessionEndDate: new Date(currentEndDate),
-          studentIds: validatedStudents.map((student) => student.id),
-        });
-
-        currentStartDate.setDate(currentStartDate.getDate() + 7);
-        currentEndDate.setDate(currentEndDate.getDate() + 7);
-      }
+    if (isRepeat && repeatUntilDate) {
+      const generatedSessions = generateRepeatedSessions(
+        new Date(newSession.sessionStartDate),
+        new Date(newSession.sessionEndDate),
+        repeatUntilDate
+      );
+      console.log(generatedSessions)
+      onSave(generatedSessions);
     } else {
-      sessionArray.push({
-        ...newSession,
-        studentIds: validatedStudents.map((student) => student.id),
-      });
-    }
-
-    if (isRepeat && repeatUntilWeek) {
-      onSave(sessionArray); // Pass the array of repeated sessions
-    } else {
-      onSave([{
-        ...newSession,
-        studentIds: selectedStudents.map((student) => student.id),
-        locationId: selectedLocation ? selectedLocation.id : 0,
-      }]); // Wrap single session in an array
+      onSave([newSession]);
     }
 
     clearForm();
     onClose();
   };
 
-  const parseWeekToDate = (weekString: string): Date => {
-    const [year, week] = weekString.split('-W').map(Number);
-    const firstDayOfYear = new Date(year, 0, 1);
-    const daysOffset = (week - 1) * 7;
+  const generateRepeatedSessions = (
+    startDate: Date,
+    endDate: Date,
+    untilDate: Date
+  ) => {
+    const sessions = [];
+    let currentStart = new Date(startDate);
+    let currentEnd = new Date(endDate);
 
-    // Adjust to the correct day of the week (Monday)
-    const dayOffset = firstDayOfYear.getDay() <= 4
-      ? 1 - firstDayOfYear.getDay()
-      : 8 - firstDayOfYear.getDay();
+    // Ensure the date comparison ignores time by resetting the time to midnight
+    function stripTime(date: Date) {
+      const newDate = new Date(date);
+      newDate.setHours(0, 0, 0, 0); // Set time to midnight
+      return newDate;
+    }
 
-    return new Date(year, 0, 1 + dayOffset + daysOffset);
+    const strippedUntilDate = stripTime(untilDate);
+
+    while (stripTime(currentStart) <= strippedUntilDate) {
+      sessions.push({
+        ...newSession,
+        sessionStartDate: new Date(currentStart),
+        sessionEndDate: new Date(currentEnd),
+      });
+
+      // Move to the same weekday next week
+      currentStart.setDate(currentStart.getDate() + 7);
+      currentEnd.setDate(currentEnd.getDate() + 7);
+    }
+
+    return sessions;
   };
+
 
   useEffect(() => {
     if (newSession.sessionType === "1on1") {
@@ -255,6 +251,24 @@ export default function AddClassSessionModal({
     clearForm();
     onClose();
   };
+
+  const handleRepeatDateChange = (selectedDate: string) => {
+    const newRepeatDate = new Date(selectedDate);
+    const sessionStartDate = newSession.sessionStartDate;
+
+    if (newRepeatDate < sessionStartDate) {
+      setFieldErrors((prev) => ({
+        ...prev,
+        repeatDate: t('errors.invalidRepeatDate', {
+          day: moment(sessionStartDate).format('YYYY-MM-DD')
+        }),
+      }));
+    } else {
+      setFieldErrors((prev) => ({ ...prev, repeatDate: null }));
+      setRepeatUntilDate(newRepeatDate);
+    }
+  };
+
 
   return (
     <Dialog open={isOpen} onClose={handleClose} maxWidth="sm" fullWidth>
@@ -338,11 +352,12 @@ export default function AddClassSessionModal({
           />
           {isRepeat && (
             <TextField
-              type="week"
+              type="date"
               fullWidth
-              value={repeatUntilWeek || ''}
-              onChange={(e) => setRepeatUntilWeek(e.target.value)}
-              sx={{ mb: 2 }}
+              value={repeatUntilDate ? moment(repeatUntilDate).format('YYYY-MM-DD') : ''}
+              onChange={(e) => handleRepeatDateChange(e.target.value)}
+              error={!!fieldErrors.repeatDate}
+              helperText={fieldErrors.repeatDate}
             />
           )}
 
