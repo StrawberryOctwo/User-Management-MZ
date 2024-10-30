@@ -95,6 +95,7 @@ export default function CustomizedCalendar({
   const [isDetailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
   const [canEditSession, setCanEditSession] = useState<boolean | null>(true);
+  const [canAddReport, setCanAddReport] = useState<boolean | null>(false);
   const [zoom, setZoom] = useState<number>(4); // Now it's a single number, not an array
 
   const { userRoles } = useAuth();
@@ -174,6 +175,9 @@ export default function CustomizedCalendar({
     if (currentDate > eventEndDate) {
       console.warn("This event has already ended.");
       setCanEditSession(false);
+      setCanAddReport(false)
+    } else if (currentDate < eventEndDate) {
+      setCanAddReport(true)
     }
 
     if (strongestRoles[0] === 'Parent' || strongestRoles[0] === 'Student') {
@@ -340,6 +344,7 @@ export default function CustomizedCalendar({
         onEdit={handleEditClassSession}
         onDelete={handleDeleteClassSession}
         canEdit={canEditSession}
+        canAddReport={canAddReport}
       />
     </Box>
   );

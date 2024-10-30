@@ -28,6 +28,7 @@ interface ClassSessionDetailsModalProps {
     onEdit: () => void;
     onDelete: () => void;
     canEdit: boolean;
+    canAddReport: boolean;
 }
 
 const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
@@ -36,7 +37,8 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     appointmentId,
     onEdit,
     onDelete,
-    canEdit
+    canEdit,
+    canAddReport
 }) => {
     const [classSession, setClassSession] = useState<any>(null);
     const [loading, setLoading] = useState<boolean>(true);
@@ -194,6 +196,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                                 <StudentDetailCard
                                     key={student.id}
                                     student={student}
+                                    canAddReport={canAddReport}
                                     reportCompleted={reportStatus[student.id]?.reportCompleted}
                                     onAddReport={() => handleAddReport(student)}
                                     onViewReport={() => handleViewReport(student)}

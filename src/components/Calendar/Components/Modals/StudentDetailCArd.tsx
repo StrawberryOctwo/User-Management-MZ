@@ -9,6 +9,7 @@ interface StudentDetailCardProps {
     onAddReport: () => void;
     onViewReport: () => void;
     onViewPayment: () => void;  // Add handler to view payment
+    canAddReport: boolean;
 }
 
 const StudentDetailCard: React.FC<StudentDetailCardProps> = ({
@@ -16,7 +17,8 @@ const StudentDetailCard: React.FC<StudentDetailCardProps> = ({
     reportCompleted,
     onAddReport,
     onViewReport,
-    onViewPayment  // New prop for viewing payment
+    onViewPayment,
+    canAddReport
 }) => {
     return (
         <Card variant="outlined" sx={{ mb: 2, mt: 1 }}>
@@ -35,9 +37,11 @@ const StudentDetailCard: React.FC<StudentDetailCardProps> = ({
                             View Report
                         </Button>
                     ) : (
-                        <Button variant="contained" color="primary" onClick={onAddReport} sx={{ mr: 1 }}>
-                            Add Report
-                        </Button>
+                        !canAddReport && (
+                            <Button variant="contained" color="primary" onClick={onAddReport} sx={{ mr: 1 }}>
+                                Add Report
+                            </Button>
+                        )
                     )}
                     {/* Enable View Payment button if report is completed */}
                     <Button
