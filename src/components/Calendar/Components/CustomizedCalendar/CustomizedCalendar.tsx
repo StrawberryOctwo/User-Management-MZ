@@ -178,6 +178,7 @@ export default function CustomizedCalendar({
       setCanAddReport(false)
     } else if (currentDate < eventEndDate) {
       setCanAddReport(true)
+      setCanEditSession(true);
     }
 
     if (strongestRoles[0] === 'Parent' || strongestRoles[0] === 'Student') {

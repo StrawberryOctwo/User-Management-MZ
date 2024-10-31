@@ -52,6 +52,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     const [isReportFormOpen, setReportFormOpen] = useState<boolean>(false);
     const [isViewReportFormOpen, setViewReportFormOpen] = useState<boolean>(false);
     const [isViewPaymentModalOpen, setViewPaymentModalOpen] = useState<boolean>(false);
+    const [isAbsenceModalOpen, setAbsenceModalOpen] = useState<boolean>(false);
     const [selectedStudent, setSelectedStudent] = useState<any>(null);
     const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
@@ -141,6 +142,11 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
         setViewPaymentModalOpen(true);
     };
 
+    const handleAbsence = (student: any) => {
+        setSelectedStudent(student);
+        setAbsenceModalOpen(true);
+    };
+
     const refreshClassSessionData = async () => {
         await loadClassSession();
     };
@@ -152,6 +158,12 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
 
     const handleCloseReportForm = () => {
         setViewReportFormOpen(false);
+        refreshClassSessionData();
+    };
+
+    const handleCloseAbsenceModel = () => {
+        setAbsenceModalOpen(false);
+        setSelectedStudent(null);
         refreshClassSessionData();
     };
 
@@ -169,7 +181,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
             onClose={onClose}
             fullWidth
             maxWidth={false}
-            sx={{ '& .MuiDialog-paper': { width: '700px', maxWidth: '700px' } }} // Set the custom width
+            sx={{ '& .MuiDialog-paper': { width: '750px', maxWidth: '750px' } }} // Set the custom width
 
         >
             <DialogTitle>Class Session Details</DialogTitle>
@@ -178,7 +190,6 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                 <Tabs value={tabIndex} onChange={handleTabChange} indicatorColor="primary" textColor="primary" sx={{ mb: 2 }}>
                     <Tab label="Session Details" />
                     <Tab label="Students Enrolled" />
-                    <Tab label="Add Absences" />
                 </Tabs>
 
                 {loading ? (
@@ -223,10 +234,12 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                                             key={student.id}
                                             student={student}
                                             canAddReport={canAddReport}
+                                            classSessionId={classSession.id}
                                             reportCompleted={reportStatus[student.id]?.reportCompleted}
                                             onAddReport={() => handleAddReport(student)}
                                             onViewReport={() => handleViewReport(student)}
                                             onViewPayment={() => handleViewPayment(student)}
+                                            handleAbsence={() => handleAbsence(student)}
                                         />
                                     ))
                                 ) : (
@@ -283,12 +296,18 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                                         sessionId={classSession.id}
                                     />
                                 )}
+
+                                {selectedStudent && (
+                                    <AbsenceTab
+                                        classSessionId={classSession.id}
+                                        isOpen={isAbsenceModalOpen}
+                                        student={selectedStudent}
+                                        onClose={handleCloseAbsenceModel}
+                                    />
+                                )}
                             </>
                         )}
 
-                        {tabIndex === 2 && (
-                            <AbsenceTab classSessionId={appointmentId} />
-                        )}
                     </Box>
                 ) : (
                     <Typography>No class session details available.</Typography>

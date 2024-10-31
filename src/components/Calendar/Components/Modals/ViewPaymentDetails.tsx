@@ -15,7 +15,7 @@ const ViewPaymentDetails: React.FC<ViewPaymentDetailsProps> = ({ isOpen, onClose
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        if (isOpen && userId) {
+        if (isOpen && userId) { 
             const fetchPayment = async () => {
                 setLoading(true);
                 try {

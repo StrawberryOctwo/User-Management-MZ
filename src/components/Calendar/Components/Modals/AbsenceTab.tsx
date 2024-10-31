@@ -1,92 +1,126 @@
-import React, { useState } from 'react';
-import { Box, Button, TextField, Typography } from '@mui/material';
-import { fetchStudents } from 'src/services/studentService';
-import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
-import { createAbsences } from 'src/services/absence';
+import React, { useState, useEffect } from 'react';
+import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, Typography, MenuItem, Select, FormControl, InputLabel, SelectChangeEvent } from '@mui/material';
+import { getAbsenceDetails, createOrUpdateAbsences } from 'src/services/absence';
 
 interface AbsenceTabProps {
-  classSessionId: string; // Accept class session ID as a prop
+  classSessionId: string;
+  isOpen: boolean;
+  student: any;
+  onClose: () => void;
 }
 
-const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId }) => {
-  const [selectedStudents, setSelectedStudents] = useState<any[]>([]);
+const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student, onClose }) => {
   const [reason, setReason] = useState<string>('');
   const [proof, setProof] = useState<string>('');
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [status, setStatus] = useState<boolean>(false); // Default to "Absent" (true)
+  const [loading, setLoading] = useState(false);
+  const [isEditMode, setIsEditMode] = useState(false);
+  const [absenceId, setAbsenceId] = useState<number | null>(null);
 
-  const handleAddAbsence = async () => {
-    if (selectedStudents.length === 0 || !reason || !proof) {
-      setErrorMessage('All fields are required.');
-      return;
-    }
-
-    try {
-      const studentIds = selectedStudents.map((student) => student.id);
-      await createAbsences({
-        studentIds,
-        reason,
-        proof,
-        classSessionId,
-        status: 'Pending',
-      });
-
-      setSelectedStudents([]);
+  useEffect(() => {
+    if (isOpen && student) {
+      setLoading(true);
+      getAbsenceDetails(student.id, classSessionId)
+        .then((data) => {
+          if (data && typeof data === 'object') {
+            setReason(data.absences[0].reason || '');
+            setProof(data.absences[0].proof || '');
+            setStatus(data.absences[0].status ?? true);
+            setAbsenceId(data.absences[0].absenceId);
+            setIsEditMode(true);
+          } else {
+            setReason('');
+            setProof('');
+            setStatus(true);
+            setAbsenceId(null);
+            setIsEditMode(false);
+          }
+        })
+        .catch((error) => console.error('Failed to fetch absence details:', error))
+        .finally(() => setLoading(false));
+    } else if (!isOpen) {
       setReason('');
       setProof('');
-      setErrorMessage(null);
-      alert('Absences recorded successfully!');
+      setStatus(true);
+      setAbsenceId(null);
+      setIsEditMode(false);
+    }
+  }, [isOpen, student, classSessionId]);
+
+  const handleSubmit = async () => {
+    try {
+      await createOrUpdateAbsences({
+        studentIds: [student.id],
+        reason,
+        proof,
+        status,
+        classSessionId,
+        absenceId: isEditMode ? absenceId : undefined,
+      });
+      onClose();
     } catch (error) {
-      console.error('Failed to add absences:', error);
-      setErrorMessage('Failed to record absences. Please try again.');
+      console.error('Failed to submit absence:', error);
+    }
+  };
+
+  const handleStatusChange = (event: SelectChangeEvent) => {
+    const newStatus = event.target.value === 'true';
+    setStatus(newStatus);
+
+    if (!newStatus) {
+      setReason('');
+      setProof('');
     }
   };
 
   return (
-    <Box sx={{ px: 1, mt: 3 }}>
+    <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
+      <DialogTitle>
+        {isEditMode ? `Edit Absence for ${student?.user.firstName} ${student?.user.lastName}` : `Add Absence for ${student?.user.firstName} ${student?.user.lastName}`}
+      </DialogTitle>
+      <DialogContent sx={{ mt: 2 }}>
+        {loading ? (
+          <Typography>Loading absence data...</Typography>
+        ) : (
+          <>
+            <FormControl fullWidth sx={{ mb: 2 }}>
+              <InputLabel>Status</InputLabel>
+              <Select
+                label="Status"
+                value={status ? 'true' : 'false'}
+                onChange={handleStatusChange}
+              >
+                <MenuItem value="true">Absent</MenuItem>
+                <MenuItem value="false">Present</MenuItem>
+              </Select>
+            </FormControl>
 
-      <Box sx={{ mb: 2 }}>
-        <MultiSelectWithCheckboxes
-          label="Search Students"
-          fetchData={(query: string | undefined) =>
-            fetchStudents(1, 5, query).then((data) =>
-              data.data.map((student: any) => ({
-                ...student,
-                fullName: `${student.firstName} ${student.lastName}`,
-              }))
-            )
-          }
-          onSelect={(selectedItems: any) => setSelectedStudents(selectedItems)}
-          displayProperty="fullName"
-          placeholder="Enter student name"
-          initialValue={selectedStudents}
-          width="100%"
-        />
-      </Box>
-
-      <TextField
-        label="Reason"
-        value={reason}
-        onChange={(e) => setReason(e.target.value)}
-        fullWidth
-        sx={{ mb: 2 }}
-      />
-
-      <TextField
-        label="Proof"
-        value={proof}
-        onChange={(e) => setProof(e.target.value)}
-        fullWidth
-        sx={{ mb: 2 }}
-      />
-
-      {errorMessage && (
-        <Typography color="error" sx={{ mb: 2 }}>{errorMessage}</Typography>
-      )}
-
-      <Button variant="contained" color="primary" onClick={handleAddAbsence} fullWidth>
-        Add Absence
-      </Button>
-    </Box>
+            <TextField
+              label="Reason"
+              value={reason}
+              onChange={(e) => setReason(e.target.value)}
+              fullWidth
+              sx={{ mb: 2 }}
+              disabled={!status}
+            />
+            <TextField
+              label="Proof"
+              value={proof}
+              onChange={(e) => setProof(e.target.value)}
+              fullWidth
+              sx={{ mb: 2 }}
+              disabled={!status}
+            />
+          </>
+        )}
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={onClose} color="secondary">Cancel</Button>
+        <Button onClick={handleSubmit} color="primary">
+          {isEditMode ? 'Update Absence' : 'Add Absence'}
+        </Button>
+      </DialogActions>
+    </Dialog>
   );
 };
 
