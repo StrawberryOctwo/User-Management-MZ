@@ -68,7 +68,6 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
             setClassSession(response);
 
             const reportResponse = await getClassSessionReportsStatus(appointmentId);
-            console.log(reportResponse)
             setAllReportsCompleted(reportResponse.allReportsCompleted);
 
             const studentReportsStatus: { [studentId: string]: { reportCompleted: boolean, reportId: string | null } } = {};
@@ -80,32 +79,10 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                 };
             }
 
-            setReportStatus(studentReportsStatus);
+            setReportStatus(studentReportsStatus)
+      
 
 
-
-
-            // If all reports are completed, check if payment was already made
-            if (allReportsCompleted) {
-                const paymentStatusResponse = await getPaymentsForUserByClassSession(response.teacher.user.id, response.id)
-                console.log(paymentStatusResponse);
-                if (paymentStatusResponse) {
-                    console.log('Payment already sent, skipping payment creation');
-                } else {
-                    try {
-                        // Payment not sent, create the payment
-                        await createPaymentForUser({
-                            userId: response.teacher.user.id,
-                            classSessionId: response.id,
-                            sessionType: sessionTypeFunc(classSession.sessionType)
-
-                        });
-                        console.log('Payment successfully sent');
-                    } catch (paymentError) {
-                        console.error('Error creating payment:', paymentError);
-                    }
-                }
-            }
         } catch (error) {
             setErrorMessage('Failed to load class session details.');
             console.error('Error fetching class session details:', error);
@@ -120,6 +97,39 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
         }
     }, [isOpen, appointmentId]);
 
+    useEffect(() => {
+        if (allReportsCompleted) {
+            handleTeacherPayment();
+        }
+    }, [allReportsCompleted]);
+    
+    const handleTeacherPayment = async () => {
+        // Check if all reports are completed before proceeding with payment
+        if (allReportsCompleted) {
+            try {
+                // Check if payment was already made
+                const paymentStatusResponse = await getPaymentsForUserByClassSession(classSession.teacher.user.id, classSession.id);
+                console.log(paymentStatusResponse);
+    
+                if (paymentStatusResponse) {
+                    console.log('Payment already sent, skipping payment creation');
+                } else {
+                    // Payment not sent, create the payment
+                    await createPaymentForUser({
+                        userId: classSession.teacher.user.id,
+                        classSessionId: classSession.id,
+                        sessionType: sessionTypeFunc(classSession.sessionType)
+                    });
+                    console.log('Payment successfully sent');
+                }
+            } catch (error) {
+                console.error('Error creating payment:', error);
+            }
+        } else {
+            console.log('Not all reports are completed; payment will not be triggered.');
+        }
+    };
+    
     const handleAddReport = (student: any) => {
         setSelectedStudent(student);
         setReportFormOpen(true);
@@ -147,7 +157,14 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     };
 
     const refreshClassSessionData = async () => {
-        await loadClassSession();
+        setLoading(true);
+        try {
+            await loadClassSession(); // Reload the session data
+        } catch (error) {
+            console.error('Error refreshing class session data:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleSaveReport = async (newReport: any) => {
@@ -160,10 +177,10 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
         refreshClassSessionData();
     };
 
-    const handleCloseAbsenceModel = () => {
+    const handleCloseAbsenceModel = async () => {
         setAbsenceModalOpen(false);
         setSelectedStudent(null);
-        refreshClassSessionData();
+        await refreshClassSessionData();
     };
 
     const handleDelete = async () => {
@@ -292,9 +309,13 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                                         classSessionId={classSession.id}
                                         isOpen={isAbsenceModalOpen}
                                         student={selectedStudent}
-                                        onClose={handleCloseAbsenceModel}
+                                        onClose={() => {
+                                            handleCloseAbsenceModel();
+                                        
+                                        }}
                                     />
                                 )}
+
                             </>
                         )}
 

@@ -42,20 +42,21 @@ const StudentDetailCard: React.FC<StudentDetailCardProps> = ({
 
                     <Button
                         variant="outlined"
-                        color={absenceLabel == 'Absent' ? "error" : "success"}
+                        color={absenceLabel === 'Absent' ? "error" : "success"}
                         onClick={handleAbsence}
                         sx={{ mr: 1 }}
+                        disabled={reportCompleted} // Disables the button if reportCompleted is true
                     >
                         {absenceLabel}
                     </Button>
 
-                    
-                    {reportCompleted && !sessionAbsence.status ? (
+ 
+                    {reportCompleted && absenceLabel == 'Present' ? (
                         <Button variant="outlined" color="primary" onClick={onViewReport} sx={{ mr: 1 }}>
                             View Report
                         </Button>
                     ) : (
-                        !canAddReport && !sessionAbsence.status && (
+                        !canAddReport && absenceLabel == 'Present' && (
                             <Button variant="outlined" color="primary" onClick={onAddReport} sx={{ mr: 1 }}>
                                 Add Report
                             </Button>
