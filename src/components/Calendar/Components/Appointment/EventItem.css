@@ -9,6 +9,11 @@
   background-color: #f5f5f5;
   border-radius: 4px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  width: 100%; /* Let FullCalendar handle the width */
+  /* min-width: 11rem; */
 }
 
 .event-header {
@@ -37,4 +42,46 @@
   color: #555;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
+}
+
+/* Student list section */
+.student-list {
+  font-size: 0.8rem;
+  color: #333;
+  margin-left: 16px;
+  text-align: right;
+}
+
+.student-names {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  font-size: 0.7rem;
+}
+
+.student-names li {
+  margin: 2px 0;
+}
+
+.no-students {
+  font-size: 0.8rem;
+  color: #999;
+}
+
+.more-students {
+  font-size: 0.7rem;
+  color: #999;
+  font-weight: bold;
+  margin-top: 2px;
+}
+
+.student-present {
+  color: #4caf50;
+  font-weight: bold;
+}
+
+.student-absent {
+  color: #f44336;
+  font-weight: bold;
 }

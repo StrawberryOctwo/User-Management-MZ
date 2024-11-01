@@ -112,12 +112,13 @@ export default function CustomizedCalendar({
   }, []);
 
   const handleEventClick = (event: any) => {
+
     const eventEndDate = new Date(event.end);
     const currentDate = new Date();
 
     if (currentDate > eventEndDate) {
       console.warn("This event has already ended.");
-      setCanEditSession(false);
+      // setCanEditSession(false);
       setCanAddReport(false)
     } else if (currentDate < eventEndDate) {
       setCanAddReport(true)
@@ -134,7 +135,7 @@ export default function CustomizedCalendar({
       setCanEditSession(false);
     }
 
-    const appointmentId = event.data?.appointment?.id;
+    const appointmentId = event.id;
     if (appointmentId) {
       setSelectedAppointmentId(appointmentId);
       setDetailsModalOpen(true);
@@ -205,10 +206,10 @@ export default function CustomizedCalendar({
         teacher: session.data.appointment.teacher,
         location: session.data.appointment.location,
         sessionType: session.data.appointment.sessionType,
+        students: session.data.appointment.students,
       },
     }));
 
-    console.log("Mapped Events:", mappedEvents); // Log mapped events to verify
 
     setEvents(mappedEvents);
   }, [classSessionEvents]);
@@ -250,14 +251,21 @@ export default function CustomizedCalendar({
         headerToolbar={{
           left: "prev,next today",
           center: "title",
-          right: "",
+          right: ""
         }}
+        // height='auto'
         resources={resources}
         events={events}
         eventContent={renderEventContent} // Use custom event content
         slotMinTime="08:00:00"
         slotMaxTime="18:00:00"
-        resourceAreaWidth="150px"
+        resourceAreaWidth="100px"
+        eventClick={(info) => handleEventClick(info.event)}
+        views={{
+          resourceTimelineDay: {
+            slotMinWidth: 120,
+          }
+        }}
       />
 
       <EditAppointmentModal

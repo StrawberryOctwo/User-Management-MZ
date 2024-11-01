@@ -11,6 +11,7 @@ import CalendarLegend from './Components/CalendarLegend';
 import { useAuth } from 'src/hooks/useAuth';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import { addClassSessions, fetchClassSessions, fetchParentClassSessions, fetchUserClassSessions } from 'src/services/classSessionService';
+import { calendarsharedService } from './CalendarSharedService';
 
 const CalendarContent: React.FC = () => {
   const [classSessionEvents, setClassSessionEvents] = useState<any[]>([]);
@@ -56,6 +57,14 @@ const CalendarContent: React.FC = () => {
         ? `${session.teacher.user.firstName} ${session.teacher.user.lastName}`
         : "Unknown Teacher";
 
+      // Map students to an array of first names
+      const studentFirstNames = session.students.map((student) => student.firstName);
+      const studentsWithStatus = session.students.map((student) => ({
+        firstName: student.firstName,
+        absenceStatus: student.absenceStatus, // Assuming absenceStatus is directly available on each student
+      }));
+
+      console.log(studentsWithStatus)
       return {
         start: moment(session.sessionStartDate).toDate(),
         end: moment(session.sessionEndDate).toDate(),
@@ -70,6 +79,7 @@ const CalendarContent: React.FC = () => {
             className: session.name,
             teacher: teacherName,
             studentCount: session.students.length,
+            students: studentsWithStatus, // Array of first names of students
             startTime: moment(session.sessionStartDate).format('HH:mm'),
             endTime: moment(session.sessionEndDate).format('HH:mm'),
             sessionType: session.sessionType,
@@ -80,7 +90,10 @@ const CalendarContent: React.FC = () => {
     });
   };
 
+
   const loadClassSessions = async () => {
+    console.log("loadClassSessions called"); // Log when loadClassSessions is called
+
     setLoading(true);
     setErrorMessage(null);
 
@@ -108,6 +121,8 @@ const CalendarContent: React.FC = () => {
       }
 
       const events = transformClassSessionsToEvents(response.data);
+
+      console.log(events)
       setClassSessionEvents(events);
     } catch (error) {
       console.error('Failed to load class sessions', error);
@@ -116,6 +131,19 @@ const CalendarContent: React.FC = () => {
       setLoading(false);
     }
   };
+
+  useEffect(() => {
+    const onAbsenceUpdated = () => {
+      console.log("Event 'absenceUpdated' received"); // Log when event is received
+      loadClassSessions();
+    };
+
+    calendarsharedService.on('absenceUpdated', onAbsenceUpdated);
+
+    return () => {
+      calendarsharedService.off('absenceUpdated', onAbsenceUpdated);
+    };
+  }, []);
 
   const handleDateChange = (newStartDate: string, newEndDate: string) => {
     setStartDate(newStartDate);
@@ -166,13 +194,13 @@ const CalendarContent: React.FC = () => {
   }, [startDate, endDate, selectedFranchise, selectedLocations]);
 
   return (
-    <Box sx={{ position: 'relative', height: '78vh' }}>
+    <Box sx={{ position: 'relative', height: '74vh' }}>
       {['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin'].includes(strongestRole || '') && (
         <FilterToolbar
           onFranchiseChange={handleFranchiseChange}
-          onLocationsChange={handleLocationsChange} // Updated to onLocationsChange
+          onLocationsChange={handleLocationsChange}
           selectedFranchise={selectedFranchise}
-          selectedLocations={selectedLocations} // Updated to pass multiple locations
+          selectedLocations={selectedLocations}
         />
       )}
 

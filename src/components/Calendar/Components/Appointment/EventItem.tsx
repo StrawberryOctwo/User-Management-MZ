@@ -1,18 +1,32 @@
-// EventItem.js
-import React from "react";
+import React, { useState, useEffect } from "react";
 import moment from "moment";
-import "./EventItem.css"; // Ensure the CSS styles below are applied
-import PersonIcon from "@mui/icons-material/Person"; // MUI icon for 1-on-1 sessions
-import VideocamIcon from "@mui/icons-material/Videocam"; // MUI icon for online sessions
-import { ReactComponent as OnlineIcon } from "../../assets/icons/OnlineIcon.svg"; // Correct path
-import { ReactComponent as GroupIcon } from "../../assets/icons/GroupIcon.svg"; // Correct path
-import { ReactComponent as UserIcon } from "../../assets/icons/UserIcon.svg"; // Correct path
+import "./EventItem.css";
+import { ReactComponent as OnlineIcon } from "../../assets/icons/OnlineIcon.svg";
+import { ReactComponent as GroupIcon } from "../../assets/icons/GroupIcon.svg";
+import { ReactComponent as UserIcon } from "../../assets/icons/UserIcon.svg";
+import { Button, Menu, MenuItem } from "@mui/material";
 
 const EventItem = ({ eventInfo }) => {
-    const { topicName, teacher, location, sessionType } = eventInfo.event.extendedProps;
+    const { topicName, teacher, location, sessionType, students } = eventInfo.event.extendedProps;
     const startTime = moment(eventInfo.event.start).format("HH:mm");
     const endTime = moment(eventInfo.event.end).format("HH:mm");
 
+    const [visibleStudents, setVisibleStudents] = useState([]);
+    const [extraStudents, setExtraStudents] = useState([]);
+    const [anchorEl, setAnchorEl] = useState(null);
+
+    const handleMoreClick = (event) => {
+        event.preventDefault(); // Prevent default browser behavior
+        event.stopPropagation(); // Stop propagation to prevent other click events
+        setAnchorEl(event.currentTarget);
+    };
+
+
+    const handleClose = () => {
+        setAnchorEl(null);
+    };
+
+    // Calculate the border color based on session type
     const getBorderColor = () => {
         switch (sessionType) {
             case "Online":
@@ -21,10 +35,6 @@ const EventItem = ({ eventInfo }) => {
                 return "#FF9800";
             case "1on1":
                 return "#4CAF50";
-            case "Pending":
-                return "#03A9F4";
-            case "Checked-In":
-                return "#8BC34A";
             default:
                 return "#BDBDBD";
         }
@@ -45,6 +55,18 @@ const EventItem = ({ eventInfo }) => {
         }
     };
 
+    // Determine how many students can be displayed based on available space
+    useEffect(() => {
+        const maxVisibleStudents = 3; // Adjust this value based on the desired display limit
+        if (students.length > maxVisibleStudents) {
+            setVisibleStudents(students.slice(0, maxVisibleStudents));
+            setExtraStudents(students.slice(maxVisibleStudents));
+        } else {
+            setVisibleStudents(students);
+            setExtraStudents([]);
+        }
+    }, [students]);
+
     return (
         <div
             className="custom-event"
@@ -53,15 +75,71 @@ const EventItem = ({ eventInfo }) => {
                 backgroundColor: "#f5f5f5",
             }}
         >
-            <div className="event-header">
-                {renderIcon()}
-                <div className="event-title">{topicName}</div>
+            <div>
+                <div className="event-header">
+                    {renderIcon()}
+                    <div className="event-title">{topicName}</div>
+                </div>
+                <div className="event-details">
+                    <span className="time">{startTime} - {endTime}</span>
+                    <span className="teacher" style={{ color: borderColor }}>{teacher}</span>
+                    <span>{location}</span>
+                </div>
             </div>
-            <div className="event-details">
-                <span className="time">{startTime} - {endTime}</span>
-                <span className="teacher" style={{ color: borderColor }}>{teacher}</span>
-                <span>{location}</span>
+            <div className="student-list">
+                {visibleStudents && visibleStudents.length > 0 ? (
+                    <ul className="student-names">
+                        {visibleStudents.map((student, index) => (
+                            <li key={index} className={student.absenceStatus ? 'student-absent' : 'student-present'}>
+                                {student.firstName}
+                            </li>
+                        ))}
+                        {extraStudents.length > 0 && (
+                            <Button
+                                onClick={handleMoreClick}
+                                className="more-students"
+                                style={{
+                                    padding: '0 4px',  // Minimal padding to keep text readable without extra space
+                                    fontSize: '0.7rem',
+                                    minWidth: 'auto',   // Ensure button doesn't take extra width
+                                    margin: 0,          // Remove any margin around the button
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}
+                            >
+                                + {extraStudents.length} more
+                            </Button>
+                        )}
+                    </ul>
+                ) : (
+                    <span className="no-students">No students</span>
+                )}
             </div>
+
+            {/* Dropdown Menu for extra students */}
+            <Menu
+                anchorEl={anchorEl}
+                open={Boolean(anchorEl)}
+                onClose={handleClose}
+                anchorOrigin={{
+                    vertical: "bottom",
+                    horizontal: "center",
+                }}
+                transformOrigin={{
+                    vertical: "top",
+                    horizontal: "center",
+                }}
+            >
+                {extraStudents.map((student, index) => (
+                    <MenuItem
+                        key={index}
+                        className={student.absenceStatus ? 'student-absent' : 'student-present'}
+                    >
+                        {student.firstName}
+                    </MenuItem>
+                ))}
+            </Menu>
         </div>
     );
 };

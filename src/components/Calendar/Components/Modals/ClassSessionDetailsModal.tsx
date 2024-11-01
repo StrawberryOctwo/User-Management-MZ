@@ -80,7 +80,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
             }
 
             setReportStatus(studentReportsStatus)
-      
+
 
 
         } catch (error) {
@@ -102,7 +102,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
             handleTeacherPayment();
         }
     }, [allReportsCompleted]);
-    
+
     const handleTeacherPayment = async () => {
         // Check if all reports are completed before proceeding with payment
         if (allReportsCompleted) {
@@ -110,7 +110,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                 // Check if payment was already made
                 const paymentStatusResponse = await getPaymentsForUserByClassSession(classSession.teacher.user.id, classSession.id);
                 console.log(paymentStatusResponse);
-    
+
                 if (paymentStatusResponse) {
                     console.log('Payment already sent, skipping payment creation');
                 } else {
@@ -129,7 +129,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
             console.log('Not all reports are completed; payment will not be triggered.');
         }
     };
-    
+
     const handleAddReport = (student: any) => {
         setSelectedStudent(student);
         setReportFormOpen(true);
@@ -302,7 +302,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                                     />
                                 )}
 
-   
+
 
                                 {selectedStudent && (
                                     <AbsenceTab
@@ -311,7 +311,6 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                                         student={selectedStudent}
                                         onClose={() => {
                                             handleCloseAbsenceModel();
-                                        
                                         }}
                                     />
                                 )}

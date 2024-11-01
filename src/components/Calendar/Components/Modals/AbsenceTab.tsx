@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, Typography, MenuItem, Select, FormControl, InputLabel, SelectChangeEvent } from '@mui/material';
 import { getAbsenceDetails, createOrUpdateAbsences } from 'src/services/absence';
+import { calendarsharedService } from '../../CalendarSharedService';
 
 interface AbsenceTabProps {
   classSessionId: string;
@@ -57,6 +58,7 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
         classSessionId,
         absenceId: isEditMode ? absenceId : undefined,
       });
+      calendarsharedService.emit('absenceUpdated');
       onClose();
     } catch (error) {
       console.error('Failed to submit absence:', error);
