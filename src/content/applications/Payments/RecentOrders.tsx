@@ -26,7 +26,6 @@ export default function ViewPaymentsPage() {
 
   useEffect(() => {
     if (userId) {
-      console.log(userId)
       loadPayments();
     } else {
       isMounted.current = true;

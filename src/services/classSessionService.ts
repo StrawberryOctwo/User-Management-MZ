@@ -1,6 +1,7 @@
 import { api } from "./api";
 
 export const fetchClassSessions = async (startDate: string, endDate: string, locationIds: number | number[]) => {
+    console.log("herer")
     try {
         const response = await api.get(`/class-sessions`, {
             params: {
@@ -61,7 +62,6 @@ export const fetchClassSessionById = async (id: string) => {
 };
 
 export const updateClassSession = async (id: string, updatedData: any) => {
-    console.log(updatedData)
     try {
         const response = await api.put(`/class-session/${id}`, updatedData);
         return response.data;

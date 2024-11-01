@@ -64,7 +64,6 @@ const CalendarContent: React.FC = () => {
         absenceStatus: student.absenceStatus, // Assuming absenceStatus is directly available on each student
       }));
 
-      console.log(studentsWithStatus)
       return {
         start: moment(session.sessionStartDate).toDate(),
         end: moment(session.sessionEndDate).toDate(),
@@ -92,7 +91,7 @@ const CalendarContent: React.FC = () => {
 
 
   const loadClassSessions = async () => {
-    console.log("loadClassSessions called"); // Log when loadClassSessions is called
+    console.log("loadClassSessions called");
 
     setLoading(true);
     setErrorMessage(null);
@@ -122,7 +121,6 @@ const CalendarContent: React.FC = () => {
 
       const events = transformClassSessionsToEvents(response.data);
 
-      console.log(events)
       setClassSessionEvents(events);
     } catch (error) {
       console.error('Failed to load class sessions', error);

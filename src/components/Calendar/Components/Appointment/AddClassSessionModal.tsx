@@ -151,7 +151,6 @@ export default function AddClassSessionModal({
         new Date(newSession.sessionEndDate),
         repeatUntilDate
       );
-      console.log(generatedSessions)
       onSave(generatedSessions);
     } else {
       onSave([newSession]);

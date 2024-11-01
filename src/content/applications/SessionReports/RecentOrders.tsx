@@ -2,7 +2,6 @@ import { Box, Button, CircularProgress, Switch } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
-import { useNavigate } from 'react-router-dom';
 import { useAuth } from 'src/hooks/useAuth';
 import { fetchParentSessionReports } from 'src/services/parentService';
 import ViewSessionReportForm from 'src/components/Calendar/Components/Modals/ViewSessionReport';
@@ -22,12 +21,10 @@ export default function ViewSessionReports() {
   const isMounted = useRef(false);
 
 
-  const navigate = useNavigate();
   const { userId } = useAuth();
 
   useEffect(() => {
     if (userId) {
-      console.log(userId)
       loadSessionReports();
     } else {
       isMounted.current = true;

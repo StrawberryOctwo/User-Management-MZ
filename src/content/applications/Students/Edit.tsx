@@ -80,7 +80,6 @@ const EditStudent = () => {
     };
 
     const handleParentSelect = (parent: any) => {
-        console.log(parent)
         setSelectedParentId(parent ? parent.id : null);
     };
 

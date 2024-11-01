@@ -109,7 +109,6 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
             try {
                 // Check if payment was already made
                 const paymentStatusResponse = await getPaymentsForUserByClassSession(classSession.teacher.user.id, classSession.id);
-                console.log(paymentStatusResponse);
 
                 if (paymentStatusResponse) {
                     console.log('Payment already sent, skipping payment creation');

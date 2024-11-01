@@ -23,7 +23,6 @@ export default function ViewInvoices() {
   // Handle component mount and unmount
   useEffect(() => {
     if (userId) {
-      console.log(userId)
       loadUserInvoices();
     }
     else {
