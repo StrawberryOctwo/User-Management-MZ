@@ -13,7 +13,7 @@ import { getStrongestRoles } from 'src/hooks/roleUtils';
 import { addClassSessions, fetchClassSessions, fetchParentClassSessions, fetchUserClassSessions } from 'src/services/classSessionService';
 
 const CalendarContent: React.FC = () => {
-  const [classSessionEvents, setClassSessionEvents] = useState<EventItem[]>([]);
+  const [classSessionEvents, setClassSessionEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [startDate, setStartDate] = useState<string>(moment().startOf('month').format('YYYY-MM-DD'));
