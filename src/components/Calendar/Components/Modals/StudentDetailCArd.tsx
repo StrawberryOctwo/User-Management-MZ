@@ -27,7 +27,6 @@ const StudentDetailCard: React.FC<StudentDetailCardProps> = ({
     // Find the absence related to the specific class session
     const sessionAbsence = student.absences?.find((absence: any) => absence.classSession.id === classSessionId) || null;
     const absenceLabel = sessionAbsence ? (sessionAbsence.status ? 'Absent' : 'Present') : 'Present';
-
     return (
         <Card variant="outlined" sx={{ mb: 2, mt: 1 }}>
             <Box display="flex" justifyContent="space-between" alignItems="center" padding={1.5}>
@@ -50,27 +49,19 @@ const StudentDetailCard: React.FC<StudentDetailCardProps> = ({
                         {absenceLabel}
                     </Button>
 
-                    {reportCompleted ? (
+                    
+                    {reportCompleted && !sessionAbsence.status ? (
                         <Button variant="outlined" color="primary" onClick={onViewReport} sx={{ mr: 1 }}>
                             View Report
                         </Button>
                     ) : (
-                        !canAddReport && (
+                        !canAddReport && !sessionAbsence.status && (
                             <Button variant="outlined" color="primary" onClick={onAddReport} sx={{ mr: 1 }}>
                                 Add Report
                             </Button>
                         )
                     )}
-                    {/* Enable View Payment button if report is completed */}
-                    <Button
-                        variant="outlined"
-                        color="secondary"
-                        onClick={onViewPayment}
-                        disabled={!reportCompleted}
-                        sx={{ mr: 1 }}
-                    >
-                        View Payment
-                    </Button>
+
 
                     <IconButton disabled={true}>
                         <CircleIcon sx={{ color: reportCompleted ? 'green' : 'red' }} />

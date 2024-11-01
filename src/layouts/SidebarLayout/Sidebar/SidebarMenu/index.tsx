@@ -306,7 +306,7 @@ function SidebarMenu() {
               </ProtectedListItem>
 
               <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher']}
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin']}
               >
                 <ListItem component="div">
                   <Button
@@ -369,7 +369,7 @@ function SidebarMenu() {
                 </ListItem>
               </ProtectedListItem>
               <ProtectedListItem
-                allowedRoles={['Teacher', 'Parent']}
+                allowedRoles={['Parent']}
               >
                 <ListItem component="div">
                   <Button
@@ -384,7 +384,7 @@ function SidebarMenu() {
                 </ListItem>
               </ProtectedListItem>
               <ProtectedListItem
-                allowedRoles={['Teacher', 'Parent']}
+                allowedRoles={[ 'Parent']}
               >
                 <ListItem component="div">
                   <Button

@@ -48,7 +48,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     const [loading, setLoading] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [reportStatus, setReportStatus] = useState<{ [studentId: string]: { reportCompleted: boolean, reportId: string | null } }>({});
-    const [allReportsCompleted, setAllReportsCompleted] = useState<boolean>(false);
+    let [allReportsCompleted, setAllReportsCompleted] = useState<boolean>(false);
     const [isReportFormOpen, setReportFormOpen] = useState<boolean>(false);
     const [isViewReportFormOpen, setViewReportFormOpen] = useState<boolean>(false);
     const [isViewPaymentModalOpen, setViewPaymentModalOpen] = useState<boolean>(false);
@@ -68,6 +68,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
             setClassSession(response);
 
             const reportResponse = await getClassSessionReportsStatus(appointmentId);
+            console.log(reportResponse)
             setAllReportsCompleted(reportResponse.allReportsCompleted);
 
             const studentReportsStatus: { [studentId: string]: { reportCompleted: boolean, reportId: string | null } } = {};
@@ -81,13 +82,11 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
 
             setReportStatus(studentReportsStatus);
 
-            // Now check if all reports are completed
-            const allReportsComplete = Object.values(studentReportsStatus).every(status => status.reportCompleted);
-            setAllReportsCompleted(allReportsComplete);
+
 
 
             // If all reports are completed, check if payment was already made
-            if (allReportsComplete) {
+            if (allReportsCompleted) {
                 const paymentStatusResponse = await getPaymentsForUserByClassSession(response.teacher.user.id, response.id)
                 console.log(paymentStatusResponse);
                 if (paymentStatusResponse) {
@@ -286,16 +285,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                                     />
                                 )}
 
-                                {/* View Payment Details Modal */}
-                                {selectedStudent && (
-                                    <ViewPaymentDetails
-                                        isOpen={isViewPaymentModalOpen}
-                                        onClose={() => setViewPaymentModalOpen(false)}
-                                        userId={selectedStudent.user.id}
-                                        studentName={`${selectedStudent.user.firstName} ${selectedStudent.user.lastName}`}
-                                        sessionId={classSession.id}
-                                    />
-                                )}
+   
 
                                 {selectedStudent && (
                                     <AbsenceTab
