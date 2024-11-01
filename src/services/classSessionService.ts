@@ -1,7 +1,6 @@
 import { api } from "./api";
 
 export const fetchClassSessions = async (startDate: string, endDate: string, locationIds: number | number[]) => {
-    console.log("herer")
     try {
         const response = await api.get(`/class-sessions`, {
             params: {

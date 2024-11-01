@@ -27,6 +27,11 @@ import FullCalendar from "@fullcalendar/react";
 import resourceTimelinePlugin from '@fullcalendar/resource-timeline';
 import EventItem from "../Appointment/EventItem";
 
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
+
+
 export enum TimeSlotMinutes {
   Five = 5,
   Ten = 10,
@@ -70,6 +75,7 @@ export default function CustomizedCalendar({
   const [canAddReport, setCanAddReport] = useState<boolean | null>(false);
   const [events, setEvents] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState("");
   const [selectedRange, setSelectedRange] = useState<{ start: Date; end: Date }>({
     start: new Date(),
     end: new Date(),
@@ -215,10 +221,11 @@ export default function CustomizedCalendar({
   }, [classSessionEvents]);
 
 
-  const handleOpenAddModal = (start: Date, end: Date) => {
+  const handleOpenAddModal = (start: Date, end: Date, roomId: string) => {
     if (strongestRoles[0] == 'Student' || strongestRoles[0] == 'Parent') {
       return
     }
+    setSelectedRoom(roomId);
     setSelectedRange({ start, end });
     setIsAddModalOpen(true);
   };
@@ -241,11 +248,15 @@ export default function CustomizedCalendar({
     return <EventItem eventInfo={eventInfo} />;
   };
 
+  const handleDateSelect = (info) => {
+    console.log('Selected range:', info.startStr, 'to', info.endStr);
+    alert(`Selected range: ${info.startStr} to ${info.endStr}`);
+  };
 
   return (
     <Box display="flex" flexDirection="column" height="100%" width="100%" gap={2} p={2}>
       <FullCalendar
-        plugins={[resourceTimelinePlugin]}
+        plugins={[resourceTimelinePlugin, dayGridPlugin, timeGridPlugin, interactionPlugin]}
         schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
         initialView="resourceTimelineDay"
         headerToolbar={{
@@ -253,20 +264,29 @@ export default function CustomizedCalendar({
           center: "title",
           right: ""
         }}
-        // height='auto'
         resources={resources}
         events={events}
         eventContent={renderEventContent} // Use custom event content
         slotMinTime="08:00:00"
         slotMaxTime="18:00:00"
         resourceAreaWidth="100px"
+        selectable={true}
+        selectMirror={true}
+        // editable={true}
+        selectOverlap={(event) => {
+          return true;
+        }}
         eventClick={(info) => handleEventClick(info.event)}
+        select={(info) => {
+          handleOpenAddModal(info.start, info.end, info.resource.id);
+        }}
         views={{
           resourceTimelineDay: {
             slotMinWidth: 120,
           }
         }}
       />
+
 
       <EditAppointmentModal
         isOpen={isModalOpen}
@@ -282,7 +302,7 @@ export default function CustomizedCalendar({
         onSave={handleSaveClassSession}
         initialStartDate={selectedRange.start}
         initialEndDate={selectedRange.end}
-      />
+        roomId={selectedRoom} />
 
       <ClassSessionDetailsModal
         isOpen={isDetailsModalOpen}

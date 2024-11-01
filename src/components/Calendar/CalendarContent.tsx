@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
 import CustomizedCalendar from "./Components/CustomizedCalendar/CustomizedCalendar";
@@ -21,26 +21,34 @@ const CalendarContent: React.FC = () => {
   const [endDate, setEndDate] = useState<string>(moment().endOf('month').format('YYYY-MM-DD'));
   const [selectedFranchise, setSelectedFranchise] = useState<any | null>(null);
   const [selectedLocations, setSelectedLocations] = useState<any[]>([]); // Updated to array
+  const [strongestRole, setStrongestRole] = useState<string | null>(null);
 
   const { userId, userRoles } = useAuth();
-  const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
-  const strongestRole = strongestRoles.includes('SuperAdmin')
-    ? 'SuperAdmin'
-    : strongestRoles.includes('FranchiseAdmin')
-      ? 'FranchiseAdmin'
-      : strongestRoles.includes('LocationAdmin')
-        ? 'LocationAdmin'
-        : strongestRoles.includes('Teacher')
-          ? 'Teacher'
-          : strongestRoles.includes('Parent')
-            ? 'Parent'
-            : strongestRoles.includes('Student')
-              ? 'Student'
-              : null;
+  // const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
+
+  useEffect(() => {
+    if (userRoles) {
+      const roles = getStrongestRoles(userRoles);
+      const role = roles.includes('SuperAdmin')
+        ? 'SuperAdmin'
+        : roles.includes('FranchiseAdmin')
+          ? 'FranchiseAdmin'
+          : roles.includes('LocationAdmin')
+            ? 'LocationAdmin'
+            : roles.includes('Teacher')
+              ? 'Teacher'
+              : roles.includes('Parent')
+                ? 'Parent'
+                : roles.includes('Student')
+                  ? 'Student'
+                  : null;
+      setStrongestRole(role);
+    }
+  }, [userRoles]);
 
   useEffect(() => {
     const savedFranchise = localStorage.getItem('selectedFranchise');
-    const savedLocations = localStorage.getItem('selectedLocations'); // Updated to locations
+    const savedLocations = localStorage.getItem('selectedLocations');
 
     if (savedFranchise) {
       setSelectedFranchise(JSON.parse(savedFranchise));
@@ -50,6 +58,23 @@ const CalendarContent: React.FC = () => {
     }
   }, []);
 
+
+  useEffect(() => {
+    const onAbsenceUpdated = () => {
+      const storedLocations = JSON.parse(localStorage.getItem('selectedLocations') || '[]');
+      if (storedLocations.length > 0) {
+        setSelectedLocations(storedLocations);
+      }
+      loadClassSessions(storedLocations);
+    };
+
+    calendarsharedService.on('absenceUpdated', onAbsenceUpdated);
+
+    return () => {
+      calendarsharedService.off('absenceUpdated', onAbsenceUpdated);
+    };
+  }, []);
+
   const transformClassSessionsToEvents = (classSessions: any[]): EventItem[] => {
     return classSessions.map((session) => {
       const resource = session.teacher?.id || 1;
@@ -57,11 +82,9 @@ const CalendarContent: React.FC = () => {
         ? `${session.teacher.user.firstName} ${session.teacher.user.lastName}`
         : "Unknown Teacher";
 
-      // Map students to an array of first names
-      const studentFirstNames = session.students.map((student) => student.firstName);
       const studentsWithStatus = session.students.map((student) => ({
         firstName: student.firstName,
-        absenceStatus: student.absenceStatus, // Assuming absenceStatus is directly available on each student
+        absenceStatus: student.absenceStatus,
       }));
 
       return {
@@ -90,15 +113,16 @@ const CalendarContent: React.FC = () => {
   };
 
 
-  const loadClassSessions = async () => {
-    console.log("loadClassSessions called");
 
+  const loadClassSessions = async (locations = selectedLocations) => {
     setLoading(true);
     setErrorMessage(null);
 
     try {
       let response;
-      const locationIds = selectedLocations.map(location => location.id); // Pass as array
+      const locationIds = locations.map(location => location.id);
+
+      console.log(strongestRole)
 
       switch (strongestRole) {
         case 'Teacher':
@@ -109,30 +133,32 @@ const CalendarContent: React.FC = () => {
           response = await fetchParentClassSessions(userId?.toString() || '', startDate, endDate);
           break;
         case 'SuperAdmin':
-
         case 'FranchiseAdmin':
         case 'LocationAdmin':
-          if (selectedLocations.length === 0) return;
+          if (locations.length === 0) {
+            return;
+          }
           response = await fetchClassSessions(startDate, endDate, locationIds);
           break;
         default:
-          throw new Error('Invalid role');
+          console.error("Invalid role: Unrecognized role encountered.");
+          throw new Error("Invalid role");
       }
 
       const events = transformClassSessionsToEvents(response.data);
-
       setClassSessionEvents(events);
     } catch (error) {
-      console.error('Failed to load class sessions', error);
-      setErrorMessage('Failed to load class sessions. Please try again.');
+      console.error("Failed to load class sessions", error);
+      setErrorMessage("Failed to load class sessions. Please try again.");
     } finally {
       setLoading(false);
     }
   };
 
+
+
   useEffect(() => {
     const onAbsenceUpdated = () => {
-      console.log("Event 'absenceUpdated' received"); // Log when event is received
       loadClassSessions();
     };
 
@@ -189,7 +215,7 @@ const CalendarContent: React.FC = () => {
     if (strongestRole && (strongestRole !== 'SuperAdmin' || selectedLocations.length > 0)) {
       loadClassSessions();
     }
-  }, [startDate, endDate, selectedFranchise, selectedLocations]);
+  }, [startDate, endDate, selectedFranchise, selectedLocations, strongestRole]);
 
   return (
     <Box sx={{ position: 'relative', height: '74vh' }}>

@@ -48,12 +48,14 @@ export default function AddClassSessionModal({
   onSave,
   initialStartDate,
   initialEndDate,
+  roomId
 }: {
   isOpen: boolean;
   onClose: () => void;
   onSave: (newSession: any) => void;
   initialStartDate: Date;
   initialEndDate: Date;
+  roomId?: string | number;
 }) {
   const [newSession, setNewSession] = useState<ClassSession>({
     name: '',
@@ -273,26 +275,24 @@ export default function AddClassSessionModal({
     <Dialog open={isOpen} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>Add Class Session</DialogTitle>
       <DialogContent>
-      <Box sx={{ mb: 2 }}>
-        <FormControl fullWidth>
-          <InputLabel>Room</InputLabel>
-          <Select
-            label="Room"
-            value={newSession.name || ""}
-            onChange={(e) =>
-              setNewSession({ ...newSession, name: e.target.value })
-            }
-          >
-            {Array.from({ length: 7 }, (_, index) => (
-              <MenuItem key={index} value={`R${index + 1}`}>
-                {`R${index + 1}`}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-      </Box>
-
-
+        <Box sx={{ mb: 2 }}>
+          <FormControl fullWidth>
+            <InputLabel>Room</InputLabel>
+            <Select
+              label="Room"
+              value={newSession.name || ""} // Use newSession.name for room selection
+              onChange={(e) =>
+                setNewSession({ ...newSession, name: e.target.value })
+              }
+            >
+              {Array.from({ length: 7 }, (_, index) => (
+                <MenuItem key={index} value={`R${index + 1}`}>
+                  {`R${index + 1}`}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
 
         <Box sx={{ mb: 2 }}>
           <FormControl fullWidth>
