@@ -274,18 +274,25 @@ export default function AddClassSessionModal({
     <Dialog open={isOpen} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>Add Class Session</DialogTitle>
       <DialogContent>
-        <Box sx={{ mb: 2, mt: 2 }}>
-          <TextField
-            label="Class Name"
-            fullWidth
-            value={newSession.name}
+      <Box sx={{ mb: 2 }}>
+        <FormControl fullWidth>
+          <InputLabel>Room</InputLabel>
+          <Select
+            label="Room"
+            value={newSession.name || ""}
             onChange={(e) =>
               setNewSession({ ...newSession, name: e.target.value })
             }
-            error={!!fieldErrors.name}
-            helperText={fieldErrors.name}
-          />
-        </Box>
+          >
+            {Array.from({ length: 7 }, (_, index) => (
+              <MenuItem key={index} value={`R${index + 1}`}>
+                {`R${index + 1}`}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
+      </Box>
+
 
 
         <Box sx={{ mb: 2 }}>

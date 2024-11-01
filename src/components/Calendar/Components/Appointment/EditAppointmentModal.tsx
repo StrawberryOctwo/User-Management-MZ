@@ -216,18 +216,26 @@ export default function EditAppointmentModal({
         ) : (
           editedAppointment && (
             <Box>
-              <TextField
-                label="Class Name"
-                value={editedAppointment.name || ""}
-                onChange={(e) =>
-                  setEditedAppointment({ ...editedAppointment, name: e.target.value })
-                }
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                error={!!fieldErrors.name}
-                helperText={fieldErrors.name}
-              />
+              <Box sx={{ mb: 2 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Room</InputLabel>
+                  <Select
+                    label="Room"
+                    value={editedAppointment.name || ""}
+                    onChange={(e) =>
+                      setEditedAppointment({ ...editedAppointment, name: e.target.value })
+                    }
+                  >
+                    {Array.from({ length: 7 }, (_, index) => (
+                      <MenuItem key={index} value={`R${index + 1}`}>
+                        {`R${index + 1}`}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+
+
 
               <FormControl fullWidth margin="normal">
                 <InputLabel>Session Type</InputLabel>
