@@ -26,26 +26,3 @@ api.interceptors.request.use(
     return Promise.reject(error);
   }
 );
-// Set up Axios interceptors globally
-// export const useAxiosInterceptors = () => {
-//   const { showMessage } = useSnackbar();
-
-//   api.interceptors.response.use(
-//     (response) => {
-//       console.log(response.data)
-//       if (response.data?.message) {
-//         showMessage(response.data.message, 'success');
-//       }
-//       return response;
-//     },
-//     (error) => {
-//       if (error.response?.data?.message?.includes('TokenExpiredError')) {
-//         triggerSessionExpiration();
-//       }
-
-//       const errorMessage = error.response?.data?.message || 'An error occurred';
-//       // showMessage(errorMessage, 'error');
-//       return Promise.reject(error);
-//     }
-//   );
-// };

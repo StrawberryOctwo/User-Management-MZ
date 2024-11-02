@@ -8,7 +8,6 @@ export const createOrUpdateAbsences = async (absenceData: {
     status: boolean;
     absenceId: number
 }) => {
-    console.log(absenceData)
     try {
         const response = await api.post('students/absences', absenceData); // POST request to /absences
         return response.data;

@@ -235,22 +235,17 @@ export default function CustomizedCalendar({
   };
 
   const resources = [
-    { id: '31', title: 'Room 1' },
-    { id: 'room2', title: 'Room 2' },
-    { id: 'room3', title: 'Room 3' },
-    { id: 'room4', title: 'Room 4' },
-    { id: 'room5', title: 'Room 5' },
-    { id: 'room6', title: 'Room 6' },
-    { id: 'room7', title: 'Room 7' },
+    { id: 'R1', title: 'Room 1' },
+    { id: 'R2', title: 'Room 2' },
+    { id: 'R3', title: 'Room 3' },
+    { id: 'R4', title: 'Room 4' },
+    { id: 'R5', title: 'Room 5' },
+    { id: 'R6', title: 'Room 6' },
+    { id: 'R7', title: 'Room 7' },
   ];
 
   const renderEventContent = (eventInfo) => {
     return <EventItem eventInfo={eventInfo} />;
-  };
-
-  const handleDateSelect = (info) => {
-    console.log('Selected range:', info.startStr, 'to', info.endStr);
-    alert(`Selected range: ${info.startStr} to ${info.endStr}`);
   };
 
   return (

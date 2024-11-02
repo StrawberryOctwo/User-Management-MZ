@@ -213,6 +213,12 @@ export default function AddClassSessionModal({
     }));
   }, [initialStartDate, initialEndDate]);
 
+  useEffect(() => {
+    if (roomId) {
+      setNewSession((prev) => ({ ...prev, name: roomId as string }));
+    }
+  }, [roomId]);
+
   const clearForm = () => {
     setSelectedStudents([]);
     setSelectedTeacher(null);

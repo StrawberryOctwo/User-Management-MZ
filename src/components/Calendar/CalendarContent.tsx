@@ -77,7 +77,7 @@ const CalendarContent: React.FC = () => {
 
   const transformClassSessionsToEvents = (classSessions: any[]): EventItem[] => {
     return classSessions.map((session) => {
-      const resource = session.teacher?.id || 1;
+      const resource = session.name || 1;
       const teacherName = session.teacher?.user
         ? `${session.teacher.user.firstName} ${session.teacher.user.lastName}`
         : "Unknown Teacher";
@@ -96,7 +96,7 @@ const CalendarContent: React.FC = () => {
             status: session.isActive ? "CI" : "P",
             location: session.location?.name || "Unknown Location",
             topic: session.topic?.name || "Unknown Topic",
-            resource: session.teacher?.idNumber || "Unknown Teacher",
+            resource: session.name || "Unknown Teacher",
             address: session.location || "Unknown address",
             className: session.name,
             teacher: teacherName,
@@ -121,9 +121,6 @@ const CalendarContent: React.FC = () => {
     try {
       let response;
       const locationIds = locations.map(location => location.id);
-
-      console.log(strongestRole)
-
       switch (strongestRole) {
         case 'Teacher':
         case 'Student':

@@ -46,7 +46,6 @@ const AddSessionReportForm: React.FC<AddSessionReportFormProps> = ({ isOpen, onC
                 const paymentDetails = await getStudentPaymentDetails(studentId);
                 setGroupSessionPrice(paymentDetails.groupSessionPrice);
                 setIndividualSessionPrice(paymentDetails.individualSessionPrice);
-                console.log(paymentDetails);
             } catch (error) {
                 console.error('Error fetching session or payment details:', error);
             }
