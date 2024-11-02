@@ -115,8 +115,16 @@ export default function AddClassSessionModal({
     if (!newSession.sessionEndDate) errors.sessionEndDate = t('errors.endTimeRequired');
     if (!selectedTeacher) errors.teacherId = t('errors.teacherSelectionRequired');
     if (!selectedTopic) errors.topicId = t('errors.topicSelectionRequired');
-    if (!selectedLocation) {
-      errors.locationId = t('errors.locationSelectionRequired');
+    if (!selectedLocation) errors.locationId = t('errors.locationSelectionRequired');
+
+    // Calculate and validate session duration
+    const start = new Date(newSession.sessionStartDate);
+    const end = new Date(newSession.sessionEndDate);
+    const durationMinutes = (end.getTime() - start.getTime()) / (1000 * 60);
+
+    const allowedDurations = [45, 60, 90, 120];
+    if (!allowedDurations.includes(durationMinutes)) {
+      errors.duration = t('errors.invalidDuration', { allowed: allowedDurations.join(', ') });
     }
 
     const { validatedStudents, error } = validateStudentSelection(
@@ -139,8 +147,8 @@ export default function AddClassSessionModal({
 
     setFieldErrors(errors);
 
-    const isStartTimeValid = validateTime(new Date(newSession.sessionStartDate), 'start');
-    const isEndTimeValid = validateTime(new Date(newSession.sessionEndDate), 'end');
+    const isStartTimeValid = validateTime(start, 'start');
+    const isEndTimeValid = validateTime(end, 'end');
 
     if (
       Object.values(errors).some((error) => error !== null) ||
@@ -151,11 +159,7 @@ export default function AddClassSessionModal({
     }
 
     if (isRepeat && repeatUntilDate) {
-      const generatedSessions = generateRepeatedSessions(
-        new Date(newSession.sessionStartDate),
-        new Date(newSession.sessionEndDate),
-        repeatUntilDate
-      );
+      const generatedSessions = generateRepeatedSessions(start, end, repeatUntilDate);
       onSave(generatedSessions);
     } else {
       onSave([newSession]);
@@ -164,6 +168,7 @@ export default function AddClassSessionModal({
     clearForm();
     onClose();
   };
+
 
 
   const generateRepeatedSessions = (
@@ -355,6 +360,11 @@ export default function AddClassSessionModal({
             helperText={fieldErrors.sessionEndDate || endTimeError}
           />
         </Box>
+        {fieldErrors.duration && (
+          <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+            {fieldErrors.duration}
+          </Typography>
+        )}
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3, ml: 1 }}>
           <FormControlLabel
