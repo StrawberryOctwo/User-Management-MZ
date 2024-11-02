@@ -108,7 +108,6 @@ export default function AddClassSessionModal({
 
   const handleSave = () => {
     const errors: { [key: string]: string | null } = {};
-    const sessionArray: ClassSession[] = [];
 
     // Validate required fields
     if (!newSession.name.trim()) errors.name = t('errors.classNameRequired');
@@ -116,8 +115,8 @@ export default function AddClassSessionModal({
     if (!newSession.sessionEndDate) errors.sessionEndDate = t('errors.endTimeRequired');
     if (!selectedTeacher) errors.teacherId = t('errors.teacherSelectionRequired');
     if (!selectedTopic) errors.topicId = t('errors.topicSelectionRequired');
-    if (strongestRoles.includes('Teacher') && !selectedLocation) {
-      errors.locationId = t('errors.locationSelectionRequired'); // Add error if location is not selected
+    if (!selectedLocation) {
+      errors.locationId = t('errors.locationSelectionRequired');
     }
 
     const { validatedStudents, error } = validateStudentSelection(
@@ -131,6 +130,11 @@ export default function AddClassSessionModal({
       errors.studentIds = error;
     } else {
       setStudentError(null);
+      // Update newSession with validated student IDs
+      setNewSession((prevSession) => ({
+        ...prevSession,
+        studentIds: validatedStudents.map((student) => student.id),
+      }));
     }
 
     setFieldErrors(errors);
@@ -138,13 +142,12 @@ export default function AddClassSessionModal({
     const isStartTimeValid = validateTime(new Date(newSession.sessionStartDate), 'start');
     const isEndTimeValid = validateTime(new Date(newSession.sessionEndDate), 'end');
 
-    // Check for any errors or invalid times
     if (
       Object.values(errors).some((error) => error !== null) ||
       !isStartTimeValid ||
       !isEndTimeValid
     ) {
-      return; // Exit if any validation fails
+      return;
     }
 
     if (isRepeat && repeatUntilDate) {
@@ -161,6 +164,7 @@ export default function AddClassSessionModal({
     clearForm();
     onClose();
   };
+
 
   const generateRepeatedSessions = (
     startDate: Date,
