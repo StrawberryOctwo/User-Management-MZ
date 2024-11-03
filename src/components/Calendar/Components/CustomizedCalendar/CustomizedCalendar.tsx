@@ -201,24 +201,30 @@ export default function CustomizedCalendar({
 
   useEffect(() => {
     // Map classSessionEvents to FullCalendar's event structure
-    const mappedEvents = classSessionEvents.map((session) => ({
-      id: session.data.appointment.id,
-      resourceId: session.resourceId,
-      title: session.data.appointment.topic, // Using topic as the title
-      start: session.start,
-      end: session.end,
-      extendedProps: {
-        topicName: session.data.appointment.topic || "No Topic",
-        teacher: session.data.appointment.teacher,
-        location: session.data.appointment.location,
-        sessionType: session.data.appointment.sessionType,
-        students: session.data.appointment.students,
-      },
-    }));
+    const mappedEvents = classSessionEvents.map((session) => {
+      // Extract and format the teacher's name to "F. LastName"
+      const [firstName, lastName] = session.data.appointment.teacher.split(' ');
+      const formattedTeacher = `${firstName[0]}. ${lastName}`;
 
+      return {
+        id: session.data.appointment.id,
+        resourceId: session.resourceId,
+        title: session.data.appointment.topic, // Using topic as the title
+        start: session.start,
+        end: session.end,
+        extendedProps: {
+          topicName: session.data.appointment.topic || "No Topic",
+          teacher: formattedTeacher, // Assigning the formatted name
+          location: session.data.appointment.location,
+          sessionType: session.data.appointment.sessionType,
+          students: session.data.appointment.students,
+        },
+      };
+    });
 
     setEvents(mappedEvents);
   }, [classSessionEvents]);
+
 
 
   const handleOpenAddModal = (start: Date, end: Date, roomId: string) => {
@@ -255,9 +261,9 @@ export default function CustomizedCalendar({
         schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
         initialView="resourceTimelineDay"
         headerToolbar={{
-          left: "prev,next today",
-          center: "title",
-          right: ""
+          left: "today", // Move "today" button to the left
+          center: "prev title next", // Center title with arrows on each side
+          right: "" // Empty right section
         }}
         resources={resources}
         events={events}
