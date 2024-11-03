@@ -261,9 +261,9 @@ export default function CustomizedCalendar({
         schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
         initialView="resourceTimelineDay"
         headerToolbar={{
-          left: "today", // Move "today" button to the left
+          left: "", // Move "today" button to the left
           center: "prev title next", // Center title with arrows on each side
-          right: "" // Empty right section
+          right: "today" // Empty right section
         }}
         resources={resources}
         events={events}

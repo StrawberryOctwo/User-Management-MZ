@@ -23,6 +23,9 @@
   font-size: 1.5rem;
   font-weight: 600;
   color: #333333;
+  font-size: 1.6rem;
+  font-weight: 600;
+  margin: 0 8px;
 }
 
 .fc-toolbar .fc-button-group .fc-button,
@@ -41,8 +44,10 @@
 }
 
 .fc-button.fc-button-primary {
-  background-color: #4f46e5;
+  background-color: #5569ff;
   color: #ffffff;
+  border-radius: 10px;
+  padding: 10px 20px;
 }
 
 /* Calendar grid */
@@ -52,10 +57,12 @@
   border-color: #e0e0e0;
 }
 
-/* Current date highlight */
-.fc-day-today {
-  background-color: rgba(79, 70, 229, 0.1);
-  border-radius: 6px;
+.fc-today-button::first-letter {
+  text-transform: uppercase; /* Capitalize the first letter */
+}
+
+.fc-today-button:hover {
+  background-color: #7586ff !important; /* Slightly lighter shade */
 }
 
 /* Adjustments for room/resource layout */
@@ -128,10 +135,11 @@
 .fc-resource-area .fc-cell-text {
   font-size: 1.1rem; /* Make resource names larger */
   font-weight: 500;
-  padding-left: 10px; /* Add padding for better readability */
+  padding-left: 10px;
 }
 /* Scrollgrid styling for a cohesive border look */
-.fc-scrollgrid, .fc-scrollgrid-liquid {
+.fc-scrollgrid,
+.fc-scrollgrid-liquid {
   border-collapse: separate;
   border-spacing: 0;
   border-radius: 12px; /* Match the border radius of the main container */
@@ -140,7 +148,8 @@
 }
 
 /* Borders within the grid */
-.fc-scrollgrid td, .fc-scrollgrid th {
+.fc-scrollgrid td,
+.fc-scrollgrid th {
   border: 1px solid #e0e0e0; /* Light border for grid cells */
   padding: 8px;
 }
@@ -163,7 +172,9 @@
 }
 
 /* Horizontal and vertical grid lines */
-.fc-daygrid-day, .fc-timegrid-slot, .fc-resource-area {
+.fc-daygrid-day,
+.fc-timegrid-slot,
+.fc-resource-area {
   border-color: #e0e0e0;
 }
 
@@ -179,4 +190,38 @@
 
 .fc-timegrid-now-indicator-container {
   position: relative;
+}
+
+/* Center-align title and arrows */
+.fc-header-toolbar .fc-toolbar-chunk {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+/* Style for navigation buttons without background color */
+.fc .fc-next-button,
+.fc .fc-prev-button {
+  background: transparent;
+  border: none;
+  color: #3b82f6; /* Text color for arrows */
+  font-size: 1.2rem;
+  padding: 6px 12px;
+  cursor: pointer;
+  transition: color 0.2s, transform 0.2s;
+}
+
+/* Hover effect for navigation buttons */
+.fc .fc-next-button:hover,
+.fc .fc-prev-button:hover {
+  color: #2563eb; /* Darker color on hover */
+  transform: scale(1.1); /* Slight scale effect on hover */
+  background-color: #eee;
+}
+
+/* Remove outline on focus */
+.fc .fc-next-button:focus,
+.fc .fc-prev-button:focus {
+  outline: none !important;
 }
