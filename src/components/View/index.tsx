@@ -9,10 +9,12 @@ interface DetailFieldConfig {
     section?: string;
     component?: React.ReactNode | ((data: any) => React.ReactNode);
     isArray?: boolean;
-    isTable?: boolean; // New flag to decide between table or list (default true)
+    isTable?: boolean; // Flag to decide between table or list (default true)
+    isTextArray?: boolean; // New flag to display array as simple text
     linkUrl?: (id: number) => string; // URL generator function for clickable items
     columns?: { field: string; headerName: string }[];
 }
+
 
 interface ReusableDetailsProps {
     fields: DetailFieldConfig[];
@@ -43,7 +45,11 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({ fields, data, entityN
                         {fields.map((field) => (
                             <Grid item xs={12} key={field.name}>
                                 {field.isArray ? (
-                                    field.isTable !== false ? (
+                                    field.isTextArray ? (
+                                        <Typography variant="body2" sx={{ ml: 1 }}>
+                                            {field.label}: {(data[field.name] as Array<any>).map((item) => item.name).join(', ')}
+                                        </Typography>
+                                    ) : field.isTable !== false ? (
                                         <DataGrid
                                             autoHeight
                                             rows={data[field.name] || []}
@@ -75,7 +81,6 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({ fields, data, entityN
                                                 '& .MuiDataGrid-cell:focus-within': { outline: 'none' },
                                             }}
                                         />
-
                                     ) : (
                                         <Box sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', ml: 1 }}>
                                             {(data[field.name] as Array<any>).map((item) => (
@@ -109,6 +114,7 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({ fields, data, entityN
         </Paper>
     );
 };
+
 
 function CustomToolbar() {
     return (

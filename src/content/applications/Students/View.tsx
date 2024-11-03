@@ -116,6 +116,13 @@ const ViewStudentPage: React.FC = () => {
         { name: 'availableDates', label: t('available_dates'), section: t('student_details') },
         { name: 'created_at', label: t('created_date'), section: t('student_details') },
         {
+            name: 'locations',
+            label: t('locations'),
+            section: t('student_details'),
+            isArray: true,
+            isTextArray: true, // Display locations as comma-separated text
+        },
+        {
             name: 'sessionReports',
             label: t('session_reports'),
             section: t('session_reports'),
