@@ -131,11 +131,10 @@ body, .fc {
 .fc-timeline-slot-frame,
 .fc-timeline-slot-lane {
   background-color: #ffffff;
+  color:#1e3a8a;
   border: 1px solid #d1d5db; /* Softer gray border for cleaner appearance */
   border-radius: 6px; /* Rounded corners for modern look */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08); /* Subtle shadow for depth */
-  padding: 10px; /* Adds space within each slot */
-  margin: 4px; /* Creates separation between slots */
   transition: transform 0.2s, box-shadow 0.2s; /* Smooth transition for hover effects */
 }
 
@@ -143,7 +142,6 @@ body, .fc {
 .fc-timeline-slot:hover,
 .fc-timeline-slot-frame:hover,
 .fc-timeline-slot-lane:hover {
-  transform: translateY(-2px); /* Slight lift on hover */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Stronger shadow on hover */
   border-color: #3b82f6; /* Accent border color on hover */
 }
@@ -355,6 +353,7 @@ body, .fc {
   overflow-y: hidden;
   overflow-x: auto;
   scrollbar-width: thin;
+  overflow: unset;
 }
 
 /* General Table Styling for Grid */
