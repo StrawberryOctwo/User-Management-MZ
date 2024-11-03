@@ -53,7 +53,7 @@
 /* Calendar grid */
 .fc-view-harness,
 .fc-daygrid-day,
-.fc-timegrid-slot {
+.fc-timeline-slot {
   border-color: #e0e0e0;
 }
 
@@ -118,16 +118,16 @@
   border-top: 2px solid #4f46e5; /* Line color for current time indicator */
 }
 
-.fc-timegrid-now-indicator-arrow {
+.fc-timeline-now-indicator-arrow {
   display: none; /* Hide arrow for a clean line appearance */
 }
 
-.fc-timegrid-now-indicator-line {
+.fc-timeline-now-indicator-line {
   border-top: 2px solid #4f46e5;
   opacity: 0.9; /* Slight transparency */
 }
 
-.fc-timegrid-now-indicator-container {
+.fc-timeline-now-indicator-container {
   position: relative;
 }
 
@@ -173,7 +173,7 @@
 
 /* Horizontal and vertical grid lines */
 .fc-daygrid-day,
-.fc-timegrid-slot,
+.fc-timeline-slot,
 .fc-resource-area {
   border-color: #e0e0e0;
 }
@@ -183,12 +183,12 @@
   border-top: 2px solid #4f46e5;
 }
 
-.fc-timegrid-now-indicator-line {
+.fc-timeline-now-indicator-line {
   border-top: 2px solid #4f46e5;
   opacity: 0.9;
 }
 
-.fc-timegrid-now-indicator-container {
+.fc-timeline-now-indicator-container {
   position: relative;
 }
 
