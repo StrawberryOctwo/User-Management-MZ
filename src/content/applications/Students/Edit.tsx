@@ -17,7 +17,7 @@ const EditStudent = () => {
     const { id } = useParams<{ id: string }>();
     const [studentData, setStudentData] = useState<Record<string, any> | null>(null);
     const [selectedLocations, setSelectedLocations] = useState<any[]>([]); // Changed to an array for multiple locations
-    const [selectedParentId, setSelectedParentId] = useState<number | null>(null);
+    const [selectedParent, setSelectedParent] = useState<any | null>(null);
     const [selectedTopics, setSelectedTopics] = useState<any[]>([]);
     const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -41,17 +41,15 @@ const EditStudent = () => {
                     postalCode: fetchedData.user.postalCode,
                     phoneNumber: fetchedData.user.phoneNumber,
                     contractEndDate: fetchedData.contractEndDate ? formatDateForInput(fetchedData.contractEndDate) : '',
-                    parent: [
-                        {
-                            firstName: fetchedData.parent.user.firstName,
-                            lastName: fetchedData.parent.user.lastName,
-                        },
-                    ],
+                    parent: {
+                        id: fetchedData.parent.id,
+                        accountHolder: fetchedData.parent.user.firstName
+                    }
                 };
-                
+
                 setStudentData(flattenedData);
                 setSelectedLocations(fetchedData.locations || []); // Set multiple locations
-                setSelectedParentId(fetchedData.parent.id);
+                setSelectedParent(flattenedData.parent);
                 setSelectedTopics(fetchedData.topics || []);
             }
 
@@ -79,8 +77,8 @@ const EditStudent = () => {
         setSelectedLocations(locations); // Capture selected locations as an array
     };
 
-    const handleParentSelect = (parent: any) => {
-        setSelectedParentId(parent ? parent.id : null);
+    const handleParentSelect = (parent) => {
+        setSelectedParent(parent); // Store the full parent object
     };
 
     const handleTopicSelect = (selectedItems: any[]) => {
@@ -101,7 +99,7 @@ const EditStudent = () => {
             showMessage("Passwords do not match", 'error');
             return;
         }
-        if (!selectedParentId) {
+        if (!selectedParent) {
             showMessage("Parent field is required", 'error');
             return;
         }
@@ -144,7 +142,7 @@ const EditStudent = () => {
 
             const response = await updateStudent(Number(id), userPayload, studentPayload);
             await assignStudentToTopics(Number(id), topicIds);
-            await assignOrUpdateParentStudents(selectedParentId, [response.studentId]);
+            await assignOrUpdateParentStudents(selectedParent.id, [response.studentId]);
 
             const userId = response.userId;
             for (const file of uploadedFiles) {
@@ -176,11 +174,18 @@ const EditStudent = () => {
         component: (
             <SingleSelectWithAutocomplete
                 label="Search Parent"
-                fetchData={(query) => fetchParents(1, 5, query).then((data) => data.data)}
+                fetchData={(query) =>
+                    fetchParents(1, 5, query).then((response) =>
+                        response.data.map((parent) => ({
+                            ...parent,
+                            accountHolder: parent.user.firstName, // Use user.firstName as accountHolder
+                        }))
+                    )
+                }
                 onSelect={handleParentSelect}
                 displayProperty="accountHolder"
                 placeholder="Type to search parent"
-                initialValue={selectedParentId}
+                initialValue={selectedParent}
             />
         ),
     };
@@ -206,7 +211,6 @@ const EditStudent = () => {
         { name: 'contractEndDate', label: t('contract_end_date'), type: 'date', required: true, section: 'Student Information' },
         { name: 'notes', label: t('notes'), type: 'text', required: false, section: 'Student Information' },
         { name: 'availableDates', label: t('available_dates'), type: 'text', required: true, section: 'Student Information' },
-        parentSelectionField,
         {
             name: 'locations',
             label: 'Locations',
@@ -223,6 +227,7 @@ const EditStudent = () => {
                 />
             ),
         },
+        parentSelectionField,
         {
             name: 'topics',
             label: 'Assign Topics',

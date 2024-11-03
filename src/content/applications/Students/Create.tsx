@@ -94,7 +94,7 @@ export default function CreateStudent() {
                 await addDocument(documentPayload, file.file);
             }
 
-            setSelectedLocationIds([]);            setSelectedParentId(null);
+            setSelectedLocationIds([]); setSelectedParentId(null);
             setSelectedTopics([]);
             setUploadedFiles([]);
             if (dropdownRef.current) dropdownRef.current.reset();
@@ -116,13 +116,21 @@ export default function CreateStudent() {
         component: (
             <SingleSelectWithAutocomplete
                 label="Search Parent"
-                fetchData={(query) => fetchParents(1, 5, query).then((data) => data.data)}
+                fetchData={(query) =>
+                    fetchParents(1, 5, query).then((data) =>
+                        data.data.map((parent) => ({
+                            ...parent,
+                            displayName: parent.user.firstName,
+                        }))
+                    )
+                }
                 onSelect={handleParentSelect}
-                displayProperty="accountHolder"
+                displayProperty="displayName"
                 placeholder="Type to search parent"
             />
         ),
     };
+
 
     const locationSelectionField = {
         name: 'locations',
