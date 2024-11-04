@@ -80,43 +80,41 @@ const EventItem = ({ eventInfo }) => {
                     {renderIcon()}
                     <div className="event-title">{topicName}</div>
                 </div>
-            </div>
-            <div className="details">
                 <div className="event-details">
                     <span className="time">{startTime} - {endTime}</span>
                     <span className="teacher" style={{ color: borderColor }}>{teacher}</span>
                     <span>{location}</span>
                 </div>
-                <div className="student-list">
-                    {visibleStudents && visibleStudents.length > 0 ? (
-                        <ul className="student-names">
-                            {visibleStudents.map((student, index) => (
-                                <li key={index} className={student.absenceStatus ? 'student-absent' : 'student-present'}>
-                                    {student.firstName}
-                                </li>
-                            ))}
-                            {extraStudents.length > 0 && (
-                                <Button
-                                    onClick={handleMoreClick}
-                                    className="more-students"
-                                    style={{
-                                        padding: '0 4px',  // Minimal padding to keep text readable without extra space
-                                        fontSize: '0.7rem',
-                                        minWidth: 'auto',   // Ensure button doesn't take extra width
-                                        margin: 0,          // Remove any margin around the button
-                                        display: 'inline-flex',
-                                        alignItems: 'center',
-                                        justifyContent: 'center',
-                                    }}
-                                >
-                                    + {extraStudents.length} more
-                                </Button>
-                            )}
-                        </ul>
-                    ) : (
-                        <span className="no-students">No students</span>
-                    )}
-                </div>
+            </div>
+            <div className="student-list">
+                {visibleStudents && visibleStudents.length > 0 ? (
+                    <ul className="student-names">
+                        {visibleStudents.map((student, index) => (
+                            <li key={index} className={student.absenceStatus ? 'student-absent' : 'student-present'}>
+                                {student.firstName}
+                            </li>
+                        ))}
+                        {extraStudents.length > 0 && (
+                            <Button
+                                onClick={handleMoreClick}
+                                className="more-students"
+                                style={{
+                                    padding: '0 4px',  // Minimal padding to keep text readable without extra space
+                                    fontSize: '0.7rem',
+                                    minWidth: 'auto',   // Ensure button doesn't take extra width
+                                    margin: 0,          // Remove any margin around the button
+                                    display: 'inline-flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                }}
+                            >
+                                + {extraStudents.length} more
+                            </Button>
+                        )}
+                    </ul>
+                ) : (
+                    <span className="no-students">No students</span>
+                )}
             </div>
 
             {/* Dropdown Menu for extra students */}

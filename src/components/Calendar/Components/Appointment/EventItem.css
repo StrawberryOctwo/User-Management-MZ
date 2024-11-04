@@ -9,6 +9,9 @@
   background-color: #f5f5f5;
   border-radius: 4px;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
   width: 100%; /* Let FullCalendar handle the width */
   /* min-width: 11rem; */
 }
@@ -16,7 +19,6 @@
 .event-header {
   display: flex;
   align-items: center;
-  width: 100%;
   gap: 8px;
   margin-bottom: 2px;
 }
@@ -33,10 +35,6 @@
 
 .teacher {
   font-weight: bold;
-}
-
-.details {
-  display: flex;
 }
 
 .custom-event .event-details {

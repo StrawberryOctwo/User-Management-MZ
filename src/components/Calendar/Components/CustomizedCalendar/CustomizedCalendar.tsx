@@ -272,7 +272,8 @@ export default function CustomizedCalendar({
         slotMaxTime="18:00:00"
         resourceAreaWidth="100px"
         selectable={true}
-        selectMirror={true}
+        // selectMirror={true}
+        expandRows
         // editable={true}
         selectOverlap={(event) => {
           return true;

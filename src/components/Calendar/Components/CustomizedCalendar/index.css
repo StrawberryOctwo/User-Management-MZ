@@ -3,7 +3,7 @@
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  padding: 20px; /* Remove padding to avoid height inconsistencies */
   margin: 0 auto;
   width: 100%;
   max-width: 90vw;
@@ -17,6 +17,7 @@
   justify-content: space-between;
   align-items: center;
   padding-bottom: 10px;
+  padding: 0 20px 10px; /* Adjust as needed to avoid affecting height of main calendar */
 }
 
 .fc-toolbar-title {
@@ -135,7 +136,8 @@
 .fc-resource-area .fc-cell-text {
   font-size: 1.1rem; /* Make resource names larger */
   font-weight: 500;
-  padding-left: 10px;
+  padding: 0 10px; /* Adjust to control text spacing within resource column */
+  box-sizing: border-box;
 }
 /* Scrollgrid styling for a cohesive border look */
 .fc-scrollgrid,
@@ -150,8 +152,16 @@
 /* Borders within the grid */
 .fc-scrollgrid td,
 .fc-scrollgrid th {
-  border: 1px solid #e0e0e0; /* Light border for grid cells */
-  padding: 8px;
+  border: 1px solid #e0e0e0;
+  padding: 0; /* Set padding to 0 to maintain uniform cell height */
+  box-sizing: border-box; /* Include border in total width/height */
+  overflow: hidden;
+}
+
+.fc-event {
+  padding: 5px; /* Set padding to control content spacing without increasing height */
+  margin: 0; /* Ensure no extra margin that could alter height */
+  box-sizing: border-box;
 }
 
 /* Calendar header styling for alignment */
@@ -161,6 +171,8 @@
   color: #333333;
   padding: 10px;
   border-bottom: 1px solid #e0e0e0;
+  padding: 5px 10px; /* Adjust header padding to ensure alignment */
+  box-sizing: border-box;
 }
 
 /* Left resource column styling */
@@ -190,6 +202,11 @@
 
 .fc-timeline-now-indicator-container {
   position: relative;
+}
+
+.fc-timeline-slot-lane {
+  padding: 0; /* Remove padding to maintain consistent cell height */
+  box-sizing: border-box;
 }
 
 /* Center-align title and arrows */
@@ -224,4 +241,11 @@
 .fc .fc-next-button:focus,
 .fc .fc-prev-button:focus {
   outline: none !important;
+}
+
+.fc-resource.selected,
+.fc-timegrid-slot.selected {
+  outline: none; /* Remove default outline on selection */
+  box-shadow: none; /* Prevent any shadow on selection */
+  border: none; /* Avoid border change on selection */
 }
