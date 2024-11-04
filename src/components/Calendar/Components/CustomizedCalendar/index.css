@@ -1,9 +1,8 @@
-/* Main container for the calendar */
 .fc {
   background-color: #ffffff;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 20px; /* Remove padding to avoid height inconsistencies */
+  padding: 20px;
   margin: 0 auto;
   width: 100%;
   max-width: 90vw;
@@ -11,13 +10,11 @@
   overflow: hidden;
 }
 
-/* Toolbar styling */
 .fc-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding-bottom: 10px;
-  padding: 0 20px 10px; /* Adjust as needed to avoid affecting height of main calendar */
 }
 
 .fc-toolbar-title {
@@ -59,123 +56,133 @@
 }
 
 .fc-today-button::first-letter {
-  text-transform: uppercase; /* Capitalize the first letter */
+  text-transform: uppercase;
 }
 
 .fc-today-button:hover {
-  background-color: #7586ff !important; /* Slightly lighter shade */
+  background-color: #7586ff !important;
 }
 
-/* Adjustments for room/resource layout */
+.fc .fc-button:disabled {
+  opacity: 0.65;
+  background-color: #2c3e50 !important;
+}
+
 .fc-col-header-cell-cushion {
   font-weight: 500;
   color: #333333;
 }
 
-/* Modern Scrollbar Styling */
+.fc .fc-timeline-slot-cushion {
+  padding: 15px 20px;
+  white-space: nowrap;
+}
+
+.fc .fc-datagrid-cell-cushion {
+  overflow: hidden;
+  padding: 15px 20px;
+  white-space: nowrap;
+  text-align: center;
+}
+
 .fc-scroller {
   overflow-y: auto;
   overflow-x: auto;
 }
 
 .fc-scroller::-webkit-scrollbar {
-  width: 8px; /* Vertical scrollbar width */
-  height: 8px; /* Horizontal scrollbar height */
+  width: 8px;
+  height: 8px;
 }
 
 .fc-scroller::-webkit-scrollbar-track {
-  background: #f0f0f0; /* Track color */
+  background: #f0f0f0;
   border-radius: 4px;
 }
 
 .fc-scroller::-webkit-scrollbar-thumb {
-  background-color: #b3b3b3; /* Thumb color */
+  background-color: #b3b3b3;
   border-radius: 4px;
-  border: 2px solid #f0f0f0; /* Adds spacing around thumb */
+  border: 2px solid #f0f0f0;
 }
 
 .fc-scroller::-webkit-scrollbar-thumb:hover {
-  background-color: #888888; /* Darker thumb on hover */
+  background-color: #888888;
 }
 
 .fc-scroller::-webkit-scrollbar-corner {
-  background: #f0f0f0; /* Corner between horizontal and vertical scrollbars */
+  background: #f0f0f0;
 }
-/* Widen the resource column */
+
 .fc-resource-area {
-  width: 150px; /* Adjust width as desired */
+  width: 150px;
 }
 
-/* Adjust time headers to match resource column */
 .fc-col-header-cell {
-  width: 150px; /* Match the resource area width */
-  text-align: center; /* Center align time headers */
-  font-weight: 600; /* Make headers bold for emphasis */
-  color: #333333; /* Adjust color to match styling */
+  width: 150px;
+  text-align: center;
+  font-weight: 600;
+  color: #333333;
 }
 
-/* Current time indicator styling */
 .fc-now-indicator {
-  border-top: 2px solid #4f46e5; /* Line color for current time indicator */
+  border-top: 2px solid #4f46e5;
 }
 
 .fc-timeline-now-indicator-arrow {
-  display: none; /* Hide arrow for a clean line appearance */
+  display: none;
 }
 
 .fc-timeline-now-indicator-line {
   border-top: 2px solid #4f46e5;
-  opacity: 0.9; /* Slight transparency */
+  opacity: 0.9;
 }
 
 .fc-timeline-now-indicator-container {
   position: relative;
 }
 
-/* Increase font size for resource names */
 .fc-resource-area .fc-cell-text {
-  font-size: 1.1rem; /* Make resource names larger */
+  font-size: 1.1rem;
   font-weight: 500;
-  padding: 0 10px; /* Adjust to control text spacing within resource column */
+  padding: 0 10px;
   box-sizing: border-box;
 }
-/* Scrollgrid styling for a cohesive border look */
+
 .fc-scrollgrid,
 .fc-scrollgrid-liquid {
   border-collapse: separate;
   border-spacing: 0;
-  border-radius: 12px; /* Match the border radius of the main container */
+  border-radius: 12px;
   overflow: hidden;
-  box-shadow: inset 0 0 0 1px #e0e0e0; /* Subtle border around the entire grid */
+  box-shadow: inset 0 0 0 1px #e0e0e0;
 }
 
 /* Borders within the grid */
 .fc-scrollgrid td,
 .fc-scrollgrid th {
   border: 1px solid #e0e0e0;
-  padding: 0; /* Set padding to 0 to maintain uniform cell height */
-  box-sizing: border-box; /* Include border in total width/height */
+  padding: 0;
+  box-sizing: border-box;
   overflow: hidden;
 }
 
 .fc-event {
-  padding: 5px; /* Set padding to control content spacing without increasing height */
-  margin: 0; /* Ensure no extra margin that could alter height */
+  padding: 5px;
+  margin: 0;
   box-sizing: border-box;
 }
 
-/* Calendar header styling for alignment */
 .fc-scrollgrid-liquid .fc-col-header-cell {
   background-color: #f7f8fa;
   font-weight: 600;
   color: #333333;
   padding: 10px;
   border-bottom: 1px solid #e0e0e0;
-  padding: 5px 10px; /* Adjust header padding to ensure alignment */
+  padding: 5px 10px;
   box-sizing: border-box;
 }
 
-/* Left resource column styling */
 .fc-scrollgrid-liquid .fc-resource-area {
   background-color: #f7f8fa;
   border-right: 1px solid #e0e0e0;
@@ -183,14 +190,12 @@
   padding-left: 10px;
 }
 
-/* Horizontal and vertical grid lines */
 .fc-daygrid-day,
 .fc-timeline-slot,
 .fc-resource-area {
   border-color: #e0e0e0;
 }
 
-/* Current time indicator styling */
 .fc-now-indicator {
   border-top: 2px solid #4f46e5;
 }
@@ -205,11 +210,10 @@
 }
 
 .fc-timeline-slot-lane {
-  padding: 0; /* Remove padding to maintain consistent cell height */
+  padding: 0;
   box-sizing: border-box;
 }
 
-/* Center-align title and arrows */
 .fc-header-toolbar .fc-toolbar-chunk {
   display: flex;
   align-items: center;
@@ -217,35 +221,45 @@
   gap: 8px;
 }
 
-/* Style for navigation buttons without background color */
 .fc .fc-next-button,
 .fc .fc-prev-button {
   background: transparent;
   border: none;
-  color: #3b82f6; /* Text color for arrows */
+  color: #3b82f6;
   font-size: 1.2rem;
   padding: 6px 12px;
   cursor: pointer;
-  transition: color 0.2s, transform 0.2s;
+  transition: color 0.2s, transform 0.2s, background-color 0.2s;
 }
 
-/* Hover effect for navigation buttons */
-.fc .fc-next-button:hover,
-.fc .fc-prev-button:hover {
-  color: #2563eb; /* Darker color on hover */
-  transform: scale(1.1); /* Slight scale effect on hover */
-  background-color: #eee;
-}
-
-/* Remove outline on focus */
 .fc .fc-next-button:focus,
 .fc .fc-prev-button:focus {
   outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  color: #3b82f6 !important;
+}
+
+.fc .fc-next-button:active,
+.fc .fc-prev-button:active {
+  background-color: #e1e1e1 !important;
+  color: #2563eb;
+  outline: none !important;
+  box-shadow: none !important;
+  transform: scale(1.05);
+}
+
+.fc .fc-next-button:hover,
+.fc .fc-prev-button:hover {
+  color: #2563eb;
+  transform: scale(1.1);
+  background-color: #eee;
+  transition: color 0.2s, transform 0.2s, background-color 0.2s;
 }
 
 .fc-resource.selected,
 .fc-timegrid-slot.selected {
-  outline: none; /* Remove default outline on selection */
-  box-shadow: none; /* Prevent any shadow on selection */
-  border: none; /* Avoid border change on selection */
+  outline: none;
+  box-shadow: none;
+  border: none;
 }

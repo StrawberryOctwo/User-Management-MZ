@@ -1,12 +1,6 @@
 import React, { useState, useCallback, useMemo, cloneElement, useEffect } from "react";
 import {
   Box,
-  Button,
-  IconButton,
-  Slider,
-  Typography,
-  Menu,
-  MenuItem,
 } from "@mui/material";
 import moment from "moment";
 import { EventProps, Views } from "react-big-calendar";
@@ -14,9 +8,6 @@ import Calendar from "../Calendar";
 
 import "react-datepicker/dist/react-datepicker.css";
 import "./index.css"; // Your custom styles
-import AppointmentEvent from "./AppointmentEvent"; // Custom Appointment Event component
-import BlockoutEvent from "./BlockoutEvent"; // Custom Blockout Event component
-import ToolbarControls from "./ToolbarControls";
 import EditAppointmentModal from "../Appointment/EditAppointmentModal"; // Import the Edit Appointment Modal
 import AddClassSessionModal from "../Appointment/AddClassSessionModal";
 import ClassSessionDetailsModal from "../Modals/ClassSessionDetailsModal";
@@ -257,7 +248,7 @@ export default function CustomizedCalendar({
   return (
     <Box display="flex" flexDirection="column" height="100%" width="100%" gap={2} p={2}>
       <FullCalendar
-        plugins={[resourceTimelinePlugin, dayGridPlugin, timeGridPlugin, interactionPlugin]}
+        plugins={[resourceTimelinePlugin, interactionPlugin]}
         schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
         initialView="resourceTimelineDay"
         headerToolbar={{
@@ -265,19 +256,17 @@ export default function CustomizedCalendar({
           center: "prev title next", // Center title with arrows on each side
           right: "today" // Empty right section
         }}
+        key={`${resources.length}-${events.length}`}
         resources={resources}
         events={events}
         eventContent={renderEventContent} // Use custom event content
         slotMinTime="08:00:00"
         slotMaxTime="18:00:00"
-        resourceAreaWidth="100px"
+        resourceAreaWidth="120px"
         selectable={true}
-        // selectMirror={true}
-        expandRows
-        // editable={true}
-        selectOverlap={(event) => {
-          return true;
-        }}
+        // selectOverlap={(event) => {
+        //   return true;
+        // }}
         eventClick={(info) => handleEventClick(info.event)}
         select={(info) => {
           handleOpenAddModal(info.start, info.end, info.resource.id);

@@ -15,9 +15,15 @@ const EventItem = ({ eventInfo }) => {
     const [extraStudents, setExtraStudents] = useState([]);
     const [anchorEl, setAnchorEl] = useState(null);
 
+    const maxVisibleStudents = 3;
+    const baseHeight = 100;
+    const studentHeight = 16;
+    const extraButtonHeight = 22;
+    const eventHeight = baseHeight + studentHeight * Math.min(students.length, maxVisibleStudents) + (students.length > maxVisibleStudents ? extraButtonHeight : 0);
+
     const handleMoreClick = (event) => {
-        event.preventDefault(); // Prevent default browser behavior
-        event.stopPropagation(); // Stop propagation to prevent other click events
+        event.preventDefault();
+        event.stopPropagation();
         setAnchorEl(event.currentTarget);
     };
 
@@ -32,7 +38,7 @@ const EventItem = ({ eventInfo }) => {
             case "Online":
                 return "#5569FF";
             case "Group":
-                return "#FF9800";
+                return "#FFA319";
             case "1on1":
                 return "#4CAF50";
             default:
@@ -40,6 +46,20 @@ const EventItem = ({ eventInfo }) => {
         }
     };
 
+    const getLighterBorderColor = () => {
+        switch (sessionType) {
+            case "Online":
+                return "rgba(85, 105, 255, 0.6)"; // Slightly more visible hint of blue
+            case "Group":
+                return "rgba(255, 152, 0, 0.6)"; // Slightly more visible hint of orange
+            case "1on1":
+                return "rgba(76, 175, 80, 0.6)"; // Slightly more visible hint of green
+            default:
+                return "rgba(189, 189, 189, 0.6)"; // Light gray for default
+        }
+    };
+
+    const lighterBorderColor = getLighterBorderColor();
     const borderColor = getBorderColor();
 
     const renderIcon = () => {
@@ -55,9 +75,7 @@ const EventItem = ({ eventInfo }) => {
         }
     };
 
-    // Determine how many students can be displayed based on available space
     useEffect(() => {
-        const maxVisibleStudents = 3; // Adjust this value based on the desired display limit
         if (students.length > maxVisibleStudents) {
             setVisibleStudents(students.slice(0, maxVisibleStudents));
             setExtraStudents(students.slice(maxVisibleStudents));
@@ -73,6 +91,7 @@ const EventItem = ({ eventInfo }) => {
             style={{
                 border: `2px solid ${borderColor}`,
                 backgroundColor: "#f5f5f5",
+                height: `${eventHeight}px`,
             }}
         >
             <div>
@@ -90,7 +109,13 @@ const EventItem = ({ eventInfo }) => {
                 {visibleStudents && visibleStudents.length > 0 ? (
                     <ul className="student-names">
                         {visibleStudents.map((student, index) => (
-                            <li key={index} className={student.absenceStatus ? 'student-absent' : 'student-present'}>
+                            <li
+                                key={index}
+                                className={student.absenceStatus ? 'student-absent' : 'student-present'}
+                                style={{
+                                    color: student.absenceStatus ? '#f8b4b4' : lighterBorderColor
+                                }}
+                            >
                                 {student.firstName}
                             </li>
                         ))}
@@ -99,10 +124,10 @@ const EventItem = ({ eventInfo }) => {
                                 onClick={handleMoreClick}
                                 className="more-students"
                                 style={{
-                                    padding: '0 4px',  // Minimal padding to keep text readable without extra space
+                                    padding: '0 4px',
                                     fontSize: '0.7rem',
-                                    minWidth: 'auto',   // Ensure button doesn't take extra width
-                                    margin: 0,          // Remove any margin around the button
+                                    minWidth: 'auto',
+                                    margin: 0,
                                     display: 'inline-flex',
                                     alignItems: 'center',
                                     justifyContent: 'center',
@@ -134,6 +159,9 @@ const EventItem = ({ eventInfo }) => {
                 {extraStudents.map((student, index) => (
                     <MenuItem
                         key={index}
+                        style={{
+                            color: student.absenceStatus ? '#f8b4b4' : lighterBorderColor,
+                        }}
                         className={student.absenceStatus ? 'student-absent' : 'student-present'}
                     >
                         {student.firstName}
