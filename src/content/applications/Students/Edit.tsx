@@ -29,8 +29,8 @@ const EditStudent = () => {
         try {
             const fetchedData = await fetchStudentById(Number(id));
             const studentDocuments = await fetchStudentDocumentsById(Number(id));
-
-            if (fetchedData && fetchedData.user && fetchedData.parent) {
+    
+            if (fetchedData && fetchedData.user) {
                 const flattenedData = {
                     ...fetchedData,
                     firstName: fetchedData.user.firstName,
@@ -41,18 +41,20 @@ const EditStudent = () => {
                     postalCode: fetchedData.user.postalCode,
                     phoneNumber: fetchedData.user.phoneNumber,
                     contractEndDate: fetchedData.contractEndDate ? formatDateForInput(fetchedData.contractEndDate) : '',
-                    parent: {
-                        id: fetchedData.parent.id,
-                        accountHolder: fetchedData.parent.user.firstName
-                    }
+                    parent: fetchedData.parent
+                        ? {
+                              id: fetchedData.parent.id,
+                              accountHolder: fetchedData.parent.user.firstName,
+                          }
+                        : null, // Set parent to null if not present
                 };
-
+    
                 setStudentData(flattenedData);
                 setSelectedLocations(fetchedData.locations || []); // Set multiple locations
                 setSelectedParent(flattenedData.parent);
                 setSelectedTopics(fetchedData.topics || []);
             }
-
+    
             const formattedDocuments = studentDocuments.documents.map((doc) => ({
                 id: doc.id,
                 fileName: doc.name,
@@ -60,7 +62,7 @@ const EditStudent = () => {
                 file: null,
                 path: doc.path,
             }));
-
+    
             setUploadedFiles(formattedDocuments);
         } catch (error) {
             console.error('Error fetching student:', error);
@@ -68,7 +70,7 @@ const EditStudent = () => {
             setLoading(false);
         }
     };
-
+    
     useEffect(() => {
         fetchStudent();
     }, [id]);
