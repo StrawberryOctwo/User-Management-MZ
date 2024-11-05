@@ -10,6 +10,8 @@ import {
     Card,
     CardContent,
     CircularProgress,
+    Tabs,
+    Tab,
 } from '@mui/material';
 import moment from 'moment';
 import { deleteClassSession, fetchClassSessionById, getClassSessionReportsStatus, getStudentSessionReportStatus } from 'src/services/classSessionService';
@@ -18,7 +20,10 @@ import ViewSessionReportForm from './ViewSessionReport';
 import ViewPaymentDetails from './ViewPaymentDetails';  // New Component for payment view
 import StudentDetailCard from './StudentDetailCArd';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
-import { createPaymentForUser, getPaymentsForUserByClassSession } from 'src/services/paymentService.'; // Fix the path if needed
+import { createPaymentForUser, getPaymentsForUserByClassSession } from 'src/services/paymentService'; // Fix the path if needed
+import { sessionTypeFunc } from 'src/utils/sessionType';
+import AbsenceForm from './AbsenceTab';
+import AbsenceTab from './AbsenceTab';
 
 interface ClassSessionDetailsModalProps {
     isOpen: boolean;
@@ -27,6 +32,7 @@ interface ClassSessionDetailsModalProps {
     onEdit: () => void;
     onDelete: () => void;
     canEdit: boolean;
+    canAddReport: boolean;
 }
 
 const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
@@ -35,19 +41,22 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     appointmentId,
     onEdit,
     onDelete,
-    canEdit
+    canEdit,
+    canAddReport
 }) => {
     const [classSession, setClassSession] = useState<any>(null);
     const [loading, setLoading] = useState<boolean>(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
     const [reportStatus, setReportStatus] = useState<{ [studentId: string]: { reportCompleted: boolean, reportId: string | null } }>({});
-    const [allReportsCompleted, setAllReportsCompleted] = useState<boolean>(false);
+    let [allReportsCompleted, setAllReportsCompleted] = useState<boolean>(false);
     const [isReportFormOpen, setReportFormOpen] = useState<boolean>(false);
     const [isViewReportFormOpen, setViewReportFormOpen] = useState<boolean>(false);
     const [isViewPaymentModalOpen, setViewPaymentModalOpen] = useState<boolean>(false);
+    const [isAbsenceModalOpen, setAbsenceModalOpen] = useState<boolean>(false);
     const [selectedStudent, setSelectedStudent] = useState<any>(null);
     const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
     const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+    const [tabIndex, setTabIndex] = useState(0);
 
     // Fetch class session details
     const loadClassSession = async () => {
@@ -70,33 +79,10 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                 };
             }
 
-            setReportStatus(studentReportsStatus);
-
-            // Now check if all reports are completed
-            const allReportsComplete = Object.values(studentReportsStatus).every(status => status.reportCompleted);
-            setAllReportsCompleted(allReportsComplete);
+            setReportStatus(studentReportsStatus)
 
 
-            // If all reports are completed, check if payment was already made
-            if (allReportsComplete) {
-                const paymentStatusResponse = await getPaymentsForUserByClassSession(response.teacher.user.id, response.id)
-                console.log(paymentStatusResponse);
-                if (paymentStatusResponse) {
-                    console.log('Payment already sent, skipping payment creation');
-                } else {
-                    try {
-                        // Payment not sent, create the payment
-                        await createPaymentForUser({
-                            amount: response.teacher.hourlyRate,
-                            userId: response.teacher.user.id,
-                            classSessionId: response.id,
-                        });
-                        console.log('Payment successfully sent');
-                    } catch (paymentError) {
-                        console.error('Error creating payment:', paymentError);
-                    }
-                }
-            }
+
         } catch (error) {
             setErrorMessage('Failed to load class session details.');
             console.error('Error fetching class session details:', error);
@@ -110,6 +96,38 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
             loadClassSession();
         }
     }, [isOpen, appointmentId]);
+
+    useEffect(() => {
+        if (allReportsCompleted) {
+            handleTeacherPayment();
+        }
+    }, [allReportsCompleted]);
+
+    const handleTeacherPayment = async () => {
+        // Check if all reports are completed before proceeding with payment
+        if (allReportsCompleted) {
+            try {
+                // Check if payment was already made
+                const paymentStatusResponse = await getPaymentsForUserByClassSession(classSession.teacher.user.id, classSession.id);
+
+                if (paymentStatusResponse) {
+                    console.log('Payment already sent, skipping payment creation');
+                } else {
+                    // Payment not sent, create the payment
+                    await createPaymentForUser({
+                        userId: classSession.teacher.user.id,
+                        classSessionId: classSession.id,
+                        sessionType: sessionTypeFunc(classSession.sessionType)
+                    });
+                    console.log('Payment successfully sent');
+                }
+            } catch (error) {
+                console.error('Error creating payment:', error);
+            }
+        } else {
+            console.log('Not all reports are completed; payment will not be triggered.');
+        }
+    };
 
     const handleAddReport = (student: any) => {
         setSelectedStudent(student);
@@ -132,8 +150,20 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
         setViewPaymentModalOpen(true);
     };
 
+    const handleAbsence = (student: any) => {
+        setSelectedStudent(student);
+        setAbsenceModalOpen(true);
+    };
+
     const refreshClassSessionData = async () => {
-        await loadClassSession();
+        setLoading(true);
+        try {
+            await loadClassSession(); // Reload the session data
+        } catch (error) {
+            console.error('Error refreshing class session data:', error);
+        } finally {
+            setLoading(false);
+        }
     };
 
     const handleSaveReport = async (newReport: any) => {
@@ -146,114 +176,147 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
         refreshClassSessionData();
     };
 
+    const handleCloseAbsenceModel = async () => {
+        setAbsenceModalOpen(false);
+        setSelectedStudent(null);
+        await refreshClassSessionData();
+    };
+
     const handleDelete = async () => {
         setDeleteDialogOpen(true);
     };
 
+    const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
+        setTabIndex(newValue);
+    };
+
     return (
-        <Dialog open={isOpen} onClose={onClose} maxWidth="md" fullWidth>
+        <Dialog
+            open={isOpen}
+            onClose={onClose}
+            fullWidth
+            maxWidth={false}
+            sx={{ '& .MuiDialog-paper': { width: '750px', maxWidth: '750px' } }} // Set the custom width
+
+        >
             <DialogTitle>Class Session Details</DialogTitle>
-            <DialogContent>
+            <DialogContent sx={{ minHeight: '370px' }} className='djfhjdf'>
+
+                <Tabs value={tabIndex} onChange={handleTabChange} indicatorColor="primary" textColor="primary" sx={{ mb: 2 }}>
+                    <Tab label="Session Details" />
+                    <Tab label="Students Enrolled" />
+                </Tabs>
+
                 {loading ? (
                     <Typography>Loading...</Typography>
                 ) : errorMessage ? (
                     <Typography color="error">{errorMessage}</Typography>
                 ) : classSession ? (
-                    <Box>
-                        <Card variant="outlined" sx={{ mb: 3 }}>
-                            <CardContent>
-                                <Typography variant="subtitle1">
-                                    <strong>Session Name:</strong> {classSession.name}
-                                </Typography>
-                                <Typography variant="subtitle1">
-                                    <strong>Teacher:</strong> {classSession.teacher?.user?.firstName} {classSession.teacher?.user?.lastName}
-                                </Typography>
-                                <Typography variant="subtitle1">
-                                    <strong>Topic:</strong> {classSession.topic?.name}
-                                </Typography>
-                                <Typography variant="subtitle1">
-                                    <strong>Location:</strong> {classSession.location.name}
-                                </Typography>
-                                <Typography variant="subtitle1">
-                                    <strong>Session Type:</strong> {classSession.sessionType}
-                                </Typography>
-                                <Typography variant="subtitle1">
-                                    <strong>Start Time:</strong> {moment(classSession.sessionStartDate).format('LLL')}
-                                </Typography>
-                                <Typography variant="subtitle1">
-                                    <strong>End Time:</strong> {moment(classSession.sessionEndDate).format('LLL')}
-                                </Typography>
-                            </CardContent>
-                        </Card>
+                    <Box sx={{ px: 1 }} >
+                        {tabIndex === 0 && (
+                            <Card variant="outlined" sx={{ mb: 3 }}>
+                                <CardContent>
+                                    <Typography variant="subtitle1">
+                                        <strong>Session Name:</strong> {classSession.name}
+                                    </Typography>
+                                    <Typography variant="subtitle1">
+                                        <strong>Teacher:</strong> {classSession.teacher?.user?.firstName} {classSession.teacher?.user?.lastName}
+                                    </Typography>
+                                    <Typography variant="subtitle1">
+                                        <strong>Topic:</strong> {classSession.topic?.name}
+                                    </Typography>
+                                    <Typography variant="subtitle1">
+                                        <strong>Location:</strong> {classSession.location.name}
+                                    </Typography>
+                                    <Typography variant="subtitle1">
+                                        <strong>Session Type:</strong> {classSession.sessionType}
+                                    </Typography>
+                                    <Typography variant="subtitle1">
+                                        <strong>Start Time:</strong> {moment(classSession.sessionStartDate).format('LLL')}
+                                    </Typography>
+                                    <Typography variant="subtitle1">
+                                        <strong>End Time:</strong> {moment(classSession.sessionEndDate).format('LLL')}
+                                    </Typography>
+                                </CardContent>
+                            </Card>
+                        )}
 
-                        <Typography variant="subtitle1"><strong>Students Enrolled:</strong></Typography>
-                        {classSession.students?.length > 0 ? (
-                            classSession.students.map((student: any) => (
-                                <StudentDetailCard
-                                    key={student.id}
-                                    student={student}
-                                    reportCompleted={reportStatus[student.id]?.reportCompleted}
-                                    onAddReport={() => handleAddReport(student)}
-                                    onViewReport={() => handleViewReport(student)}
-                                    onViewPayment={() => handleViewPayment(student)}
+                        {tabIndex === 1 && (
+                            <>
+                                {classSession.students?.length > 0 ? (
+                                    classSession.students.map((student: any) => (
+                                        <StudentDetailCard
+                                            key={student.id}
+                                            student={student}
+                                            canAddReport={canAddReport}
+                                            classSessionId={classSession.id}
+                                            reportCompleted={reportStatus[student.id]?.reportCompleted}
+                                            onAddReport={() => handleAddReport(student)}
+                                            onViewReport={() => handleViewReport(student)}
+                                            onViewPayment={() => handleViewPayment(student)}
+                                            handleAbsence={() => handleAbsence(student)}
+                                        />
+                                    ))
+                                ) : (
+                                    <Typography variant="body2">No students enrolled.</Typography>
+                                )}
+
+                                {allReportsCompleted && (
+                                    <Box display="flex" justifyContent="center" alignItems="center" mt={3}>
+                                        <Typography
+                                            variant="h5"
+                                            color="green"
+                                            sx={{
+                                                fontWeight: 'bold',
+                                                textAlign: 'center',
+                                                backgroundColor: '#e0f2f1',
+                                                padding: '10px',
+                                                borderRadius: '5px',
+                                                border: '1px solid green'
+                                            }}
+                                        >
+                                            Session Reports Submitted
+                                        </Typography>
+                                    </Box>
+                                )}
+
+                                {/* Add Session Report Form Dialog */}
+                                <AddSessionReportForm
+                                    isOpen={isReportFormOpen}
+                                    onClose={() => setReportFormOpen(false)}
+                                    onSave={handleSaveReport}
+                                    studentName={selectedStudent ? `${selectedStudent.user.firstName} ${selectedStudent.user.lastName}` : ''}
+                                    classSessionId={appointmentId}
+                                    studentId={selectedStudent ? selectedStudent.id : ''}
+                                    userId={selectedStudent ? selectedStudent.user.id : ''}
                                 />
-                            ))
-                        ) : (
-                            <Typography variant="body2">No students enrolled.</Typography>
+
+                                {/* View Session Report Form Dialog */}
+                                {selectedStudent && selectedReportId && (
+                                    <ViewSessionReportForm
+                                        isOpen={isViewReportFormOpen}
+                                        onClose={handleCloseReportForm}
+                                        reportId={selectedReportId}
+                                        onDelete={handleCloseReportForm}
+                                    />
+                                )}
+
+
+
+                                {selectedStudent && (
+                                    <AbsenceTab
+                                        classSessionId={classSession.id}
+                                        isOpen={isAbsenceModalOpen}
+                                        student={selectedStudent}
+                                        onClose={() => {
+                                            handleCloseAbsenceModel();
+                                        }}
+                                    />
+                                )}
+
+                            </>
                         )}
 
-                        {allReportsCompleted && (
-                            <Box display="flex" justifyContent="center" alignItems="center" mt={3}>
-                                <Typography
-                                    variant="h5"
-                                    color="green"
-                                    sx={{
-                                        fontWeight: 'bold',
-                                        textAlign: 'center',
-                                        backgroundColor: '#e0f2f1',
-                                        padding: '10px',
-                                        borderRadius: '5px',
-                                        border: '1px solid green'
-                                    }}
-                                >
-                                    Session Reports Submitted
-                                </Typography>
-                            </Box>
-                        )}
-
-                        {/* Add Session Report Form Dialog */}
-                        <AddSessionReportForm
-                            isOpen={isReportFormOpen}
-                            onClose={() => setReportFormOpen(false)}
-                            onSave={handleSaveReport}
-                            studentName={selectedStudent ? `${selectedStudent.user.firstName} ${selectedStudent.user.lastName}` : ''}
-                            classSessionId={appointmentId}
-                            studentId={selectedStudent ? selectedStudent.id : ''}
-                            userId={selectedStudent ? selectedStudent.user.id : ''}
-                        />
-
-                        {/* View Session Report Form Dialog */}
-                        {selectedStudent && selectedReportId && (
-                            <ViewSessionReportForm
-                                isOpen={isViewReportFormOpen}
-                                onClose={handleCloseReportForm}
-                                reportId={selectedReportId}
-                                student={selectedStudent}
-                                classSessionId={appointmentId}
-                                onDelete={handleCloseReportForm}
-                            />
-                        )}
-
-                        {/* View Payment Details Modal */}
-                        {selectedStudent && (
-                            <ViewPaymentDetails
-                                isOpen={isViewPaymentModalOpen}
-                                onClose={() => setViewPaymentModalOpen(false)}
-                                userId={selectedStudent.user.id}
-                                studentName={`${selectedStudent.user.firstName} ${selectedStudent.user.lastName}`}
-                                sessionId={classSession.id}
-                            />
-                        )}
                     </Box>
                 ) : (
                     <Typography>No class session details available.</Typography>

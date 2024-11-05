@@ -25,6 +25,7 @@ export const addStudent = async (studentData: any) => {
 };
 
 
+
 export const deleteStudent = async (studentIds: number[]) => {
     try {
         const response = await api.post('/students/delete', {
@@ -57,10 +58,9 @@ export const fetchStudentDocumentsById = async (id: number) => {
     }
 };
 
-export const updateStudent = async (id: number, parentPayload: any, userData: any, studentData: any) => {
+export const updateStudent = async (id: number, userData: any, studentData: any) => {
     try {
         const payload = {
-            parent: parentPayload,
             user: userData,
             student: studentData,
         };

@@ -6,26 +6,27 @@ import { getStrongestRoles } from 'src/hooks/roleUtils';
 import { useAuth } from 'src/hooks/useAuth';
 import { fetchFranchises } from 'src/services/franchiseService';
 import { fetchLocationsByFranchise, fetchLocations } from 'src/services/locationService';
-
+import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
+import { t } from 'i18next';
 
 interface FilterToolbarProps {
   onFranchiseChange: (franchise: any) => void;
-  onLocationChange: (location: any) => void;
+  onLocationsChange: (locations: any[]) => void; // Updated to accept an array
   selectedFranchise: any | null;
-  selectedLocation: any | null;
+  selectedLocations: any[] | null; // Updated to accept an array of locations
   userRole?: string;
 }
 
 const FilterToolbar: React.FC<FilterToolbarProps> = ({
   onFranchiseChange,
-  onLocationChange,
+  onLocationsChange,
   selectedFranchise,
-  selectedLocation,
+  selectedLocations,
   userRole,
 }) => {
   const [franchiseId, setFranchiseId] = useState<number | null>(null);
   const [isLocationEnabled, setIsLocationEnabled] = useState(!!selectedFranchise);
-  const { userRoles } = useAuth(); // Get user roles from custom hook
+  const { userRoles } = useAuth();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
   const hasFranchiseAccess = strongestRoles.includes('SuperAdmin') || strongestRoles.includes('FranchiseAdmin');
 
@@ -41,19 +42,19 @@ const FilterToolbar: React.FC<FilterToolbarProps> = ({
     onFranchiseChange(franchise);
   };
 
-  const handleLocationChange = (location: any) => {
-    onLocationChange(location);
+  const handleLocationsChange = (locations: any[]) => {
+    onLocationsChange(locations); // Passes selected locations array to the parent
   };
 
-  if (userRole === 'Teacher' || userRole === 'Student') {
+  if (userRole === 'Teacher' || userRole === 'Student' || userRole === 'Parent') {
     return null;
   }
 
   return (
     <Box sx={{ mb: 2, mt: 3 }}>
       <Grid container spacing={2}>
-        {hasFranchiseAccess && ( // Conditionally show Franchise field
-          <Grid item xs={12} sm={2} sx={{ ml: 2 }}> {/* Add margin-left here */}
+        {hasFranchiseAccess && (
+          <Grid item xs={12} sm={12} md={3} sx={{ ml: 2 }}>
             <SingleSelectWithAutocomplete
               label="Select Franchise"
               fetchData={(query) => fetchFranchises(1, 5, query).then((data) => data.data)}
@@ -64,9 +65,9 @@ const FilterToolbar: React.FC<FilterToolbarProps> = ({
             />
           </Grid>
         )}
-        <Grid item xs={12} sm={2} sx={{ ml: 0 }}> {/* Add margin-left here */}
-          <SingleSelectWithAutocomplete
-            label="Select Location"
+        <Grid item xs={12} sm={12} md={3} sx={{ ml: 1, mr: 2, pl: 0 }}>
+          <MultiSelectWithCheckboxes
+            label={t('Search_and_assign_locations')}
             fetchData={(query) => {
               if (hasFranchiseAccess && franchiseId) {
                 return fetchLocationsByFranchise(franchiseId, query).then((data) => data);
@@ -74,15 +75,15 @@ const FilterToolbar: React.FC<FilterToolbarProps> = ({
                 return fetchLocations(1, 5, query).then((response) => response.data);
               }
             }}
-            onSelect={handleLocationChange}
+            onSelect={handleLocationsChange}  // Updated to handle multiple locations
             displayProperty="name"
-            placeholder="Search Location"
-            initialValue={selectedLocation}
+            placeholder="Type to search locations"
+            initialValue={selectedLocations}
+            width="100%"
           />
         </Grid>
       </Grid>
     </Box>
-
   );
 };
 

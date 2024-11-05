@@ -1,5 +1,5 @@
 import React from 'react';
-import { Card, CardContent, Typography, Button, Box, IconButton } from '@mui/material';
+import { Card, Typography, Button, Box, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
 import CircleIcon from '@mui/icons-material/Circle';
 
@@ -8,7 +8,10 @@ interface StudentDetailCardProps {
     reportCompleted: boolean; // Track if the report is completed
     onAddReport: () => void;
     onViewReport: () => void;
-    onViewPayment: () => void;  // Add handler to view payment
+    onViewPayment: () => void;
+    handleAbsence: () => void;
+    canAddReport: boolean;
+    classSessionId: number; // Add the class session ID as a prop
 }
 
 const StudentDetailCard: React.FC<StudentDetailCardProps> = ({
@@ -16,8 +19,14 @@ const StudentDetailCard: React.FC<StudentDetailCardProps> = ({
     reportCompleted,
     onAddReport,
     onViewReport,
-    onViewPayment  // New prop for viewing payment
+    onViewPayment,
+    handleAbsence,
+    canAddReport,
+    classSessionId
 }) => {
+    // Find the absence related to the specific class session
+    const sessionAbsence = student.absences?.find((absence: any) => absence.classSession.id === classSessionId) || null;
+    const absenceLabel = sessionAbsence ? (sessionAbsence.status ? 'Absent' : 'Present') : 'Present';
     return (
         <Card variant="outlined" sx={{ mb: 2, mt: 1 }}>
             <Box display="flex" justifyContent="space-between" alignItems="center" padding={1.5}>
@@ -30,25 +39,31 @@ const StudentDetailCard: React.FC<StudentDetailCardProps> = ({
                 </Box>
                 <Box display="flex" alignItems="center">
                     {/* If report is completed, show View Report, else show Add Report */}
-                    {reportCompleted ? (
-                        <Button variant="contained" color="primary" onClick={onViewReport} sx={{ mr: 1 }}>
+
+                    <Button
+                        variant="outlined"
+                        color={absenceLabel === 'Absent' ? "error" : "success"}
+                        onClick={handleAbsence}
+                        sx={{ mr: 1 }}
+                        disabled={reportCompleted} // Disables the button if reportCompleted is true
+                    >
+                        {absenceLabel}
+                    </Button>
+
+ 
+                    {reportCompleted && absenceLabel == 'Present' ? (
+                        <Button variant="outlined" color="primary" onClick={onViewReport} sx={{ mr: 1 }}>
                             View Report
                         </Button>
                     ) : (
-                        <Button variant="contained" color="primary" onClick={onAddReport} sx={{ mr: 1 }}>
-                            Add Report
-                        </Button>
+                        !canAddReport && absenceLabel == 'Present' && (
+                            <Button variant="outlined" color="primary" onClick={onAddReport} sx={{ mr: 1 }}>
+                                Add Report
+                            </Button>
+                        )
                     )}
-                    {/* Enable View Payment button if report is completed */}
-                    <Button
-                        variant="contained"
-                        color="secondary"
-                        onClick={onViewPayment}  // Trigger view payment handler
-                        disabled={!reportCompleted}  // Enable only if report is completed
-                        sx={{ mr: 1 }}
-                    >
-                        View Payment
-                    </Button>
+
+
                     <IconButton disabled={true}>
                         <CircleIcon sx={{ color: reportCompleted ? 'green' : 'red' }} />
                     </IconButton>

@@ -24,6 +24,7 @@ import { fetchClassSessionById, updateClassSession } from "src/services/classSes
 import { fetchStudents } from "src/services/studentService";
 import { fetchTeachers } from "src/services/teacherService";
 import { fetchTopics } from "src/services/topicService";
+import { fetchLocations } from "src/services/locationService";
 
 interface EditAppointmentModalProps {
   isOpen: boolean;
@@ -50,6 +51,8 @@ export default function EditAppointmentModal({
   const [studentError, setStudentError] = useState<string | null>(null);
   const [startTimeError, setStartTimeError] = useState<string | null>(null);
   const [endTimeError, setEndTimeError] = useState<string | null>(null);
+  const [selectedLocation, setSelectedLocation] = useState<any | null>(null); // Location state
+
 
   useEffect(() => {
     if (appointmentId && isOpen) {
@@ -59,20 +62,29 @@ export default function EditAppointmentModal({
           const session = await fetchClassSessionById(appointmentId);
           setEditedAppointment(session);
 
-          // Set teacher with full name
+          // Preload teacher with full name
           const teacher = session.teacher
             ? { id: session.teacher.id, fullName: `${session.teacher.user.firstName} ${session.teacher.user.lastName}` }
             : null;
           setSelectedTeacher(teacher);
 
-          // Set students with full names
+          // Preload students with full names
           const students = session.students?.map((student: any) => ({
             id: student.id,
             fullName: `${student.user.firstName} ${student.user.lastName}`,
           })) || [];
           setSelectedStudents(students);
 
+          // Preload topic
           setSelectedTopic(session.topic);
+
+          // Preload location
+          if (session.location) {
+            setSelectedLocation({
+              id: session.location.id,
+              name: session.location.name,
+            });
+          }
         } catch (error) {
           setErrorMessage("Failed to fetch class session");
         } finally {
@@ -82,6 +94,7 @@ export default function EditAppointmentModal({
       fetchClassSession();
     }
   }, [appointmentId, isOpen]);
+
 
   const validateTime = (date: Date | null, type: 'start' | 'end'): boolean => {
     if (date) {
@@ -140,6 +153,7 @@ export default function EditAppointmentModal({
       if (!editedAppointment.sessionEndDate) errors.sessionEndDate = t('errors.endTimeRequired');
       if (!selectedTeacher) errors.teacherId = t('errors.teacherSelectionRequired');
       if (!selectedTopic) errors.topicId = t('errors.topicSelectionRequired');
+      if (!selectedLocation) errors.locationId = t('errors.locationSelectionRequired'); // Validate location
 
       // Validate student selection based on the session type
       const { validatedStudents, error } = validateStudentSelection(
@@ -174,6 +188,7 @@ export default function EditAppointmentModal({
         ...restAppointment,
         teacherId: selectedTeacher?.id || null,
         topicId: selectedTopic?.id || null,
+        locationId: selectedLocation?.id || null,
         studentIds: validatedStudents.map((student) => student.id),
       };
 
@@ -201,18 +216,26 @@ export default function EditAppointmentModal({
         ) : (
           editedAppointment && (
             <Box>
-              <TextField
-                label="Class Name"
-                value={editedAppointment.name || ""}
-                onChange={(e) =>
-                  setEditedAppointment({ ...editedAppointment, name: e.target.value })
-                }
-                variant="outlined"
-                fullWidth
-                margin="normal"
-                error={!!fieldErrors.name}
-                helperText={fieldErrors.name}
-              />
+              <Box sx={{ mb: 2 }}>
+                <FormControl fullWidth>
+                  <InputLabel>Room</InputLabel>
+                  <Select
+                    label="Room"
+                    value={editedAppointment.name || ""}
+                    onChange={(e) =>
+                      setEditedAppointment({ ...editedAppointment, name: e.target.value })
+                    }
+                  >
+                    {Array.from({ length: 7 }, (_, index) => (
+                      <MenuItem key={index} value={`R${index + 1}`}>
+                        {`R${index + 1}`}
+                      </MenuItem>
+                    ))}
+                  </Select>
+                </FormControl>
+              </Box>
+
+
 
               <FormControl fullWidth margin="normal">
                 <InputLabel>Session Type</InputLabel>
@@ -287,6 +310,26 @@ export default function EditAppointmentModal({
                 label="Is Holiday Course"
                 sx={{ mb: 2 }}
               />
+
+              <Box sx={{ mb: 2 }}>
+                <SingleSelectWithAutocomplete
+                  label="Select Location"
+                  fetchData={(query) =>
+                    fetchLocations(1, 5, query).then((data) => data.data)
+                  }
+                  onSelect={(location) => setSelectedLocation(location)}
+                  displayProperty="name"
+                  placeholder="Search Location"
+                  initialValue={selectedLocation}
+                  width="100%"
+                />
+                {fieldErrors.locationId && (
+                  <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+                    {fieldErrors.locationId}
+                  </Typography>
+                )}
+              </Box>
+
 
               <Box sx={{ mb: 2 }}>
                 <SingleSelectWithAutocomplete

@@ -1,9 +1,13 @@
 import { api } from "./api";
 
-export const fetchClassSessions = async (startDate: string, endDate: string, location: string = '') => {
+export const fetchClassSessions = async (startDate: string, endDate: string, locationIds: number | number[]) => {
     try {
         const response = await api.get(`/class-sessions`, {
-            params: { startDate, endDate, location },
+            params: {
+                startDate,
+                endDate,
+                locationId: Array.isArray(locationIds) ? locationIds.join(',') : locationIds
+            },
         });
         return response.data;
     } catch (error) {
@@ -12,7 +16,7 @@ export const fetchClassSessions = async (startDate: string, endDate: string, loc
     }
 };
 
-export const fetchUserClassSessions = async (id: string,startDate: string, endDate: string) => {
+export const fetchUserClassSessions = async (id: string, startDate: string, endDate: string) => {
     try {
         const response = await api.get(`/user/${id}/class-sessions`, {
             params: { startDate, endDate },
@@ -23,12 +27,25 @@ export const fetchUserClassSessions = async (id: string,startDate: string, endDa
         throw error;
     }
 };
-export const addClassSessions = async(classData: any)=>{
-    try{
-        const response = await api.post('/class-session',classData)
+
+export const fetchParentClassSessions = async (parentUserId: string, startDate?: string, endDate?: string) => {
+    try {
+        const response = await api.get(`/parent/${parentUserId}/class-sessions`, {
+            params: { startDate, endDate },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching Parent class sessions:', error);
+        throw error;
+    }
+};
+
+export const addClassSessions = async (classData: any) => {
+    try {
+        const response = await api.post('/class-session', classData)
         return response.data
-    }catch(error){
-        console.error('Error adding Class Session',error)
+    } catch (error) {
+        console.error('Error adding Class Session', error)
         throw error
     }
 }

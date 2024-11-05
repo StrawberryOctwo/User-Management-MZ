@@ -1,9 +1,9 @@
 import { api } from "./api";
 
 // Create payment for student when session report is completed
-export const createPaymentForUser = async ({ amount, userId, classSessionId }) => {
+export const createPaymentForUser = async ({ userId, classSessionId,sessionType }) => {
     try {
-        const response = await api.post('/payments/', { amount, userId, classSessionId });
+        const response = await api.post('/payments/', {  userId, classSessionId,sessionType });
         return response.data;
     } catch (error) {
         console.error('Error creating payment for user:', error);
@@ -32,17 +32,31 @@ export const getStudentPaymentDetails = async (studentId: string) => {
     }
 };
 
-// Fetch payments for a student
-export const getPaymentsForUser = async (userId) => {
+export const getParentPayments = async (userId:number,page = 1, limit = 10,  search: string = '',) => {
     try {
-        const response = await api.get(`/payments/user/${userId}`);
+        const response = await api.get(`/parent-payments/${userId}`, {
+            params: { page, limit,search }
+          });
         return response.data;
     } catch (error) {
-        console.error('Error fetching payments for user:', error);
+        console.error('Error fetching parent payment details:', error);
         throw error;
     }
 };
 
+// Fetch payments for a user with pagination
+export const getPaymentsForUser = async (userId:number, page = 1, limit = 10) => {
+    try {
+      const response = await api.get(`/payments/user/${userId}`, {
+        params: { page, limit }
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching payments for user:', error);
+      throw error;
+    }
+  };
+  
 // Fetch payments for a student
 export const getPaymentsForUserByClassSession = async (userId,classSessionId) => {
     try {

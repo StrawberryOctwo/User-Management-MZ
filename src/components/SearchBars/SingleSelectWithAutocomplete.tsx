@@ -26,6 +26,7 @@ const SingleSelectWithAutocomplete = forwardRef(({
     const [options, setOptions] = useState<any[]>([]);
     const [selectedItem, setSelectedItem] = useState<any | null>(initialValue);
     const [loading, setLoading] = useState(false);
+    const [focused, setFocused] = useState(false); // Track focus state
 
     useImperativeHandle(ref, () => ({
         reset: () => {
@@ -44,7 +45,7 @@ const SingleSelectWithAutocomplete = forwardRef(({
         let active = true;
 
         const fetchOptions = async () => {
-            if (query.length >= 0) {
+            if (focused) { // Ensure API is called only when focused
                 setLoading(true);
                 try {
                     const data = await fetchData(query);
@@ -59,8 +60,6 @@ const SingleSelectWithAutocomplete = forwardRef(({
                         setLoading(false);
                     }
                 }
-            } else {
-                setOptions([]); // Reset options when query is cleared or too short
             }
         };
 
@@ -69,7 +68,10 @@ const SingleSelectWithAutocomplete = forwardRef(({
         return () => {
             active = false;
         };
-    }, [query, fetchData]);
+    }, [focused, query, fetchData]); // Only refetch when focused or query changes
+
+    const handleFocus = () => setFocused(true); // Set focus state when focused
+    const handleBlur = () => setFocused(false); // Reset focus state when blurred
 
     const handleChange = (event: any, value: any) => {
         setSelectedItem(value);
@@ -86,6 +88,8 @@ const SingleSelectWithAutocomplete = forwardRef(({
             value={selectedItem}
             isOptionEqualToValue={(option, value) => option[displayProperty] === value[displayProperty]}
             disabled={disabled}
+            onFocus={handleFocus} // Add focus handler
+            onBlur={handleBlur} // Add blur handler
             renderInput={(params) => (
                 <TextField
                     {...params}

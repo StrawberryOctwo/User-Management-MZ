@@ -68,7 +68,7 @@
   "loading_location_data": "Loading location data...",
   "loading_teacher_data": "Loading teacher data...",
   "loading_student_data": "Loading student data...",
-  "user_details": "User Details",
+  "user_details": "Personal Details",
   "teacher_details": "Teacher Details",
   "location_admins": "Location Admins",
   "location_admin": "Location Admin",
@@ -124,5 +124,8 @@
   "payments_section": "Payments Section",
   "lesson_topic": "Lesson Topic",
   "active_participation": "Active Participation",
-  "tutor_remarks": "Tutor Remarks"
+  "tutor_remarks": "Tutor Remarks",
+  "amount": "Amount",
+  "payment_date": "Payment Date",
+  "payment_status": "Payment Status"
 }

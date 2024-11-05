@@ -14,28 +14,9 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { NavLink as RouterLink } from 'react-router-dom';
 import { SidebarContext } from 'src/contexts/SidebarContext';
 import EditCalendarIcon from '@mui/icons-material/CalendarMonth';
-import DesignServicesTwoToneIcon from '@mui/icons-material/DesignServicesTwoTone';
-import BrightnessLowTwoToneIcon from '@mui/icons-material/BrightnessLowTwoTone';
-import CalendarMonthOutlined from '@mui/icons-material/CalendarMonthOutlined'
-import MmsTwoToneIcon from '@mui/icons-material/MmsTwoTone';
-import TableChartTwoToneIcon from '@mui/icons-material/TableChartTwoTone';
-import AccountCircleTwoToneIcon from '@mui/icons-material/AccountCircleTwoTone';
-import BallotTwoToneIcon from '@mui/icons-material/BallotTwoTone';
-import BeachAccessTwoToneIcon from '@mui/icons-material/BeachAccessTwoTone';
-import EmojiEventsTwoToneIcon from '@mui/icons-material/EmojiEventsTwoTone';
-import FilterVintageTwoToneIcon from '@mui/icons-material/FilterVintageTwoTone';
-import HowToVoteTwoToneIcon from '@mui/icons-material/HowToVoteTwoTone';
-import LocalPharmacyTwoToneIcon from '@mui/icons-material/LocalPharmacyTwoTone';
-import RedeemTwoToneIcon from '@mui/icons-material/RedeemTwoTone';
-import SettingsTwoToneIcon from '@mui/icons-material/SettingsTwoTone';
-import TrafficTwoToneIcon from '@mui/icons-material/TrafficTwoTone';
-import CheckBoxTwoToneIcon from '@mui/icons-material/CheckBoxTwoTone';
-import ChromeReaderModeTwoToneIcon from '@mui/icons-material/ChromeReaderModeTwoTone';
-import WorkspacePremiumTwoToneIcon from '@mui/icons-material/WorkspacePremiumTwoTone';
-import CameraFrontTwoToneIcon from '@mui/icons-material/CameraFrontTwoTone';
-import DisplaySettingsTwoToneIcon from '@mui/icons-material/DisplaySettingsTwoTone';
-import { GridFilterListIcon } from '@mui/x-data-grid';
-import { BusinessOutlined, FileUploadSharp, LocationCity, LocationOffRounded, LocationOffSharp, LocationOn, LocationSearching, LocationSearchingTwoTone, Person, PersonAddAlt1Sharp } from '@mui/icons-material';
+import { AttachMoney, BusinessOutlined, FileUploadSharp, LocationSearching, LocationSearchingTwoTone, MoneyRounded, Person, PersonAddAlt1Sharp, Topic } from '@mui/icons-material';
+import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
+import ReceiptIcon from '@mui/icons-material/Receipt';
 import withRole from 'src/hooks/withRole';
 
 const MenuWrapper = styled(Box)(
@@ -201,7 +182,7 @@ function SidebarMenu() {
           <SubMenuWrapper>
             <List component="div">
               <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'Teacher', 'Student', 'LocationAdmin']}
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'Teacher', 'Student', 'Parent', 'LocationAdmin']}
               >
                 <ListItem component="div">
                   <Button
@@ -240,6 +221,22 @@ function SidebarMenu() {
                     startIcon={<BusinessOutlined />}
                   >
                     Franchises
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
+
+              <ProtectedListItem
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/management/billings"
+                    startIcon={<MoneyRounded />}
+                  >
+                    Billings
                   </Button>
                 </ListItem>
               </ProtectedListItem>
@@ -309,6 +306,22 @@ function SidebarMenu() {
               </ProtectedListItem>
 
               <ProtectedListItem
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/management/parents"
+                    startIcon={<PersonAddAlt1Sharp />}
+                  >
+                    Parents
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
+
+              <ProtectedListItem
                 allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher']}
               >
                 <ListItem component="div">
@@ -336,6 +349,67 @@ function SidebarMenu() {
                     startIcon={<FileUploadSharp />}
                   >
                     Files
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
+
+              <ProtectedListItem
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/management/topics"
+                    startIcon={<Topic />}
+                  >
+                    Topics
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
+              <ProtectedListItem
+                allowedRoles={['Parent']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/management/parent-session-reports"
+                    startIcon={<DescriptionOutlinedIcon />}
+                  >
+                    Session Reports
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
+              <ProtectedListItem
+                allowedRoles={[ 'Parent']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/management/payments"
+                    startIcon={<AttachMoney />}
+                  >
+                    Session Payments
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
+              <ProtectedListItem
+                allowedRoles={['Teacher', 'Parent']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/management/invoices"
+                    startIcon={<ReceiptIcon />}
+                  >
+                    Monthly Invoices
                   </Button>
                 </ListItem>
               </ProtectedListItem>

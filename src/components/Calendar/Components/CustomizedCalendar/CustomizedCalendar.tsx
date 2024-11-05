@@ -1,12 +1,6 @@
 import React, { useState, useCallback, useMemo, cloneElement, useEffect } from "react";
 import {
   Box,
-  Button,
-  IconButton,
-  Slider,
-  Typography,
-  Menu,
-  MenuItem,
 } from "@mui/material";
 import moment from "moment";
 import { EventProps, Views } from "react-big-calendar";
@@ -14,16 +8,20 @@ import Calendar from "../Calendar";
 
 import "react-datepicker/dist/react-datepicker.css";
 import "./index.css"; // Your custom styles
-import AppointmentEvent from "./AppointmentEvent"; // Custom Appointment Event component
-import BlockoutEvent from "./BlockoutEvent"; // Custom Blockout Event component
-import { EventItem } from "../../types";
-import ToolbarControls from "./ToolbarControls";
 import EditAppointmentModal from "../Appointment/EditAppointmentModal"; // Import the Edit Appointment Modal
 import AddClassSessionModal from "../Appointment/AddClassSessionModal";
 import ClassSessionDetailsModal from "../Modals/ClassSessionDetailsModal";
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import { useAuth } from "src/hooks/useAuth";
 import { deleteClassSession } from "src/services/classSessionService";
+import FullCalendar from "@fullcalendar/react";
+import resourceTimelinePlugin from '@fullcalendar/resource-timeline';
+import EventItem from "../Appointment/EventItem";
+
+import dayGridPlugin from '@fullcalendar/daygrid';
+import timeGridPlugin from '@fullcalendar/timegrid';
+import interactionPlugin from '@fullcalendar/interaction';
+
 
 export enum TimeSlotMinutes {
   Five = 5,
@@ -31,41 +29,11 @@ export enum TimeSlotMinutes {
   Fifteen = 15,
   Thirty = 30,
 }
-
-const timeSlotLinesMap = {
-  [TimeSlotMinutes.Five]: {
-    '.rbc-time-slot:nth-child(6n + 4):after': {
-      width: '25% !important',
-    },
-    '.rbc-time-slot:nth-child(3n + 2):after': {
-      width: '12.5% !important',
-    },
-    '.rbc-time-slot:nth-child(3n + 3):after': {
-      width: '12.5% !important',
-    },
-  },
-  [TimeSlotMinutes.Ten]: {
-    '.rbc-time-slot:nth-child(3n + 2):after': {
-      width: '12.5% !important',
-    },
-    '.rbc-time-slot:nth-child(3n + 3):after': {
-      width: '12.5% !important',
-    },
-  },
-  [TimeSlotMinutes.Fifteen]: {
-    '.rbc-time-slot:nth-child(2n):after': {
-      width: '25% !important',
-    },
-  },
-  [TimeSlotMinutes.Thirty]: {},
-};
-
-
 type Keys = keyof typeof Views;
 
 
 type DemoProps = {
-  classSessionEvents: EventItem[]; // Accept classSessionEvents as a prop
+  classSessionEvents: any[]; // Accept classSessionEvents as a prop
   onDateChange: (startDate: string, endDate: string) => void; // New prop to pass the date change handler
   handleSaveClassSession: (newSession: any) => void; // Accept as a prop
   loadClassSessions: () => void; // Add this prop
@@ -86,12 +54,24 @@ export default function CustomizedCalendar({
     resourceId: number;
   }>();
 
+  const STEP = 15;
+  const TIME_SLOTS = 60 / STEP;
+
   // State for managing selected event and modal visibility
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isDetailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
   const [canEditSession, setCanEditSession] = useState<boolean | null>(true);
+  const [canAddReport, setCanAddReport] = useState<boolean | null>(false);
+  const [events, setEvents] = useState([]);
+  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [selectedRoom, setSelectedRoom] = useState("");
+  const [selectedRange, setSelectedRange] = useState<{ start: Date; end: Date }>({
+    start: new Date(),
+    end: new Date(),
+  });
+
   const { userRoles } = useAuth();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
 
@@ -115,8 +95,6 @@ export default function CustomizedCalendar({
     }
   }, [view, date]);
 
-  const [zoom, setZoom] = useState<number>(4); // Now it's a single number, not an array
-
   const dateText = useMemo(() => {
     if (view === Views.DAY) return moment(date).format("dddd, MMMM DD");
     if (view === Views.WEEK) {
@@ -126,53 +104,35 @@ export default function CustomizedCalendar({
     }
   }, [view, date]);
 
-  const components: any = {
-    event: ({ event }: EventProps<any>) => {
-      const data = event?.data;
-      if (data?.appointment) {
-        return <AppointmentEvent appointment={data?.appointment} />;
-      }
-      if (data?.blockout) {
-        return <BlockoutEvent blockout={data?.blockout} />;
-      }
-      return null;
-    },
-    timeSlotWrapper: ({
-      children,
-      value,
-      resource,
-    }: {
-      children: JSX.Element;
-      value: string;
-      resource: number;
-    }) => {
-      return cloneElement(children, {
-        onContextMenu: (e: MouseEvent) => {
-          e.preventDefault();
-          setContextMenuInfo({
-            xPosition: e.clientX,
-            yPosition: e.clientY,
-            selectedTime: value,
-            resourceId: resource,
-          });
-        },
-      });
-    },
-  };
-
   const onTodayClick = useCallback(() => {
     setDate(moment().toDate());
   }, []);
 
-  const STEP = 15;
-  const TIME_SLOTS = 60 / STEP;
-
-  // Function to handle event selection
   const handleEventClick = (event: any) => {
-    if (strongestRoles[0] == 'Teacher' || strongestRoles[0] == 'Student') {
-      setCanEditSession(false)
+
+    const eventEndDate = new Date(event.end);
+    const currentDate = new Date();
+
+    if (currentDate > eventEndDate) {
+      console.warn("This event has already ended.");
+      // setCanEditSession(false);
+      setCanAddReport(false)
+    } else if (currentDate < eventEndDate) {
+      setCanAddReport(true)
+      setCanEditSession(true);
     }
-    const appointmentId = event.data?.appointment?.id;
+
+    if (strongestRoles[0] === 'Parent' || strongestRoles[0] === 'Student') {
+      return;
+    }
+
+    if (
+      strongestRoles[0] === 'Teacher' || strongestRoles[0] === 'Parent' || strongestRoles[0] === 'Student'
+    ) {
+      setCanEditSession(false);
+    }
+
+    const appointmentId = event.id;
     if (appointmentId) {
       setSelectedAppointmentId(appointmentId);
       setDetailsModalOpen(true);
@@ -180,6 +140,7 @@ export default function CustomizedCalendar({
       console.error("Event ID is undefined or not available.");
     }
   };
+
 
   const handleEditClassSession = () => {
     if (strongestRoles[0] == 'Teacher' || strongestRoles[0] == 'Student') {
@@ -229,17 +190,39 @@ export default function CustomizedCalendar({
     calculateStartEndDates();
   }, [date, view, calculateStartEndDates]);
 
-  // Modal state
-  const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  const [selectedRange, setSelectedRange] = useState<{ start: Date; end: Date }>({
-    start: new Date(),
-    end: new Date(),
-  });
+  useEffect(() => {
+    // Map classSessionEvents to FullCalendar's event structure
+    const mappedEvents = classSessionEvents.map((session) => {
+      // Extract and format the teacher's name to "F. LastName"
+      const [firstName, lastName] = session.data.appointment.teacher.split(' ');
+      const formattedTeacher = `${firstName[0]}. ${lastName}`;
 
-  const handleOpenAddModal = (start: Date, end: Date) => {
-    if (strongestRoles[0] == 'Student') {
+      return {
+        id: session.data.appointment.id,
+        resourceId: session.resourceId,
+        title: session.data.appointment.topic, // Using topic as the title
+        start: session.start,
+        end: session.end,
+        extendedProps: {
+          topicName: session.data.appointment.topic || "No Topic",
+          teacher: formattedTeacher, // Assigning the formatted name
+          location: session.data.appointment.location,
+          sessionType: session.data.appointment.sessionType,
+          students: session.data.appointment.students,
+        },
+      };
+    });
+
+    setEvents(mappedEvents);
+  }, [classSessionEvents]);
+
+
+
+  const handleOpenAddModal = (start: Date, end: Date, roomId: string) => {
+    if (strongestRoles[0] == 'Student' || strongestRoles[0] == 'Parent') {
       return
     }
+    setSelectedRoom(roomId);
     setSelectedRange({ start, end });
     setIsAddModalOpen(true);
   };
@@ -248,59 +231,53 @@ export default function CustomizedCalendar({
     setIsAddModalOpen(false);
   };
 
+  const resources = [
+    { id: 'R1', title: 'Room 1' },
+    { id: 'R2', title: 'Room 2' },
+    { id: 'R3', title: 'Room 3' },
+    { id: 'R4', title: 'Room 4' },
+    { id: 'R5', title: 'Room 5' },
+    { id: 'R6', title: 'Room 6' },
+    { id: 'R7', title: 'Room 7' },
+  ];
+
+  const renderEventContent = (eventInfo) => {
+    return <EventItem eventInfo={eventInfo} />;
+  };
+
   return (
     <Box display="flex" flexDirection="column" height="100%" width="100%" gap={2} p={2}>
-      <ToolbarControls
-        date={date}
-        zoom={zoom}
-        setZoom={setZoom}
-        setDate={setDate}
-        onTodayClick={onTodayClick}
-        onPrevClick={onPrevClick}
-        onNextClick={onNextClick}
-        setView={setView}
-        view={view}
-        dateText={dateText}
-      />
-      <Box
-        flex={1}
-        width="100%"
-        overflow="auto"
-        position="relative"
-        onClick={() => setContextMenuInfo(undefined)}
-        sx={{
-          '.rbc-timeslot-group': {
-            minHeight: `${zoom * 24}px !important`,
-          },
-          ...timeSlotLinesMap[STEP as TimeSlotMinutes],
+      <FullCalendar
+        plugins={[resourceTimelinePlugin, interactionPlugin]}
+        schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
+        initialView="resourceTimelineDay"
+        headerToolbar={{
+          left: "", // Move "today" button to the left
+          center: "prev title next", // Center title with arrows on each side
+          right: "today" // Empty right section
         }}
-      >
-        <Calendar
-          events={classSessionEvents}
-          defaultDate={moment().toDate()}
-          defaultView={Views.WEEK}
-          min={moment().set({ hour: 9, minute: 0 }).toDate()}
-          max={moment().set({ hour: 22, minute: 0 }).toDate()}
-          components={components}
-          toolbar={false}
-          date={date}
-          view={view}
-          onView={setView}
-          onNavigate={setDate}
-          onSelectEvent={handleEventClick}
-          step={STEP}
-          timeslots={TIME_SLOTS}
-          selectable
-          onSelectSlot={(slotInfo) => {
-            handleOpenAddModal(slotInfo.start, slotInfo.end);
-          }}
-          formats={{
-            timeGutterFormat: "HH:mm",
-            eventTimeRangeFormat: ({ start, end }) =>
-              `${moment(start).format("HH:mm")} - ${moment(end).format("HH:mm")}`,
-          }}
-        />
-      </Box>
+        key={`${resources.length}-${events.length}`}
+        resources={resources}
+        events={events}
+        eventContent={renderEventContent} // Use custom event content
+        slotMinTime="08:00:00"
+        slotMaxTime="18:00:00"
+        resourceAreaWidth="120px"
+        selectable={true}
+        // selectOverlap={(event) => {
+        //   return true;
+        // }}
+        eventClick={(info) => handleEventClick(info.event)}
+        select={(info) => {
+          handleOpenAddModal(info.start, info.end, info.resource.id);
+        }}
+        views={{
+          resourceTimelineDay: {
+            slotMinWidth: 120,
+          }
+        }}
+      />
+
 
       <EditAppointmentModal
         isOpen={isModalOpen}
@@ -316,7 +293,7 @@ export default function CustomizedCalendar({
         onSave={handleSaveClassSession}
         initialStartDate={selectedRange.start}
         initialEndDate={selectedRange.end}
-      />
+        roomId={selectedRoom} />
 
       <ClassSessionDetailsModal
         isOpen={isDetailsModalOpen}
@@ -325,6 +302,7 @@ export default function CustomizedCalendar({
         onEdit={handleEditClassSession}
         onDelete={handleDeleteClassSession}
         canEdit={canEditSession}
+        canAddReport={canAddReport}
       />
     </Box>
   );

@@ -1,60 +1,89 @@
 import React, { useState } from 'react';
-import { FieldConfig } from 'src/components/Table/tableRowCreate'; // Import FieldConfig type from the correct path
-import { Box } from '@mui/material';
+import Box from '@mui/material/Box';
 import { t } from 'i18next';
-import { addFranchise } from 'src/services/franchiseService';
-import ReusableForm from 'src/components/Table/tableRowCreate';
+import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
+import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
+import { fetchFranchises } from 'src/services/franchiseService';
+import { addTopic } from 'src/services/topicService';
 
-// Separate configurations for franchise fields
+const CreateTopic = () => {
+    const [selectedFranchise, setSelectedFranchise] = useState<any>(null); // Store single selected franchise
+    const [loading, setLoading] = useState(false);
 
+    // Handle franchise selection
+    const handleFranchiseSelect = (selectedItem: any) => {
+        setSelectedFranchise(selectedItem); // Save the single selected franchise
+    };
 
-const CreateFranchise = () => {
-    const [loading, setLoading] = useState(false); // Unified loading state for both fetching and deleting
-
-    const handleFranchiseSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
+    // Handle form submission
+    const handleSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
         setLoading(true);
-
-        // Structure the data as required by the API
         try {
+            // Check if a franchise is selected
+            const franchiseId = selectedFranchise?.id || null;
+
+            if (!franchiseId) {
+                throw new Error('Please select a franchise.');
+            }
+
+            // Prepare the payload for topic creation
             const payload = {
                 name: data.name,
-                ownerName: data.ownerName,
-                cardHolderName: data.cardHolderName,
-                iban: data.iban,
-                bic: data.bic,
-                status: data.status,
-                totalEmployees: data.totalEmployees,
+                description: data.description,
+                franchiseId: franchiseId, // Include the selected franchise ID
             };
-            const response = await addFranchise(payload);
-            return response
-        }
-        catch (error: any) {
-            console.error("Error adding Franchise:", error);
+
+            // Step 1: Create the topic
+            const response = await addTopic(payload);
+
+            // Reset form fields and franchise after successful submission
+            setSelectedFranchise(null);
+
+            return response;
+        } catch (error: any) {
+            console.error("Error adding topic:", error);
             throw error;
         } finally {
             setLoading(false);
         }
     };
-    const franchiseFields: FieldConfig[] = [
-        { name: 'name', label: t('franchise_name'), type: 'text', required: true, section: 'Franchise Information' },
-        { name: 'ownerName', label: t('owner_name'), type: 'text', required: true, section: 'Franchise Information' },
-        { name: 'cardHolderName', label: t('card_holder_name'), type: 'text', required: true, section: 'Franchise Information' },
-        { name: 'iban', label: t('iban'), type: 'text', required: true, section: 'Franchise Information' },
-        { name: 'bic', label: t('bic'), type: 'text', required: true, section: 'Franchise Information' },
-        { name: 'status', label: t('status'), type: 'text', required: true, section: 'Franchise Information' }, // You may want to make this a dropdown for predefined statuses
-        { name: 'totalEmployees', label: t('total_employees'), type: 'number', required: true, section: 'Franchise Information' },
+
+    // Topic Data fields configuration
+    const topicFields: FieldConfig[] = [
+        { name: 'name', label: t('topic_name'), type: 'text', required: true, section: 'Topic Information' },
+        { name: 'description', label: t('description'), type: 'textarea', required: true, section: 'Topic Information' },
     ];
+
+    // Franchise Selection field configuration
+    const franchiseField = [
+        {
+            name: 'franchise',
+            label: 'Franchise',
+            type: 'custom',
+            section: 'Franchise Assignment',
+            component: (
+                <SingleSelectWithAutocomplete
+                    label={t('Search_and_assign_franchises')}
+                    fetchData={(query) => fetchFranchises(1, 5, query).then((data) => data.data)}
+                    onSelect={handleFranchiseSelect}
+                    displayProperty="name"
+                    placeholder="Type to search franchises"
+                />
+            ),
+        },
+    ];
+
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
 
             <ReusableForm
-                fields={franchiseFields} // Use franchise fields array
-                onSubmit={handleFranchiseSubmit}
-                entityName="Franchise"
+                fields={[...topicFields, ...franchiseField]} // Merge both field arrays
+                onSubmit={handleSubmit}
+                entityName="Topic"
                 entintyFunction="Add"
             />
         </Box>
     );
 };
 
-export default CreateFranchise;
+export default CreateTopic;

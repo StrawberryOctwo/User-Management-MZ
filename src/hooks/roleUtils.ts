@@ -1,5 +1,5 @@
 // roleUtils.ts
-export const ROLE_HIERARCHY = ['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher', 'Student'];
+export const ROLE_HIERARCHY = ['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher', 'Parent','Student'];
 
 // Function to get the strongest roles for the logged user
 export const getStrongestRoles = (userRoles: string[]): string[] => {

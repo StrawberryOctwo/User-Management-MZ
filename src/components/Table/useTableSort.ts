@@ -6,7 +6,7 @@ type Order = 'asc' | 'desc';
 
 const useTableSort = (defaultOrderBy: string) => {
     const [order, setOrder] = useState<Order>('asc');
-    const [orderBy, setOrderBy] = useState<string>(defaultOrderBy);
+    const [orderBy, setOrderBy] = useState<string | null>(null);
 
     const handleRequestSort = (property: string) => {
         const isAsc = orderBy === property && order === 'asc';

@@ -3,12 +3,12 @@ import React, { useEffect, useState } from 'react';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
-import { Franchise } from 'src/models/FranchiseModel';
-import { deleteFranchise, fetchFranchises } from 'src/services/franchiseService';
+import { deleteTopic, fetchTopics } from 'src/services/topicService'; // Updated import to topicService
 import { useNavigate } from 'react-router-dom';
+import { Topic } from 'src/models/TopicModel';
 
-export default function ViewFranchisePage() {
-  const [franchises, setFranchises] = useState<Franchise[]>([]);
+export default function ViewTopicPage() { // Updated component name
+  const [topics, setTopics] = useState<Topic[]>([]); // Updated state for topics
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -21,37 +21,44 @@ export default function ViewFranchisePage() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadFranchises();
+    loadTopics(); // Updated to load topics
   }, [limit, page]);
 
-  const loadFranchises = async (searchQuery = '') => {
+  const loadTopics = async (searchQuery='') => {
     setLoading(true);
+    setErrorMessage(null); // Clear any previous error message
     try {
-      const { data, total } = await fetchFranchises(page + 1, limit, searchQuery);
-      setFranchises([...data]);
+      const { data, total } = await fetchTopics(page + 1, limit, searchQuery);
+      const flattenedTopics = data.map((topic: { id: any; name: any; description: any; franchise: { name: any; }; created_at: string }) => ({
+        id: topic.id,
+        name: topic.name,
+        description: topic.description,
+        franchiseName: topic.franchise?.name || 'N/A', // Flatten the franchise name
+        created_at: topic.created_at, // Retain the created_at field
+      }));
+      setTopics(flattenedTopics); // Set the transformed topics
       setTotalCount(total);
     } catch (error) {
-      showMessage('Failed to load franchises.', 'error');
+      console.error('Failed to load topics:', error);
+      setErrorMessage('Failed to load topics. Please try again.');
     } finally {
       setLoading(false);
     }
   };
+  
 
   const columns = [
-    { field: 'name', headerName: 'Franchise Name' },
-    { field: 'ownerName', headerName: 'Owner Name' },
-    { field: 'status', headerName: 'Status', render: (value: any) => (value === '1' ? '1' : '0') },
-    { field: 'totalEmployees', headerName: 'Total Employees' },
-    { field: 'created_at', headerName: 'Created At', render: (value: any) => new Date(value).toLocaleDateString() },
+    { field: 'name', headerName: 'Topic Name' }, // Topic name
+    { field: 'description', headerName: 'Description' }, // Topic description
+    { field: 'franchiseName', headerName: 'Franchise' }, // Franchise name (flattened)
+    { field: 'created_at', headerName: 'Created At', render: (value: any) => new Date(value).toLocaleDateString() }, // Created date
   ];
-
   const handleEdit = (id: any) => {
     navigate(`edit/${id}`);
   };
 
   const handleView = (id: any) => {
     navigate(`view/${id}`);
-
   };
 
   const handleDelete = async () => {
@@ -59,11 +66,11 @@ export default function ViewFranchisePage() {
     setLoading(true);
 
     try {
-      const response = await deleteFranchise(selectedIds);
+      const response = await deleteTopic(selectedIds[0]); // Updated API call for deleting topics
       showMessage(response.message, 'success');
-      await loadFranchises();
+      await loadTopics(); // Reload topics after delete
     } catch (error: any) {
-      const errorMessage = error.response?.data?.message || 'Failed to delete franchises.';
+      const errorMessage = error.response?.data?.message || 'Failed to delete topics.';
       showMessage(errorMessage, 'error');
     } finally {
       setLoading(false);
@@ -90,13 +97,13 @@ export default function ViewFranchisePage() {
   return (
     <Box>
       <ReusableTable
-        data={franchises}
+        data={topics} // Updated data to topics
         columns={columns}
-        title="Franchise List"
+        title="Topic List" // Updated title
         onEdit={handleEdit}
         onView={handleView}
         onDelete={confirmDelete}
-        onSearchChange={loadFranchises}
+        onSearchChange={loadTopics} // Updated search handler
         loading={loading}
         error={!!errorMessage}
         page={page}
@@ -126,8 +133,8 @@ export default function ViewFranchisePage() {
           </>
         }
       >
-        <p>Are you sure you want to delete the selected franchise admins?</p>
+        <p>Are you sure you want to delete the selected topics?</p>
       </ReusableDialog>
     </Box>
   );
-};
+}

@@ -48,12 +48,14 @@ export default function AddClassSessionModal({
   onSave,
   initialStartDate,
   initialEndDate,
+  roomId
 }: {
   isOpen: boolean;
   onClose: () => void;
   onSave: (newSession: any) => void;
   initialStartDate: Date;
   initialEndDate: Date;
+  roomId?: string | number;
 }) {
   const [newSession, setNewSession] = useState<ClassSession>({
     name: '',
@@ -106,7 +108,6 @@ export default function AddClassSessionModal({
 
   const handleSave = () => {
     const errors: { [key: string]: string | null } = {};
-    const sessionArray: ClassSession[] = [];
 
     // Validate required fields
     if (!newSession.name.trim()) errors.name = t('errors.classNameRequired');
@@ -114,8 +115,16 @@ export default function AddClassSessionModal({
     if (!newSession.sessionEndDate) errors.sessionEndDate = t('errors.endTimeRequired');
     if (!selectedTeacher) errors.teacherId = t('errors.teacherSelectionRequired');
     if (!selectedTopic) errors.topicId = t('errors.topicSelectionRequired');
-    if (strongestRoles.includes('Teacher') && !selectedLocation) {
-      errors.locationId = t('errors.locationSelectionRequired'); // Add error if location is not selected
+    if (!selectedLocation) errors.locationId = t('errors.locationSelectionRequired');
+
+    // Calculate and validate session duration
+    const start = new Date(newSession.sessionStartDate);
+    const end = new Date(newSession.sessionEndDate);
+    const durationMinutes = (end.getTime() - start.getTime()) / (1000 * 60);
+
+    const allowedDurations = [45, 60, 90, 120];
+    if (!allowedDurations.includes(durationMinutes)) {
+      errors.duration = t('errors.invalidDuration', { allowed: allowedDurations.join(', ') });
     }
 
     const { validatedStudents, error } = validateStudentSelection(
@@ -129,29 +138,28 @@ export default function AddClassSessionModal({
       errors.studentIds = error;
     } else {
       setStudentError(null);
+      // Update newSession with validated student IDs
+      setNewSession((prevSession) => ({
+        ...prevSession,
+        studentIds: validatedStudents.map((student) => student.id),
+      }));
     }
 
     setFieldErrors(errors);
 
-    const isStartTimeValid = validateTime(new Date(newSession.sessionStartDate), 'start');
-    const isEndTimeValid = validateTime(new Date(newSession.sessionEndDate), 'end');
+    const isStartTimeValid = validateTime(start, 'start');
+    const isEndTimeValid = validateTime(end, 'end');
 
-    // Check for any errors or invalid times
     if (
       Object.values(errors).some((error) => error !== null) ||
       !isStartTimeValid ||
       !isEndTimeValid
     ) {
-      return; // Exit if any validation fails
+      return;
     }
 
     if (isRepeat && repeatUntilDate) {
-      const generatedSessions = generateRepeatedSessions(
-        new Date(newSession.sessionStartDate),
-        new Date(newSession.sessionEndDate),
-        repeatUntilDate
-      );
-      console.log(generatedSessions)
+      const generatedSessions = generateRepeatedSessions(start, end, repeatUntilDate);
       onSave(generatedSessions);
     } else {
       onSave([newSession]);
@@ -160,6 +168,8 @@ export default function AddClassSessionModal({
     clearForm();
     onClose();
   };
+
+
 
   const generateRepeatedSessions = (
     startDate: Date,
@@ -211,6 +221,12 @@ export default function AddClassSessionModal({
       sessionEndDate: initialEndDate,
     }));
   }, [initialStartDate, initialEndDate]);
+
+  useEffect(() => {
+    if (roomId) {
+      setNewSession((prev) => ({ ...prev, name: roomId as string }));
+    }
+  }, [roomId]);
 
   const clearForm = () => {
     setSelectedStudents([]);
@@ -274,19 +290,24 @@ export default function AddClassSessionModal({
     <Dialog open={isOpen} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>Add Class Session</DialogTitle>
       <DialogContent>
-        <Box sx={{ mb: 2, mt: 2 }}>
-          <TextField
-            label="Class Name"
-            fullWidth
-            value={newSession.name}
-            onChange={(e) =>
-              setNewSession({ ...newSession, name: e.target.value })
-            }
-            error={!!fieldErrors.name}
-            helperText={fieldErrors.name}
-          />
+        <Box sx={{ mb: 2 }}>
+          <FormControl fullWidth>
+            <InputLabel>Room</InputLabel>
+            <Select
+              label="Room"
+              value={newSession.name || ""} // Use newSession.name for room selection
+              onChange={(e) =>
+                setNewSession({ ...newSession, name: e.target.value })
+              }
+            >
+              {Array.from({ length: 7 }, (_, index) => (
+                <MenuItem key={index} value={`R${index + 1}`}>
+                  {`R${index + 1}`}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Box>
-
 
         <Box sx={{ mb: 2 }}>
           <FormControl fullWidth>
@@ -339,6 +360,11 @@ export default function AddClassSessionModal({
             helperText={fieldErrors.sessionEndDate || endTimeError}
           />
         </Box>
+        {fieldErrors.duration && (
+          <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+            {fieldErrors.duration}
+          </Typography>
+        )}
 
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3, ml: 1 }}>
           <FormControlLabel

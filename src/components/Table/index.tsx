@@ -29,6 +29,7 @@ import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import useTableSort from './useTableSort';
 import { CSVLink } from 'react-csv';
 import React from 'react';
+import DownloadTwoToneIcon from '@mui/icons-material/DownloadTwoTone';
 
 interface Column {
     field: string;
@@ -44,6 +45,7 @@ interface ReusableTableProps {
     onView?: (id: any) => void;
     onDelete?: (selectedIds: number[]) => void;
     onSearchChange?: (query: string) => void;
+    onDownload?: (row: any) => void;
     loading: boolean;
     error?: boolean;
     page: number;
@@ -51,6 +53,7 @@ interface ReusableTableProps {
     onPageChange: (newPage: number) => void;
     onLimitChange: (newLimit: number) => void;
     totalCount: number;
+    showDefaultActions?: boolean;
 }
 
 const getStatusLabel = (status: string): JSX.Element => {
@@ -71,13 +74,15 @@ export default function ReusableTable({
     onView,
     onDelete,
     onSearchChange,
+    onDownload,
     loading = false,
     error = false,
     page,
     limit,
     onPageChange,
     onLimitChange,
-    totalCount
+    totalCount,
+    showDefaultActions = true
 }: ReusableTableProps) {
     const [searchQuery, setSearchQuery] = useState('');
     const [selectedRows, setSelectedRows] = useState<number[]>([]);
@@ -216,22 +221,6 @@ export default function ReusableTable({
                     ))
                 }
                 <TableCell align="right">
-                    {onEdit && (
-                        <Tooltip title="Edit" arrow>
-                            <IconButton
-                                onClick={() => onEdit(row.id)}
-                                sx={{
-                                    '&:hover': {
-                                        background: theme.colors.primary.lighter,
-                                    },
-                                    color: theme.palette.primary.main,
-                                }}
-                                size="small"
-                            >
-                                <EditTwoToneIcon fontSize="small" />
-                            </IconButton>
-                        </Tooltip>
-                    )}
                     {onView && (
                         <Tooltip title="View" arrow>
                             <IconButton
@@ -245,6 +234,22 @@ export default function ReusableTable({
                                 size="small"
                             >
                                 <VisibilityTwoToneIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+                    )}
+                    {onEdit && (
+                        <Tooltip title="Edit" arrow>
+                            <IconButton
+                                onClick={() => onEdit(row.id)}
+                                sx={{
+                                    '&:hover': {
+                                        background: theme.colors.primary.lighter,
+                                    },
+                                    color: theme.palette.primary.main,
+                                }}
+                                size="small"
+                            >
+                                <EditTwoToneIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>
                     )}
@@ -263,6 +268,23 @@ export default function ReusableTable({
                                 <DeleteTwoToneIcon fontSize="small" />
                             </IconButton>
                         </Tooltip>
+                    )}
+                    {onDownload && (
+                        <Tooltip title="Download" arrow>
+                            <IconButton
+                                onClick={() => onDownload(row)}
+                                sx={{
+                                    '&:hover': {
+                                        background: theme.colors.secondary.lighter,
+                                    },
+                                    color: theme.palette.info.dark,
+                                }}
+                                size="small"
+                            >
+                                <DownloadTwoToneIcon fontSize="small" />
+                            </IconButton>
+                        </Tooltip>
+
                     )}
                 </TableCell>
             </TableRow >
@@ -345,7 +367,10 @@ export default function ReusableTable({
                                     </TableSortLabel>
                                 </TableCell>
                             ))}
-                            <TableCell align="right">Actions</TableCell>
+                            {/* Conditionally render the Actions column */}
+                            {showDefaultActions && (
+                                <TableCell align="right">Actions</TableCell>
+                            )}
                         </TableRow>
                     </TableHead>
                     <TableBody>{renderTableBody()}</TableBody>
@@ -364,4 +389,5 @@ export default function ReusableTable({
             </Box>
         </Card>
     );
+
 };

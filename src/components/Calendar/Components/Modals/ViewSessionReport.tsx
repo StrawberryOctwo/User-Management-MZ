@@ -7,9 +7,9 @@ interface ViewSessionReportFormProps {
     isOpen: boolean;
     reportId: string;
     onClose: () => void;
-    onDelete: () => void;  // Remove refresh logic here
-    student: any;
-    classSessionId: string;
+    onDelete: () => void;
+    readOnly?: boolean; 
+
 }
 
 const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
@@ -17,22 +17,22 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
     onClose,
     reportId,
     onDelete,
-    student,
-    classSessionId,
+    readOnly = false 
+
 }) => {
-    const [lessonTopic, setLessonTopic] = useState<string>(''); 
-    const [coveredMaterials, setCoveredMaterials] = useState<string>(''); 
-    const [progress, setProgress] = useState<string>(''); 
-    const [learningAssessment, setLearningAssessment] = useState<string>(''); 
+    const [lessonTopic, setLessonTopic] = useState<string>('');
+    const [coveredMaterials, setCoveredMaterials] = useState<string>('');
+    const [progress, setProgress] = useState<string>('');
+    const [learningAssessment, setLearningAssessment] = useState<string>('');
     const [activeParticipation, setActiveParticipation] = useState<boolean>(false);
     const [concentration, setConcentration] = useState<boolean>(false);
     const [worksIndependently, setWorksIndependently] = useState<boolean>(false);
     const [cooperation, setCooperation] = useState<boolean>(false);
     const [previousHomeworkCompleted, setPreviousHomeworkCompleted] = useState<boolean>(false);
-    const [nextHomework, setNextHomework] = useState<string>(''); 
-    const [tutorRemarks, setTutorRemarks] = useState<string>(''); 
-    const [sessionDate, setSessionDate] = useState<string>(''); 
-    const [studentName, setStudentName] = useState<string>(''); 
+    const [nextHomework, setNextHomework] = useState<string>('');
+    const [tutorRemarks, setTutorRemarks] = useState<string>('');
+    const [sessionDate, setSessionDate] = useState<string>('');
+    const [studentName, setStudentName] = useState<string>('');
     const [loading, setLoading] = useState<boolean>(true);  // Track loading state for the form data
 
     // Fetch the session report when the dialog opens
@@ -42,9 +42,9 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                 setLoading(true);
                 try {
                     const report = await getSessionReportById(reportId);  // Fetch the report by ID
-                    
+
                     // Set all fields to the values from the fetched report
-        
+
                     setLessonTopic(report.data.lessonTopic || '');
                     setCoveredMaterials(report.data.coveredMaterials || '');
                     setProgress(report.data.progress || '');
@@ -91,19 +91,19 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
 
     const handleSave = async () => {
         try {
-            await updateSessionReport(reportId, { 
+            await updateSessionReport(reportId, {
 
-                lessonTopic, 
-                coveredMaterials, 
-                progress, 
-                learningAssessment, 
-                activeParticipation, 
-                concentration, 
-                worksIndependently, 
-                cooperation, 
-                previousHomeworkCompleted, 
-                nextHomework, 
-                tutorRemarks 
+                lessonTopic,
+                coveredMaterials,
+                progress,
+                learningAssessment,
+                activeParticipation,
+                concentration,
+                worksIndependently,
+                cooperation,
+                previousHomeworkCompleted,
+                nextHomework,
+                tutorRemarks
             });
             onClose();   // Close the dialog after saving
         } catch (error) {
@@ -123,7 +123,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
 
     return (
         <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle>View/Edit Session Report for {studentName}</DialogTitle>
+            <DialogTitle>{readOnly ? 'View' : 'View/Edit'} Session Report for {studentName}</DialogTitle>
             <DialogContent>
                 {loading ? (
                     <Box display="flex" justifyContent="center" mt={2}>
@@ -131,7 +131,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                     </Box>
                 ) : (
                     <Box display="flex" flexDirection="column" gap={2} mt={2}>
-                        
+
                         {/* Read-Only Fields */}
                         <TextField
                             label="Student Name"
@@ -139,19 +139,20 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                             fullWidth
                             InputProps={{ readOnly: true }}
                         />
-                        
+
                         <TextField
                             label="Session Date"
                             value={sessionDate}
                             fullWidth
                             InputProps={{ readOnly: true }}
                         />
-                        
+
                         <TextField
                             label="Lesson Topic"
                             value={lessonTopic}
                             onChange={(e) => setLessonTopic(e.target.value)}
                             fullWidth
+                            InputProps={{ readOnly }}
                         />
 
                         <TextField
@@ -159,6 +160,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                             value={coveredMaterials}
                             onChange={(e) => setCoveredMaterials(e.target.value)}
                             fullWidth
+                            InputProps={{ readOnly }}
                         />
 
                         <TextField
@@ -166,6 +168,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                             value={progress}
                             onChange={(e) => setProgress(e.target.value)}
                             fullWidth
+                            InputProps={{ readOnly }}
                         />
 
                         <TextField
@@ -173,6 +176,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                             value={learningAssessment}
                             onChange={(e) => setLearningAssessment(e.target.value)}
                             fullWidth
+                            InputProps={{ readOnly }}
                         />
 
                         <TextField
@@ -180,6 +184,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                             value={nextHomework}
                             onChange={(e) => setNextHomework(e.target.value)}
                             fullWidth
+                            InputProps={{ readOnly }}
                         />
 
                         <TextField
@@ -187,6 +192,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                             value={tutorRemarks}
                             onChange={(e) => setTutorRemarks(e.target.value)}
                             fullWidth
+                            InputProps={{ readOnly }}
                         />
 
                         {/* Boolean fields */}
@@ -197,6 +203,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                                 value={activeParticipation ? 'Yes' : 'No'}
                                 onChange={(e) => setActiveParticipation(e.target.value === 'Yes')}
                                 fullWidth
+                                InputProps={{ readOnly }}
                             >
                                 <MenuItem value="Yes">Yes</MenuItem>
                                 <MenuItem value="No">No</MenuItem>
@@ -208,6 +215,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                                 value={concentration ? 'Yes' : 'No'}
                                 onChange={(e) => setConcentration(e.target.value === 'Yes')}
                                 fullWidth
+                                InputProps={{ readOnly }}
                             >
                                 <MenuItem value="Yes">Yes</MenuItem>
                                 <MenuItem value="No">No</MenuItem>
@@ -221,6 +229,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                                 value={worksIndependently ? 'Yes' : 'No'}
                                 onChange={(e) => setWorksIndependently(e.target.value === 'Yes')}
                                 fullWidth
+                                InputProps={{ readOnly }}
                             >
                                 <MenuItem value="Yes">Yes</MenuItem>
                                 <MenuItem value="No">No</MenuItem>
@@ -232,6 +241,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                                 value={cooperation ? 'Yes' : 'No'}
                                 onChange={(e) => setCooperation(e.target.value === 'Yes')}
                                 fullWidth
+                                InputProps={{ readOnly }}
                             >
                                 <MenuItem value="Yes">Yes</MenuItem>
                                 <MenuItem value="No">No</MenuItem>
@@ -245,6 +255,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                                 value={previousHomeworkCompleted ? 'Yes' : 'No'}
                                 onChange={(e) => setPreviousHomeworkCompleted(e.target.value === 'Yes')}
                                 fullWidth
+                                InputProps={{ readOnly }}
                             >
                                 <MenuItem value="Yes">Yes</MenuItem>
                                 <MenuItem value="No">No</MenuItem>
@@ -254,14 +265,16 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                     </Box>
                 )}
             </DialogContent>
-            <DialogActions>
-                <Button onClick={handleDelete} color="secondary">
-                    Delete Report
-                </Button>
-                <Button onClick={handleSave} color="primary" variant="contained">
-                    Save Report
-                </Button>
-            </DialogActions>
+            {!readOnly && (
+                <DialogActions>
+                    <Button onClick={handleDelete} color="error">
+                        Delete Report
+                    </Button>
+                    <Button onClick={handleSave} color="primary" variant="contained">
+                        Save Report
+                    </Button>
+                </DialogActions>
+            )}
         </Dialog>
     );
 };

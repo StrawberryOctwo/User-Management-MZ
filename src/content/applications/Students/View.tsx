@@ -1,13 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Box, Typography } from '@mui/material';
+import { Box, Typography, Button, MenuItem, Select, Dialog, DialogActions, DialogContent, DialogTitle } from '@mui/material';
 import { t } from 'i18next';
-import { format } from 'date-fns';
 import { fetchStudentById, fetchStudentDocumentsById } from 'src/services/studentService';
+import { getSessionReportsForStudent } from 'src/services/sessionReportService';
 import ReusableDetails from 'src/components/View';
 import FileActions from 'src/components/Files/FileActions';
-import { getSessionReportsForStudent } from 'src/services/sessionReportService';
-import { getPaymentsForUser } from 'src/services/paymentService.';
+import { getPaymentsForUser, updatePaymentStatus } from 'src/services/paymentService';
+import ViewSessionReportForm from 'src/components/Calendar/Components/Modals/ViewSessionReport';
 
 const ViewStudentPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -17,6 +17,8 @@ const ViewStudentPage: React.FC = () => {
     const [documents, setDocuments] = useState<any[]>([]);
     const [sessionReports, setSessionReports] = useState<any[]>([]);
     const [payments, setPayments] = useState<any[]>([]);
+    const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
+    const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
 
     // Function to load the student and associated data
     const loadStudentData = async () => {
@@ -34,7 +36,7 @@ const ViewStudentPage: React.FC = () => {
             setSessionReports(reports);
 
             const userPayments = await getPaymentsForUser(studentData.user?.id);
-            setPayments(userPayments);
+            setPayments(userPayments.data);
         } catch (error: any) {
             console.error('Failed to fetch student data:', error);
             setErrorMessage(t('failed_to_fetch_student'));
@@ -43,17 +45,36 @@ const ViewStudentPage: React.FC = () => {
         }
     };
 
+
+    const handleUpdateStatus = async (paymentId: number, newStatus: string) => {
+        setPayments((prevPayments) =>
+            prevPayments.map((payment) =>
+                payment.id === paymentId ? { ...payment, paymentStatus: newStatus } : payment
+            )
+        );
+
+        try {
+            await updatePaymentStatus(paymentId, newStatus); // Call API to confirm update
+        } catch (error) {
+            console.error('Failed to update payment status:', error);
+            loadStudentData();
+        }
+    };
+
+
+
     useEffect(() => {
         if (id) {
             loadStudentData();
         }
     }, [id]);
+
     const flattenedData = {
-        ...student, // Spread original student data
-        sessionReports, // Include sessionReports
-        documents, // Include documents
-        payments, // Include payments
-        firstName: student?.user?.firstName || '', // Flatten user fields
+        ...student,
+        sessionReports,
+        documents,
+        payments,
+        firstName: student?.user?.firstName || '',
         lastName: student?.user?.lastName || '',
         dob: student?.user?.dob || '',
         email: student?.user?.email || '',
@@ -62,10 +83,22 @@ const ViewStudentPage: React.FC = () => {
         phoneNumber: student?.user?.phoneNumber || '',
     };
 
-
     // Ensure the user data is fetched correctly
     const user = student?.user || {}; // Use a default empty object if user is undefined
-    // Define fields for ReusableDetails
+
+    // Open the session report dialog
+    const openReportDialog = (reportId: string) => {
+        setSelectedReportId(reportId);
+        setIsReportDialogOpen(true);
+    };
+
+    // Close the session report dialog and reload data if needed
+    const closeReportDialog = () => {
+        setIsReportDialogOpen(false);
+        setSelectedReportId(null);
+        // loadStudentData();
+    };
+
     const Fields = [
         { name: 'firstName', label: t('first_name'), section: t('user_details') },
         { name: 'lastName', label: t('last_name'), section: t('user_details') },
@@ -83,6 +116,13 @@ const ViewStudentPage: React.FC = () => {
         { name: 'availableDates', label: t('available_dates'), section: t('student_details') },
         { name: 'created_at', label: t('created_date'), section: t('student_details') },
         {
+            name: 'locations',
+            label: t('locations'),
+            section: t('student_details'),
+            isArray: true,
+            isTextArray: true, // Display locations as comma-separated text
+        },
+        {
             name: 'sessionReports',
             label: t('session_reports'),
             section: t('session_reports'),
@@ -91,6 +131,21 @@ const ViewStudentPage: React.FC = () => {
                 { field: 'lessonTopic', headerName: t('lesson_topic'), flex: 1 },
                 { field: 'activeParticipation', headerName: t('active_participation'), flex: 1 },
                 { field: 'tutorRemarks', headerName: t('tutor_remarks'), flex: 1 },
+                {
+                    field: 'actions',
+                    headerName: t('actions'),
+                    renderCell: (params: { row: { id: string } }) => (
+                        <Button
+                            variant="contained"
+                            color="primary"
+                            onClick={() => openReportDialog(params.row.id)}
+                        >
+                            {t('view_report')}
+                        </Button>
+                    ),
+                    sortable: false,
+                    width: 150,
+                },
             ],
         },
         {
@@ -100,8 +155,31 @@ const ViewStudentPage: React.FC = () => {
             isArray: true,
             columns: [
                 { field: 'amount', headerName: t('amount'), flex: 1 },
-                { field: 'paymentStatus', headerName: t('status'), flex: 1 },
-                { field: 'paymentDate', headerName: t('date'), format: 'yyyy-MM-dd', flex: 1 },
+                {
+                    field: 'paymentDate',
+                    headerName: t('payment_date'),
+                    flex: 1,
+                    render: (value: any) =>
+                        new Date(value).toLocaleDateString(undefined, { year: 'numeric', month: '2-digit', day: '2-digit' }),
+                },
+                {
+                    field: 'paymentStatus',
+                    headerName: t('payment_status'),
+                    renderCell: (params: { row: { id: number; paymentStatus: string } }) => (
+                        <Select
+                            value={params.row.paymentStatus}
+                            onChange={(e) => handleUpdateStatus(params.row.id, e.target.value)}
+                            fullWidth
+                            sx={{ height: 40 }}
+                        >
+                            <MenuItem value="Pending">{t('pending')}</MenuItem>
+                            <MenuItem value="Paid">{t('paid')}</MenuItem>
+                            <MenuItem value="Cancelled">{t('cancelled')}</MenuItem>
+                        </Select>
+                    ),
+                    sortable: false,
+                    width: 180,
+                },
             ],
         },
         {
@@ -140,6 +218,15 @@ const ViewStudentPage: React.FC = () => {
                 />
             ) : (
                 <Typography variant="h6">{t('no_student_data_available')}</Typography>
+            )}
+            {/* View Session Report Dialog */}
+            {selectedReportId && (
+                <ViewSessionReportForm
+                    isOpen={isReportDialogOpen}
+                    reportId={selectedReportId}
+                    onClose={closeReportDialog}
+                    onDelete={closeReportDialog}
+                />
             )}
         </Box>
     );

@@ -26,6 +26,7 @@ const MultiSelectWithCheckboxes = forwardRef(({
     const [options, setOptions] = useState<any[]>(initialValue || []);
     const [selectedItems, setSelectedItems] = useState<any[]>(initialValue || []);
     const [loading, setLoading] = useState(false);
+    const [focused, setFocused] = useState(false); // Track focus state
 
     useImperativeHandle(ref, () => ({
         reset: () => {
@@ -35,7 +36,6 @@ const MultiSelectWithCheckboxes = forwardRef(({
         },
         selectedItems, // Expose selectedItems
     }));
-
 
     useEffect(() => {
         if (initialValue.length > 0) {
@@ -48,7 +48,7 @@ const MultiSelectWithCheckboxes = forwardRef(({
         let active = true;
 
         const fetchOptions = async () => {
-            if (query.length >= 0) {
+            if (focused) { // Only fetch options if the input is focused
                 setLoading(true);
                 try {
                     const data = await fetchData(query);
@@ -66,8 +66,6 @@ const MultiSelectWithCheckboxes = forwardRef(({
                         setLoading(false);
                     }
                 }
-            } else if (query.length === 0 && initialValue.length === 0) {
-                setOptions([]);
             }
         };
 
@@ -78,17 +76,18 @@ const MultiSelectWithCheckboxes = forwardRef(({
         return () => {
             active = false;
         };
-    }, [query, fetchData, selectedItems, displayProperty]);
+    }, [focused, query, fetchData, selectedItems]);
+
+    const handleFocus = () => setFocused(true); // Set focus state
+    const handleBlur = () => setFocused(false); // Reset focus state on blur
 
     const handleChange = (event: any, value: any[]) => {
         setSelectedItems(value);
         onSelect(value);
     };
 
-    // Helper function to get the nested property value
-    const getNestedProperty = (option: any, path: string) => {
-        return path.split('.').reduce((acc, part) => acc && acc[part], option);
-    };
+    const getNestedProperty = (option: any, path: string) =>
+        path.split('.').reduce((acc, part) => acc && acc[part], option);
 
     return (
         <Autocomplete
@@ -99,22 +98,21 @@ const MultiSelectWithCheckboxes = forwardRef(({
             getOptionLabel={(option) => getNestedProperty(option, displayProperty) || ''}
             onChange={handleChange}
             onInputChange={(event, newInputValue) => setQuery(newInputValue)}
+            onFocus={handleFocus} // Handle focus
+            onBlur={handleBlur} // Handle blur
             loading={loading}
             isOptionEqualToValue={(option, value) => option.id === value.id}
-            renderOption={(props, option, { selected }) => {
-                // Remove destructuring of 'key'
-                return (
-                    <li {...props} key={option.id}> {/* Assign key using a unique identifier like option.id */}
-                        <Checkbox
-                            icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
-                            checkedIcon={<CheckBoxIcon fontSize="small" />}
-                            style={{ marginRight: 8 }}
-                            checked={selected}
-                        />
-                        {getNestedProperty(option, displayProperty)}
-                    </li>
-                );
-            }}
+            renderOption={(props, option, { selected }) => (
+                <li {...props} key={option.id}>
+                    <Checkbox
+                        icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+                        checkedIcon={<CheckBoxIcon fontSize="small" />}
+                        style={{ marginRight: 8 }}
+                        checked={selected}
+                    />
+                    {getNestedProperty(option, displayProperty)}
+                </li>
+            )}
             renderInput={(params) => (
                 <TextField
                     {...params}
@@ -134,7 +132,6 @@ const MultiSelectWithCheckboxes = forwardRef(({
             style={{ width }}
         />
     );
-    
 });
 
 export default MultiSelectWithCheckboxes;

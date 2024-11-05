@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box } from '@mui/material';
-import { getPaymentsForUserByClassSession } from 'src/services/paymentService.';
+import { getPaymentsForUserByClassSession } from 'src/services/paymentService';
 
 interface ViewPaymentDetailsProps {
     isOpen: boolean;
@@ -15,7 +15,7 @@ const ViewPaymentDetails: React.FC<ViewPaymentDetailsProps> = ({ isOpen, onClose
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        if (isOpen && userId) {
+        if (isOpen && userId) { 
             const fetchPayment = async () => {
                 setLoading(true);
                 try {
