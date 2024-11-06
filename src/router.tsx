@@ -159,6 +159,10 @@ const TopicCreate = Loader(
   lazy(() => import('src/content/applications/Topics/Create'))
 );
 
+const Contracts = Loader(
+  lazy(() => import('src/content/applications/Contracts'))
+);
+
 const UserProfile = Loader(
   lazy(() => import('src/content/applications/Users/profile'))
 );
@@ -461,6 +465,10 @@ const routes: RouteObject[] = [
           {
             path: 'topics/create',
             element: <TopicCreate />
+          },
+          {
+            path: 'contracts',
+            element: <Contracts />
           },
           {
             path: 'profile',

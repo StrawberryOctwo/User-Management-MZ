@@ -10,6 +10,7 @@
   overflow: hidden;
 }
 
+
 .fc-toolbar {
   display: flex;
   justify-content: space-between;
@@ -48,7 +49,6 @@
   padding: 10px 20px;
 }
 
-/* Calendar grid */
 .fc-view-harness,
 .fc-daygrid-day,
 .fc-timeline-slot {
@@ -158,7 +158,6 @@
   box-shadow: inset 0 0 0 1px #e0e0e0;
 }
 
-/* Borders within the grid */
 .fc-scrollgrid td,
 .fc-scrollgrid th {
   border: 1px solid #e0e0e0;

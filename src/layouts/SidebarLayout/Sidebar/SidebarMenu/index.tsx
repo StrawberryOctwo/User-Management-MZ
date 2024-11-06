@@ -369,6 +369,21 @@ function SidebarMenu() {
                 </ListItem>
               </ProtectedListItem>
               <ProtectedListItem
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/management/contracts"
+                    startIcon={<Topic />}
+                  >
+                    Contracts
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
+              <ProtectedListItem
                 allowedRoles={['Parent']}
               >
                 <ListItem component="div">
@@ -384,7 +399,7 @@ function SidebarMenu() {
                 </ListItem>
               </ProtectedListItem>
               <ProtectedListItem
-                allowedRoles={[ 'Parent']}
+                allowedRoles={['Parent']}
               >
                 <ListItem component="div">
                   <Button
