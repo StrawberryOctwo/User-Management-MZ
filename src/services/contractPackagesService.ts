@@ -13,6 +13,28 @@ export const fetchContractPackages = async (page: number, limit: number, franchi
     }
 };
 
+export const fetchContractPackagesByEntity = async (page: number, limit: Number) => {
+    try {
+        const response = await api.get('/contract-packages/franchises', {
+            params: { page, limit},
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching contract packages:', error);
+        throw error;
+    }
+};
+
+export const assignStudentToContract= async (studentId: number, contractId: Number) => {
+    try {
+        const response = await api.post('/assign/student/contract', { studentId, contractId});
+        return response.data;
+    } catch (error) {
+        console.error('Error assigning contract to student:', error);
+        throw error;
+    }
+};
+
 
 // Fetch all session types
 export const fetchSessionTypes = async () => {

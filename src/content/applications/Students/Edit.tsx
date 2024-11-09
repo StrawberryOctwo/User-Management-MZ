@@ -12,12 +12,15 @@ import { fetchStudentById, fetchStudentDocumentsById, updateStudent } from 'src/
 import { assignStudentToTopics, fetchTopics } from 'src/services/topicService';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
 import { assignOrUpdateParentStudents, fetchParents } from 'src/services/parentService';
+import { assignStudentToContract, fetchContractPackagesByEntity } from 'src/services/contractPackagesService';
 
 const EditStudent = () => {
     const { id } = useParams<{ id: string }>();
     const [studentData, setStudentData] = useState<Record<string, any> | null>(null);
     const [selectedLocations, setSelectedLocations] = useState<any[]>([]); // Changed to an array for multiple locations
     const [selectedParent, setSelectedParent] = useState<any | null>(null);
+    const [selectedContract, setSelectedContract] = useState<any | null>(null);
+
     const [selectedTopics, setSelectedTopics] = useState<any[]>([]);
     const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -53,6 +56,7 @@ const EditStudent = () => {
                 setSelectedLocations(fetchedData.locations || []); // Set multiple locations
                 setSelectedParent(flattenedData.parent);
                 setSelectedTopics(fetchedData.topics || []);
+                setSelectedContract(fetchedData.contract)
             }
     
             const formattedDocuments = studentDocuments.documents.map((doc) => ({
@@ -78,8 +82,12 @@ const EditStudent = () => {
     const handleLocationSelect = (locations: any[]) => {
         setSelectedLocations(locations); // Capture selected locations as an array
     };
-
+    const handleContractSelect = (contract) => {
+        console.log(contract)
+        setSelectedContract(contract);
+    };
     const handleParentSelect = (parent) => {
+        console.log(parent)
         setSelectedParent(parent); // Store the full parent object
     };
 
@@ -131,10 +139,7 @@ const EditStudent = () => {
             };
 
             const studentPayload = {
-                payPerHour: data.payPerHour,
-                individualPayPerHour: data.individualPayPerHour,
                 status: data.status,
-                gradeLevel: data.gradeLevel,
                 contractType: data.contractType,
                 contractEndDate: data.contractEndDate,
                 notes: data.notes,
@@ -145,7 +150,7 @@ const EditStudent = () => {
             const response = await updateStudent(Number(id), userPayload, studentPayload);
             await assignStudentToTopics(Number(id), topicIds);
             await assignOrUpdateParentStudents(selectedParent.id, [response.studentId]);
-
+            await assignStudentToContract(response.studentId,selectedContract.id)
             const userId = response.userId;
             for (const file of uploadedFiles) {
                 const documentPayload = {
@@ -168,6 +173,26 @@ const EditStudent = () => {
         }
     };
 
+    const contractSelectionField = {
+        name: 'contracts',
+        label: 'Contracts',
+        type: 'custom',
+        section: 'Student Information',
+        component: (
+            <SingleSelectWithAutocomplete
+                label="Search Contracts"
+                fetchData={(query) =>
+                    fetchContractPackagesByEntity(1, 5).then((data) =>
+                        data.data
+                    )
+                }
+                onSelect={handleContractSelect}
+                displayProperty="name"
+                placeholder="Type to search contracts"
+                initialValue={selectedContract}
+            />
+        ),
+    };
     const parentSelectionField = {
         name: 'parent',
         label: 'Select Parent',
@@ -205,11 +230,8 @@ const EditStudent = () => {
     ];
 
     const studentFields = [
-        { name: 'payPerHour', label: t('pay_per_hour'), type: 'number', required: true, section: 'Student Information' },
-        { name: 'individualPayPerHour', label: t('ind_pay_per_her'), type: 'number', required: true, section: 'Student Information' },
         { name: 'status', label: t('status'), type: 'text', required: true, section: 'Student Information' },
         { name: 'gradeLevel', label: t('grade_level'), type: 'number', required: true, section: 'Student Information' },
-        { name: 'contractType', label: t('contract_type'), type: 'text', required: true, section: 'Student Information' },
         { name: 'contractEndDate', label: t('contract_end_date'), type: 'date', required: true, section: 'Student Information' },
         { name: 'notes', label: t('notes'), type: 'text', required: false, section: 'Student Information' },
         { name: 'availableDates', label: t('available_dates'), type: 'text', required: true, section: 'Student Information' },
@@ -230,6 +252,7 @@ const EditStudent = () => {
             ),
         },
         parentSelectionField,
+        contractSelectionField,
         {
             name: 'topics',
             label: 'Assign Topics',

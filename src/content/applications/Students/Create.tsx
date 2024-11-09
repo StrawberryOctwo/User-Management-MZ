@@ -11,10 +11,12 @@ import { addStudent } from 'src/services/studentService';
 import { assignStudentToTopics, fetchTopics } from 'src/services/topicService';
 import UploadSection from 'src/components/Files/UploadDocuments';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
+import { assignStudentToContract, fetchContractPackagesByEntity } from 'src/services/contractPackagesService';
 
 export default function CreateStudent() {
     const [selectedLocationIds, setSelectedLocationIds] = useState<number[]>([]); // Update to handle multiple IDs
     const [selectedParentId, setSelectedParentId] = useState<number | null>(null);
+    const [selectedContractId, setSelectedContractId] = useState<number | null>(null);
     const [selectedTopics, setSelectedTopics] = useState<any[]>([]);
     const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
@@ -28,6 +30,11 @@ export default function CreateStudent() {
     const handleParentSelect = (parent: any) => {
         setSelectedParentId(parent ? parent.id : null);
     };
+
+    const handleContractSelect = (contract: any) => {
+        setSelectedContractId(contract ? contract.id : null);
+    };
+
 
     const handleTopicSelect = (selectedItems: any[]) => {
         setSelectedTopics(selectedItems);
@@ -57,11 +64,9 @@ export default function CreateStudent() {
 
             const payload = {
                 student: {
-                    payPerHour: data['payPerHour'],
-                    individualPayPerHour: data['individualPayPerHour'],
                     status: data['status'],
                     gradeLevel: data['gradeLevel'],
-                    contractType: data['contractType'],
+                    contract: data['contract'],
                     contractEndDate: data['contractEndDate'],
                     notes: data['notes'],
                     availableDates: data['availableDates'],
@@ -81,8 +86,10 @@ export default function CreateStudent() {
             };
 
             const response = await addStudent(payload);
+            console.log(selectedContractId)
             await assignStudentToTopics(response.studentId, topicIds);
             await assignOrUpdateParentStudents(selectedParentId, [response.studentId]);
+            await assignStudentToContract(response.studentId,selectedContractId)
 
             const userId = response.userId;
             for (const file of uploadedFiles) {
@@ -94,7 +101,9 @@ export default function CreateStudent() {
                 await addDocument(documentPayload, file.file);
             }
 
-            setSelectedLocationIds([]); setSelectedParentId(null);
+            setSelectedLocationIds([]); 
+            setSelectedParentId(null);
+            setSelectedContractId(null);
             setSelectedTopics([]);
             setUploadedFiles([]);
             if (dropdownRef.current) dropdownRef.current.reset();
@@ -131,7 +140,25 @@ export default function CreateStudent() {
         ),
     };
 
-
+    const contractSelectionField = {
+        name: 'contracts',
+        label: 'Contracts',
+        type: 'custom',
+        section: 'Student Information',
+        component: (
+            <SingleSelectWithAutocomplete
+                label="Search Contracts"
+                fetchData={(query) =>
+                    fetchContractPackagesByEntity(1, 5).then((data) =>
+                        data.data
+                    )
+                }
+                onSelect={handleContractSelect}
+                displayProperty="name"
+                placeholder="Type to search contracts"
+            />
+        ),
+    };
     const locationSelectionField = {
         name: 'locations',
         label: 'Locations',
@@ -160,14 +187,12 @@ export default function CreateStudent() {
     ];
 
     const studentFields = [
-        { name: 'payPerHour', label: t('pay_per_hour'), type: 'number', required: true, section: 'Student Information' },
-        { name: 'individualPayPerHour', label: t('ind_pay_per_her'), type: 'number', required: true, section: 'Student Information' },
         { name: 'status', label: t('status'), type: 'text', required: true, section: 'Student Information' },
         { name: 'gradeLevel', label: t('grade_level'), type: 'number', required: true, section: 'Student Information' },
-        { name: 'contractType', label: t('contract_type'), type: 'text', required: true, section: 'Student Information' },
         { name: 'contractEndDate', label: t('contract_end_date'), type: 'date', required: true, section: 'Student Information' },
         { name: 'notes', label: t('notes'), type: 'text', required: false, section: 'Student Information' },
         { name: 'availableDates', label: t('available_dates'), type: 'text', required: true, section: 'Student Information' },
+        contractSelectionField,
         locationSelectionField,
         parentSelectionField,
         {
