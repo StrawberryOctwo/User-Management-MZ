@@ -201,31 +201,57 @@ export default function CustomizedCalendar({
   //   calculateStartEndDates();
   // }, [date, view]);
 
-  useEffect(() => {
-    // Map classSessionEvents to FullCalendar's event structure
-    const mappedEvents = classSessionEvents.map((session) => {
-      // Extract and format the teacher's name to "F. LastName"
-      const [firstName, lastName] = session.data.appointment.teacher.split(' ');
-      const formattedTeacher = `${firstName[0]}. ${lastName}`;
+// Helper function to check for overlapping sessions for the same teacher
+const checkOverlap = (currentSession, allSessions) => {
+  const currentTeacher = currentSession.data.appointment.teacher;
+  const currentStart = new Date(currentSession.start);
+  const currentEnd = new Date(currentSession.end);
 
-      return {
-        id: session.data.appointment.id,
-        resourceId: session.resourceId,
-        title: session.data.appointment.topic, // Using topic as the title
-        start: session.start,
-        end: session.end,
-        extendedProps: {
-          topicName: session.data.appointment.topic || 'No Topic',
-          teacher: formattedTeacher, // Assigning the formatted name
-          location: session.data.appointment.location,
-          sessionType: session.data.appointment.sessionType,
-          students: session.data.appointment.students
-        }
-      };
-    });
+  return allSessions.some((otherSession) => {
+    if (otherSession.data.appointment.id === currentSession.data.appointment.id) return false; // Skip itself
+    const otherTeacher = otherSession.data.appointment.teacher;
+    const otherStart = new Date(otherSession.start);
+    const otherEnd = new Date(otherSession.end);
 
-    setEvents(mappedEvents);
-  }, [classSessionEvents]);
+    // Check if sessions overlap for the same teacher
+    return (
+      currentTeacher === otherTeacher &&
+      ((currentStart >= otherStart && currentStart < otherEnd) || // Start overlaps another session
+        (currentEnd > otherStart && currentEnd <= otherEnd) || // End overlaps another session
+        (currentStart <= otherStart && currentEnd >= otherEnd)) // Full overlap
+    );
+  });
+};
+
+
+useEffect(() => {
+  // Map classSessionEvents to FullCalendar's event structure
+  const mappedEvents = classSessionEvents.map((session) => {
+    // Extract and format the teacher's name to "F. LastName"
+    const [firstName, lastName] = session.data.appointment.teacher.split(' ');
+    const formattedTeacher = `${firstName[0]}. ${lastName}`;
+    const hasOverlap = checkOverlap(session, classSessionEvents);
+
+    return {
+      id: session.data.appointment.id,
+      resourceId: session.resourceId,
+      title: session.data.appointment.topic, // Using topic as the title
+      start: session.start,
+      end: session.end,
+      extendedProps: {
+        topicName: session.data.appointment.topic || 'No Topic',
+        teacher: formattedTeacher, // Assigning the formatted name
+        location: session.data.appointment.location,
+        sessionType: session.data.appointment.sessionType,
+        students: session.data.appointment.students,
+        hasOverlap // Pass overlap status to EventItem
+      }
+    };
+  });
+
+  setEvents(mappedEvents);
+}, [classSessionEvents]);
+
 
   const handleOpenAddModal = (start: Date, end: Date, roomId: string) => {
     if (strongestRoles[0] == 'Student' || strongestRoles[0] == 'Parent') {
