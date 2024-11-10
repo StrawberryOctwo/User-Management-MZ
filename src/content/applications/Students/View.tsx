@@ -74,6 +74,7 @@ const ViewStudentPage: React.FC = () => {
         sessionReports,
         documents,
         payments,
+        sessionBalance:student?.sessionBalance,
         firstName: student?.user?.firstName || '',
         lastName: student?.user?.lastName || '',
         dob: student?.user?.dob || '',
@@ -81,7 +82,7 @@ const ViewStudentPage: React.FC = () => {
         address: student?.user?.address || '',
         postalCode: student?.user?.postalCode || '',
         phoneNumber: student?.user?.phoneNumber || '',
-        contractType:student?.contract.name
+        contractType:student?.contract?.name
     };
 
     // Ensure the user data is fetched correctly
