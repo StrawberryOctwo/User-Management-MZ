@@ -65,6 +65,7 @@ const EditContract = () => {
                 contractName: data.contractName,
                 monthlyFee: data.monthlyFee,
                 oneTimeFee: data.oneTimeFee,
+                initialSessionBalance: data.initialSessionBalance,
                 isVatExempt,
                 vatPercentage: isVatExempt ? 0 : vatPercentage,
                 franchiseId: selectedFranchise.id,
@@ -96,6 +97,7 @@ const EditContract = () => {
         contractName: contractData?.contractName,
         monthlyFee: contractData?.monthlyFee,
         oneTimeFee: contractData?.oneTimeFee,
+        initialSessionBalance: contractData?.initialSessionBalance,
         isVatExempt: contractData?.isVatExempt,
         vatPercentage: contractData?.vatPercentage,
         franchise: selectedFranchise,
@@ -113,6 +115,7 @@ const EditContract = () => {
         { name: 'name', label: t('contract_name'), type: 'text', required: true, section: 'Contract Information' },
         { name: 'contractName', label: t('specific_contract_name'), type: 'text', required: true, section: 'Contract Information' },
         { name: 'monthlyFee', label: t('monthly_fee'), type: 'number', required: true, section: 'Contract Information' },
+        { name: 'initialSessionBalance', label: t('initial_session_balance'), type: 'number', required: true, section: 'Contract Information' },
         { name: 'oneTimeFee', label: t('one_time_fee'), type: 'number', required: true, section: 'Contract Information' },
         {
             name: 'isVatExempt',

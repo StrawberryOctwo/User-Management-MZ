@@ -1,7 +1,7 @@
 import { CircularProgress, Grid } from '@mui/material';
 import React, { useEffect, useState } from 'react';
 import ContractCard from 'src/components/Cards';
-import { fetchContractPackages } from 'src/services/contractPackagesService';
+import { deleteContractPackages, fetchContractPackages } from 'src/services/contractPackagesService';
 import { useNavigate } from 'react-router-dom';
 
 export default function ContractPage() {
@@ -29,6 +29,10 @@ export default function ContractPage() {
 
   const handleEdit = (id: string) => {
     navigate(`edit/${id}`);
+  };
+
+  const handleDelete = (id: string) => {
+    deleteContractPackages([id])
   };
 
   if (errorMessage) return <div>{errorMessage}</div>;
@@ -59,6 +63,7 @@ export default function ContractPage() {
               isVatExempt={contract.isVatExempt}
               vat_percentage={parseFloat(contract.vatPercentage)}
               onEdit={() => handleEdit(contract.id)}
+              onDelete={() => handleDelete(contract.id)}
             />
           </Grid>
         );
