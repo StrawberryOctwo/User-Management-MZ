@@ -257,7 +257,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                     <strong>Location:</strong> {classSession.location.name}
                   </Typography>
                   <Typography variant="subtitle1">
-                    <strong>Session Type:</strong> {classSession.sessionType}
+                    <strong>Session Type:</strong> {classSession?.sessionType?.name}
                   </Typography>
                   <Typography variant="subtitle1">
                     <strong>Start Time:</strong>{' '}

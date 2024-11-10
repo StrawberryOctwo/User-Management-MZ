@@ -6,11 +6,11 @@ import { ReactComponent as GroupIcon } from "../../assets/icons/GroupIcon.svg";
 import { ReactComponent as UserIcon } from "../../assets/icons/UserIcon.svg";
 import { Button, Menu, MenuItem } from "@mui/material";
 
-const EventItem = ({ eventInfo }) => {
+const EventItem = ({ eventInfo, }) => {
     const { topicName, teacher, location, sessionType, students } = eventInfo.event.extendedProps;
     const startTime = moment(eventInfo.event.start).format("HH:mm");
     const endTime = moment(eventInfo.event.end).format("HH:mm");
-
+    const sessionTypeName = sessionType?.name 
     const [visibleStudents, setVisibleStudents] = useState([]);
     const [extraStudents, setExtraStudents] = useState([]);
     const [anchorEl, setAnchorEl] = useState(null);
@@ -34,42 +34,47 @@ const EventItem = ({ eventInfo }) => {
 
     // Calculate the border color based on session type
     const getBorderColor = () => {
-        switch (sessionType) {
-            case "Online":
-                return "#5569FF";
+        switch (sessionTypeName) {
             case "Group":
-                return "#FFA319";
-            case "1on1":
-                return "#4CAF50";
+                return "#FFA319"; // Orange for Group
+            case "Online":
+                return "#5569FF"; // Blue for Online
+            case "Individual":
+                return "#4CAF50"; // Green for Individual
+            case "Intensive Individual":
+                return "#FF6347"; // Red-like color for Intensive Individual
             default:
-                return "#BDBDBD";
+                return "#BDBDBD"; // Gray for unknown session type
         }
     };
-
+    
     const getLighterBorderColor = () => {
-        switch (sessionType) {
-            case "Online":
-                return "rgba(85, 105, 255, 0.6)"; // Slightly more visible hint of blue
+        switch (sessionTypeName) {
             case "Group":
-                return "rgba(255, 152, 0, 0.6)"; // Slightly more visible hint of orange
-            case "1on1":
-                return "rgba(76, 175, 80, 0.6)"; // Slightly more visible hint of green
+                return "rgba(255, 163, 25, 0.6)";
+            case "Online":
+                return "rgba(85, 105, 255, 0.6)";
+            case "Individual":
+                return "rgba(76, 175, 80, 0.6)";
+            case "Intensive Individual":
+                return "rgba(255, 99, 71, 0.6)";
             default:
-                return "rgba(189, 189, 189, 0.6)"; // Light gray for default
+                return "rgba(189, 189, 189, 0.6)";
         }
     };
-
     const lighterBorderColor = getLighterBorderColor();
     const borderColor = getBorderColor();
 
     const renderIcon = () => {
-        switch (sessionType) {
-            case "Online":
-                return <OnlineIcon style={{ color: '#333', width: 20, height: 20 }} />;
+        switch (sessionTypeName) {
             case "Group":
                 return <GroupIcon style={{ color: '#333', width: 20, height: 20 }} />;
-            case "1on1":
+            case "Online":
+                return <OnlineIcon style={{ color: '#333', width: 20, height: 20 }} />;
+            case "Individual":
                 return <UserIcon style={{ color: '#333', width: 18, height: 18 }} />;
+            case "Intensive Individual":
+                return <UserIcon style={{ color: '#FF6347', width: 18, height: 18 }} />; // Different color for Intensive
             default:
                 return null;
         }
