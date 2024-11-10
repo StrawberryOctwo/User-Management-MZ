@@ -30,6 +30,7 @@ export interface FieldConfig {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   disabled?: boolean;
   value?: string | number;
+  initialValue?: string | number; // New property for initial value
 }
 
 interface ReusableFormProps {
@@ -49,17 +50,14 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
 }) => {
   const getInitialFormData = () => {
     return fields.reduce((acc, field) => {
-      acc[field.name] = initialData[field.name] ?? (field.name === 'status' ? 1 : field.type === 'number' ? 0 : ''); // Default status to 1
+      // Use initialValue from field config, fallback to initialData, or sensible default
+      acc[field.name] = field.initialValue ?? initialData[field.name] ?? (field.type === 'number' ? 0 : '');
       return acc;
     }, {} as Record<string, any>);
   };
 
   const [formData, setFormData] = useState<Record<string, any>>(getInitialFormData());
-  const [showPassword, setShowPassword] = useState(false);
-  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [passwordVisibility, setPasswordVisibility] = useState<Record<string, boolean>>({});
-
-  const toggleConfirmPasswordVisibility = () => setShowConfirmPassword((prev) => !prev);
 
   useEffect(() => {
     if (Object.keys(initialData).length > 0) {
@@ -83,7 +81,7 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
       const response = await onSubmit(formData);
       if (entintyFunction.toLowerCase() === 'add') {
         setFormData(fields.reduce((acc, field) => {
-          acc[field.name] = field.type === 'number' ? 0 : '';
+          acc[field.name] = field.initialValue ?? (field.type === 'number' ? 0 : '');
           return acc;
         }, {} as Record<string, any>));
       }

@@ -1,85 +1,184 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Box from '@mui/material/Box';
-import { useParams } from 'react-router-dom';
 import { t } from 'i18next';
+import { CircularProgress, Switch, FormControlLabel, Button } from '@mui/material';
+import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
+import ReusableForm from 'src/components/Table/tableRowCreate';
+import { fetchFranchises } from 'src/services/franchiseService';
+import { fetchContractPackageById, editContractPackage, fetchDiscounts, fetchSessionTypes } from 'src/services/contractPackagesService';
+import { useParams } from 'react-router-dom';
+import { useSnackbar } from 'src/contexts/SnackbarContext';
 
-import { fetchFranchiseById, updateFranchise } from 'src/services/franchiseService';
-import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
+const EditContract = () => {
+    const { id } = useParams(); // Assuming you're using react-router for routing
+    const [selectedFranchise, setSelectedFranchise] = useState<any>(null);
+    const [loading, setLoading] = useState(false);
+    const [sessionTypes, setSessionTypes] = useState<any[]>([]);
+    const [discounts, setDiscounts] = useState<any[]>([]);
+    const [formLoading, setFormLoading] = useState(true);
+    const [isVatExempt, setIsVatExempt] = useState(false);
+    const [vatPercentage, setVatPercentage] = useState(19); // Default VAT value
+    const [contractData, setContractData] = useState<any>(null);
+    const franchiseRef = useRef<any>(null);
+    const { showMessage } = useSnackbar();
 
-const EditFranchise = () => {
-    const { id } = useParams<{ id: string }>(); // Get franchise ID from URL
-    const [franchiseData, setFranchiseData] = useState<Record<string, any> | null>(null);
-    const [loading, setLoading] = useState(true);
-    const [submitLoading, setSubmitLoading] = useState(false);
+    const loadData = async () => {
+        try {
+            const sessionTypesData = await fetchSessionTypes();
+            const discountsData = await fetchDiscounts();
+            setSessionTypes(sessionTypesData);
+            setDiscounts(discountsData);
 
-    // Fetch franchise data by ID on component mount
-    const fetchFranchise = async () => {
+            // Fetch the contract data by ID
+            const fetchedContractData = await fetchContractPackageById(id);
+            setContractData(fetchedContractData);
+            setSelectedFranchise(fetchedContractData.franchise);
+            setIsVatExempt(fetchedContractData.isVatExempt);
+            setVatPercentage(fetchedContractData.vatPercentage || 19); // Set VAT percentage from data or default
+        } catch (error) {
+            console.error("Error loading contract data:", error);
+        } finally {
+            setFormLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        loadData();
+    }, [id]);
+
+    const handleFranchiseSelect = (selectedItem: any) => {
+        setSelectedFranchise(selectedItem);
+    };
+
+    const handleContractSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
+        if (selectedFranchise === null) {
+            showMessage('Please select a franchise.', 'error');
+            return;
+        }
         setLoading(true);
         try {
-            const fetchedFranchise = await fetchFranchiseById(Number(id)); // Fetch franchise by ID
-            setFranchiseData(fetchedFranchise); // Set franchise data to state
-        } catch (error) {
-            console.error('Error fetching franchise:', error);
+            if (!selectedFranchise) {
+                throw new Error('Please select a franchise.');
+            }
+            const payload = {
+                name: data.name,
+                contractName: data.contractName,
+                monthlyFee: data.monthlyFee,
+                oneTimeFee: data.oneTimeFee,
+                isVatExempt,
+                vatPercentage: isVatExempt ? 0 : vatPercentage,
+                franchiseId: selectedFranchise.id,
+                sessionTypePrices: sessionTypes.map(type => ({
+                    sessionTypeId: type.id,
+                    price: data[`sessionPrice_${type.id}`],
+                })),
+                discounts: discounts.map(discount => ({
+                    discountId: discount.id,
+                    price: data[`discountPrice_${discount.id}`],
+                })),
+            };
+            const response = await editContractPackage(id, payload);
+
+            loadData();
+            return response;
+        } catch (error: any) {
+            console.error("Error updating contract package:", error);
+            throw error;
         } finally {
             setLoading(false);
         }
     };
 
-    useEffect(() => {
-        fetchFranchise();
-    }, [id]);
+    if (formLoading) return <CircularProgress />;
 
-    const handleFranchiseSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
-        setSubmitLoading(true);
-        try {
-            const payload = {
-                name: data.name,
-                ownerName: data.ownerName,
-                cardHolderName: data.cardHolderName,
-                iban: data.iban,
-                bic: data.bic,
-                status: data.status,
-                totalEmployees: data.totalEmployees,
-                percentage:data.percentage
-
-            };
-            const response = await updateFranchise(Number(id), payload); // Update franchise
-            return response; // Don't fetch again to prevent re-rendering
-        } catch (error: any) {
-            console.error('Error updating Franchise:', error);
-            throw error;
-        } finally {
-            setSubmitLoading(false); // Reset submit loading state
-        }
+    const initialData = {
+        name: contractData?.name,
+        contractName: contractData?.contractName,
+        monthlyFee: contractData?.monthlyFee,
+        oneTimeFee: contractData?.oneTimeFee,
+        isVatExempt: contractData?.isVatExempt,
+        vatPercentage: contractData?.vatPercentage,
+        franchise: selectedFranchise,
+        ...sessionTypes.reduce((acc, type) => ({
+            ...acc,
+            [`sessionPrice_${type.id}`]: contractData?.packageSessionTypePrices?.find(st => st.sessionType.id === type.id)?.price,
+        }), {}),
+        ...discounts.reduce((acc, discount) => ({
+            ...acc,
+            [`discountPrice_${discount.id}`]: contractData?.packageDiscountPrices?.find(d => d.discount.id === discount.id)?.price,
+        }), {}),
     };
 
-    // Define the fields for the form
-    const franchiseFields: FieldConfig[] = [
-        { name: 'name', label: t('franchise_name'), type: 'text', required: true, section: 'Franchise Information' },
-        { name: 'ownerName', label: t('owner_name'), type: 'text', required: true, section: 'Franchise Information' },
-        { name: 'cardHolderName', label: t('card_holder_name'), type: 'text', required: true, section: 'Franchise Information' },
-        { name: 'iban', label: t('iban'), type: 'text', required: true, section: 'Franchise Information' },
-        { name: 'bic', label: t('bic'), type: 'text', required: true, section: 'Franchise Information' },
-        { name: 'status', label: t('status'), type: 'text', required: true, section: 'Franchise Information' }, // Optionally make this a dropdown
-        { name: 'totalEmployees', label: t('total_employees'), type: 'number', required: true, section: 'Franchise Information' },
-        { name: 'percentage', label: t('percentage'), type: 'number', required: true, section: 'Franchise Information' },
-
+    const contractFields = [
+        { name: 'name', label: t('contract_name'), type: 'text', required: true, section: 'Contract Information' },
+        { name: 'contractName', label: t('specific_contract_name'), type: 'text', required: true, section: 'Contract Information' },
+        { name: 'monthlyFee', label: t('monthly_fee'), type: 'number', required: true, section: 'Contract Information' },
+        { name: 'oneTimeFee', label: t('one_time_fee'), type: 'number', required: true, section: 'Contract Information' },
+        {
+            name: 'isVatExempt',
+            label: t('vat_exempt'),
+            type: 'custom',
+            section: 'Contract Information',
+            component: (
+                <FormControlLabel
+                    control={<Switch checked={isVatExempt} onChange={() => { setIsVatExempt(!isVatExempt); if (!isVatExempt) setVatPercentage(19); }} />}
+                    label={t('VAT Exempt')}
+                />
+            ),
+        },
+        {
+            name: 'vatPercentage',
+            label: t('vat_percentage'),
+            type: 'number',
+            required: !isVatExempt, // Required only if not exempt
+            section: 'Contract Information',
+            disabled: isVatExempt, // Disable if exempt
+            defaultValue: vatPercentage,
+        },
+        {
+            name: 'franchise',
+            label: 'Franchise',
+            type: 'custom',
+            section: 'Franchise Assignment',
+            component: (
+                <SingleSelectWithAutocomplete
+                    ref={franchiseRef}
+                    label={t("Search_and_assign_franchises")}
+                    fetchData={(query) => fetchFranchises(1, 5, query).then((data) => data.data)}
+                    onSelect={handleFranchiseSelect}
+                    displayProperty="name"
+                    placeholder="Type to search franchises"
+                    initialValue={selectedFranchise}
+                />
+            ),
+        },
+        ...sessionTypes.map(type => ({
+            name: `sessionPrice_${type.id}`,
+            label: `${type.name} Price`,
+            type: 'number',
+            required: true,
+            section: 'Session Type Prices',
+        })),
+        ...discounts.map(discount => ({
+            name: `discountPrice_${discount.id}`,
+            label: `${discount.name} Discount Percentage`,
+            type: 'number',
+            required: false, // Discounts are optional
+            section: 'Discounts',
+        })),
     ];
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            {!loading && franchiseData && (
-                <ReusableForm
-                    key={franchiseData.id} // Add key to force re-render when franchiseData changes
-                    fields={franchiseFields} // Use franchise fields array
-                    onSubmit={handleFranchiseSubmit} // Submit handler for editing
-                    initialData={franchiseData} // Pre-fill form with franchise data
-                    entityName="Franchise"
-                    entintyFunction="Edit"
-                />
-            )}
+            <ReusableForm
+                fields={contractFields}
+                onSubmit={handleContractSubmit}
+                entityName="Contract Package"
+                entintyFunction="Edit"
+                initialData={initialData} // Pass initialData here
+            />
         </Box>
     );
 };
 
-export default EditFranchise;
+export default EditContract;

@@ -165,6 +165,9 @@ const Contracts = Loader(
 const CreateContract = Loader(
   lazy(() => import('src/content/applications/Contracts/Create'))
 );
+const EditContract = Loader(
+  lazy(() => import('src/content/applications/Contracts/Edit'))
+);
 
 const UserProfile = Loader(
   lazy(() => import('src/content/applications/Users/profile'))
@@ -476,6 +479,10 @@ const routes: RouteObject[] = [
           {
             path: 'contracts/create',
             element: <CreateContract />
+          },
+          {
+            path: 'contracts/edit/:id',
+            element: <EditContract />
           },
           {
             path: 'profile',

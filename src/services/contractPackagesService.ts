@@ -1,4 +1,4 @@
-import {api} from './api'; // Assuming `api` is the configured Axios instance
+import { api } from './api'; // Assuming `api` is the configured Axios instance
 
 // Fetch all contract packages with pagination
 export const fetchContractPackages = async (page: number, limit: number, franchiseId?: number) => {
@@ -13,10 +13,10 @@ export const fetchContractPackages = async (page: number, limit: number, franchi
     }
 };
 
-export const fetchContractPackagesByEntity = async (page: number, limit: Number) => {
+export const fetchContractPackageById = async (contractId?: string) => {
     try {
-        const response = await api.get('/contract-packages/franchises', {
-            params: { page, limit},
+        const response = await api.get(`/contract-package/${contractId}`, {
+            params: { contractId },
         });
         return response.data;
     } catch (error) {
@@ -25,9 +25,21 @@ export const fetchContractPackagesByEntity = async (page: number, limit: Number)
     }
 };
 
-export const assignStudentToContract= async (studentId: number, contractId: Number) => {
+export const fetchContractPackagesByEntity = async (page: number, limit: Number) => {
     try {
-        const response = await api.post('/assign/student/contract', { studentId, contractId});
+        const response = await api.get('/contract-packages/franchises', {
+            params: { page, limit },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching contract packages:', error);
+        throw error;
+    }
+};
+
+export const assignStudentToContract = async (studentId: number, contractId: Number) => {
+    try {
+        const response = await api.post('/assign/student/contract', { studentId, contractId });
         return response.data;
     } catch (error) {
         console.error('Error assigning contract to student:', error);
@@ -84,7 +96,7 @@ export const addContractPackage = async (contractPackageData: any) => {
 };
 
 // Edit a contract package by ID
-export const editContractPackage = async (id: number, contractPackageData: any) => {
+export const editContractPackage = async (id: string, contractPackageData: any) => {
     try {
         const response = await api.put(`/contract-packages/${id}`, contractPackageData);
         return response.data;

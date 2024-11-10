@@ -20,6 +20,7 @@ type ContractCardProps = {
     one_time_fee?: number | null;
     isVatExempt: boolean;
     vat_percentage: number;
+    onEdit: () => void;
 };
 
 const ContractCard: React.FC<ContractCardProps> = ({
@@ -31,6 +32,7 @@ const ContractCard: React.FC<ContractCardProps> = ({
     one_time_fee,
     isVatExempt,
     vat_percentage,
+    onEdit
 }) => {
     return (
         <Card sx={{ minWidth: 275, marginBottom: 4, borderRadius: 2, boxShadow: 3, textAlign: 'center', padding: 2 }}>
@@ -44,7 +46,7 @@ const ContractCard: React.FC<ContractCardProps> = ({
                 <Typography variant="h5" component="div" sx={{ fontWeight: 'bold', color: '#1976d2', mb: 2 }}>
                     {name.toUpperCase()}
                 </Typography>
-                
+
                 {/* Monthly and One-Time Fees */}
                 <Box display="flex" justifyContent="space-around" alignItems="center" sx={{ mb: 3 }}>
                     <Box>
@@ -64,7 +66,7 @@ const ContractCard: React.FC<ContractCardProps> = ({
                         </Typography>
                     </Box>
                 </Box>
-                
+
                 {/* Session Prices */}
                 <Box mt={2} mb={2} sx={{ borderTop: '1px solid #ddd', pt: 2 }}>
                     <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>Session Prices:</Typography>
@@ -76,8 +78,8 @@ const ContractCard: React.FC<ContractCardProps> = ({
 
                     {/* Discounts */}
                     <Typography variant="body2" sx={{ fontWeight: 'bold', mt: 2, mb: 1 }}>Discounts:</Typography>
-                    {discounts.length > 0 ? (
-                        discounts.map((discount, index) => (
+                    {discounts.filter(discount => discount.percentage > 0).length > 0 ? (
+                        discounts.filter(discount => discount.percentage > 0).map((discount, index) => (
                             <Box key={`discount-${index}`} display="flex" alignItems="center" justifyContent="center" my={1}>
                                 <Typography variant="body2">
                                     • {discount.name}: {discount.percentage}%
@@ -105,6 +107,7 @@ const ContractCard: React.FC<ContractCardProps> = ({
                     variant="contained"
                     color="primary"
                     sx={{ mt: 2, width: '100%', fontWeight: 'bold', borderRadius: '50px' }}
+                    onClick={onEdit}
                 >
                     Edit
                 </Button>
