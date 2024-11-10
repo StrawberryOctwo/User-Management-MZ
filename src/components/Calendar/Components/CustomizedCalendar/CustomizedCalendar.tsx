@@ -36,7 +36,7 @@ type Keys = keyof typeof Views;
 
 type DemoProps = {
   classSessionEvents: any[]; // Accept classSessionEvents as a prop
-  onDateChange: (startDate: string, endDate: string) => void; // New prop to pass the date change handler
+  onDateChange: (date: string) => void; // New prop to pass the date change handler
   handleSaveClassSession: (newSession: any) => void; // Accept as a prop
   loadClassSessions: () => void; // Add this prop
 };
@@ -174,28 +174,32 @@ export default function CustomizedCalendar({
     }
   };
 
-  const calculateStartEndDates = useCallback(() => {
-    let startDate = moment(); // Initialize with a default value
-    let endDate = moment(); // Initialize with a default value
+  // const calculateStartEndDates = useCallback(() => {
+  //   let startDate = moment(date); // Initialize with a default value
+  //   let endDate = moment(date); // Initialize with a default value
 
-    if (view === Views.DAY) {
-      startDate = moment(date).startOf('day');
-      endDate = moment(date).endOf('day');
-    } else if (view === Views.WEEK) {
-      startDate = moment(date).startOf('week');
-      endDate = moment(date).endOf('week');
-    } else if (view === Views.MONTH) {
-      startDate = moment(date).startOf('month');
-      endDate = moment(date).endOf('month');
-    }
+  //   if (view === Views.DAY) {
+  //     startDate = moment(date).startOf('day');
+  //     endDate = moment(date).endOf('day');
+  //   }
+  //   // } else if (view === Views.WEEK) {
+  //   //   startDate = moment(date).startOf('week');
+  //   //   endDate = moment(date).endOf('week');
+  //   // } else if (view === Views.MONTH) {
+  //   //   startDate = moment(date).startOf('month');
+  //   //   endDate = moment(date).endOf('month');
+  //   // }
 
-    // Notify parent (CalendarContent) about the new date range
-    onDateChange(startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD'));
-  }, [view, date, onDateChange]);
+  //   console.log('Start Date:', startDate.format('YYYY-MM-DD'));
+  //   console.log('End Date:', endDate.format('YYYY-MM-DD'));
 
-  useEffect(() => {
-    calculateStartEndDates();
-  }, [date, view, calculateStartEndDates]);
+  //   // Notify parent (CalendarContent) about the new date range
+  //   onDateChange(startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD'));
+  // }, [view, date]);
+
+  // useEffect(() => {
+  //   calculateStartEndDates();
+  // }, [date, view]);
 
   useEffect(() => {
     // Map classSessionEvents to FullCalendar's event structure
@@ -263,24 +267,21 @@ export default function CustomizedCalendar({
         plugins={[resourceTimelinePlugin, interactionPlugin]}
         schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
         initialView="resourceTimelineDay"
+        initialDate={date} // Set the initial date explicitly
         headerToolbar={{
-          left: '', // Move "today" button to the left
-          center: 'prev title next', // Center title with arrows on each side
-          right: 'today' // Empty right section
+          left: '',
+          center: 'prev title next',
+          right: 'today'
         }}
-        key={`${resources.length}-${events.length}`}
         resources={resources}
         events={events}
-        eventContent={renderEventContent} // Use custom event content
+        eventContent={renderEventContent}
         slotMinTime="08:00:00"
         slotMaxTime="18:00:00"
         resourceAreaWidth="120px"
         selectable={true}
-        // selectOverlap={(event) => {
-        //   return true;
-        // }}
         datesSet={(info) => {
-          setDate(info.start);
+          onDateChange(moment(info.start).format('YYYY-MM-DD'));
         }}
         eventClick={(info) => handleEventClick(info.event)}
         select={(info) => {
