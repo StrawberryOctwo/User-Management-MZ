@@ -28,6 +28,7 @@ const CalendarContent: React.FC = () => {
   const [endDate, setEndDate] = useState<string>(
     moment().endOf('month').format('YYYY-MM-DD')
   );
+  const [date, setDate] = useState<string>(() => moment().format('YYYY-MM-DD'));
   const [selectedFranchise, setSelectedFranchise] = useState<any | null>(null);
   const [selectedLocations, setSelectedLocations] = useState<any[]>([]); // Updated to array
   const [strongestRole, setStrongestRole] = useState<string | null>(null);
@@ -136,15 +137,15 @@ const CalendarContent: React.FC = () => {
         case 'Student':
           response = await fetchUserClassSessions(
             userId?.toString() || '',
-            startDate,
-            endDate
+            date,
+            date
           );
           break;
         case 'Parent':
           response = await fetchParentClassSessions(
             userId?.toString() || '',
-            startDate,
-            endDate
+            date,
+            date
           );
           break;
         case 'SuperAdmin':
@@ -153,7 +154,7 @@ const CalendarContent: React.FC = () => {
           if (locations.length === 0) {
             return;
           }
-          response = await fetchClassSessions(startDate, endDate, locationIds);
+          response = await fetchClassSessions(date, date, locationIds);
           break;
         default:
           console.error('Invalid role: Unrecognized role encountered.');
@@ -181,11 +182,6 @@ const CalendarContent: React.FC = () => {
       calendarsharedService.off('absenceUpdated', onAbsenceUpdated);
     };
   }, []);
-
-  const handleDateChange = (newStartDate: string, newEndDate: string) => {
-    setStartDate(newStartDate);
-    setEndDate(newEndDate);
-  };
 
   const handleSaveClassSession = async (
     newSessionArray: any[],
@@ -229,13 +225,18 @@ const CalendarContent: React.FC = () => {
   };
 
   useEffect(() => {
+    console.log('useEffect triggered with date:', date);
     if (
       strongestRole &&
       (strongestRole !== 'SuperAdmin' || selectedLocations.length > 0)
     ) {
       loadClassSessions();
     }
-  }, [startDate, endDate, selectedFranchise, selectedLocations, strongestRole]);
+  }, [date, selectedFranchise, selectedLocations, strongestRole]);
+
+  // useEffect(() => {
+  //   console.log('date is', date);
+  // }, [date]);
 
   return (
     <Box sx={{ position: 'relative', height: '74vh' }}>
@@ -253,7 +254,7 @@ const CalendarContent: React.FC = () => {
       <Box sx={{ position: 'relative', height: '100%', overflow: 'hidden' }}>
         <CustomizedCalendar
           classSessionEvents={classSessionEvents}
-          onDateChange={handleDateChange}
+          onDateChange={setDate}
           handleSaveClassSession={handleSaveClassSession}
           loadClassSessions={loadClassSessions}
         />
