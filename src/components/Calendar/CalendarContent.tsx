@@ -1,24 +1,33 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
 import Typography from '@mui/material/Typography';
-import CustomizedCalendar from "./Components/CustomizedCalendar/CustomizedCalendar";
-import moment from "moment";
+import CustomizedCalendar from './Components/CustomizedCalendar/CustomizedCalendar';
+import moment from 'moment';
 import { EventItem } from './types';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { t } from 'i18next';
+import { t, use } from 'i18next';
 import FilterToolbar from './Components/CustomizedCalendar/FilterToolbar';
 import CalendarLegend from './Components/CalendarLegend';
 import { useAuth } from 'src/hooks/useAuth';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
-import { addClassSessions, fetchClassSessions, fetchParentClassSessions, fetchUserClassSessions } from 'src/services/classSessionService';
+import {
+  addClassSessions,
+  fetchClassSessions,
+  fetchParentClassSessions,
+  fetchUserClassSessions
+} from 'src/services/classSessionService';
 import { calendarsharedService } from './CalendarSharedService';
 
 const CalendarContent: React.FC = () => {
   const [classSessionEvents, setClassSessionEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [startDate, setStartDate] = useState<string>(moment().startOf('month').format('YYYY-MM-DD'));
-  const [endDate, setEndDate] = useState<string>(moment().endOf('month').format('YYYY-MM-DD'));
+  const [startDate, setStartDate] = useState<string>(
+    moment().startOf('month').format('YYYY-MM-DD')
+  );
+  const [endDate, setEndDate] = useState<string>(
+    moment().endOf('month').format('YYYY-MM-DD')
+  );
   const [selectedFranchise, setSelectedFranchise] = useState<any | null>(null);
   const [selectedLocations, setSelectedLocations] = useState<any[]>([]); // Updated to array
   const [strongestRole, setStrongestRole] = useState<string | null>(null);
@@ -32,16 +41,16 @@ const CalendarContent: React.FC = () => {
       const role = roles.includes('SuperAdmin')
         ? 'SuperAdmin'
         : roles.includes('FranchiseAdmin')
-          ? 'FranchiseAdmin'
-          : roles.includes('LocationAdmin')
-            ? 'LocationAdmin'
-            : roles.includes('Teacher')
-              ? 'Teacher'
-              : roles.includes('Parent')
-                ? 'Parent'
-                : roles.includes('Student')
-                  ? 'Student'
-                  : null;
+        ? 'FranchiseAdmin'
+        : roles.includes('LocationAdmin')
+        ? 'LocationAdmin'
+        : roles.includes('Teacher')
+        ? 'Teacher'
+        : roles.includes('Parent')
+        ? 'Parent'
+        : roles.includes('Student')
+        ? 'Student'
+        : null;
       setStrongestRole(role);
     }
   }, [userRoles]);
@@ -58,10 +67,11 @@ const CalendarContent: React.FC = () => {
     }
   }, []);
 
-
   useEffect(() => {
     const onAbsenceUpdated = () => {
-      const storedLocations = JSON.parse(localStorage.getItem('selectedLocations') || '[]');
+      const storedLocations = JSON.parse(
+        localStorage.getItem('selectedLocations') || '[]'
+      );
       if (storedLocations.length > 0) {
         setSelectedLocations(storedLocations);
       }
@@ -75,16 +85,18 @@ const CalendarContent: React.FC = () => {
     };
   }, []);
 
-  const transformClassSessionsToEvents = (classSessions: any[]): EventItem[] => {
+  const transformClassSessionsToEvents = (
+    classSessions: any[]
+  ): EventItem[] => {
     return classSessions.map((session) => {
       const resource = session.name || 1;
       const teacherName = session.teacher?.user
         ? `${session.teacher.user.firstName} ${session.teacher.user.lastName}`
-        : "Unknown Teacher";
+        : 'Unknown Teacher';
 
       const studentsWithStatus = session.students.map((student) => ({
         firstName: student.firstName,
-        absenceStatus: student.absenceStatus,
+        absenceStatus: student.absenceStatus
       }));
 
       return {
@@ -93,26 +105,24 @@ const CalendarContent: React.FC = () => {
         data: {
           appointment: {
             id: session.id,
-            status: session.isActive ? "CI" : "P",
-            location: session.location?.name || "Unknown Location",
-            topic: session.topic?.name || "Unknown Topic",
-            resource: session.name || "Unknown Teacher",
-            address: session.location || "Unknown address",
+            status: session.isActive ? 'CI' : 'P',
+            location: session.location?.name || 'Unknown Location',
+            topic: session.topic?.name || 'Unknown Topic',
+            resource: session.name || 'Unknown Teacher',
+            address: session.location || 'Unknown address',
             className: session.name,
             teacher: teacherName,
             studentCount: session.students.length,
             students: studentsWithStatus, // Array of first names of students
             startTime: moment(session.sessionStartDate).format('HH:mm'),
             endTime: moment(session.sessionEndDate).format('HH:mm'),
-            sessionType: session.sessionType,
+            sessionType: session.sessionType
           }
         },
-        resourceId: resource,
+        resourceId: resource
       };
     });
   };
-
-
 
   const loadClassSessions = async (locations = selectedLocations) => {
     setLoading(true);
@@ -120,14 +130,22 @@ const CalendarContent: React.FC = () => {
 
     try {
       let response;
-      const locationIds = locations.map(location => location.id);
+      const locationIds = locations.map((location) => location.id);
       switch (strongestRole) {
         case 'Teacher':
         case 'Student':
-          response = await fetchUserClassSessions(userId?.toString() || '', startDate, endDate);
+          response = await fetchUserClassSessions(
+            userId?.toString() || '',
+            startDate,
+            endDate
+          );
           break;
         case 'Parent':
-          response = await fetchParentClassSessions(userId?.toString() || '', startDate, endDate);
+          response = await fetchParentClassSessions(
+            userId?.toString() || '',
+            startDate,
+            endDate
+          );
           break;
         case 'SuperAdmin':
         case 'FranchiseAdmin':
@@ -138,21 +156,19 @@ const CalendarContent: React.FC = () => {
           response = await fetchClassSessions(startDate, endDate, locationIds);
           break;
         default:
-          console.error("Invalid role: Unrecognized role encountered.");
-          throw new Error("Invalid role");
+          console.error('Invalid role: Unrecognized role encountered.');
+          throw new Error('Invalid role');
       }
 
       const events = transformClassSessionsToEvents(response.data);
       setClassSessionEvents(events);
     } catch (error) {
-      console.error("Failed to load class sessions", error);
-      setErrorMessage("Failed to load class sessions. Please try again.");
+      console.error('Failed to load class sessions', error);
+      setErrorMessage('Failed to load class sessions. Please try again.');
     } finally {
       setLoading(false);
     }
   };
-
-
 
   useEffect(() => {
     const onAbsenceUpdated = () => {
@@ -171,12 +187,15 @@ const CalendarContent: React.FC = () => {
     setEndDate(newEndDate);
   };
 
-  const handleSaveClassSession = async (newSessionArray: any[], callback?: () => void) => {
+  const handleSaveClassSession = async (
+    newSessionArray: any[],
+    callback?: () => void
+  ) => {
     try {
       for (const session of newSessionArray) {
         const sessionPayload = {
           ...session,
-          locationId: session.locationId || selectedLocations[0]?.id || 0,
+          locationId: session.locationId || selectedLocations[0]?.id || 0
         };
         await addClassSessions(sessionPayload);
       }
@@ -198,7 +217,8 @@ const CalendarContent: React.FC = () => {
     }
   };
 
-  const handleLocationsChange = (locations: any[]) => { // Updated to multiple locations
+  const handleLocationsChange = (locations: any[]) => {
+    // Updated to multiple locations
     setSelectedLocations(locations);
     setClassSessionEvents([]);
     if (locations.length > 0) {
@@ -209,14 +229,19 @@ const CalendarContent: React.FC = () => {
   };
 
   useEffect(() => {
-    if (strongestRole && (strongestRole !== 'SuperAdmin' || selectedLocations.length > 0)) {
+    if (
+      strongestRole &&
+      (strongestRole !== 'SuperAdmin' || selectedLocations.length > 0)
+    ) {
       loadClassSessions();
     }
   }, [startDate, endDate, selectedFranchise, selectedLocations, strongestRole]);
 
   return (
     <Box sx={{ position: 'relative', height: '74vh' }}>
-      {['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin'].includes(strongestRole || '') && (
+      {['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin'].includes(
+        strongestRole || ''
+      ) && (
         <FilterToolbar
           onFranchiseChange={handleFranchiseChange}
           onLocationsChange={handleLocationsChange}
@@ -232,26 +257,30 @@ const CalendarContent: React.FC = () => {
           handleSaveClassSession={handleSaveClassSession}
           loadClassSessions={loadClassSessions}
         />
-        {selectedLocations.length === 0 && strongestRole !== 'Teacher' && strongestRole !== 'Student' && strongestRole !== 'Parent' && (
-          <Box
-            sx={{
-              position: 'absolute',
-              top: 0,
-              left: 0,
-              width: '100%',
-              height: '100%',
-              backgroundColor: 'rgba(0, 0, 0, 0.5)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              zIndex: 1000,
-            }}
-          >
-            <Typography variant="h6" color="white">
-              Please enter a franchise and select locations to view the calendar.
-            </Typography>
-          </Box>
-        )}
+        {selectedLocations.length === 0 &&
+          strongestRole !== 'Teacher' &&
+          strongestRole !== 'Student' &&
+          strongestRole !== 'Parent' && (
+            <Box
+              sx={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '100%',
+                height: '100%',
+                backgroundColor: 'rgba(0, 0, 0, 0.5)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 1000
+              }}
+            >
+              <Typography variant="h6" color="white">
+                Please enter a franchise and select locations to view the
+                calendar.
+              </Typography>
+            </Box>
+          )}
       </Box>
 
       <CalendarLegend />
