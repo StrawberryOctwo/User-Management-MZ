@@ -257,6 +257,7 @@ const CalendarContent: React.FC = () => {
           onDateChange={setDate}
           handleSaveClassSession={handleSaveClassSession}
           loadClassSessions={loadClassSessions}
+          selectedLocations={selectedLocations}
         />
         {selectedLocations.length === 0 &&
           strongestRole !== 'Teacher' &&

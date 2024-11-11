@@ -27,6 +27,7 @@ import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import EventTypeSelectionModal from '../Modals/EventTypeSelectionModal';
 import ToDoModal from '../Modals/ToDoModal';
+import { useSnackbar } from 'src/contexts/SnackbarContext';
 
 export enum TimeSlotMinutes {
   Five = 5,
@@ -41,13 +42,15 @@ type DemoProps = {
   onDateChange: (date: string) => void; // New prop to pass the date change handler
   handleSaveClassSession: (newSession: any) => void; // Accept as a prop
   loadClassSessions: () => void; // Add this prop
+  selectedLocations: any[];
 };
 
 export default function CustomizedCalendar({
   classSessionEvents,
   onDateChange,
   handleSaveClassSession,
-  loadClassSessions
+  loadClassSessions,
+  selectedLocations
 }: DemoProps) {
   const [date, setDate] = useState<Date>(moment().toDate());
   const [view, setView] = useState<typeof Views[Keys]>(Views.DAY);
@@ -83,6 +86,7 @@ export default function CustomizedCalendar({
     end: new Date()
   });
 
+  const { showMessage } = useSnackbar();
   const { userRoles } = useAuth();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
 
@@ -220,7 +224,6 @@ export default function CustomizedCalendar({
 
   useEffect(() => {
     const mappedEvents = classSessionEvents.map((session) => {
-      console.log(session)
       const [firstName, lastName] = session.data.appointment.teacher.split(' ');
       const formattedTeacher = `${firstName[0]}. ${lastName}`;
       const hasOverlap = checkOverlap(session, classSessionEvents);
@@ -251,6 +254,10 @@ export default function CustomizedCalendar({
     if (strongestRoles[0] == 'Student' || strongestRoles[0] == 'Parent') {
       return;
     }
+    if (selectedLocations.length > 1) {
+      showMessage('Please select a single location to add a class session.', 'error');
+      return;
+    }
     setSelectedRoom(roomId);
     setSelectedRange({ start, end });
     setIsAddModalOpen(true);
@@ -272,6 +279,10 @@ export default function CustomizedCalendar({
     if (eventType === 'To-Do') {
       setIsToDoModalOpen(true);
     } else if (eventType === 'Class Session') {
+      if (selectedLocations.length > 1) {
+        showMessage('Please select a single location to add a class session.', 'error');
+        return;
+      }
       setIsAddModalOpen(true);
     }
   };
@@ -366,6 +377,7 @@ export default function CustomizedCalendar({
         initialStartDate={selectedRange.start}
         initialEndDate={selectedRange.end}
         roomId={selectedRoom}
+        passedLocations={selectedLocations}
       />
 
       <ToDoModal

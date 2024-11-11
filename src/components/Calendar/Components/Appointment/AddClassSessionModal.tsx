@@ -50,7 +50,8 @@ export default function AddClassSessionModal({
   onSave,
   initialStartDate,
   initialEndDate,
-  roomId
+  roomId,
+  passedLocations
 }: {
   isOpen: boolean;
   onClose: () => void;
@@ -58,6 +59,7 @@ export default function AddClassSessionModal({
   initialStartDate: Date;
   initialEndDate: Date;
   roomId?: string | number;
+  passedLocations?: any[];
 }) {
   const [newSession, setNewSession] = useState<ClassSession>({
     name: '',
@@ -68,7 +70,7 @@ export default function AddClassSessionModal({
     isHolidayCourse: false,
     teacherId: 0,
     topicId: 0,
-    locationId: 0,
+    locationId: passedLocations[0]?.id || 0,
     studentIds: []
   });
 
@@ -115,15 +117,11 @@ export default function AddClassSessionModal({
 
     // Validate required fields
     if (!newSession.name.trim()) errors.name = t('errors.classNameRequired');
-    if (!newSession.sessionStartDate)
-      errors.sessionStartDate = t('errors.startTimeRequired');
-    if (!newSession.sessionEndDate)
-      errors.sessionEndDate = t('errors.endTimeRequired');
-    if (!selectedTeacher)
-      errors.teacherId = t('errors.teacherSelectionRequired');
+    if (!newSession.sessionStartDate) errors.sessionStartDate = t('errors.startTimeRequired');
+    if (!newSession.sessionEndDate) errors.sessionEndDate = t('errors.endTimeRequired');
+    if (!selectedTeacher) errors.teacherId = t('errors.teacherSelectionRequired');
     if (!selectedTopic) errors.topicId = t('errors.topicSelectionRequired');
-    if (!selectedLocation)
-      errors.locationId = t('errors.locationSelectionRequired');
+    if (!selectedLocation) errors.locationId = t('errors.locationSelectionRequired');
 
     // Calculate and validate session duration
     const start = new Date(newSession.sessionStartDate);
@@ -148,7 +146,6 @@ export default function AddClassSessionModal({
       errors.studentIds = error;
     } else {
       setStudentError(null);
-      // Update newSession with validated student IDs
       setNewSession((prevSession) => ({
         ...prevSession,
         studentIds: validatedStudents.map((student) => student.id)
@@ -168,20 +165,25 @@ export default function AddClassSessionModal({
       return;
     }
 
+    const sessionPayload = {
+      ...newSession,
+      locationId: selectedLocation?.id
+    };
+
     if (isRepeat && repeatUntilDate) {
-      const generatedSessions = generateRepeatedSessions(
-        start,
-        end,
-        repeatUntilDate
-      );
+      const generatedSessions = generateRepeatedSessions(start, end, repeatUntilDate).map(session => ({
+        ...session,
+        locationId: selectedLocation?.id
+      }));
+      console.log(generatedSessions)
       onSave(generatedSessions);
     } else {
-      onSave([newSession]);
+      onSave([sessionPayload]);
     }
 
-    clearForm();
     onClose();
   };
+
 
   const generateRepeatedSessions = (
     startDate: Date,
@@ -192,7 +194,6 @@ export default function AddClassSessionModal({
     let currentStart = new Date(startDate);
     let currentEnd = new Date(endDate);
 
-    // Ensure the date comparison ignores time by resetting the time to midnight
     function stripTime(date: Date) {
       const newDate = new Date(date);
       newDate.setHours(0, 0, 0, 0); // Set time to midnight
@@ -305,6 +306,12 @@ export default function AddClassSessionModal({
       setRepeatUntilDate(newRepeatDate);
     }
   };
+
+  useEffect(() => {
+    if (isOpen && passedLocations && passedLocations[0]) {
+      setSelectedLocation(passedLocations[0]);
+    }
+  }, [isOpen, passedLocations]);
 
   return (
     <Dialog open={isOpen} onClose={handleClose} maxWidth="sm" fullWidth>
@@ -450,6 +457,7 @@ export default function AddClassSessionModal({
             placeholder="Search Location"
             initialValue={selectedLocation}
             width="100%"
+            disabled={true}
           />
           {fieldErrors.locationId && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
