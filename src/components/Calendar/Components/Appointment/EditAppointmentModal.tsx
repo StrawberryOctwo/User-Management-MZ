@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -13,19 +13,22 @@ import {
   Switch,
   Box,
   Typography,
-  FormControlLabel,
-} from "@mui/material";
-import moment from "moment";
+  FormControlLabel
+} from '@mui/material';
+import moment from 'moment';
 
-import { t } from "i18next";
-import SingleSelectWithAutocomplete from "src/components/SearchBars/SingleSelectWithAutocomplete";
-import MultiSelectWithCheckboxes from "src/components/SearchBars/MultiSelectWithCheckboxes";
-import { fetchClassSessionById, updateClassSession } from "src/services/classSessionService";
-import { fetchStudents } from "src/services/studentService";
-import { fetchTeachers } from "src/services/teacherService";
-import { fetchTopics } from "src/services/topicService";
-import { fetchLocations } from "src/services/locationService";
-import { fetchSessionTypes } from "src/services/contractPackagesService";
+import { t } from 'i18next';
+import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
+import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
+import {
+  fetchClassSessionById,
+  updateClassSession
+} from 'src/services/classSessionService';
+import { fetchStudents } from 'src/services/studentService';
+import { fetchTeachers } from 'src/services/teacherService';
+import { fetchTopics } from 'src/services/topicService';
+import { fetchLocations } from 'src/services/locationService';
+import { fetchSessionTypes } from 'src/services/contractPackagesService';
 
 interface EditAppointmentModalProps {
   isOpen: boolean;
@@ -40,7 +43,7 @@ export default function EditAppointmentModal({
   onClose,
   appointmentId,
   onSave,
-  loadClassSessions, // Destructure the prop
+  loadClassSessions // Destructure the prop
 }: EditAppointmentModalProps) {
   const [editedAppointment, setEditedAppointment] = useState<any>(null);
   const [selectedTeacher, setSelectedTeacher] = useState<any | null>(null);
@@ -48,12 +51,14 @@ export default function EditAppointmentModal({
   const [selectedStudents, setSelectedStudents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string | null }>({});
+  const [fieldErrors, setFieldErrors] = useState<{
+    [key: string]: string | null;
+  }>({});
   const [studentError, setStudentError] = useState<string | null>(null);
   const [startTimeError, setStartTimeError] = useState<string | null>(null);
   const [endTimeError, setEndTimeError] = useState<string | null>(null);
-  const [selectedLocation, setSelectedLocation] = useState<any | null>(null); 
-  const [sessionTypes, setSessionTypes] = useState<any[]>([]); 
+  const [selectedLocation, setSelectedLocation] = useState<any | null>(null);
+  const [sessionTypes, setSessionTypes] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchSessionTypeOptions = async () => {
@@ -61,7 +66,7 @@ export default function EditAppointmentModal({
         const types = await fetchSessionTypes();
         setSessionTypes(types);
       } catch (error) {
-        console.error("Failed to fetch session types", error);
+        console.error('Failed to fetch session types', error);
       }
     };
 
@@ -77,15 +82,19 @@ export default function EditAppointmentModal({
 
           // Preload teacher with full name
           const teacher = session.teacher
-            ? { id: session.teacher.id, fullName: `${session.teacher.user.firstName} ${session.teacher.user.lastName}` }
+            ? {
+                id: session.teacher.id,
+                fullName: `${session.teacher.user.firstName} ${session.teacher.user.lastName}`
+              }
             : null;
           setSelectedTeacher(teacher);
 
           // Preload students with full names
-          const students = session.students?.map((student: any) => ({
-            id: student.id,
-            fullName: `${student.user.firstName} ${student.user.lastName}`,
-          })) || [];
+          const students =
+            session.students?.map((student: any) => ({
+              id: student.id,
+              fullName: `${student.user.firstName} ${student.user.lastName}`
+            })) || [];
           setSelectedStudents(students);
 
           // Preload topic
@@ -95,11 +104,11 @@ export default function EditAppointmentModal({
           if (session.location) {
             setSelectedLocation({
               id: session.location.id,
-              name: session.location.name,
+              name: session.location.name
             });
           }
         } catch (error) {
-          setErrorMessage("Failed to fetch class session");
+          setErrorMessage('Failed to fetch class session');
         } finally {
           setLoading(false);
         }
@@ -107,7 +116,6 @@ export default function EditAppointmentModal({
       fetchClassSession();
     }
   }, [appointmentId, isOpen]);
-
 
   const validateTime = (date: Date | null, type: 'start' | 'end'): boolean => {
     if (date) {
@@ -131,7 +139,6 @@ export default function EditAppointmentModal({
     return false;
   };
 
-
   const validateStudentSelection = (
     sessionType: string,
     students: any[],
@@ -140,33 +147,37 @@ export default function EditAppointmentModal({
     if (sessionType === '1on1' && students.length !== 1) {
       return {
         validatedStudents: students.slice(0, 1),
-        error: t('errors.oneStudentRequired'),
+        error: t('errors.oneStudentRequired')
       };
     } else if (sessionType === 'Group' && students.length > maxGroupSize) {
       return {
         validatedStudents: students.slice(0, maxGroupSize),
-        error: t('errors.maxStudentsExceeded', { max: maxGroupSize }),
+        error: t('errors.maxStudentsExceeded', { max: maxGroupSize })
       };
     }
     // For 'Online' or valid 'Group' session, no restriction
     return {
       validatedStudents: students,
-      error: null,
+      error: null
     };
   };
-
 
   const handleSave = async () => {
     if (editedAppointment) {
       // Validate all required fields
       const errors: { [key: string]: string | null } = {};
 
-      if (!editedAppointment.name.trim()) errors.name = t('errors.classNameRequired');
-      if (!editedAppointment.sessionStartDate) errors.sessionStartDate = t('errors.startTimeRequired');
-      if (!editedAppointment.sessionEndDate) errors.sessionEndDate = t('errors.endTimeRequired');
-      if (!selectedTeacher) errors.teacherId = t('errors.teacherSelectionRequired');
+      if (!editedAppointment.name.trim())
+        errors.name = t('errors.classNameRequired');
+      if (!editedAppointment.sessionStartDate)
+        errors.sessionStartDate = t('errors.startTimeRequired');
+      if (!editedAppointment.sessionEndDate)
+        errors.sessionEndDate = t('errors.endTimeRequired');
+      if (!selectedTeacher)
+        errors.teacherId = t('errors.teacherSelectionRequired');
       if (!selectedTopic) errors.topicId = t('errors.topicSelectionRequired');
-      if (!selectedLocation) errors.locationId = t('errors.locationSelectionRequired'); // Validate location
+      if (!selectedLocation)
+        errors.locationId = t('errors.locationSelectionRequired'); // Validate location
 
       // Validate student selection based on the session type
       const { validatedStudents, error } = validateStudentSelection(
@@ -184,8 +195,14 @@ export default function EditAppointmentModal({
       setFieldErrors(errors);
 
       // Validate the time fields
-      const isStartTimeValid = validateTime(new Date(editedAppointment.sessionStartDate), 'start');
-      const isEndTimeValid = validateTime(new Date(editedAppointment.sessionEndDate), 'end');
+      const isStartTimeValid = validateTime(
+        new Date(editedAppointment.sessionStartDate),
+        'start'
+      );
+      const isEndTimeValid = validateTime(
+        new Date(editedAppointment.sessionEndDate),
+        'end'
+      );
 
       if (
         Object.values(errors).some((error) => error !== null) ||
@@ -195,8 +212,8 @@ export default function EditAppointmentModal({
         return; // Exit if any errors exist or if times are invalid
       }
 
-      const { teacher, topic, students, ...restAppointment } = editedAppointment;
-
+      const { teacher, topic, students, ...restAppointment } =
+        editedAppointment;
 
       const updatedSession = {
         ...restAppointment,
@@ -204,7 +221,7 @@ export default function EditAppointmentModal({
         topicId: selectedTopic?.id || null,
         locationId: selectedLocation?.id || null,
         studentIds: validatedStudents.map((student) => student.id),
-        sessionType: editedAppointment.sessionType.id,
+        sessionType: editedAppointment.sessionType.id
       };
 
       try {
@@ -213,7 +230,7 @@ export default function EditAppointmentModal({
         loadClassSessions(); // Call the function directly
         onClose();
       } catch (error) {
-        setErrorMessage("Failed to update class session");
+        setErrorMessage('Failed to update class session');
       } finally {
         setLoading(false);
       }
@@ -236,9 +253,12 @@ export default function EditAppointmentModal({
                   <InputLabel>Room</InputLabel>
                   <Select
                     label="Room"
-                    value={editedAppointment.name || ""}
+                    value={editedAppointment.name || ''}
                     onChange={(e) =>
-                      setEditedAppointment({ ...editedAppointment, name: e.target.value })
+                      setEditedAppointment({
+                        ...editedAppointment,
+                        name: e.target.value
+                      })
                     }
                   >
                     {Array.from({ length: 7 }, (_, index) => (
@@ -250,20 +270,24 @@ export default function EditAppointmentModal({
                 </FormControl>
               </Box>
 
-
-
               <FormControl fullWidth margin="normal">
                 <InputLabel>Session Type</InputLabel>
                 <Select
                   label="Session Type"
-                  value={editedAppointment.sessionType.id || ""}
+                  value={editedAppointment.sessionType.id || ''}
                   onChange={(e) => {
-                    const selectedType = sessionTypes.find(type => type.id === e.target.value);
+                    const selectedType = sessionTypes.find(
+                      (type) => type.id === e.target.value
+                    );
                     setEditedAppointment({
                       ...editedAppointment,
-                      sessionType: { id: selectedType.id, name: selectedType.name },
+                      sessionType: {
+                        id: selectedType.id,
+                        name: selectedType.name
+                      }
                     });
-                  }}                >
+                  }}
+                >
                   {sessionTypes.map((type) => (
                     <MenuItem key={type.id} value={type.id}>
                       {type.name}
@@ -276,12 +300,14 @@ export default function EditAppointmentModal({
                 <TextField
                   label="Start Time"
                   type="datetime-local"
-                  value={moment(editedAppointment.sessionStartDate).format("YYYY-MM-DDTHH:mm")}
+                  value={moment(editedAppointment.sessionStartDate).format(
+                    'YYYY-MM-DDTHH:mm'
+                  )}
                   onChange={(e) => {
                     const newStartDate = new Date(e.target.value);
                     setEditedAppointment({
                       ...editedAppointment,
-                      sessionStartDate: newStartDate,
+                      sessionStartDate: newStartDate
                     });
                     validateTime(newStartDate, 'start');
                   }}
@@ -292,12 +318,14 @@ export default function EditAppointmentModal({
                 <TextField
                   label="End Time"
                   type="datetime-local"
-                  value={moment(editedAppointment.sessionEndDate).format('YYYY-MM-DDTHH:mm')}
+                  value={moment(editedAppointment.sessionEndDate).format(
+                    'YYYY-MM-DDTHH:mm'
+                  )}
                   onChange={(e) => {
                     const newEndDate = new Date(e.target.value);
                     setEditedAppointment({
                       ...editedAppointment,
-                      sessionEndDate: newEndDate,
+                      sessionEndDate: newEndDate
                     });
                     validateTime(newEndDate, 'end');
                   }}
@@ -312,7 +340,10 @@ export default function EditAppointmentModal({
                   <Switch
                     checked={editedAppointment.isActive}
                     onChange={(e) =>
-                      setEditedAppointment({ ...editedAppointment, isActive: e.target.checked })
+                      setEditedAppointment({
+                        ...editedAppointment,
+                        isActive: e.target.checked
+                      })
                     }
                   />
                 }
@@ -325,7 +356,10 @@ export default function EditAppointmentModal({
                   <Switch
                     checked={editedAppointment.isHolidayCourse}
                     onChange={(e) =>
-                      setEditedAppointment({ ...editedAppointment, isHolidayCourse: e.target.checked })
+                      setEditedAppointment({
+                        ...editedAppointment,
+                        isHolidayCourse: e.target.checked
+                      })
                     }
                   />
                 }
@@ -352,14 +386,18 @@ export default function EditAppointmentModal({
                 )}
               </Box>
 
-
               <Box sx={{ mb: 2 }}>
                 <SingleSelectWithAutocomplete
                   label="Search Topic"
-                  fetchData={(query: string) => fetchTopics(1, 5, query).then((response) => response.data)}
+                  fetchData={(query: string) =>
+                    fetchTopics(1, 5, query).then((response) => response.data)
+                  }
                   onSelect={(topic) => {
                     setSelectedTopic(topic);
-                    setEditedAppointment({ ...editedAppointment, topicId: topic?.id });
+                    setEditedAppointment({
+                      ...editedAppointment,
+                      topicId: topic?.id
+                    });
                   }}
                   displayProperty="name"
                   placeholder="Search Topic"
@@ -380,13 +418,16 @@ export default function EditAppointmentModal({
                     fetchTeachers(1, 5, query).then((data) =>
                       data.data.map((teacher: any) => ({
                         ...teacher,
-                        fullName: `${teacher.firstName} ${teacher.lastName}`,
+                        fullName: `${teacher.firstName} ${teacher.lastName}`
                       }))
                     )
                   }
                   onSelect={(teacher) => {
                     setSelectedTeacher(teacher);
-                    setEditedAppointment({ ...editedAppointment, teacherId: teacher?.id });
+                    setEditedAppointment({
+                      ...editedAppointment,
+                      teacherId: teacher?.id
+                    });
                   }}
                   displayProperty="fullName"
                   placeholder="Search Teacher"
@@ -407,13 +448,16 @@ export default function EditAppointmentModal({
                     fetchStudents(1, 5, query).then((data) =>
                       data.data.map((student: any) => ({
                         ...student,
-                        fullName: `${student.firstName} ${student.lastName}`,
+                        fullName: `${student.firstName} ${student.lastName}`
                       }))
                     )
                   }
                   onSelect={(selectedItems) => {
                     setSelectedStudents(selectedItems);
-                    setEditedAppointment({ ...editedAppointment, studentIds: selectedItems.map((item: any) => item.id) });
+                    setEditedAppointment({
+                      ...editedAppointment,
+                      studentIds: selectedItems.map((item: any) => item.id)
+                    });
                   }}
                   displayProperty="fullName"
                   placeholder="Enter student name"
@@ -426,6 +470,20 @@ export default function EditAppointmentModal({
                   </Typography>
                 )}
               </Box>
+              <TextField
+                fullWidth
+                multiline
+                rows={4}
+                value={editedAppointment.note}
+                onChange={(e) =>
+                  setEditedAppointment({
+                    ...editedAppointment,
+                    note: e.target.value
+                  })
+                }
+                variant="outlined"
+                sx={{ mt: 2 }}
+              />
             </Box>
           )
         )}
@@ -434,7 +492,12 @@ export default function EditAppointmentModal({
         <Button onClick={onClose} color="secondary">
           Cancel
         </Button>
-        <Button onClick={handleSave} color="primary" variant="contained" disabled={loading}>
+        <Button
+          onClick={handleSave}
+          color="primary"
+          variant="contained"
+          disabled={loading}
+        >
           Save
         </Button>
       </DialogActions>

@@ -14,15 +14,16 @@ import {
   Box,
   FormControlLabel,
   Typography,
-  Checkbox,
+  Checkbox
 } from '@mui/material';
 import moment from 'moment';
-
-
 import { t } from 'i18next';
 import { fetchStudents } from 'src/services/studentService';
 import { fetchTopics } from 'src/services/topicService';
-import { fetchTeacherByUserId, fetchTeachers } from 'src/services/teacherService';
+import {
+  fetchTeacherByUserId,
+  fetchTeachers
+} from 'src/services/teacherService';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import { useAuth } from 'src/hooks/useAuth';
@@ -34,6 +35,7 @@ interface ClassSession {
   name: string;
   sessionStartDate: Date;
   sessionEndDate: Date;
+  note: string;
   sessionType: string;
   isActive: boolean;
   isHolidayCourse: boolean;
@@ -62,20 +64,23 @@ export default function AddClassSessionModal({
     name: '',
     sessionStartDate: initialStartDate,
     sessionEndDate: initialEndDate,
+    note: '',
     sessionType: '',
     isActive: false,
     isHolidayCourse: false,
     teacherId: 0,
     topicId: 0,
     locationId: 0,
-    studentIds: [],
+    studentIds: []
   });
 
   const [selectedStudents, setSelectedStudents] = useState<any[]>([]);
   const [selectedTeacher, setSelectedTeacher] = useState<any | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<any | null>(null);
   const [maxStudents, setMaxStudents] = useState(4);
-  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string | null }>({});
+  const [fieldErrors, setFieldErrors] = useState<{
+    [key: string]: string | null;
+  }>({});
   const [studentError, setStudentError] = useState<string | null>(null);
   const [startTimeError, setStartTimeError] = useState<string | null>(null);
   const [endTimeError, setEndTimeError] = useState<string | null>(null);
@@ -112,11 +117,15 @@ export default function AddClassSessionModal({
 
     // Validate required fields
     if (!newSession.name.trim()) errors.name = t('errors.classNameRequired');
-    if (!newSession.sessionStartDate) errors.sessionStartDate = t('errors.startTimeRequired');
-    if (!newSession.sessionEndDate) errors.sessionEndDate = t('errors.endTimeRequired');
-    if (!selectedTeacher) errors.teacherId = t('errors.teacherSelectionRequired');
+    if (!newSession.sessionStartDate)
+      errors.sessionStartDate = t('errors.startTimeRequired');
+    if (!newSession.sessionEndDate)
+      errors.sessionEndDate = t('errors.endTimeRequired');
+    if (!selectedTeacher)
+      errors.teacherId = t('errors.teacherSelectionRequired');
     if (!selectedTopic) errors.topicId = t('errors.topicSelectionRequired');
-    if (!selectedLocation) errors.locationId = t('errors.locationSelectionRequired');
+    if (!selectedLocation)
+      errors.locationId = t('errors.locationSelectionRequired');
 
     // Calculate and validate session duration
     const start = new Date(newSession.sessionStartDate);
@@ -125,7 +134,9 @@ export default function AddClassSessionModal({
 
     const allowedDurations = [45, 60, 90, 120];
     if (!allowedDurations.includes(durationMinutes)) {
-      errors.duration = t('errors.invalidDuration', { allowed: allowedDurations.join(', ') });
+      errors.duration = t('errors.invalidDuration', {
+        allowed: allowedDurations.join(', ')
+      });
     }
 
     const { validatedStudents, error } = validateStudentSelection(
@@ -142,7 +153,7 @@ export default function AddClassSessionModal({
       // Update newSession with validated student IDs
       setNewSession((prevSession) => ({
         ...prevSession,
-        studentIds: validatedStudents.map((student) => student.id),
+        studentIds: validatedStudents.map((student) => student.id)
       }));
     }
 
@@ -160,7 +171,11 @@ export default function AddClassSessionModal({
     }
 
     if (isRepeat && repeatUntilDate) {
-      const generatedSessions = generateRepeatedSessions(start, end, repeatUntilDate);
+      const generatedSessions = generateRepeatedSessions(
+        start,
+        end,
+        repeatUntilDate
+      );
       onSave(generatedSessions);
     } else {
       onSave([newSession]);
@@ -169,8 +184,6 @@ export default function AddClassSessionModal({
     clearForm();
     onClose();
   };
-
-
 
   const generateRepeatedSessions = (
     startDate: Date,
@@ -194,7 +207,7 @@ export default function AddClassSessionModal({
       sessions.push({
         ...newSession,
         sessionStartDate: new Date(currentStart),
-        sessionEndDate: new Date(currentEnd),
+        sessionEndDate: new Date(currentEnd)
       });
 
       // Move to the same weekday next week
@@ -210,9 +223,9 @@ export default function AddClassSessionModal({
       setSessionTypes(data);
     });
   }, []);
-  
+
   useEffect(() => {
-    if (newSession.sessionType === "1on1") {
+    if (newSession.sessionType === '1on1') {
       setSelectedStudents((prev) => prev.slice(0, 1));
       setMaxStudents(1);
     } else {
@@ -224,7 +237,7 @@ export default function AddClassSessionModal({
     setNewSession((prevSession) => ({
       ...prevSession,
       sessionStartDate: initialStartDate,
-      sessionEndDate: initialEndDate,
+      sessionEndDate: initialEndDate
     }));
   }, [initialStartDate, initialEndDate]);
 
@@ -243,27 +256,32 @@ export default function AddClassSessionModal({
       name: '',
       sessionStartDate: initialStartDate,
       sessionEndDate: initialEndDate,
+      note: '',
       sessionType: '',
       isActive: false,
       isHolidayCourse: false,
       teacherId: 0,
       topicId: 0,
       locationId: 0,
-      studentIds: [],
+      studentIds: []
     });
     setFieldErrors({});
   };
 
-  const validateStudentSelection = (sessionType: string, students: any[], maxGroupSize: number = 4) => {
-    if (sessionType === "1on1" && students.length !== 1) {
+  const validateStudentSelection = (
+    sessionType: string,
+    students: any[],
+    maxGroupSize: number = 4
+  ) => {
+    if (sessionType === '1on1' && students.length !== 1) {
       return {
         validatedStudents: students.slice(0, 1),
-        error: 'You must select exactly one student for a 1-on-1 session.',
+        error: 'You must select exactly one student for a 1-on-1 session.'
       };
     } else if (sessionType === 'Group' && students.length > maxGroupSize) {
       return {
         validatedStudents: students.slice(0, maxGroupSize),
-        error: `You can select up to ${maxGroupSize} students for a group session.`,
+        error: `You can select up to ${maxGroupSize} students for a group session.`
       };
     }
     return { validatedStudents: students, error: null };
@@ -283,14 +301,13 @@ export default function AddClassSessionModal({
         ...prev,
         repeatDate: t('errors.invalidRepeatDate', {
           day: moment(sessionStartDate).format('YYYY-MM-DD')
-        }),
+        })
       }));
     } else {
       setFieldErrors((prev) => ({ ...prev, repeatDate: null }));
       setRepeatUntilDate(newRepeatDate);
     }
   };
-
 
   return (
     <Dialog open={isOpen} onClose={handleClose} maxWidth="sm" fullWidth>
@@ -301,7 +318,7 @@ export default function AddClassSessionModal({
             <InputLabel>Room</InputLabel>
             <Select
               label="Room"
-              value={newSession.name || ""} // Use newSession.name for room selection
+              value={newSession.name || ''} // Use newSession.name for room selection
               onChange={(e) =>
                 setNewSession({ ...newSession, name: e.target.value })
               }
@@ -314,7 +331,6 @@ export default function AddClassSessionModal({
             </Select>
           </FormControl>
         </Box>
-
         <Box sx={{ mb: 2 }}>
           <FormControl fullWidth>
             <InputLabel>Session Type</InputLabel>
@@ -333,18 +349,19 @@ export default function AddClassSessionModal({
             </Select>
           </FormControl>
         </Box>
-
         <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
           <TextField
             label="Start Time"
             type="datetime-local"
             fullWidth
-            value={moment(newSession.sessionStartDate).format('YYYY-MM-DDTHH:mm')}
+            value={moment(newSession.sessionStartDate).format(
+              'YYYY-MM-DDTHH:mm'
+            )}
             onChange={(e) => {
               const newStartDate = new Date(e.target.value);
               setNewSession({
                 ...newSession,
-                sessionStartDate: newStartDate,
+                sessionStartDate: newStartDate
               });
               validateTime(newStartDate, 'start'); // Validate start time
             }}
@@ -360,7 +377,7 @@ export default function AddClassSessionModal({
               const newEndDate = new Date(e.target.value);
               setNewSession({
                 ...newSession,
-                sessionEndDate: newEndDate,
+                sessionEndDate: newEndDate
               });
               validateTime(newEndDate, 'end'); // Validate end time
             }}
@@ -373,8 +390,15 @@ export default function AddClassSessionModal({
             {fieldErrors.duration}
           </Typography>
         )}
-
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, mb: 3, ml: 1 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            mb: 3,
+            ml: 1
+          }}
+        >
           <FormControlLabel
             control={
               <Checkbox
@@ -388,7 +412,11 @@ export default function AddClassSessionModal({
             <TextField
               type="date"
               fullWidth
-              value={repeatUntilDate ? moment(repeatUntilDate).format('YYYY-MM-DD') : ''}
+              value={
+                repeatUntilDate
+                  ? moment(repeatUntilDate).format('YYYY-MM-DD')
+                  : ''
+              }
               onChange={(e) => handleRepeatDateChange(e.target.value)}
               error={!!fieldErrors.repeatDate}
               helperText={fieldErrors.repeatDate}
@@ -413,7 +441,10 @@ export default function AddClassSessionModal({
                 <Switch
                   checked={newSession.isHolidayCourse}
                   onChange={(e) =>
-                    setNewSession({ ...newSession, isHolidayCourse: e.target.checked })
+                    setNewSession({
+                      ...newSession,
+                      isHolidayCourse: e.target.checked
+                    })
                   }
                 />
               }
@@ -421,8 +452,6 @@ export default function AddClassSessionModal({
             />
           </Box>
         </Box>
-
-
         <Box sx={{ mb: 2 }}>
           <SingleSelectWithAutocomplete
             label="Select Location"
@@ -441,11 +470,12 @@ export default function AddClassSessionModal({
             </Typography>
           )}
         </Box>
-
         <Box sx={{ mb: 2 }}>
           <SingleSelectWithAutocomplete
             label="Search Topic"
-            fetchData={(query: string) => fetchTopics(1, 5, query).then((response) => response.data)}
+            fetchData={(query: string) =>
+              fetchTopics(1, 5, query).then((response) => response.data)
+            }
             onSelect={(topic) => {
               setSelectedTopic(topic);
               setNewSession({ ...newSession, topicId: topic?.id });
@@ -461,7 +491,6 @@ export default function AddClassSessionModal({
             </Typography>
           )}
         </Box>
-
         <Box sx={{ mb: 2 }}>
           <SingleSelectWithAutocomplete
             label="Search Teacher"
@@ -471,15 +500,15 @@ export default function AddClassSessionModal({
                 return fetchTeacherByUserId(userId).then((teacher) => [
                   {
                     ...teacher,
-                    fullName: `${teacher.user.firstName} ${teacher.user.lastName}`,
-                  },
+                    fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
+                  }
                 ]);
               } else {
                 // If the user is not a Teacher, allow them to search for teachers
                 return fetchTeachers(1, 5, query).then((data) =>
                   data.data.map((teacher: any) => ({
                     ...teacher,
-                    fullName: `${teacher.firstName} ${teacher.lastName}`,
+                    fullName: `${teacher.firstName} ${teacher.lastName}`
                   }))
                 );
               }
@@ -500,7 +529,6 @@ export default function AddClassSessionModal({
           )}
         </Box>
 
-
         <Box sx={{ mb: 2 }}>
           <MultiSelectWithCheckboxes
             label="Search Students"
@@ -514,7 +542,10 @@ export default function AddClassSessionModal({
             }
             onSelect={(selectedItems: any) => {
               setSelectedStudents(selectedItems);
-              setNewSession({ ...newSession, studentIds: selectedItems.map((item: any) => item.id) });
+              setNewSession({
+                ...newSession,
+                studentIds: selectedItems.map((item: any) => item.id)
+              });
             }}
             displayProperty="fullName"
             placeholder="Enter student name"
@@ -527,7 +558,24 @@ export default function AddClassSessionModal({
             </Typography>
           )}
         </Box>
-
+        <Box sx={{ mb: 2 }}>
+          <TextField
+            label="Additional Notes"
+            fullWidth
+            multiline
+            rows={3}
+            value={newSession.note}
+            onChange={(e) =>
+              setNewSession({ ...newSession, note: e.target.value })
+            }
+            variant="outlined"
+          />
+          {fieldErrors.note && (
+            <Typography color="error" variant="body2" sx={{ mt: 1 }}>
+              {fieldErrors.note}
+            </Typography>
+          )}
+        </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="secondary">

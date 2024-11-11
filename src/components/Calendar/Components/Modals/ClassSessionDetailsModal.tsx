@@ -11,7 +11,8 @@ import {
   CardContent,
   CircularProgress,
   Tabs,
-  Tab
+  Tab,
+  TextField
 } from '@mui/material';
 import moment from 'moment';
 import {
@@ -25,10 +26,7 @@ import ViewSessionReportForm from './ViewSessionReport';
 import ViewPaymentDetails from './ViewPaymentDetails'; // New Component for payment view
 import StudentDetailCard from './StudentDetailCArd';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
-import {
-
-  getPaymentsForUserByClassSession
-} from 'src/services/paymentService'; // Fix the path if needed
+import { getPaymentsForUserByClassSession } from 'src/services/paymentService'; // Fix the path if needed
 import { sessionTypeFunc } from 'src/utils/sessionType';
 import AbsenceForm from './AbsenceTab';
 import AbsenceTab from './AbsenceTab';
@@ -121,11 +119,8 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
 
   useEffect(() => {
     if (allReportsCompleted) {
-
     }
   }, [allReportsCompleted]);
-
-
 
   const handleAddReport = (student: any) => {
     setSelectedStudent(student);
@@ -244,7 +239,8 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                     <strong>Location:</strong> {classSession.location.name}
                   </Typography>
                   <Typography variant="subtitle1">
-                    <strong>Session Type:</strong> {classSession?.sessionType?.name}
+                    <strong>Session Type:</strong>{' '}
+                    {classSession?.sessionType?.name}
                   </Typography>
                   <Typography variant="subtitle1">
                     <strong>Start Time:</strong>{' '}
@@ -254,6 +250,39 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                     <strong>End Time:</strong>{' '}
                     {moment(classSession.sessionEndDate).format('LLL')}
                   </Typography>
+                </CardContent>
+                <CardContent>
+                  <Typography variant="subtitle1">
+                    <strong>Notes:</strong>
+                  </Typography>
+                  {/* <TextField
+                    fullWidth
+                    multiline
+                    rows={4}
+                    value={classSession.note}
+                    onChange={(e) =>
+                      setClassSession({
+                        ...classSession,
+                        note: e.target.value
+                      })
+                    }
+                    InputProps={{
+                      readOnly: isReadOnly
+                    }}
+                    variant="outlined"
+                    sx={{ mt: 2 }}
+                  />
+                  {!isReadOnly && (
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={handleSaveNote}
+                      sx={{ mt: 2 }}
+                    >
+                      Save Note
+                    </Button>
+                  )} */}
+                  <Typography variant="body2">{classSession.note}</Typography>
                 </CardContent>
               </Card>
             )}
@@ -376,12 +405,16 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                 style={{
                   padding: '8px 16px'
                 }}
-                color='error'
+                color="error"
                 variant="outlined"
               >
                 Delete
               </Button>
-              <Button onClick={() => setDeactivateDialogOpen(true)} color="warning" variant="outlined">
+              <Button
+                onClick={() => setDeactivateDialogOpen(true)}
+                color="warning"
+                variant="outlined"
+              >
                 {classSession?.isActive ? 'Deactivate' : 'Reactivate'}
               </Button>
             </Box>
@@ -417,20 +450,35 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       </ReusableDialog>
       <ReusableDialog
         open={deactivateDialogOpen}
-        title={`Confirm ${classSession?.isActive ? 'Deactivation' : 'Reactivation'}`}
+        title={`Confirm ${
+          classSession?.isActive ? 'Deactivation' : 'Reactivation'
+        }`}
         onClose={() => setDeactivateDialogOpen(false)}
         actions={
           <>
-            <Button onClick={() => setDeactivateDialogOpen(false)} color="inherit" disabled={loading}>
+            <Button
+              onClick={() => setDeactivateDialogOpen(false)}
+              color="inherit"
+              disabled={loading}
+            >
               Cancel
             </Button>
-            <Button onClick={handleToggleActivation} color="primary" autoFocus disabled={loading}>
+            <Button
+              onClick={handleToggleActivation}
+              color="primary"
+              autoFocus
+              disabled={loading}
+            >
               {loading ? <CircularProgress size={24} /> : 'Confirm'}
             </Button>
           </>
         }
       >
-        <p>Are you sure you want to {classSession?.isActive ? 'deactivate' : 'reactivate'} the class session?</p>
+        <p>
+          Are you sure you want to{' '}
+          {classSession?.isActive ? 'deactivate' : 'reactivate'} the class
+          session?
+        </p>
       </ReusableDialog>
     </Dialog>
   );
