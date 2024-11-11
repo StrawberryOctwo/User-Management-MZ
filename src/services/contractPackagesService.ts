@@ -107,7 +107,7 @@ export const editContractPackage = async (id: string, contractPackageData: any) 
 };
 
 // Delete multiple contract packages by IDs
-export const deleteContractPackages = async (ids: number[]) => {
+export const deleteContractPackages = async (ids: string[]) => {
     try {
         const response = await api.delete('/contract-packages', {
             data: { ids },

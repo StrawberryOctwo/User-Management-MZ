@@ -25,6 +25,7 @@ import { fetchStudents } from "src/services/studentService";
 import { fetchTeachers } from "src/services/teacherService";
 import { fetchTopics } from "src/services/topicService";
 import { fetchLocations } from "src/services/locationService";
+import { fetchSessionTypes } from "src/services/contractPackagesService";
 
 interface EditAppointmentModalProps {
   isOpen: boolean;
@@ -51,9 +52,21 @@ export default function EditAppointmentModal({
   const [studentError, setStudentError] = useState<string | null>(null);
   const [startTimeError, setStartTimeError] = useState<string | null>(null);
   const [endTimeError, setEndTimeError] = useState<string | null>(null);
-  const [selectedLocation, setSelectedLocation] = useState<any | null>(null); // Location state
+  const [selectedLocation, setSelectedLocation] = useState<any | null>(null); 
+  const [sessionTypes, setSessionTypes] = useState<any[]>([]); 
 
+  useEffect(() => {
+    const fetchSessionTypeOptions = async () => {
+      try {
+        const types = await fetchSessionTypes();
+        setSessionTypes(types);
+      } catch (error) {
+        console.error("Failed to fetch session types", error);
+      }
+    };
 
+    fetchSessionTypeOptions();
+  }, []);
   useEffect(() => {
     if (appointmentId && isOpen) {
       const fetchClassSession = async () => {
@@ -184,12 +197,14 @@ export default function EditAppointmentModal({
 
       const { teacher, topic, students, ...restAppointment } = editedAppointment;
 
+
       const updatedSession = {
         ...restAppointment,
         teacherId: selectedTeacher?.id || null,
         topicId: selectedTopic?.id || null,
         locationId: selectedLocation?.id || null,
         studentIds: validatedStudents.map((student) => student.id),
+        sessionType: editedAppointment.sessionType.id,
       };
 
       try {
@@ -241,12 +256,19 @@ export default function EditAppointmentModal({
                 <InputLabel>Session Type</InputLabel>
                 <Select
                   label="Session Type"
-                  value={editedAppointment.sessionType || "Online"}
-                  onChange={(e) => setEditedAppointment({ ...editedAppointment, sessionType: e.target.value })}
-                >
-                  <MenuItem value="Online">{t('sessionOnline')}</MenuItem>
-                  <MenuItem value="Group">{t('sessionGroup')}</MenuItem>
-                  <MenuItem value="1on1">{t('1on1')}</MenuItem>
+                  value={editedAppointment.sessionType.id || ""}
+                  onChange={(e) => {
+                    const selectedType = sessionTypes.find(type => type.id === e.target.value);
+                    setEditedAppointment({
+                      ...editedAppointment,
+                      sessionType: { id: selectedType.id, name: selectedType.name },
+                    });
+                  }}                >
+                  {sessionTypes.map((type) => (
+                    <MenuItem key={type.id} value={type.id}>
+                      {type.name}
+                    </MenuItem>
+                  ))}
                 </Select>
               </FormControl>
 

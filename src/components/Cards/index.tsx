@@ -1,5 +1,6 @@
 import React from 'react';
 import { Card, CardContent, Typography, Box, Button } from '@mui/material';
+import DeleteButtonWithConfirmation from '../DeleteButton';
 
 type SessionTypePrice = {
     name: string;
@@ -21,6 +22,7 @@ type ContractCardProps = {
     isVatExempt: boolean;
     vat_percentage: number;
     onEdit: () => void;
+    onDelete: () => void;
 };
 
 const ContractCard: React.FC<ContractCardProps> = ({
@@ -32,7 +34,8 @@ const ContractCard: React.FC<ContractCardProps> = ({
     one_time_fee,
     isVatExempt,
     vat_percentage,
-    onEdit
+    onEdit,
+    onDelete
 }) => {
     return (
         <Card sx={{ minWidth: 275, marginBottom: 4, borderRadius: 2, boxShadow: 3, textAlign: 'center', padding: 2 }}>
@@ -112,7 +115,8 @@ const ContractCard: React.FC<ContractCardProps> = ({
                     Edit
                 </Button>
                 <Typography variant="body2" color="textSecondary" sx={{ mt: 1, cursor: 'pointer' }}>
-                    See Details
+                <DeleteButtonWithConfirmation onDelete={onDelete} />
+
                 </Typography>
             </CardContent>
         </Card>

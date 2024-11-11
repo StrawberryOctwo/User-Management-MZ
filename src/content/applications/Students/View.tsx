@@ -74,6 +74,7 @@ const ViewStudentPage: React.FC = () => {
         sessionReports,
         documents,
         payments,
+        sessionBalance:student?.sessionBalance,
         firstName: student?.user?.firstName || '',
         lastName: student?.user?.lastName || '',
         dob: student?.user?.dob || '',
@@ -81,6 +82,7 @@ const ViewStudentPage: React.FC = () => {
         address: student?.user?.address || '',
         postalCode: student?.user?.postalCode || '',
         phoneNumber: student?.user?.phoneNumber || '',
+        contractType:student?.contract?.name
     };
 
     // Ensure the user data is fetched correctly
@@ -107,10 +109,10 @@ const ViewStudentPage: React.FC = () => {
         { name: 'address', label: t('address'), section: t('user_details') },
         { name: 'postalCode', label: t('postal_code'), section: t('user_details') },
         { name: 'phoneNumber', label: t('phone_number'), section: t('user_details') },
-        { name: 'payPerHour', label: t('pay_per_hour'), section: t('student_details') },
         { name: 'status', label: t('status'), section: t('student_details') },
         { name: 'gradeLevel', label: t('grade_level'), section: t('student_details') },
         { name: 'contractType', label: t('contract_type'), section: t('student_details') },
+        { name: 'sessionBalance', label: t('session_balance'), section: t('student_details') },
         { name: 'contractEndDate', label: t('contract_end_date'), section: t('student_details') },
         { name: 'notes', label: t('notes'), section: t('student_details') },
         { name: 'availableDates', label: t('available_dates'), section: t('student_details') },

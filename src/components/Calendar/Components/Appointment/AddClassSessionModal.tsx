@@ -28,6 +28,7 @@ import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWith
 import { useAuth } from 'src/hooks/useAuth';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import { fetchLocations } from 'src/services/locationService';
+import { fetchSessionTypes } from 'src/services/contractPackagesService';
 
 interface ClassSession {
   name: string;
@@ -61,7 +62,7 @@ export default function AddClassSessionModal({
     name: '',
     sessionStartDate: initialStartDate,
     sessionEndDate: initialEndDate,
-    sessionType: 'Online',
+    sessionType: '',
     isActive: false,
     isHolidayCourse: false,
     teacherId: 0,
@@ -79,7 +80,7 @@ export default function AddClassSessionModal({
   const [startTimeError, setStartTimeError] = useState<string | null>(null);
   const [endTimeError, setEndTimeError] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<any | null>(null); // Location state
-
+  const [sessionTypes, setSessionTypes] = useState<any[]>([]);
   const [isRepeat, setIsRepeat] = useState(false);
   const [repeatUntilDate, setRepeatUntilDate] = useState<Date | null>(null);
   const [repeatUntilWeek, setRepeatUntilWeek] = useState<string | null>(null);
@@ -204,7 +205,12 @@ export default function AddClassSessionModal({
     return sessions;
   };
 
-
+  useEffect(() => {
+    fetchSessionTypes().then((data) => {
+      setSessionTypes(data);
+    });
+  }, []);
+  
   useEffect(() => {
     if (newSession.sessionType === "1on1") {
       setSelectedStudents((prev) => prev.slice(0, 1));
@@ -237,7 +243,7 @@ export default function AddClassSessionModal({
       name: '',
       sessionStartDate: initialStartDate,
       sessionEndDate: initialEndDate,
-      sessionType: 'Online',
+      sessionType: '',
       isActive: false,
       isHolidayCourse: false,
       teacherId: 0,
@@ -319,9 +325,11 @@ export default function AddClassSessionModal({
                 setNewSession({ ...newSession, sessionType: e.target.value })
               }
             >
-              <MenuItem value="Online">{t('sessionOnline')}</MenuItem>
-              <MenuItem value="Group">{t('sessionGroup')}</MenuItem>
-              <MenuItem value="1on1">{t('1on1')}</MenuItem>
+              {sessionTypes.map((type) => (
+                <MenuItem key={type.id} value={type.id}>
+                  {type.name}
+                </MenuItem>
+              ))}
             </Select>
           </FormControl>
         </Box>
