@@ -26,7 +26,7 @@ import ViewPaymentDetails from './ViewPaymentDetails'; // New Component for paym
 import StudentDetailCard from './StudentDetailCArd';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import {
-  
+
   getPaymentsForUserByClassSession
 } from 'src/services/paymentService'; // Fix the path if needed
 import { sessionTypeFunc } from 'src/utils/sessionType';
@@ -39,8 +39,10 @@ interface ClassSessionDetailsModalProps {
   appointmentId: string;
   onEdit: () => void;
   onDelete: () => void;
+  onDeactivate: (appointmentId: any, newStatus: any) => void;
   canEdit: boolean;
   canAddReport: boolean;
+  onDeactivateComplete: () => void; // New prop
 }
 
 const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
@@ -49,6 +51,8 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
   appointmentId,
   onEdit,
   onDelete,
+  onDeactivate,
+  onDeactivateComplete,
   canEdit,
   canAddReport
 }) => {
@@ -68,6 +72,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
   const [selectedStudent, setSelectedStudent] = useState<any>(null);
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [deactivateDialogOpen, setDeactivateDialogOpen] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
 
   // Fetch class session details
@@ -116,11 +121,11 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
 
   useEffect(() => {
     if (allReportsCompleted) {
-      
+
     }
   }, [allReportsCompleted]);
 
- 
+
 
   const handleAddReport = (student: any) => {
     setSelectedStudent(student);
@@ -179,8 +184,19 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     setDeleteDialogOpen(true);
   };
 
+  const handleDeactivate = async () => {
+    setDeactivateDialogOpen(true);
+  };
+
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setTabIndex(newValue);
+  };
+
+  const handleToggleActivation = async () => {
+    const newStatus = !classSession.isActive;
+    await onDeactivate(appointmentId, newStatus); // Toggle activation status
+    setDeactivateDialogOpen(false);
+    onDeactivateComplete(); // Refresh sessions in parent component
   };
 
   return (
@@ -331,39 +347,44 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
         )}
       </DialogContent>
       <DialogActions sx={{ marginBottom: 2 }}>
-        <Box sx={{ flexGrow: 1, paddingLeft: 2 }}>
+        {/* <Box sx={{ flexGrow: 1, paddingLeft: 2 }}>
           {canEdit && (
-            <Button
-              onClick={handleDelete}
-              style={{
-                color: 'white',
-                backgroundColor: 'red',
-                padding: '8px 16px'
-              }}
-              variant="contained"
-            >
-              Delete
-            </Button>
+            
           )}
-        </Box>
+        </Box> */}
         <Box sx={{ paddingRight: 2 }}>
-          <Button
+          {/* <Button
             onClick={onClose}
             color="secondary"
             style={{ padding: '8px 16px' }}
             sx={{ marginRight: 1 }}
           >
             Close
-          </Button>
+          </Button> */}
           {canEdit && (
-            <Button
-              onClick={onEdit}
-              color="primary"
-              variant="contained"
-              style={{ padding: '8px 16px' }}
-            >
-              Edit
-            </Button>
+            <Box sx={{ display: 'flex', gap: 1 }}>
+              <Button
+                onClick={onEdit}
+                color="primary"
+                variant="outlined"
+                style={{ padding: '8px 16px' }}
+              >
+                Edit
+              </Button>
+              <Button
+                onClick={handleDelete}
+                style={{
+                  padding: '8px 16px'
+                }}
+                color='error'
+                variant="outlined"
+              >
+                Delete
+              </Button>
+              <Button onClick={() => setDeactivateDialogOpen(true)} color="warning" variant="outlined">
+                {classSession?.isActive ? 'Deactivate' : 'Reactivate'}
+              </Button>
+            </Box>
           )}
         </Box>
       </DialogActions>
@@ -392,7 +413,24 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
           </>
         }
       >
-        <p>Are you sure you want to delete the selected class session?</p>
+        <p>Are you sure you want to delete the class session?</p>
+      </ReusableDialog>
+      <ReusableDialog
+        open={deactivateDialogOpen}
+        title={`Confirm ${classSession?.isActive ? 'Deactivation' : 'Reactivation'}`}
+        onClose={() => setDeactivateDialogOpen(false)}
+        actions={
+          <>
+            <Button onClick={() => setDeactivateDialogOpen(false)} color="inherit" disabled={loading}>
+              Cancel
+            </Button>
+            <Button onClick={handleToggleActivation} color="primary" autoFocus disabled={loading}>
+              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+            </Button>
+          </>
+        }
+      >
+        <p>Are you sure you want to {classSession?.isActive ? 'deactivate' : 'reactivate'} the class session?</p>
       </ReusableDialog>
     </Dialog>
   );

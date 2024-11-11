@@ -17,7 +17,7 @@ import AddClassSessionModal from '../Appointment/AddClassSessionModal';
 import ClassSessionDetailsModal from '../Modals/ClassSessionDetailsModal';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import { useAuth } from 'src/hooks/useAuth';
-import { deleteClassSession } from 'src/services/classSessionService';
+import { deleteClassSession, toggleClassSessionActivation } from 'src/services/classSessionService';
 import FullCalendar from '@fullcalendar/react';
 import resourceTimelinePlugin from '@fullcalendar/resource-timeline';
 import EventItem from '../Appointment/EventItem';
@@ -174,83 +174,73 @@ export default function CustomizedCalendar({
     }
   };
 
-  // const calculateStartEndDates = useCallback(() => {
-  //   let startDate = moment(date); // Initialize with a default value
-  //   let endDate = moment(date); // Initialize with a default value
+  const handleDeactivateClassSession = async (appointmentId: string, isActive: boolean) => {
+    if (strongestRoles[0] === 'Teacher' || strongestRoles[0] === 'Student') return;
 
-  //   if (view === Views.DAY) {
-  //     startDate = moment(date).startOf('day');
-  //     endDate = moment(date).endOf('day');
-  //   }
-  //   // } else if (view === Views.WEEK) {
-  //   //   startDate = moment(date).startOf('week');
-  //   //   endDate = moment(date).endOf('week');
-  //   // } else if (view === Views.MONTH) {
-  //   //   startDate = moment(date).startOf('month');
-  //   //   endDate = moment(date).endOf('month');
-  //   // }
-
-  //   console.log('Start Date:', startDate.format('YYYY-MM-DD'));
-  //   console.log('End Date:', endDate.format('YYYY-MM-DD'));
-
-  //   // Notify parent (CalendarContent) about the new date range
-  //   onDateChange(startDate.format('YYYY-MM-DD'), endDate.format('YYYY-MM-DD'));
-  // }, [view, date]);
-
-  // useEffect(() => {
-  //   calculateStartEndDates();
-  // }, [date, view]);
-
-// Helper function to check for overlapping sessions for the same teacher
-const checkOverlap = (currentSession, allSessions) => {
-  const currentTeacher = currentSession.data.appointment.teacher;
-  const currentStart = new Date(currentSession.start);
-  const currentEnd = new Date(currentSession.end);
-
-  return allSessions.some((otherSession) => {
-    if (otherSession.data.appointment.id === currentSession.data.appointment.id) return false; // Skip itself
-    const otherTeacher = otherSession.data.appointment.teacher;
-    const otherStart = new Date(otherSession.start);
-    const otherEnd = new Date(otherSession.end);
-
-    // Check if sessions overlap for the same teacher
-    return (
-      currentTeacher === otherTeacher &&
-      ((currentStart >= otherStart && currentStart < otherEnd) || // Start overlaps another session
-        (currentEnd > otherStart && currentEnd <= otherEnd) || // End overlaps another session
-        (currentStart <= otherStart && currentEnd >= otherEnd)) // Full overlap
-    );
-  });
-};
+    try {
+      await toggleClassSessionActivation([Number(appointmentId)], isActive);
+      handleDeactivateComplete(); // Refresh data in parent component after toggle
+    } catch (error) {
+      console.error('Error toggling class session activation:', error);
+    }
+  };
 
 
-useEffect(() => {
-  // Map classSessionEvents to FullCalendar's event structure
-  const mappedEvents = classSessionEvents.map((session) => {
-    // Extract and format the teacher's name to "F. LastName"
-    const [firstName, lastName] = session.data.appointment.teacher.split(' ');
-    const formattedTeacher = `${firstName[0]}. ${lastName}`;
-    const hasOverlap = checkOverlap(session, classSessionEvents);
+  const handleDeactivateComplete = () => {
+    loadClassSessions(); // Reload sessions to reflect the deactivated session
+    setSelectedAppointmentId(null);
+    setDetailsModalOpen(false)
+  };
 
-    return {
-      id: session.data.appointment.id,
-      resourceId: session.resourceId,
-      title: session.data.appointment.topic, // Using topic as the title
-      start: session.start,
-      end: session.end,
-      extendedProps: {
-        topicName: session.data.appointment.topic || 'No Topic',
-        teacher: formattedTeacher, // Assigning the formatted name
-        location: session.data.appointment.location,
-        sessionType: session.data.appointment.sessionType,
-        students: session.data.appointment.students,
-        hasOverlap // Pass overlap status to EventItem
-      }
-    };
-  });
+  // Helper function to check for overlapping sessions for the same teacher
+  const checkOverlap = (currentSession, allSessions) => {
+    const currentTeacher = currentSession.data.appointment.teacher;
+    const currentStart = new Date(currentSession.start);
+    const currentEnd = new Date(currentSession.end);
 
-  setEvents(mappedEvents);
-}, [classSessionEvents]);
+    return allSessions.some((otherSession) => {
+      if (otherSession.data.appointment.id === currentSession.data.appointment.id) return false; // Skip itself
+      const otherTeacher = otherSession.data.appointment.teacher;
+      const otherStart = new Date(otherSession.start);
+      const otherEnd = new Date(otherSession.end);
+
+      // Check if sessions overlap for the same teacher
+      return (
+        currentTeacher === otherTeacher &&
+        ((currentStart >= otherStart && currentStart < otherEnd) || // Start overlaps another session
+          (currentEnd > otherStart && currentEnd <= otherEnd) || // End overlaps another session
+          (currentStart <= otherStart && currentEnd >= otherEnd)) // Full overlap
+      );
+    });
+  };
+
+  useEffect(() => {
+    // Map classSessionEvents to FullCalendar's event structure
+    const mappedEvents = classSessionEvents.map((session) => {
+      // Extract and format the teacher's name to "F. LastName"
+      const [firstName, lastName] = session.data.appointment.teacher.split(' ');
+      const formattedTeacher = `${firstName[0]}. ${lastName}`;
+      const hasOverlap = checkOverlap(session, classSessionEvents);
+
+      return {
+        id: session.data.appointment.id,
+        resourceId: session.resourceId,
+        title: session.data.appointment.topic, // Using topic as the title
+        start: session.start,
+        end: session.end,
+        extendedProps: {
+          topicName: session.data.appointment.topic || 'No Topic',
+          teacher: formattedTeacher, // Assigning the formatted name
+          location: session.data.appointment.location,
+          sessionType: session.data.appointment.sessionType,
+          students: session.data.appointment.students,
+          hasOverlap // Pass overlap status to EventItem
+        }
+      };
+    });
+
+    setEvents(mappedEvents);
+  }, [classSessionEvents]);
 
 
   const handleOpenAddModal = (start: Date, end: Date, roomId: string) => {
@@ -343,6 +333,8 @@ useEffect(() => {
         appointmentId={selectedAppointmentId!}
         onEdit={handleEditClassSession}
         onDelete={handleDeleteClassSession}
+        onDeactivate={handleDeactivateClassSession}
+        onDeactivateComplete={handleDeactivateComplete}
         canEdit={canEditSession}
         canAddReport={canAddReport}
       />

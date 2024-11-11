@@ -127,3 +127,16 @@ export const deleteClassSession = async (classSessionId: number[]) => {
     throw error;
   }
 };
+
+export async function toggleClassSessionActivation(ids: number[], isActive: boolean) {
+  try {
+    const response = await api.post('/class-sessions/toggle-activation', {
+      ids: ids,
+      isActive: isActive
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting Class Session:', error);
+    throw error;
+  }
+};
