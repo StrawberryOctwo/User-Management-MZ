@@ -97,7 +97,8 @@ const CalendarContent: React.FC = () => {
 
       const studentsWithStatus = session.students.map((student) => ({
         firstName: student.firstName,
-        absenceStatus: student.absenceStatus
+        absenceStatus: student.absenceStatus,
+        gradeLevel: student.gradeLevel
       }));
 
       return {

@@ -125,7 +125,7 @@ const EventItem = ({ eventInfo }) => {
                   color: student.absenceStatus ? '#f8b4b4' : lighterBorderColor
                 }}
               >
-                {student.firstName}
+                G{student.gradeLevel}-{student.firstName}
               </li>
             ))}
             {extraStudents.length > 0 && (

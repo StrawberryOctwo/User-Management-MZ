@@ -32,7 +32,7 @@ const EditStudent = () => {
         try {
             const fetchedData = await fetchStudentById(Number(id));
             const studentDocuments = await fetchStudentDocumentsById(Number(id));
-    
+
             if (fetchedData && fetchedData.user) {
                 const flattenedData = {
                     ...fetchedData,
@@ -46,19 +46,19 @@ const EditStudent = () => {
                     contractEndDate: fetchedData.contractEndDate ? formatDateForInput(fetchedData.contractEndDate) : '',
                     parent: fetchedData.parent
                         ? {
-                              id: fetchedData.parent.id,
-                              accountHolder: fetchedData.parent.user.firstName,
-                          }
+                            id: fetchedData.parent.id,
+                            accountHolder: fetchedData.parent.user.firstName,
+                        }
                         : null, // Set parent to null if not present
                 };
-    
+
                 setStudentData(flattenedData);
                 setSelectedLocations(fetchedData.locations || []); // Set multiple locations
                 setSelectedParent(flattenedData.parent);
                 setSelectedTopics(fetchedData.topics || []);
                 setSelectedContract(fetchedData.contract)
             }
-    
+
             const formattedDocuments = studentDocuments.documents.map((doc) => ({
                 id: doc.id,
                 fileName: doc.name,
@@ -66,7 +66,7 @@ const EditStudent = () => {
                 file: null,
                 path: doc.path,
             }));
-    
+
             setUploadedFiles(formattedDocuments);
         } catch (error) {
             console.error('Error fetching student:', error);
@@ -74,7 +74,7 @@ const EditStudent = () => {
             setLoading(false);
         }
     };
-    
+
     useEffect(() => {
         fetchStudent();
     }, [id]);
@@ -144,13 +144,14 @@ const EditStudent = () => {
                 contractEndDate: data.contractEndDate,
                 notes: data.notes,
                 availableDates: data.availableDates,
+                gradeLevel: data.gradeLevel,
                 locationIds, // Updated to send multiple location IDs
             };
 
             const response = await updateStudent(Number(id), userPayload, studentPayload);
             await assignStudentToTopics(Number(id), topicIds);
             await assignOrUpdateParentStudents(selectedParent.id, [response.studentId]);
-            await assignStudentToContract(response.studentId,selectedContract.id)
+            await assignStudentToContract(response.studentId, selectedContract.id)
             const userId = response.userId;
             for (const file of uploadedFiles) {
                 const documentPayload = {
@@ -172,6 +173,11 @@ const EditStudent = () => {
             setLoading(false);
         }
     };
+
+    const gradeOptions = Array.from({ length: 12 }, (_, i) => ({
+        id: i + 1,
+        name: `Grade ${i + 1}`,
+    }));
 
     const contractSelectionField = {
         name: 'contracts',
@@ -231,7 +237,26 @@ const EditStudent = () => {
 
     const studentFields = [
         { name: 'status', label: t('status'), type: 'text', required: true, section: 'Student Information' },
-        { name: 'gradeLevel', label: t('grade_level'), type: 'number', required: true, section: 'Student Information' },
+        {
+            name: 'gradeLevel',
+            label: t('grade_level'),
+            type: 'custom',
+            required: true,
+            section: 'Student Information',
+            component: (
+                <SingleSelectWithAutocomplete
+                    label="Select Grade Level"
+                    fetchData={() => Promise.resolve(gradeOptions)} // Static data function
+                    onSelect={(selectedGrade) => setStudentData((prevData) => ({
+                        ...prevData,
+                        gradeLevel: selectedGrade ? selectedGrade.id : null,
+                    }))}
+                    displayProperty="name"
+                    placeholder="Select Grade"
+                    initialValue={studentData?.gradeLevel ? gradeOptions.find(grade => grade.id === studentData.gradeLevel) : null}
+                />
+            ),
+        },
         { name: 'contractEndDate', label: t('contract_end_date'), type: 'date', required: true, section: 'Student Information' },
         { name: 'notes', label: t('notes'), type: 'text', required: false, section: 'Student Information' },
         { name: 'availableDates', label: t('available_dates'), type: 'text', required: true, section: 'Student Information' },
