@@ -37,7 +37,6 @@ interface ClassSession {
   sessionEndDate: Date;
   note: string;
   sessionType: string;
-  isActive: boolean;
   isHolidayCourse: boolean;
   teacherId: any;
   topicId: any;
@@ -66,7 +65,6 @@ export default function AddClassSessionModal({
     sessionEndDate: initialEndDate,
     note: '',
     sessionType: '',
-    isActive: false,
     isHolidayCourse: false,
     teacherId: 0,
     topicId: 0,
@@ -258,7 +256,6 @@ export default function AddClassSessionModal({
       sessionEndDate: initialEndDate,
       note: '',
       sessionType: '',
-      isActive: false,
       isHolidayCourse: false,
       teacherId: 0,
       topicId: 0,
@@ -424,17 +421,7 @@ export default function AddClassSessionModal({
           )}
 
           <Box>
-            <FormControlLabel
-              control={
-                <Switch
-                  checked={newSession.isActive}
-                  onChange={(e) =>
-                    setNewSession({ ...newSession, isActive: e.target.checked })
-                  }
-                />
-              }
-              label="Is Active"
-            />
+
 
             <FormControlLabel
               control={
