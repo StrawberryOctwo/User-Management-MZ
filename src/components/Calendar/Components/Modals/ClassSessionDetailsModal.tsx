@@ -26,7 +26,7 @@ import ViewPaymentDetails from './ViewPaymentDetails'; // New Component for paym
 import StudentDetailCard from './StudentDetailCArd';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import {
-  createPaymentForUser,
+  
   getPaymentsForUserByClassSession
 } from 'src/services/paymentService'; // Fix the path if needed
 import { sessionTypeFunc } from 'src/utils/sessionType';
@@ -116,40 +116,11 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
 
   useEffect(() => {
     if (allReportsCompleted) {
-      handleTeacherPayment();
+      
     }
   }, [allReportsCompleted]);
 
-  const handleTeacherPayment = async () => {
-    // Check if all reports are completed before proceeding with payment
-    if (allReportsCompleted) {
-      try {
-        // Check if payment was already made
-        const paymentStatusResponse = await getPaymentsForUserByClassSession(
-          classSession.teacher.user.id,
-          classSession.id
-        );
-
-        if (paymentStatusResponse) {
-          console.log('Payment already sent, skipping payment creation');
-        } else {
-          // Payment not sent, create the payment
-          await createPaymentForUser({
-            userId: classSession.teacher.user.id,
-            classSessionId: classSession.id,
-            sessionType: sessionTypeFunc(classSession.sessionType)
-          });
-          console.log('Payment successfully sent');
-        }
-      } catch (error) {
-        console.error('Error creating payment:', error);
-      }
-    } else {
-      console.log(
-        'Not all reports are completed; payment will not be triggered.'
-      );
-    }
-  };
+ 
 
   const handleAddReport = (student: any) => {
     setSelectedStudent(student);

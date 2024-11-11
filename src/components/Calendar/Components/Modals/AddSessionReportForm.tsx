@@ -3,7 +3,7 @@ import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, M
 import { useTranslation } from 'react-i18next'; // Import translation hook
 import { addSessionReport } from 'src/services/sessionReportService';
 import { fetchClassSessionById } from 'src/services/classSessionService';
-import { createPaymentForUser, getStudentPaymentDetails } from 'src/services/paymentService';
+import {  getStudentPaymentDetails } from 'src/services/paymentService';
 import { sessionTypeFunc } from 'src/utils/sessionType'
 interface AddSessionReportFormProps {
     isOpen: boolean;
@@ -84,17 +84,7 @@ const AddSessionReportForm: React.FC<AddSessionReportFormProps> = ({ isOpen, onC
                 onSave(newReport);  // Pass the newly created report to the parent to refresh UI
   
 
-                // Try to create payment after report submission, but don't stop if it fails
-                try {
-                    await createPaymentForUser({
-                        userId,
-                        classSessionId,
-                        sessionType:sessionTypeFunc(sessionType)
-                    });
-                } catch (paymentError) {
-                    console.error('Payment creation failed, but session report saved:', paymentError);
-                }
-
+  
 
                 setLessonTopic('');
                 setCoveredMaterials('');
