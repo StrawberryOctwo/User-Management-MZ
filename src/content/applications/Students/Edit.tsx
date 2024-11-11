@@ -13,6 +13,7 @@ import { assignStudentToTopics, fetchTopics } from 'src/services/topicService';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
 import { assignOrUpdateParentStudents, fetchParents } from 'src/services/parentService';
 import { assignStudentToContract, fetchContractPackagesByEntity } from 'src/services/contractPackagesService';
+import { fetchSchoolTypes } from 'src/services/schoolTypeService';
 
 const EditStudent = () => {
     const { id } = useParams<{ id: string }>();
@@ -20,6 +21,7 @@ const EditStudent = () => {
     const [selectedLocations, setSelectedLocations] = useState<any[]>([]); // Changed to an array for multiple locations
     const [selectedParent, setSelectedParent] = useState<any | null>(null);
     const [selectedContract, setSelectedContract] = useState<any | null>(null);
+    const [selectedSchoolType, setSelectedSchoolType] = useState<any | null>(null);
 
     const [selectedTopics, setSelectedTopics] = useState<any[]>([]);
     const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
@@ -57,6 +59,8 @@ const EditStudent = () => {
                 setSelectedParent(flattenedData.parent);
                 setSelectedTopics(fetchedData.topics || []);
                 setSelectedContract(fetchedData.contract)
+                setSelectedSchoolType(fetchedData.schoolType);
+
             }
 
             const formattedDocuments = studentDocuments.documents.map((doc) => ({
@@ -90,6 +94,7 @@ const EditStudent = () => {
         console.log(parent)
         setSelectedParent(parent); // Store the full parent object
     };
+    const handleSchoolTypeSelect = (schoolType: any) => setSelectedSchoolType(schoolType);
 
     const handleTopicSelect = (selectedItems: any[]) => {
         setSelectedTopics(selectedItems);
@@ -145,14 +150,17 @@ const EditStudent = () => {
                 notes: data.notes,
                 availableDates: data.availableDates,
                 gradeLevel: data.gradeLevel,
-                locationIds, // Updated to send multiple location IDs
+                locationIds, 
+                schoolType: selectedSchoolType.id, 
+
             };
 
             const response = await updateStudent(Number(id), userPayload, studentPayload);
             await assignStudentToTopics(Number(id), topicIds);
             await assignOrUpdateParentStudents(selectedParent.id, [response.studentId]);
-            await assignStudentToContract(response.studentId, selectedContract.id)
-            const userId = response.userId;
+            if (selectedContract && (!studentData.contract || selectedContract.id !== studentData.contract.id)) {
+                await assignStudentToContract(response.studentId, selectedContract.id);
+            }            const userId = response.userId;
             for (const file of uploadedFiles) {
                 const documentPayload = {
                     type: file.fileType,
@@ -178,7 +186,22 @@ const EditStudent = () => {
         id: i + 1,
         name: `Grade ${i + 1}`,
     }));
-
+    const schoolTypeSelectionField = {
+        name: 'schoolType',
+        label: 'School Type',
+        type: 'custom',
+        section: 'Student Information',
+        component: (
+            <SingleSelectWithAutocomplete
+                label="Search School Type"
+                fetchData={(query) => fetchSchoolTypes().then((data) => data)}
+                onSelect={handleSchoolTypeSelect}
+                displayProperty="name"
+                placeholder="Type to search school type"
+                initialValue={selectedSchoolType}
+            />
+        ),
+    };
     const contractSelectionField = {
         name: 'contracts',
         label: 'Contracts',
@@ -278,6 +301,7 @@ const EditStudent = () => {
         },
         parentSelectionField,
         contractSelectionField,
+        schoolTypeSelectionField,
         {
             name: 'topics',
             label: 'Assign Topics',

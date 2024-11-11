@@ -12,6 +12,7 @@ import { assignStudentToTopics, fetchTopics } from 'src/services/topicService';
 import UploadSection from 'src/components/Files/UploadDocuments';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
 import { assignStudentToContract, fetchContractPackagesByEntity } from 'src/services/contractPackagesService';
+import { fetchSchoolTypes } from 'src/services/schoolTypeService';
 
 export default function CreateStudent() {
     const [selectedLocationIds, setSelectedLocationIds] = useState<number[]>([]); // Update to handle multiple IDs
@@ -19,6 +20,8 @@ export default function CreateStudent() {
     const [selectedContractId, setSelectedContractId] = useState<number | null>(null);
     const [selectedTopics, setSelectedTopics] = useState<any[]>([]);
     const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
+    const [selectedSchoolTypeId, setSelectedSchoolTypeId] = useState<number | null>(null);
+
     const [loading, setLoading] = useState(false);
     const dropdownRef = useRef<any>(null);
     const { showMessage } = useSnackbar();
@@ -44,6 +47,11 @@ export default function CreateStudent() {
         setUploadedFiles(files);
     };
 
+    const handleSchoolTypeSelect = (schoolType: any) => {
+     
+        setSelectedSchoolTypeId(schoolType ? schoolType.id : null);
+
+    };
     const handleStudentSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
         if (selectedLocationIds.length === 0) {
             showMessage("Location field is required", 'error');
@@ -70,8 +78,9 @@ export default function CreateStudent() {
                     contractEndDate: data['contractEndDate'],
                     notes: data['notes'],
                     availableDates: data['availableDates'],
-                    locationIds: selectedLocationIds, // Updated to send multiple location IDs
-                    parentId: selectedParentId, // Link the student to the selected parent
+                    locationIds: selectedLocationIds, 
+                    parentId: selectedParentId, 
+                    schoolType: selectedSchoolTypeId
                 },
                 user: {
                     firstName: data['firstName'],
@@ -105,7 +114,8 @@ export default function CreateStudent() {
             setSelectedParentId(null);
             setSelectedContractId(null);
             setSelectedTopics([]);
-            setUploadedFiles([]);
+            setUploadedFiles([]); 
+            setSelectedSchoolTypeId(null);
             if (dropdownRef.current) dropdownRef.current.reset();
 
             return response;
@@ -139,7 +149,21 @@ export default function CreateStudent() {
             />
         ),
     };
-
+    const schoolTypeSelectionField = {
+        name: 'schoolType',
+        label: 'School Type',
+        type: 'custom',
+        section: 'Student Information',
+        component: (
+            <SingleSelectWithAutocomplete
+                label="Search School Type"
+                fetchData={(query) => fetchSchoolTypes().then((data) => data)}
+                onSelect={handleSchoolTypeSelect}
+                displayProperty="name"
+                placeholder="Type to search school type"
+            />
+        ),
+    };
     const contractSelectionField = {
         name: 'contracts',
         label: 'Contracts',
@@ -193,6 +217,7 @@ export default function CreateStudent() {
         { name: 'notes', label: t('notes'), type: 'text', required: false, section: 'Student Information' },
         { name: 'availableDates', label: t('available_dates'), type: 'text', required: true, section: 'Student Information' },
         contractSelectionField,
+        schoolTypeSelectionField,
         locationSelectionField,
         parentSelectionField,
         {
