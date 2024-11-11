@@ -267,11 +267,11 @@ export default function CustomizedCalendar({
         plugins={[resourceTimelinePlugin, interactionPlugin]}
         schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
         initialView="resourceTimelineDay"
-        initialDate={date} // Set the initial date explicitly
+        initialDate={date}
         headerToolbar={{
-          left: '',
+          left: 'today',
           center: 'prev title next',
-          right: 'today'
+          right: ''
         }}
         resources={resources}
         events={events}

@@ -42,16 +42,16 @@ const CalendarContent: React.FC = () => {
       const role = roles.includes('SuperAdmin')
         ? 'SuperAdmin'
         : roles.includes('FranchiseAdmin')
-        ? 'FranchiseAdmin'
-        : roles.includes('LocationAdmin')
-        ? 'LocationAdmin'
-        : roles.includes('Teacher')
-        ? 'Teacher'
-        : roles.includes('Parent')
-        ? 'Parent'
-        : roles.includes('Student')
-        ? 'Student'
-        : null;
+          ? 'FranchiseAdmin'
+          : roles.includes('LocationAdmin')
+            ? 'LocationAdmin'
+            : roles.includes('Teacher')
+              ? 'Teacher'
+              : roles.includes('Parent')
+                ? 'Parent'
+                : roles.includes('Student')
+                  ? 'Student'
+                  : null;
       setStrongestRole(role);
     }
   }, [userRoles]);
@@ -225,7 +225,6 @@ const CalendarContent: React.FC = () => {
   };
 
   useEffect(() => {
-    console.log('useEffect triggered with date:', date);
     if (
       strongestRole &&
       (strongestRole !== 'SuperAdmin' || selectedLocations.length > 0)
@@ -243,13 +242,13 @@ const CalendarContent: React.FC = () => {
       {['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin'].includes(
         strongestRole || ''
       ) && (
-        <FilterToolbar
-          onFranchiseChange={handleFranchiseChange}
-          onLocationsChange={handleLocationsChange}
-          selectedFranchise={selectedFranchise}
-          selectedLocations={selectedLocations}
-        />
-      )}
+          <FilterToolbar
+            onFranchiseChange={handleFranchiseChange}
+            onLocationsChange={handleLocationsChange}
+            selectedFranchise={selectedFranchise}
+            selectedLocations={selectedLocations}
+          />
+        )}
 
       <Box sx={{ position: 'relative', height: '100%', overflow: 'hidden' }}>
         <CustomizedCalendar
