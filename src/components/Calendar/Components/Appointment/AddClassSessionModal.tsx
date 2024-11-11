@@ -138,7 +138,6 @@ export default function AddClassSessionModal({
     const { validatedStudents, error } = validateStudentSelection(
       newSession.sessionType,
       selectedStudents,
-      maxStudents
     );
 
     if (error) {
@@ -268,22 +267,17 @@ export default function AddClassSessionModal({
 
   const validateStudentSelection = (
     sessionType: string,
-    students: any[],
-    maxGroupSize: number = 4
+    students: any[]
   ) => {
     if (sessionType === '1on1' && students.length !== 1) {
       return {
         validatedStudents: students.slice(0, 1),
         error: 'You must select exactly one student for a 1-on-1 session.'
       };
-    } else if (sessionType === 'Group' && students.length > maxGroupSize) {
-      return {
-        validatedStudents: students.slice(0, maxGroupSize),
-        error: `You can select up to ${maxGroupSize} students for a group session.`
-      };
     }
     return { validatedStudents: students, error: null };
   };
+
 
   const handleClose = () => {
     clearForm();
