@@ -215,9 +215,8 @@ export default function CustomizedCalendar({
   };
 
   useEffect(() => {
-    // Map classSessionEvents to FullCalendar's event structure
     const mappedEvents = classSessionEvents.map((session) => {
-      // Extract and format the teacher's name to "F. LastName"
+      console.log(session)
       const [firstName, lastName] = session.data.appointment.teacher.split(' ');
       const formattedTeacher = `${firstName[0]}. ${lastName}`;
       const hasOverlap = checkOverlap(session, classSessionEvents);
@@ -225,16 +224,17 @@ export default function CustomizedCalendar({
       return {
         id: session.data.appointment.id,
         resourceId: session.resourceId,
-        title: session.data.appointment.topic, // Using topic as the title
+        title: session.data.appointment.topic,
         start: session.start,
         end: session.end,
+        status: session.data.appointment.status,
         extendedProps: {
           topicName: session.data.appointment.topic || 'No Topic',
-          teacher: formattedTeacher, // Assigning the formatted name
+          teacher: formattedTeacher,
           location: session.data.appointment.location,
           sessionType: session.data.appointment.sessionType,
           students: session.data.appointment.students,
-          hasOverlap // Pass overlap status to EventItem
+          hasOverlap
         }
       };
     });

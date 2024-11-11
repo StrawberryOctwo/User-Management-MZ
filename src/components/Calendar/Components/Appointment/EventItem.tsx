@@ -8,7 +8,7 @@ import { Warning as WarningIcon } from "@mui/icons-material"; // Warning icon
 import { Button, Menu, MenuItem } from "@mui/material";
 
 const EventItem = ({ eventInfo }) => {
-  const { topicName, teacher, location, sessionType, students, hasOverlap } = eventInfo.event.extendedProps;
+  const { topicName, teacher, location, sessionType, students, hasOverlap, status } = eventInfo.event.extendedProps;
   const startTime = moment(eventInfo.event.start).format("HH:mm");
   const endTime = moment(eventInfo.event.end).format("HH:mm");
   const sessionTypeName = sessionType?.name;
@@ -91,11 +91,12 @@ const EventItem = ({ eventInfo }) => {
 
   return (
     <div
-      className="custom-event"
+      className={`custom-event ${!status ? 'inactive-event' : ''}`}
       style={{
         border: `2px solid ${borderColor}`,
         backgroundColor: "#f5f5f5",
         height: `${eventHeight}px`,
+        position: "relative",
       }}
     >
       <div>

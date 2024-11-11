@@ -107,7 +107,7 @@ const CalendarContent: React.FC = () => {
         data: {
           appointment: {
             id: session.id,
-            status: session.isActive ? 'CI' : 'P',
+            status: session.isActive,
             location: session.location?.name || 'Unknown Location',
             topic: session.topic?.name || 'Unknown Topic',
             resource: session.name || 'Unknown Teacher',

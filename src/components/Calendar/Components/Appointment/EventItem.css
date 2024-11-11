@@ -21,6 +21,26 @@
   /* min-height: 130px; */
 }
 
+.inactive-event {
+  opacity: 0.7;
+  background: linear-gradient(
+      to top left,
+      rgba(255, 0, 0, 0) 0%,
+      rgba(255, 0, 0, 0) calc(50% - 0.8px),
+      rgba(255, 0, 0, 1) 50%,
+      rgba(255, 0, 0, 0) calc(50% + 0.8px),
+      rgba(255, 0, 0, 0) 100%
+    ),
+    linear-gradient(
+      to top right,
+      rgba(255, 0, 0, 0) 0%,
+      rgba(255, 0, 0, 0) calc(50% - 0.8px),
+      rgba(255, 0, 0, 1) 50%,
+      rgba(255, 0, 0, 0) calc(50% + 0.8px),
+      rgba(255, 0, 0, 0) 100%
+    );
+}
+
 .event-header {
   display: flex;
   align-items: center;
