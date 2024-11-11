@@ -256,34 +256,25 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                   <Typography variant="subtitle1">
                     <strong>Notes:</strong>
                   </Typography>
-                  {/* <TextField
-                    fullWidth
-                    multiline
-                    rows={4}
-                    value={classSession.note}
-                    onChange={(e) =>
-                      setClassSession({
-                        ...classSession,
-                        note: e.target.value
-                      })
-                    }
-                    InputProps={{
-                      readOnly: isReadOnly
+
+                  <Typography
+                    variant="body2"
+                    sx={{
+                      maxHeight: '9em', // Limit height to approximately 3 lines (1.5em per line)
+                      overflowY: 'auto', // Enable vertical scrolling
+                      wordBreak: 'break-word', // Break long words
+                      scrollbarWidth: 'thin', // Thin scrollbar for Firefox
+                      '&::-webkit-scrollbar': {
+                        width: '6px' // Thin scrollbar for WebKit browsers
+                      },
+                      '&::-webkit-scrollbar-thumb': {
+                        backgroundColor: 'rgba(0, 0, 0, 0.3)', // Scrollbar thumb color
+                        borderRadius: '3px' // Rounded scrollbar thumb
+                      }
                     }}
-                    variant="outlined"
-                    sx={{ mt: 2 }}
-                  />
-                  {!isReadOnly && (
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={handleSaveNote}
-                      sx={{ mt: 2 }}
-                    >
-                      Save Note
-                    </Button>
-                  )} */}
-                  <Typography variant="body2">{classSession.note}</Typography>
+                  >
+                    {classSession.note}
+                  </Typography>
                 </CardContent>
               </Card>
             )}
