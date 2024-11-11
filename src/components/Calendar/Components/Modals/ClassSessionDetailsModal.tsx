@@ -30,6 +30,7 @@ import { getPaymentsForUserByClassSession } from 'src/services/paymentService'; 
 import { sessionTypeFunc } from 'src/utils/sessionType';
 import AbsenceForm from './AbsenceTab';
 import AbsenceTab from './AbsenceTab';
+import RoleBasedComponent from 'src/components/ProtectedComponent';
 
 interface ClassSessionDetailsModalProps {
   isOpen: boolean;
@@ -410,13 +411,16 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
               >
                 Delete
               </Button>
-              <Button
-                onClick={() => setDeactivateDialogOpen(true)}
-                color="warning"
-                variant="outlined"
-              >
-                {classSession?.isActive ? 'Deactivate' : 'Reactivate'}
-              </Button>
+              <RoleBasedComponent
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher']}>
+                <Button
+                  onClick={() => setDeactivateDialogOpen(true)}
+                  color="warning"
+                  variant="outlined"
+                >
+                  {classSession?.isActive ? 'Deactivate' : 'Reactivate'}
+                </Button>
+              </RoleBasedComponent>
             </Box>
           )}
         </Box>
@@ -450,9 +454,8 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       </ReusableDialog>
       <ReusableDialog
         open={deactivateDialogOpen}
-        title={`Confirm ${
-          classSession?.isActive ? 'Deactivation' : 'Reactivation'
-        }`}
+        title={`Confirm ${classSession?.isActive ? 'Deactivation' : 'Reactivation'
+          }`}
         onClose={() => setDeactivateDialogOpen(false)}
         actions={
           <>

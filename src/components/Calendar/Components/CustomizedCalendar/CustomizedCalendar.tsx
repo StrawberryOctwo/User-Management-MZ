@@ -25,6 +25,8 @@ import EventItem from '../Appointment/EventItem';
 import dayGridPlugin from '@fullcalendar/daygrid';
 import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
+import EventTypeSelectionModal from '../Modals/EventTypeSelectionModal';
+import ToDoModal from '../Modals/ToDoModal';
 
 export enum TimeSlotMinutes {
   Five = 5,
@@ -70,6 +72,8 @@ export default function CustomizedCalendar({
   const [canAddReport, setCanAddReport] = useState<boolean | null>(false);
   const [events, setEvents] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+  const [isEventTypeModalOpen, setIsEventTypeModalOpen] = useState(false);
+  const [isToDoModalOpen, setIsToDoModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState('');
   const [selectedRange, setSelectedRange] = useState<{
     start: Date;
@@ -256,6 +260,31 @@ export default function CustomizedCalendar({
     setIsAddModalOpen(false);
   };
 
+  const handleOpenEventTypeModal = () => {
+    setIsEventTypeModalOpen(true);
+  };
+
+  const handleCloseEventTypeModal = () => {
+    setIsEventTypeModalOpen(false);
+  };
+
+  const handleContinue = (eventType: string) => {
+    if (eventType === 'To-Do') {
+      setIsToDoModalOpen(true);
+    } else if (eventType === 'Class Session') {
+      setIsAddModalOpen(true);
+    }
+  };
+
+  const handleCloseToDoModal = () => {
+    setIsToDoModalOpen(false);
+  };
+
+  const handleSaveToDo = (todo) => {
+    console.log('Saving To-Do:', todo);
+    // Implement save logic here
+  };
+
   const resources = [
     { id: 'R1', title: 'Room 1' },
     { id: 'R2', title: 'Room 2' },
@@ -287,7 +316,13 @@ export default function CustomizedCalendar({
         headerToolbar={{
           left: 'today',
           center: 'prev title next',
-          right: ''
+          right: 'eventButton'
+        }}
+        customButtons={{
+          eventButton: {
+            text: 'Add Event',
+            click: handleOpenEventTypeModal
+          }
         }}
         resources={resources}
         events={events}
@@ -310,6 +345,12 @@ export default function CustomizedCalendar({
         }}
       />
 
+      <EventTypeSelectionModal
+        isOpen={isEventTypeModalOpen}
+        onClose={handleCloseEventTypeModal}
+        onContinue={handleContinue}
+      />
+
       <EditAppointmentModal
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
@@ -325,6 +366,12 @@ export default function CustomizedCalendar({
         initialStartDate={selectedRange.start}
         initialEndDate={selectedRange.end}
         roomId={selectedRoom}
+      />
+
+      <ToDoModal
+        isOpen={isToDoModalOpen}
+        onClose={handleCloseToDoModal}
+        onSave={handleSaveToDo}
       />
 
       <ClassSessionDetailsModal
