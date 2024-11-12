@@ -237,8 +237,9 @@ export default function CustomizedCalendar({
           location: session.data.appointment.location,
           sessionType: session.data.appointment.sessionType,
           students: session.data.appointment.students,
-          hasOverlap
-        }
+          reportStatus: session.data.appointment.reportStatus,
+          hasOverlap,
+        },
       };
     });
 

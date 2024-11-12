@@ -8,7 +8,7 @@ import { Warning as WarningIcon } from "@mui/icons-material"; // Warning icon
 import { Button, Menu, MenuItem } from "@mui/material";
 
 const EventItem = ({ eventInfo }) => {
-  const { topicName, teacher, location, sessionType, students, hasOverlap, status } = eventInfo.event.extendedProps;
+  const { topicName, teacher, location, sessionType, students, hasOverlap, status, reportStatus } = eventInfo.event.extendedProps;
   const startTime = moment(eventInfo.event.start).format("HH:mm");
   const endTime = moment(eventInfo.event.end).format("HH:mm");
   const sessionTypeName = sessionType?.name;
@@ -151,6 +151,27 @@ const EventItem = ({ eventInfo }) => {
           <span className="no-students">No students</span>
         )}
       </div>
+
+      {/* Display report status in the bottom-right corner with conditional background color */}
+      {reportStatus && (
+        <div
+          className="report-status"
+          style={{
+            position: "absolute",
+            bottom: 4,
+            right: 4,
+            fontSize: "0.7rem",
+            padding: "2px 12px", // Adjust padding for pill shape
+            borderRadius: "20px", // Rounded for pill shape
+            backgroundColor: reportStatus.allReportsCompleted ? "#d4edda" : "#f8d7da", // Green if completed, red if not
+            color: reportStatus.allReportsCompleted ? "#155724" : "#721c24", // Dark green text for complete, dark red for incomplete
+            display: "inline-block",
+            marginBottom: "3px",
+          }}
+        >
+          {reportStatus.completedReports}/{reportStatus.totalStudents}
+        </div>
+      )}
 
       <Menu
         anchorEl={anchorEl}
