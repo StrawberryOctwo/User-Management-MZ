@@ -118,7 +118,8 @@ const CalendarContent: React.FC = () => {
             students: studentsWithStatus, // Array of first names of students
             startTime: moment(session.sessionStartDate).format('HH:mm'),
             endTime: moment(session.sessionEndDate).format('HH:mm'),
-            sessionType: session.sessionType
+            sessionType: session.sessionType,
+            reportStatus: session.reportStatus,
           }
         },
         resourceId: resource
