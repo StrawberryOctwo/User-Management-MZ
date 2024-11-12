@@ -1,10 +1,7 @@
 import React from 'react';
 import { Button } from '@mui/material';
 import { t } from 'i18next';
-import { Cookies } from 'react-cookie';
-
-// Create an instance of Cookies to retrieve the token
-const cookies = new Cookies();
+import { downloadFile } from 'src/services/fileUploadService';
 
 interface FileActionsProps {
     fileId: any;
@@ -12,74 +9,36 @@ interface FileActionsProps {
 }
 
 const FileActions: React.FC<FileActionsProps> = ({ fileId, fileName }) => {
-    // Function to get the token from cookies
-    const getToken = () => {
-        return cookies.get('token');
-    };
-
-    const handleViewFile = async () => {
-        const token = getToken();
-        if (!token) {
-            console.error('No authentication token found');
-            return;
-        }
-
+    const handleFileAction = async (action: 'view' | 'download') => {
         try {
-            const response = await fetch(`http://localhost:3003/api/files/download/${fileId}?action=view`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const { url, contentType } = await downloadFile(fileId);
 
-            if (response.ok) {
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                window.open(url); // Open the blob URL in a new tab
+            // Define MIME types that can be opened in the browser
+            const viewableTypes = ['application/pdf', 'image/jpeg', 'image/png', 'text/plain'];
+
+            if (action === 'view' && viewableTypes.includes(contentType)) {
+                // Open in a new tab if viewable
+                window.open(url, '_blank');
             } else {
-                console.error('Failed to view file', response.status);
-            }
-        } catch (error) {
-            console.error('Error viewing file:', error);
-        }
-    };
-
-    const handleDownloadFile = async () => {
-        const token = getToken();
-        if (!token) {
-            console.error('No authentication token found');
-            return;
-        }
-
-        try {
-            const response = await fetch(`http://localhost:3003/api/files/download/${fileId}?action=download`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
-
-            if (response.ok) {
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
+                // Trigger download
                 const link = document.createElement('a');
                 link.href = url;
-                link.setAttribute('download', fileName); // Set the download file name
+                link.download = fileName; // Use specified file name
                 document.body.appendChild(link);
                 link.click();
-                document.body.removeChild(link); // Clean up after download
-            } else {
-                console.error('Failed to download file', response.status);
+                document.body.removeChild(link); // Cleanup
             }
         } catch (error) {
-            console.error('Error downloading file:', error);
+            console.error(`Error ${action}ing file:`, error);
         }
     };
 
     return (
         <>
-            <Button variant="text" color="secondary" onClick={handleViewFile}>
+            <Button variant="text" color="secondary" onClick={() => handleFileAction('view')}>
                 {t('view')}
             </Button>
-            <Button variant="text" color="primary" onClick={handleDownloadFile}>
+            <Button variant="text" color="primary" onClick={() => handleFileAction('download')}>
                 {t('download')}
             </Button>
         </>

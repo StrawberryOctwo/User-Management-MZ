@@ -1,54 +1,41 @@
 import React from 'react';
 import { Button } from '@mui/material';
 import { t } from 'i18next';
-import { Cookies } from 'react-cookie';
-
-// Create an instance of Cookies to retrieve the token
-const cookies = new Cookies();
+import { downloadFile } from 'src/services/fileUploadService';
 
 interface FileViewProps {
     fileId: any;
 }
 
 const FileView: React.FC<FileViewProps> = ({ fileId }) => {
-    // Function to get the token from cookies
-    const getToken = () => {
-        return cookies.get('token');
-    };
-
     const handleViewFile = async () => {
-        const token = getToken();
-        if (!token) {
-            console.error('No authentication token found');
-            return;
-        }
-
         try {
-            const response = await fetch(`http://localhost:3003/api/files/download/${fileId}?action=view`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const { url, contentType } = await downloadFile(fileId);
 
-            if (response.ok) {
-                const blob = await response.blob();
-                const url = window.URL.createObjectURL(blob);
-                window.open(url); // Open the blob URL in a new tab
+            // Define MIME types that can be opened in the browser
+            const viewableTypes = ['application/pdf', 'image/jpeg', 'image/png', 'text/plain'];
+
+            if (viewableTypes.includes(contentType)) {
+                // Open in a new tab if viewable
+                window.open(url, '_blank');
             } else {
-                console.error('Failed to view file', response.status);
+                // Trigger download if not viewable
+                const link = document.createElement('a');
+                link.href = url;
+                link.download = 'downloaded-file'; // Specify a default file name
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
             }
         } catch (error) {
             console.error('Error viewing file:', error);
         }
     };
 
-
     return (
-        <>
-            <Button variant="text" color="secondary" onClick={handleViewFile}>
-                {t('view')}
-            </Button>
-        </>
+        <Button variant="text" color="secondary" onClick={handleViewFile}>
+            {t('view')}
+        </Button>
     );
 };
 
