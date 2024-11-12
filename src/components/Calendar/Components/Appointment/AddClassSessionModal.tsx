@@ -307,6 +307,15 @@ export default function AddClassSessionModal({
     }
   }, [isOpen, passedLocations]);
 
+  useEffect(() => {
+    if (isOpen && roomId) {
+      setNewSession((prevSession) => ({
+        ...prevSession,
+        name: roomId as string,
+      }));
+    }
+  }, [isOpen, roomId]);
+
   return (
     <Dialog open={isOpen} onClose={handleClose} maxWidth="sm" fullWidth>
       <DialogTitle>Add Class Session</DialogTitle>

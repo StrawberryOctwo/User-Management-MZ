@@ -11,8 +11,8 @@ import { EventProps, Views } from 'react-big-calendar';
 import Calendar from '../Calendar';
 
 import 'react-datepicker/dist/react-datepicker.css';
-import './index.css'; // Your custom styles
-import EditAppointmentModal from '../Appointment/EditAppointmentModal'; // Import the Edit Appointment Modal
+import './index.css';
+import EditAppointmentModal from '../Appointment/EditAppointmentModal';
 import AddClassSessionModal from '../Appointment/AddClassSessionModal';
 import ClassSessionDetailsModal from '../Modals/ClassSessionDetailsModal';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
@@ -38,10 +38,10 @@ export enum TimeSlotMinutes {
 type Keys = keyof typeof Views;
 
 type DemoProps = {
-  classSessionEvents: any[]; // Accept classSessionEvents as a prop
-  onDateChange: (date: string) => void; // New prop to pass the date change handler
-  handleSaveClassSession: (newSession: any) => void; // Accept as a prop
-  loadClassSessions: () => void; // Add this prop
+  classSessionEvents: any[];
+  onDateChange: (date: string) => void;
+  handleSaveClassSession: (newSession: any) => void;
+  loadClassSessions: () => void;
   selectedLocations: any[];
 };
 
@@ -64,7 +64,6 @@ export default function CustomizedCalendar({
   const STEP = 15;
   const TIME_SLOTS = 60 / STEP;
 
-  // State for managing selected event and modal visibility
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isDetailsModalOpen, setDetailsModalOpen] = useState(false);
@@ -129,7 +128,6 @@ export default function CustomizedCalendar({
 
     if (currentDate > eventEndDate) {
       console.warn('This event has already ended.');
-      // setCanEditSession(false);
       setCanAddReport(false);
     } else if (currentDate < eventEndDate) {
       setCanAddReport(true);
@@ -187,7 +185,7 @@ export default function CustomizedCalendar({
 
     try {
       await toggleClassSessionActivation([Number(appointmentId)], isActive);
-      handleDeactivateComplete(); // Refresh data in parent component after toggle
+      handleDeactivateComplete();
     } catch (error) {
       console.error('Error toggling class session activation:', error);
     }
@@ -195,29 +193,27 @@ export default function CustomizedCalendar({
 
 
   const handleDeactivateComplete = () => {
-    loadClassSessions(); // Reload sessions to reflect the deactivated session
+    loadClassSessions();
     setSelectedAppointmentId(null);
     setDetailsModalOpen(false)
   };
 
-  // Helper function to check for overlapping sessions for the same teacher
   const checkOverlap = (currentSession, allSessions) => {
     const currentTeacher = currentSession.data.appointment.teacher;
     const currentStart = new Date(currentSession.start);
     const currentEnd = new Date(currentSession.end);
 
     return allSessions.some((otherSession) => {
-      if (otherSession.data.appointment.id === currentSession.data.appointment.id) return false; // Skip itself
+      if (otherSession.data.appointment.id === currentSession.data.appointment.id) return false;
       const otherTeacher = otherSession.data.appointment.teacher;
       const otherStart = new Date(otherSession.start);
       const otherEnd = new Date(otherSession.end);
 
-      // Check if sessions overlap for the same teacher
       return (
         currentTeacher === otherTeacher &&
-        ((currentStart >= otherStart && currentStart < otherEnd) || // Start overlaps another session
-          (currentEnd > otherStart && currentEnd <= otherEnd) || // End overlaps another session
-          (currentStart <= otherStart && currentEnd >= otherEnd)) // Full overlap
+        ((currentStart >= otherStart && currentStart < otherEnd) ||
+          (currentEnd > otherStart && currentEnd <= otherEnd) ||
+          (currentStart <= otherStart && currentEnd >= otherEnd))
       );
     });
   };
@@ -293,7 +289,6 @@ export default function CustomizedCalendar({
 
   const handleSaveToDo = (todo) => {
     console.log('Saving To-Do:', todo);
-    // Implement save logic here
   };
 
   const resources = [
