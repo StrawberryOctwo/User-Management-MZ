@@ -32,8 +32,6 @@ const ViewTeacherPage: React.FC = () => {
             const teacherDocuments = await fetchTeacherDocumentsById(Number(id));
             setDocuments(teacherDocuments.documents);
 
-            const userPayments = await getPaymentsForUser(teacherData.user?.id);
-            setPayments(userPayments);
         } catch (error: any) {
             console.error('Failed to fetch teacher:', error);
             setErrorMessage(t('failed_to_fetch_teacher'));
@@ -56,19 +54,7 @@ const ViewTeacherPage: React.FC = () => {
         setNewStatus(currentStatus);
         setIsDialogOpen(true);
     };
-        // Handle updating the payment status
-        const handleUpdateStatus = async () => {
-            if (selectedPaymentId) {
-                try {
-                    await updatePaymentStatus(selectedPaymentId, newStatus);
-                    loadTeacher(); // Refresh the data
-                } catch (error) {
-                    console.error('Failed to update payment status:', error);
-                } finally {
-                    handleCloseDialog();
-                }
-            }
-        };
+
     const formattedContractStartDate = teacher ? format(new Date(teacher.contractStartDate), 'PP') : '';
     const formattedContractEndDate = teacher ? format(new Date(teacher.contractEndDate), 'PP') : '';
     const formattedDob = teacher ? format(new Date(teacher.user.dob), 'PP') : '';
@@ -140,32 +126,7 @@ const ViewTeacherPage: React.FC = () => {
                 },
             ],
         },
-        {
-            name: 'payments',
-            label: t('payments'),
-            section: t('payments_section'),
-            isArray: true,
-            columns: [
-                { field: 'amount', headerName: t('amount'), flex: 1 },
-                { field: 'paymentStatus', headerName: t('status'), flex: 1 },
-                { field: 'paymentDate', headerName: t('date'), format: 'yyyy-MM-dd', flex: 1 },
-                {
-                    field: 'actions',
-                    headerName: t('actions'),
-                    renderCell: (params: { row: { id: number; paymentStatus: string } }) => (
-                        <Button
-                            variant="contained"
-                            color="primary"
-                            onClick={() => handleOpenDialog(params.row.id, params.row.paymentStatus)}
-                        >
-                            {t('update_status')}
-                        </Button>
-                    ),
-                    sortable: false,
-                    width: 150,
-                },
-            ],
-        },
+       ,
     
         {
             name: 'documents',
@@ -207,12 +168,6 @@ const ViewTeacherPage: React.FC = () => {
             'franchise.name': location?.franchise?.name,
             created_at: location.created_at ? format(new Date(location.created_at), 'dd-MM-yyyy') : '',
         })),
-        'classSessions': teacher?.classSessions.map((classSession: any) => ({
-            ...classSession,
-            location_name: classSession.location.name,
-            topic_name: classSession.topic.name,
-            created_at: classSession.created_at ? format(new Date(classSession.created_at), 'dd-MM-yyyy') : '',
-        })),
         'topics': teacher?.topics,
         'documents': documents,
     };
@@ -247,7 +202,7 @@ const ViewTeacherPage: React.FC = () => {
                     <Button onClick={handleCloseDialog} color="secondary">
                         {t('cancel')}
                     </Button>
-                    <Button onClick={handleUpdateStatus} color="primary">
+                    <Button  color="primary">
                         {t('submit')}
                     </Button>
                 </DialogActions>

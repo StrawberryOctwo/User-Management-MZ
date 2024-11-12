@@ -123,9 +123,7 @@ function CustomToolbar() {
             <GridToolbarColumnsButton />
             <GridToolbarDensitySelector />
             <GridToolbarExport
-                slotProps={{
-                    tooltip: { title: 'Export data' },
-                }}
+ 
             />
             <Box sx={{ flex: 1 }}></Box>
             <GridToolbarQuickFilter />

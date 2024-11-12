@@ -18,6 +18,7 @@ import { styled } from '@mui/material/styles';
 import ExpandMoreTwoToneIcon from '@mui/icons-material/ExpandMoreTwoTone';
 import LockOpenTwoToneIcon from '@mui/icons-material/LockOpenTwoTone';
 import { useAuth } from '../../../../hooks/useAuth';
+import { PersonOffOutlined, Settings } from '@mui/icons-material';
 
 const UserBoxButton = styled(Button)(
   ({ theme }) => `
@@ -84,6 +85,10 @@ function HeaderUserbox() {
   const handleLogout = (): void => {
     navigate('/logout'); // Redirect to /logout route
   };
+  const handleProfile = (): void => {
+    navigate('/management/profile/settings'); // Redirect to /logout route
+  };
+
 
   return (
     <>
@@ -129,6 +134,12 @@ function HeaderUserbox() {
         </MenuUserBox>
         <Divider sx={{ mb: 0 }} />
         <Divider />
+        <Box sx={{ m: 1 }}>
+          <Button color="primary" fullWidth onClick={handleProfile}>
+            <Settings sx={{ mr: 1 }} />
+            Settings
+          </Button>
+        </Box>
         <Box sx={{ m: 1 }}>
           <Button color="primary" fullWidth onClick={handleLogout}>
             <LockOpenTwoToneIcon sx={{ mr: 1 }} />
