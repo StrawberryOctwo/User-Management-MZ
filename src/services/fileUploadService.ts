@@ -13,6 +13,17 @@ export const fetchFiles = async (page: number, limit: number, searchQuery: strin
         throw error;
     }
 };
+export const fetchSelfFiles = async (page: number, limit: number, searchQuery: string = '') => {
+    try {
+        const response = await api.get('/files/self', {
+            params: { page, limit, search: searchQuery },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching files:', error);
+        throw error;
+    }
+};
 
 // Upload a new file
 export const uploadFile = async (formData: FormData) => {
@@ -42,6 +53,21 @@ export const addDocument = async (payload: { type: string, customFileName: strin
         },
     });
 };
+
+export const addUserDocument = async (payload: { type: string, customFileName: string}, file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', payload.type);
+    formData.append('customFileName', payload.customFileName);
+
+
+    return api.post('/upload', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};
+
 
 // Function to delete multiple files
 export const deleteFiles = async (fileIds: number[]) => {

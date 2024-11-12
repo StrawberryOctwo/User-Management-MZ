@@ -41,6 +41,9 @@ const Transactions = Loader(
 const Files = Loader(
   lazy(() => import('src/content/applications/Files'))
 );
+const CreateFile = Loader(
+  lazy(() => import('src/content/applications/Files/Create'))
+);
 
 
 
@@ -363,6 +366,10 @@ const routes: RouteObject[] = [
           {
             path: 'files/',
             element: <Files />
+          },
+          {
+            path: 'files/create',
+            element: <CreateFile />
           },
 
           {

@@ -3,13 +3,16 @@ import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 function PageHeader() {
+  const navigate = useNavigate(); // Initialize useNavigate
 
   const user = {
     name: '',
     avatar: '/static/images/avatars/1.jpg'
   };
 
-
+  const handleCreateFile = () => {
+    navigate('create'); // Navigate to the Create Franchise page
+  };
   return (
     <Grid container justifyContent="space-between" alignItems="center">
       <Grid item>
@@ -21,6 +24,14 @@ function PageHeader() {
         </Typography>
       </Grid>
       <Grid item>
+      <Button
+          sx={{ mt: { xs: 2, md: 0 } }}
+          variant="contained"
+          startIcon={<AddTwoToneIcon fontSize="small" />}
+          onClick={handleCreateFile} // Add onClick handler
+        >
+          Upload file
+        </Button>
       </Grid>
     </Grid>
   );

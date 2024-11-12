@@ -3,7 +3,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
-import { fetchFiles, deleteFiles } from 'src/services/fileUploadService';
+import { fetchSelfFiles, deleteFiles } from 'src/services/fileUploadService';
 
 export default function FileUploadContent() {
   const [files, setFiles] = useState([]);
@@ -28,7 +28,7 @@ export default function FileUploadContent() {
   const loadFiles = async (searchQuery = '') => {
     setLoading(true);
     try {
-      const { data, total } = await fetchFiles(page + 1, limit, searchQuery);
+      const { data, total } = await fetchSelfFiles(page + 1, limit, searchQuery);
       setFiles([...data]);
       setTotalCount(total);
     } catch (error) {
