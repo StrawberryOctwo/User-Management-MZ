@@ -6,7 +6,7 @@ import { ReactComponent as GroupIcon } from "../../assets/icons/GroupIcon.svg";
 import { ReactComponent as UserIcon } from "../../assets/icons/UserIcon.svg";
 import { Warning as WarningIcon } from "@mui/icons-material"; // Warning icon
 import { Button, Menu, MenuItem } from "@mui/material";
-
+import TvIcon from '@mui/icons-material/Tv';
 const EventItem = ({ eventInfo }) => {
   const { topicName, teacher, location, sessionType, students, hasOverlap, status, reportStatus } = eventInfo.event.extendedProps;
   const startTime = moment(eventInfo.event.start).format("HH:mm");
@@ -69,7 +69,7 @@ const EventItem = ({ eventInfo }) => {
       case "Group":
         return <GroupIcon style={{ color: '#333', width: 20, height: 20 }} />;
       case "Online":
-        return <OnlineIcon style={{ color: '#333', width: 20, height: 20 }} />;
+        return <TvIcon style={{ color: '#333', width: 20, height: 20 }} />;
       case "Individual":
         return <UserIcon style={{ color: '#333', width: 18, height: 18 }} />;
       case "Intensive Individual":

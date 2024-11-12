@@ -4,6 +4,7 @@ import HeaderNotifications from './Notifications';
 import HeaderLocalization from './Localization';
 import HeaderAvailability from './Availability';
 import withRole from 'src/hooks/withRole';
+import StudentExamsHeader from './StudentExam';
 
 function HeaderButtons() {
   return (
@@ -16,10 +17,16 @@ function HeaderButtons() {
         <HeaderLocalization />
       </Box>
       <Box sx={{ mx: 0.5 }} component="span">
-      <ProtectedListItem
-                allowedRoles={['Teacher']}
-              >
-        <HeaderAvailability />
+        <ProtectedListItem
+          allowedRoles={['Teacher']}
+        >
+          <HeaderAvailability />
+        </ProtectedListItem>
+      </Box>
+      <Box sx={{ mx: 0.5 }} component="span">
+        <ProtectedListItem
+          allowedRoles={['Student']}
+        ><StudentExamsHeader />
         </ProtectedListItem>
       </Box>
     </Box>
