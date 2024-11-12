@@ -14,7 +14,11 @@ import {
   Box,
   FormControlLabel,
   Typography,
-  Checkbox
+  Checkbox,
+  RadioGroup,
+  Radio,
+  ListItemText,
+  SelectChangeEvent
 } from '@mui/material';
 import moment from 'moment';
 import { t } from 'i18next';
@@ -31,11 +35,27 @@ import { getStrongestRoles } from 'src/hooks/roleUtils';
 import { fetchLocations } from 'src/services/locationService';
 import { fetchSessionTypes } from 'src/services/contractPackagesService';
 
+const recurrenceOptions = [
+  { value: 'weekly', label: 'Weekly' },
+  { value: 'biweekly', label: 'Bi-Weekly' }
+];
+
+const daysOfWeek = [
+  { value: 'MO', label: 'Monday' },
+  { value: 'TU', label: 'Tuesday' },
+  { value: 'WE', label: 'Wednesday' },
+  { value: 'TH', label: 'Thursday' },
+  { value: 'FR', label: 'Friday' },
+  { value: 'SA', label: 'Saturday' },
+  { value: 'SU', label: 'Sunday' }
+];
+
 interface ClassSession {
   name: string;
-  sessionStartDate: Date;
-  sessionEndDate: Date;
+  startTime: Date;
   note: string;
+  duration: number;
+  recurrencePattern: string;
   sessionType: string;
   isHolidayCourse: boolean;
   teacherId: any;
@@ -48,24 +68,22 @@ export default function AddClassSessionModal({
   isOpen,
   onClose,
   onSave,
-  initialStartDate,
-  initialEndDate,
   roomId,
   passedLocations
 }: {
   isOpen: boolean;
   onClose: () => void;
   onSave: (newSession: any) => void;
-  initialStartDate: Date;
-  initialEndDate: Date;
+  startTime: Date;
   roomId?: string | number;
   passedLocations?: any[];
 }) {
   const [newSession, setNewSession] = useState<ClassSession>({
     name: '',
-    sessionStartDate: initialStartDate,
-    sessionEndDate: initialEndDate,
+    startTime: new Date(),
     note: '',
+    duration: 0,
+    recurrencePattern: 'weekly',
     sessionType: '',
     isHolidayCourse: false,
     teacherId: 0,
@@ -86,9 +104,38 @@ export default function AddClassSessionModal({
   const [endTimeError, setEndTimeError] = useState<string | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<any | null>(null); // Location state
   const [sessionTypes, setSessionTypes] = useState<any[]>([]);
-  const [isRepeat, setIsRepeat] = useState(false);
-  const [repeatUntilDate, setRepeatUntilDate] = useState<Date | null>(null);
-  const [repeatUntilWeek, setRepeatUntilWeek] = useState<string | null>(null);
+  const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [recurrencePatternOption, setRecurrencePatternOption] =
+    useState<string>('weekly');
+  const [biWeeklyTimes, setBiWeeklyTimes] = useState({
+    startTime1: new Date(),
+    duration1: 0,
+    startTime2: new Date(),
+    duration2: 0
+  });
+
+  const handleDayChange = (event: SelectChangeEvent<string[]>) => {
+    const value = event.target.value as string[];
+    if (recurrencePatternOption === 'weekly' && value.length > 1) {
+      return; // Prevent selecting more than one day for weekly recurrence
+    }
+    if (recurrencePatternOption === 'biweekly' && value.length > 2) {
+      return; // Prevent selecting more than two days for biweekly recurrence
+    }
+    setSelectedDays(value);
+  };
+
+  const generateRRule = (pattern: string, days: string[]): string => {
+    if (pattern === 'none') return '';
+    const freq = pattern.toUpperCase();
+    const byDay = days.map((day) => day.slice(0, 2).toUpperCase()).join(',');
+    return `RRULE:FREQ=${freq}${byDay ? `;BYDAY=${byDay}` : ''}`;
+  };
+
+  useEffect(() => {
+    const rrule = generateRRule(recurrencePatternOption, selectedDays);
+    setNewSession((prev) => ({ ...prev, recurrencePattern: rrule }));
+  }, [recurrencePatternOption, selectedDays]);
 
   const { userId, userRoles } = useAuth();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
@@ -117,19 +164,16 @@ export default function AddClassSessionModal({
 
     // Validate required fields
     if (!newSession.name.trim()) errors.name = t('errors.classNameRequired');
-    if (!newSession.sessionStartDate) errors.sessionStartDate = t('errors.startTimeRequired');
-    if (!newSession.sessionEndDate) errors.sessionEndDate = t('errors.endTimeRequired');
-    if (!selectedTeacher) errors.teacherId = t('errors.teacherSelectionRequired');
-    if (!selectedTopic) errors.topicId = t('errors.topicSelectionRequired');
-    if (!selectedLocation) errors.locationId = t('errors.locationSelectionRequired');
+    if (!newSession.startTime) errors.startTime = t('errors.startTimeRequired');
 
-    // Calculate and validate session duration
-    const start = new Date(newSession.sessionStartDate);
-    const end = new Date(newSession.sessionEndDate);
-    const durationMinutes = (end.getTime() - start.getTime()) / (1000 * 60);
+    if (!selectedTeacher)
+      errors.teacherId = t('errors.teacherSelectionRequired');
+    if (!selectedTopic) errors.topicId = t('errors.topicSelectionRequired');
+    if (!selectedLocation)
+      errors.locationId = t('errors.locationSelectionRequired');
 
     const allowedDurations = [45, 60, 90, 120];
-    if (!allowedDurations.includes(durationMinutes)) {
+    if (!allowedDurations.includes(newSession.duration)) {
       errors.duration = t('errors.invalidDuration', {
         allowed: allowedDurations.join(', ')
       });
@@ -137,7 +181,7 @@ export default function AddClassSessionModal({
 
     const { validatedStudents, error } = validateStudentSelection(
       newSession.sessionType,
-      selectedStudents,
+      selectedStudents
     );
 
     if (error) {
@@ -153,14 +197,7 @@ export default function AddClassSessionModal({
 
     setFieldErrors(errors);
 
-    const isStartTimeValid = validateTime(start, 'start');
-    const isEndTimeValid = validateTime(end, 'end');
-
-    if (
-      Object.values(errors).some((error) => error !== null) ||
-      !isStartTimeValid ||
-      !isEndTimeValid
-    ) {
+    if (Object.values(errors).some((error) => error !== null)) {
       return;
     }
 
@@ -169,50 +206,23 @@ export default function AddClassSessionModal({
       locationId: selectedLocation?.id
     };
 
-    if (isRepeat && repeatUntilDate) {
-      const generatedSessions = generateRepeatedSessions(start, end, repeatUntilDate).map(session => ({
-        ...session,
-        locationId: selectedLocation?.id
-      }));
-      onSave(generatedSessions);
-    } else {
-      onSave([sessionPayload]);
-    }
+    console.log('Session Payload:', sessionPayload);
+
+    // if (isRepeat && repeatUntilDate) {
+    //   const generatedSessions = generateRepeatedSessions(
+    //     start,
+    //     end,
+    //     repeatUntilDate
+    //   ).map((session) => ({
+    //     ...session,
+    //     locationId: selectedLocation?.id
+    //   }));
+    //   onSave(generatedSessions);
+    // } else {
+    //   onSave([sessionPayload]);
+    // }
 
     onClose();
-  };
-
-
-  const generateRepeatedSessions = (
-    startDate: Date,
-    endDate: Date,
-    untilDate: Date
-  ) => {
-    const sessions = [];
-    let currentStart = new Date(startDate);
-    let currentEnd = new Date(endDate);
-
-    function stripTime(date: Date) {
-      const newDate = new Date(date);
-      newDate.setHours(0, 0, 0, 0); // Set time to midnight
-      return newDate;
-    }
-
-    const strippedUntilDate = stripTime(untilDate);
-
-    while (stripTime(currentStart) <= strippedUntilDate) {
-      sessions.push({
-        ...newSession,
-        sessionStartDate: new Date(currentStart),
-        sessionEndDate: new Date(currentEnd)
-      });
-
-      // Move to the same weekday next week
-      currentStart.setDate(currentStart.getDate() + 7);
-      currentEnd.setDate(currentEnd.getDate() + 7);
-    }
-
-    return sessions;
   };
 
   useEffect(() => {
@@ -231,14 +241,6 @@ export default function AddClassSessionModal({
   }, [newSession.sessionType]);
 
   useEffect(() => {
-    setNewSession((prevSession) => ({
-      ...prevSession,
-      sessionStartDate: initialStartDate,
-      sessionEndDate: initialEndDate
-    }));
-  }, [initialStartDate, initialEndDate]);
-
-  useEffect(() => {
     if (roomId) {
       setNewSession((prev) => ({ ...prev, name: roomId as string }));
     }
@@ -251,8 +253,9 @@ export default function AddClassSessionModal({
     setSelectedLocation(null);
     setNewSession({
       name: '',
-      sessionStartDate: initialStartDate,
-      sessionEndDate: initialEndDate,
+      startTime: new Date(),
+      duration: 0,
+      recurrencePattern: 'weekly',
       note: '',
       sessionType: '',
       isHolidayCourse: false,
@@ -264,10 +267,7 @@ export default function AddClassSessionModal({
     setFieldErrors({});
   };
 
-  const validateStudentSelection = (
-    sessionType: string,
-    students: any[]
-  ) => {
+  const validateStudentSelection = (sessionType: string, students: any[]) => {
     if (sessionType === '1on1' && students.length !== 1) {
       return {
         validatedStudents: students.slice(0, 1),
@@ -277,28 +277,27 @@ export default function AddClassSessionModal({
     return { validatedStudents: students, error: null };
   };
 
-
   const handleClose = () => {
     clearForm();
     onClose();
   };
 
-  const handleRepeatDateChange = (selectedDate: string) => {
-    const newRepeatDate = new Date(selectedDate);
-    const sessionStartDate = newSession.sessionStartDate;
+  // const handleRepeatDateChange = (selectedDate: string) => {
+  //   const newRepeatDate = new Date(selectedDate);
+  //   const sessionStartDate = newSession.sessionStartDate;
 
-    if (newRepeatDate < sessionStartDate) {
-      setFieldErrors((prev) => ({
-        ...prev,
-        repeatDate: t('errors.invalidRepeatDate', {
-          day: moment(sessionStartDate).format('YYYY-MM-DD')
-        })
-      }));
-    } else {
-      setFieldErrors((prev) => ({ ...prev, repeatDate: null }));
-      setRepeatUntilDate(newRepeatDate);
-    }
-  };
+  //   if (newRepeatDate < sessionStartDate) {
+  //     setFieldErrors((prev) => ({
+  //       ...prev,
+  //       repeatDate: t('errors.invalidRepeatDate', {
+  //         day: moment(sessionStartDate).format('YYYY-MM-DD')
+  //       })
+  //     }));
+  //   } else {
+  //     setFieldErrors((prev) => ({ ...prev, repeatDate: null }));
+  //     setRepeatUntilDate(newRepeatDate);
+  //   }
+  // };
 
   useEffect(() => {
     if (isOpen && passedLocations && passedLocations[0]) {
@@ -310,7 +309,7 @@ export default function AddClassSessionModal({
     if (isOpen && roomId) {
       setNewSession((prevSession) => ({
         ...prevSession,
-        name: roomId as string,
+        name: roomId as string
       }));
     }
   }, [isOpen, roomId]);
@@ -355,47 +354,214 @@ export default function AddClassSessionModal({
             </Select>
           </FormControl>
         </Box>
+
+        <InputLabel>Class Type</InputLabel>
+
         <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
-          <TextField
-            label="Start Time"
-            type="datetime-local"
-            fullWidth
-            value={moment(newSession.sessionStartDate).format(
-              'YYYY-MM-DDTHH:mm'
-            )}
-            onChange={(e) => {
-              const newStartDate = new Date(e.target.value);
-              setNewSession({
-                ...newSession,
-                sessionStartDate: newStartDate
-              });
-              validateTime(newStartDate, 'start'); // Validate start time
-            }}
-            error={!!fieldErrors.sessionStartDate || !!startTimeError}
-            helperText={fieldErrors.sessionStartDate || startTimeError}
-          />
-          <TextField
-            label="End Time"
-            type="datetime-local"
-            fullWidth
-            value={moment(newSession.sessionEndDate).format('YYYY-MM-DDTHH:mm')}
-            onChange={(e) => {
-              const newEndDate = new Date(e.target.value);
-              setNewSession({
-                ...newSession,
-                sessionEndDate: newEndDate
-              });
-              validateTime(newEndDate, 'end'); // Validate end time
-            }}
-            error={!!fieldErrors.sessionEndDate || !!endTimeError}
-            helperText={fieldErrors.sessionEndDate || endTimeError}
-          />
+          <FormControl component="fieldset" fullWidth>
+            <RadioGroup
+              row
+              aria-label="recurrence-pattern"
+              name="recurrence-pattern"
+              value={recurrencePatternOption}
+              onChange={(e) => setRecurrencePatternOption(e.target.value)}
+            >
+              {recurrenceOptions.map((option) => (
+                <FormControlLabel
+                  key={option.value}
+                  value={option.value}
+                  control={<Radio />}
+                  label={option.label}
+                />
+              ))}
+            </RadioGroup>
+          </FormControl>
         </Box>
-        {fieldErrors.duration && (
-          <Typography color="error" variant="body2" sx={{ mt: 1 }}>
-            {fieldErrors.duration}
-          </Typography>
+
+        <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+          <FormControl fullWidth>
+            <InputLabel>Days of the Week</InputLabel>
+            <Select
+              label="Days of the Week"
+              multiple
+              value={selectedDays}
+              onChange={handleDayChange}
+              renderValue={(selected) => (selected as string[]).join(', ')}
+            >
+              {daysOfWeek.map((day) => (
+                <MenuItem key={day.value} value={day.value}>
+                  <Checkbox checked={selectedDays.indexOf(day.value) > -1} />
+                  <ListItemText primary={day.label} />
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
+        </Box>
+
+        {recurrencePatternOption === 'weekly' && (
+          <>
+            <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+              <TextField
+                label="Start Time"
+                type="time"
+                fullWidth
+                value={moment(newSession.startTime).format('HH:mm')}
+                onChange={(e) => {
+                  const [hours, minutes] = e.target.value.split(':');
+                  const newStartTime = new Date();
+                  newStartTime.setHours(parseInt(hours, 10));
+                  newStartTime.setMinutes(parseInt(minutes, 10));
+                  setNewSession({
+                    ...newSession,
+                    startTime: newStartTime
+                  });
+                  validateTime(newStartTime, 'start'); // Validate start time
+                }}
+                error={!!fieldErrors.sessionStartDate || !!startTimeError}
+                helperText={fieldErrors.sessionStartDate || startTimeError}
+              />
+            </Box>
+
+            <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+              <TextField
+                label="Duration (minutes)"
+                type="number"
+                fullWidth
+                value={newSession.duration || ''}
+                onChange={(e) => {
+                  const duration = parseInt(e.target.value, 10);
+                  setNewSession({
+                    ...newSession,
+                    duration
+                  });
+
+                  const allowedDurations = [45, 60, 90, 120];
+                  if (!allowedDurations.includes(duration)) {
+                    setFieldErrors((prev) => ({
+                      ...prev,
+                      duration: t('errors.invalidDuration', {
+                        allowed: allowedDurations.join(', ')
+                      })
+                    }));
+                  } else {
+                    setFieldErrors((prev) => ({ ...prev, duration: null }));
+                  }
+                }}
+                error={!!fieldErrors.duration}
+                helperText={fieldErrors.duration}
+              />
+            </Box>
+          </>
         )}
+
+        {recurrencePatternOption === 'biweekly' && (
+          <>
+            <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+              <TextField
+                label="Start Time 1"
+                type="time"
+                fullWidth
+                value={moment(biWeeklyTimes.startTime1).format('HH:mm')}
+                onChange={(e) => {
+                  const [hours, minutes] = e.target.value.split(':');
+                  const newStartTime = new Date();
+                  newStartTime.setHours(parseInt(hours, 10));
+                  newStartTime.setMinutes(parseInt(minutes, 10));
+                  setBiWeeklyTimes((prev) => ({
+                    ...prev,
+                    startTime1: newStartTime
+                  }));
+                  validateTime(newStartTime, 'start'); // Validate start time
+                }}
+                error={!!fieldErrors.sessionStartDate || !!startTimeError}
+                helperText={fieldErrors.sessionStartDate || startTimeError}
+              />
+            </Box>
+
+            <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+              <TextField
+                label="Duration 1 (minutes)"
+                type="number"
+                fullWidth
+                value={biWeeklyTimes.duration1 || ''}
+                onChange={(e) => {
+                  const duration = parseInt(e.target.value, 10);
+                  setBiWeeklyTimes((prev) => ({
+                    ...prev,
+                    duration1: duration
+                  }));
+
+                  const allowedDurations = [45, 60, 90, 120];
+                  if (!allowedDurations.includes(duration)) {
+                    setFieldErrors((prev) => ({
+                      ...prev,
+                      duration: t('errors.invalidDuration', {
+                        allowed: allowedDurations.join(', ')
+                      })
+                    }));
+                  } else {
+                    setFieldErrors((prev) => ({ ...prev, duration: null }));
+                  }
+                }}
+                error={!!fieldErrors.duration}
+                helperText={fieldErrors.duration}
+              />
+            </Box>
+
+            <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+              <TextField
+                label="Start Time 2"
+                type="time"
+                fullWidth
+                value={moment(biWeeklyTimes.startTime2).format('HH:mm')}
+                onChange={(e) => {
+                  const [hours, minutes] = e.target.value.split(':');
+                  const newStartTime = new Date();
+                  newStartTime.setHours(parseInt(hours, 10));
+                  newStartTime.setMinutes(parseInt(minutes, 10));
+                  setBiWeeklyTimes((prev) => ({
+                    ...prev,
+                    startTime2: newStartTime
+                  }));
+                  validateTime(newStartTime, 'start'); // Validate start time
+                }}
+                error={!!fieldErrors.sessionStartDate || !!startTimeError}
+                helperText={fieldErrors.sessionStartDate || startTimeError}
+              />
+            </Box>
+
+            <Box sx={{ display: 'flex', gap: 2, mb: 2 }}>
+              <TextField
+                label="Duration 2 (minutes)"
+                type="number"
+                fullWidth
+                value={biWeeklyTimes.duration2 || ''}
+                onChange={(e) => {
+                  const duration = parseInt(e.target.value, 10);
+                  setBiWeeklyTimes((prev) => ({
+                    ...prev,
+                    duration2: duration
+                  }));
+
+                  const allowedDurations = [45, 60, 90, 120];
+                  if (!allowedDurations.includes(duration)) {
+                    setFieldErrors((prev) => ({
+                      ...prev,
+                      duration: t('errors.invalidDuration', {
+                        allowed: allowedDurations.join(', ')
+                      })
+                    }));
+                  } else {
+                    setFieldErrors((prev) => ({ ...prev, duration: null }));
+                  }
+                }}
+                error={!!fieldErrors.duration}
+                helperText={fieldErrors.duration}
+              />
+            </Box>
+          </>
+        )}
+
         <Box
           sx={{
             display: 'flex',
@@ -405,7 +571,7 @@ export default function AddClassSessionModal({
             ml: 1
           }}
         >
-          <FormControlLabel
+          {/* <FormControlLabel
             control={
               <Checkbox
                 checked={isRepeat}
@@ -427,11 +593,9 @@ export default function AddClassSessionModal({
               error={!!fieldErrors.repeatDate}
               helperText={fieldErrors.repeatDate}
             />
-          )}
+          )} */}
 
           <Box>
-
-
             <FormControlLabel
               control={
                 <Switch

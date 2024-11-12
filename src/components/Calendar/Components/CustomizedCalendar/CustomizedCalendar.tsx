@@ -17,7 +17,10 @@ import AddClassSessionModal from '../Appointment/AddClassSessionModal';
 import ClassSessionDetailsModal from '../Modals/ClassSessionDetailsModal';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import { useAuth } from 'src/hooks/useAuth';
-import { deleteClassSession, toggleClassSessionActivation } from 'src/services/classSessionService';
+import {
+  deleteClassSession,
+  toggleClassSessionActivation
+} from 'src/services/classSessionService';
 import FullCalendar from '@fullcalendar/react';
 import resourceTimelinePlugin from '@fullcalendar/resource-timeline';
 import EventItem from '../Appointment/EventItem';
@@ -180,8 +183,12 @@ export default function CustomizedCalendar({
     }
   };
 
-  const handleDeactivateClassSession = async (appointmentId: string, isActive: boolean) => {
-    if (strongestRoles[0] === 'Teacher' || strongestRoles[0] === 'Student') return;
+  const handleDeactivateClassSession = async (
+    appointmentId: string,
+    isActive: boolean
+  ) => {
+    if (strongestRoles[0] === 'Teacher' || strongestRoles[0] === 'Student')
+      return;
 
     try {
       await toggleClassSessionActivation([Number(appointmentId)], isActive);
@@ -191,11 +198,10 @@ export default function CustomizedCalendar({
     }
   };
 
-
   const handleDeactivateComplete = () => {
     loadClassSessions();
     setSelectedAppointmentId(null);
-    setDetailsModalOpen(false)
+    setDetailsModalOpen(false);
   };
 
   const checkOverlap = (currentSession, allSessions) => {
@@ -204,7 +210,10 @@ export default function CustomizedCalendar({
     const currentEnd = new Date(currentSession.end);
 
     return allSessions.some((otherSession) => {
-      if (otherSession.data.appointment.id === currentSession.data.appointment.id) return false;
+      if (
+        otherSession.data.appointment.id === currentSession.data.appointment.id
+      )
+        return false;
       const otherTeacher = otherSession.data.appointment.teacher;
       const otherStart = new Date(otherSession.start);
       const otherEnd = new Date(otherSession.end);
@@ -238,21 +247,23 @@ export default function CustomizedCalendar({
           sessionType: session.data.appointment.sessionType,
           students: session.data.appointment.students,
           reportStatus: session.data.appointment.reportStatus,
-          hasOverlap,
-        },
+          hasOverlap
+        }
       };
     });
 
     setEvents(mappedEvents);
   }, [classSessionEvents]);
 
-
   const handleOpenAddModal = (start: Date, end: Date, roomId: string) => {
     if (strongestRoles[0] == 'Student' || strongestRoles[0] == 'Parent') {
       return;
     }
     if (selectedLocations.length > 1) {
-      showMessage('Please select a single location to add a class session.', 'error');
+      showMessage(
+        'Please select a single location to add a class session.',
+        'error'
+      );
       return;
     }
     setSelectedRoom(roomId);
@@ -277,7 +288,10 @@ export default function CustomizedCalendar({
       setIsToDoModalOpen(true);
     } else if (eventType === 'Class Session') {
       if (selectedLocations.length > 1) {
-        showMessage('Please select a single location to add a class session.', 'error');
+        showMessage(
+          'Please select a single location to add a class session.',
+          'error'
+        );
         return;
       }
       setIsAddModalOpen(true);
@@ -370,8 +384,7 @@ export default function CustomizedCalendar({
         isOpen={isAddModalOpen}
         onClose={handleCloseAddModal}
         onSave={handleSaveClassSession}
-        initialStartDate={selectedRange.start}
-        initialEndDate={selectedRange.end}
+        startTime={selectedRange.start}
         roomId={selectedRoom}
         passedLocations={selectedLocations}
       />

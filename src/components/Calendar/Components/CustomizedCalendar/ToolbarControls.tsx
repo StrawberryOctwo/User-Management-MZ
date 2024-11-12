@@ -177,8 +177,7 @@ export default function ToolbarControls({
         isOpen={isAddModalOpen}
         onClose={handleCloseAddModal}
         onSave={handleSaveClassSession}
-        initialStartDate={date}
-        initialEndDate={moment(date).add(1, 'hour').toDate()} // Example default for end date
+        startTime={date}
       />
     </Box>
   );
