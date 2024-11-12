@@ -24,7 +24,11 @@ import {
   updatePaymentStatus
 } from 'src/services/paymentService';
 import ViewSessionReportForm from 'src/components/Calendar/Components/Modals/ViewSessionReport';
-import { capitalizeFirstLetter, decodeAvailableDates } from './utils';
+import {
+  capitalizeFirstLetter,
+  decodeAvailableDates,
+  formatDate
+} from './utils';
 
 const ViewStudentPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -44,9 +48,14 @@ const ViewStudentPage: React.FC = () => {
 
     try {
       const studentData = await fetchStudentById(Number(id));
+      console.log('studentData:', studentData);
       studentData.availableDates = decodeAvailableDates(
         studentData.availableDates
       ).map(capitalizeFirstLetter);
+      studentData.contractEndDate = formatDate(studentData.contractEndDate);
+      studentData.created_at = formatDate(studentData.created_at);
+      studentData.user.dob = formatDate(studentData.user.dob);
+
       setStudent(studentData);
 
       const studentDocuments = await fetchStudentDocumentsById(Number(id));
