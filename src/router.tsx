@@ -345,7 +345,7 @@ const routes: RouteObject[] = [
           },
 
           {
-            path: 'parent-session-reports',
+            path: 'session-reports',
             element: <SessionReports />
           },
 

@@ -14,6 +14,18 @@ export const fetchStudents = async (page: number, limit: number, searchQuery: st
     }
 };
 
+
+export const fetchParentStudents = async (page: number, limit: number, searchQuery: string = '') => {
+    try {
+        const response = await api.get(`/parent/students/`, {
+            params: { page, limit, search: searchQuery }, // Include search query in the request
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching students:', error);
+        throw error;
+    }
+};
 export const addStudent = async (studentData: any) => {
     try {
         const response = await api.post('/student', studentData);

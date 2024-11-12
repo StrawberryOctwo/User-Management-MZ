@@ -1,52 +1,61 @@
 import { useState, useEffect } from 'react';
 import Cookies from 'universal-cookie';
-import { jwtDecode } from 'jwt-decode'; // Make sure this is imported correctly
+import {jwtDecode} from 'jwt-decode'; // Ensure correct import
 
 interface DecodedToken {
-  name: string;        // First name
-  lastname: string;    // Last name
+  name: string; // First name
+  lastname: string; // Last name
   id: number;
-  roles: string[];     // Array of roles
-  exp: number;
+  roles: string[]; // Array of roles
+  exp: number; // Expiration time (Unix timestamp in seconds)
 }
 
 export const useAuth = () => {
-  const [userId, setUserId] = useState<number | null>(null);  // State for user ID
-  const [userRoles, setUserRoles] = useState<string[] | null>(null);  // State for array of roles
-  const [username, setUsername] = useState<string | null>(null);  // State for username
+  const [userId, setUserId] = useState<number | null>(null);
+  const [userRoles, setUserRoles] = useState<string[] | null>(null);
+  const [username, setUsername] = useState<string | null>(null);
   const cookies = new Cookies();
-  const token = cookies.get('token');
+  const token = cookies.get('token'); // Get token from cookies
 
   useEffect(() => {
     if (token) {
       try {
-        const decoded = jwtDecode<DecodedToken>(token);
-        setUserId(decoded.id);  // Set the user ID
-        setUserRoles(decoded.roles);  // Set the roles array
-        setUsername(`${decoded.name} ${decoded.lastname}`);  // Set the full username as "name lastname"
+        if (isTokenExpired(token)) {
+          cookies.remove('token'); // Remove expired token
+          setUserId(null);
+          setUserRoles(null);
+          setUsername(null);
+        } else {
+          const decoded = jwtDecode<DecodedToken>(token);
+          setUserId(decoded.id);
+          setUserRoles(decoded.roles);
+          setUsername(`${decoded.name} ${decoded.lastname}`);
+        }
       } catch (error) {
         console.error('Failed to decode token:', error);
-        setUserId(null);  // Reset user ID on error
-        setUserRoles(null);  // Reset roles on error
-        setUsername(null);  // Reset username on error
+        setUserId(null);
+        setUserRoles(null);
+        setUsername(null);
       }
     } else {
-      setUserId(null);  // Reset user ID if no token is found
-      setUserRoles(null);  // Reset roles if no token is found
-      setUsername(null);  // Reset username if no token is found
+      // Reset all state if token is not found
+      setUserId(null);
+      setUserRoles(null);
+      setUsername(null);
     }
-  }, [token]);  // Dependency on token
+  }, [token]);
 
   return { userId, userRoles, username };
 };
 
+// Utility function to check if the token is expired
 export const isTokenExpired = (token: string): boolean => {
   try {
     const decoded: DecodedToken = jwtDecode(token);
-    const currentTime = Date.now() / 1000;  // Current time in seconds
-    return decoded.exp < currentTime;  // Token is expired if expiration time is in the past
+    const currentTime = Date.now() / 1000; // Current time in seconds
+    return decoded.exp < currentTime; // Expired if expiration time is in the past
   } catch (error) {
     console.error('Invalid token format:', error);
-    return true;  // If token is invalid, consider it expired
+    return true; // Consider invalid token as expired
   }
 };
