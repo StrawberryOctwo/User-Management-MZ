@@ -127,7 +127,6 @@ const EditTeacher = () => {
                 iban: data.iban,
                 bic: data.bic,
             };
-            console.log(data.rateMultiplier)
             // Update teacher and user data together
             const response = await updateTeacher(Number(id), userData, teacherData);
 

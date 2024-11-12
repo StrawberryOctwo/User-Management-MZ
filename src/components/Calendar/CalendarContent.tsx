@@ -235,9 +235,7 @@ const CalendarContent: React.FC = () => {
     }
   }, [date, selectedFranchise, selectedLocations, strongestRole]);
 
-  // useEffect(() => {
-  //   console.log('date is', date);
-  // }, [date]);
+ 
 
   return (
     <Box sx={{ position: 'relative', height: '74vh' }}>

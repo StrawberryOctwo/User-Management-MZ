@@ -174,7 +174,6 @@ export default function AddClassSessionModal({
         ...session,
         locationId: selectedLocation?.id
       }));
-      console.log(generatedSessions)
       onSave(generatedSessions);
     } else {
       onSave([sessionPayload]);
