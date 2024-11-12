@@ -10,27 +10,29 @@ function PageHeader() {
     avatar: '/static/images/avatars/1.jpg'
   };
 
-  const handleCreateFile = () => {
-    navigate('create'); // Navigate to the Create Franchise page
+  // Handle the navigation when button is clicked
+  const handleCreateContract = () => {
+    navigate('create'); // Navigate to the Create Contract page
   };
+
   return (
     <Grid container justifyContent="space-between" alignItems="center">
       <Grid item>
         <Typography variant="h3" component="h3" gutterBottom>
-          Files
+          Contracts
         </Typography>
         <Typography variant="subtitle2">
-          {user.name}, these are your recent files
+          {user.name}, these are your recent conracts
         </Typography>
       </Grid>
       <Grid item>
-      <Button
+        <Button
           sx={{ mt: { xs: 2, md: 0 } }}
           variant="contained"
           startIcon={<AddTwoToneIcon fontSize="small" />}
-          onClick={handleCreateFile} // Add onClick handler
+          onClick={handleCreateContract} // Add onClick handler
         >
-          Upload file
+          Create conract
         </Button>
       </Grid>
     </Grid>

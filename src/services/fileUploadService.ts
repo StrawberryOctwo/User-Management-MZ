@@ -14,6 +14,37 @@ export const fetchFiles = async (page: number, limit: number, searchQuery: strin
     }
 };
 
+export const downloadFile = async (fileId: number) => {
+    try {
+      const response = await api.get(`/files/download/${fileId}`, {
+        responseType: 'blob',
+      });
+  
+      // Extract MIME type from headers
+      const contentType = response.headers['content-type'];
+      const blob = new Blob([response.data], { type: contentType });
+      const url = window.URL.createObjectURL(blob);
+  
+      return { url, contentType }; // Return both URL and MIME type
+    } catch (error) {
+      console.error('Error downloading file:', error);
+      throw error;
+    }
+  };
+  
+  
+export const fetchSelfFiles = async (page: number, limit: number, searchQuery: string = '') => {
+    try {
+        const response = await api.get('/files/self', {
+            params: { page, limit, search: searchQuery },
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching files:', error);
+        throw error;
+    }
+};
+
 // Upload a new file
 export const uploadFile = async (formData: FormData) => {
     try {
@@ -42,6 +73,21 @@ export const addDocument = async (payload: { type: string, customFileName: strin
         },
     });
 };
+
+export const addUserDocument = async (payload: { type: string, customFileName: string}, file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', payload.type);
+    formData.append('customFileName', payload.customFileName);
+
+
+    return api.post('/upload', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
+};
+
 
 // Function to delete multiple files
 export const deleteFiles = async (fileIds: number[]) => {

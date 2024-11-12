@@ -122,11 +122,12 @@ const EditTeacher = () => {
                 contractStartDate: data.contractStartDate,
                 contractEndDate: data.contractEndDate,
                 hourlyRate: data.hourlyRate,
-                bank: data.bank,
+                rateMultiplier : data.rateMultiplier,
+                sessionRateMultiplier : data.sessionRateMultiplier,                bank: data.bank,
                 iban: data.iban,
                 bic: data.bic,
             };
-
+            console.log(data.rateMultiplier)
             // Update teacher and user data together
             const response = await updateTeacher(Number(id), userData, teacherData);
 
@@ -174,6 +175,8 @@ const EditTeacher = () => {
 
     const teacherFields = [
         { name: 'hourlyRate', label: t('hourly_rate'), type: 'number', required: true, section: 'Teacher Information' },
+        { name: 'rateMultiplier', label: 'rateMultiplier', type: 'number', required: true, section: 'Teacher Information' },
+        { name: 'sessionRateMultiplier', label: 'sessionRateMultiplier', type: 'number', required: true, section: 'Teacher Information' },
         { name: 'employeeNumber', label: t('employee_number'), type: 'text', required: true, section: 'Teacher Information' },
         { name: 'idNumber', label: t('id_number'), type: 'text', required: false, section: 'Teacher Information' },
         { name: 'contractStartDate', label: t('contract_start_date'), type: 'date', required: true, section: 'Teacher Information' },

@@ -2,8 +2,9 @@ import { Box, Button, CircularProgress } from '@mui/material';
 import React, { useEffect, useState, useRef } from 'react';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
-import { fetchStudents, deleteStudent } from 'src/services/studentService';
+import { fetchStudents, deleteStudent, fetchParentStudents } from 'src/services/studentService';
 import { useNavigate } from 'react-router-dom';
+import { useAuth } from 'src/hooks/useAuth';
 
 export default function StudentsContent() {
   const [students, setStudents] = useState([]);
@@ -14,7 +15,7 @@ export default function StudentsContent() {
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(25);
-
+  const {userRoles} = useAuth()
   const isMounted = useRef(false);
   const navigate = useNavigate();
 
@@ -27,11 +28,20 @@ export default function StudentsContent() {
   }, [page, limit]);
 
   const loadStudents = async (searchQuery = '') => {
+ 
     setLoading(true);
     setErrorMessage(null);
     try {
-      const { data, total } = await fetchStudents(page + 1, limit, searchQuery);
-
+      let result;
+      // PLEASE MR MZ FIX PLEASE
+      if (userRoles && userRoles.includes('Parent')) {
+        result = await fetchParentStudents(page + 1, limit, searchQuery);
+      } else {
+        result = await fetchStudents(page + 1, limit, searchQuery);
+      }
+      
+      // Destructure `data` and `total` from the result
+      const { data, total } = result;
       if (isMounted.current) {
         // Merge firstName and lastName into fullName
         const mergedData = data.map((student: any) => ({
@@ -47,6 +57,7 @@ export default function StudentsContent() {
         if (error.response?.data?.message.includes('TokenExpiredError')) {
           // Handle token expiration
         } else {
+          console.log(error)
           setErrorMessage('Failed to load students. Please try again.');
         }
       }

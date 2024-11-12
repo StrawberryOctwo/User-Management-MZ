@@ -41,6 +41,9 @@ const Transactions = Loader(
 const Files = Loader(
   lazy(() => import('src/content/applications/Files'))
 );
+const CreateFile = Loader(
+  lazy(() => import('src/content/applications/Files/Create'))
+);
 
 
 
@@ -157,6 +160,16 @@ const Topics = Loader(
 
 const TopicCreate = Loader(
   lazy(() => import('src/content/applications/Topics/Create'))
+);
+
+const Contracts = Loader(
+  lazy(() => import('src/content/applications/Contracts'))
+);
+const CreateContract = Loader(
+  lazy(() => import('src/content/applications/Contracts/Create'))
+);
+const EditContract = Loader(
+  lazy(() => import('src/content/applications/Contracts/Edit'))
 );
 
 const UserProfile = Loader(
@@ -335,7 +348,7 @@ const routes: RouteObject[] = [
           },
 
           {
-            path: 'parent-session-reports',
+            path: 'session-reports',
             element: <SessionReports />
           },
 
@@ -353,6 +366,10 @@ const routes: RouteObject[] = [
           {
             path: 'files/',
             element: <Files />
+          },
+          {
+            path: 'files/create',
+            element: <CreateFile />
           },
 
           {
@@ -461,6 +478,18 @@ const routes: RouteObject[] = [
           {
             path: 'topics/create',
             element: <TopicCreate />
+          },
+          {
+            path: 'contracts',
+            element: <Contracts />
+          },
+          {
+            path: 'contracts/create',
+            element: <CreateContract />
+          },
+          {
+            path: 'contracts/edit/:id',
+            element: <EditContract />
           },
           {
             path: 'profile',

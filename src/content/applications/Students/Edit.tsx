@@ -12,12 +12,17 @@ import { fetchStudentById, fetchStudentDocumentsById, updateStudent } from 'src/
 import { assignStudentToTopics, fetchTopics } from 'src/services/topicService';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
 import { assignOrUpdateParentStudents, fetchParents } from 'src/services/parentService';
+import { assignStudentToContract, fetchContractPackagesByEntity } from 'src/services/contractPackagesService';
+import { fetchSchoolTypes } from 'src/services/schoolTypeService';
 
 const EditStudent = () => {
     const { id } = useParams<{ id: string }>();
     const [studentData, setStudentData] = useState<Record<string, any> | null>(null);
     const [selectedLocations, setSelectedLocations] = useState<any[]>([]); // Changed to an array for multiple locations
     const [selectedParent, setSelectedParent] = useState<any | null>(null);
+    const [selectedContract, setSelectedContract] = useState<any | null>(null);
+    const [selectedSchoolType, setSelectedSchoolType] = useState<any | null>(null);
+
     const [selectedTopics, setSelectedTopics] = useState<any[]>([]);
     const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
@@ -29,7 +34,7 @@ const EditStudent = () => {
         try {
             const fetchedData = await fetchStudentById(Number(id));
             const studentDocuments = await fetchStudentDocumentsById(Number(id));
-    
+
             if (fetchedData && fetchedData.user) {
                 const flattenedData = {
                     ...fetchedData,
@@ -43,18 +48,21 @@ const EditStudent = () => {
                     contractEndDate: fetchedData.contractEndDate ? formatDateForInput(fetchedData.contractEndDate) : '',
                     parent: fetchedData.parent
                         ? {
-                              id: fetchedData.parent.id,
-                              accountHolder: fetchedData.parent.user.firstName,
-                          }
+                            id: fetchedData.parent.id,
+                            accountHolder: fetchedData.parent.user.firstName,
+                        }
                         : null, // Set parent to null if not present
                 };
-    
+
                 setStudentData(flattenedData);
                 setSelectedLocations(fetchedData.locations || []); // Set multiple locations
                 setSelectedParent(flattenedData.parent);
                 setSelectedTopics(fetchedData.topics || []);
+                setSelectedContract(fetchedData.contract)
+                setSelectedSchoolType(fetchedData.schoolType);
+
             }
-    
+
             const formattedDocuments = studentDocuments.documents.map((doc) => ({
                 id: doc.id,
                 fileName: doc.name,
@@ -62,7 +70,7 @@ const EditStudent = () => {
                 file: null,
                 path: doc.path,
             }));
-    
+
             setUploadedFiles(formattedDocuments);
         } catch (error) {
             console.error('Error fetching student:', error);
@@ -70,7 +78,7 @@ const EditStudent = () => {
             setLoading(false);
         }
     };
-    
+
     useEffect(() => {
         fetchStudent();
     }, [id]);
@@ -78,10 +86,15 @@ const EditStudent = () => {
     const handleLocationSelect = (locations: any[]) => {
         setSelectedLocations(locations); // Capture selected locations as an array
     };
-
+    const handleContractSelect = (contract) => {
+        console.log(contract)
+        setSelectedContract(contract);
+    };
     const handleParentSelect = (parent) => {
+        console.log(parent)
         setSelectedParent(parent); // Store the full parent object
     };
+    const handleSchoolTypeSelect = (schoolType: any) => setSelectedSchoolType(schoolType);
 
     const handleTopicSelect = (selectedItems: any[]) => {
         setSelectedTopics(selectedItems);
@@ -131,22 +144,23 @@ const EditStudent = () => {
             };
 
             const studentPayload = {
-                payPerHour: data.payPerHour,
-                individualPayPerHour: data.individualPayPerHour,
                 status: data.status,
-                gradeLevel: data.gradeLevel,
                 contractType: data.contractType,
                 contractEndDate: data.contractEndDate,
                 notes: data.notes,
                 availableDates: data.availableDates,
-                locationIds, // Updated to send multiple location IDs
+                gradeLevel: data.gradeLevel,
+                locationIds, 
+                schoolType: selectedSchoolType.id, 
+
             };
 
             const response = await updateStudent(Number(id), userPayload, studentPayload);
             await assignStudentToTopics(Number(id), topicIds);
             await assignOrUpdateParentStudents(selectedParent.id, [response.studentId]);
-
-            const userId = response.userId;
+            if (selectedContract && (!studentData.contract || selectedContract.id !== studentData.contract.id)) {
+                await assignStudentToContract(response.studentId, selectedContract.id);
+            }            const userId = response.userId;
             for (const file of uploadedFiles) {
                 const documentPayload = {
                     type: file.fileType,
@@ -168,6 +182,46 @@ const EditStudent = () => {
         }
     };
 
+    const gradeOptions = Array.from({ length: 12 }, (_, i) => ({
+        id: i + 1,
+        name: `Grade ${i + 1}`,
+    }));
+    const schoolTypeSelectionField = {
+        name: 'schoolType',
+        label: 'School Type',
+        type: 'custom',
+        section: 'Student Information',
+        component: (
+            <SingleSelectWithAutocomplete
+                label="Search School Type"
+                fetchData={(query) => fetchSchoolTypes().then((data) => data)}
+                onSelect={handleSchoolTypeSelect}
+                displayProperty="name"
+                placeholder="Type to search school type"
+                initialValue={selectedSchoolType}
+            />
+        ),
+    };
+    const contractSelectionField = {
+        name: 'contracts',
+        label: 'Contracts',
+        type: 'custom',
+        section: 'Student Information',
+        component: (
+            <SingleSelectWithAutocomplete
+                label="Search Contracts"
+                fetchData={(query) =>
+                    fetchContractPackagesByEntity(1, 5).then((data) =>
+                        data.data
+                    )
+                }
+                onSelect={handleContractSelect}
+                displayProperty="name"
+                placeholder="Type to search contracts"
+                initialValue={selectedContract}
+            />
+        ),
+    };
     const parentSelectionField = {
         name: 'parent',
         label: 'Select Parent',
@@ -205,11 +259,27 @@ const EditStudent = () => {
     ];
 
     const studentFields = [
-        { name: 'payPerHour', label: t('pay_per_hour'), type: 'number', required: true, section: 'Student Information' },
-        { name: 'individualPayPerHour', label: t('ind_pay_per_her'), type: 'number', required: true, section: 'Student Information' },
         { name: 'status', label: t('status'), type: 'text', required: true, section: 'Student Information' },
-        { name: 'gradeLevel', label: t('grade_level'), type: 'number', required: true, section: 'Student Information' },
-        { name: 'contractType', label: t('contract_type'), type: 'text', required: true, section: 'Student Information' },
+        {
+            name: 'gradeLevel',
+            label: t('grade_level'),
+            type: 'custom',
+            required: true,
+            section: 'Student Information',
+            component: (
+                <SingleSelectWithAutocomplete
+                    label="Select Grade Level"
+                    fetchData={() => Promise.resolve(gradeOptions)} // Static data function
+                    onSelect={(selectedGrade) => setStudentData((prevData) => ({
+                        ...prevData,
+                        gradeLevel: selectedGrade ? selectedGrade.id : null,
+                    }))}
+                    displayProperty="name"
+                    placeholder="Select Grade"
+                    initialValue={studentData?.gradeLevel ? gradeOptions.find(grade => grade.id === studentData.gradeLevel) : null}
+                />
+            ),
+        },
         { name: 'contractEndDate', label: t('contract_end_date'), type: 'date', required: true, section: 'Student Information' },
         { name: 'notes', label: t('notes'), type: 'text', required: false, section: 'Student Information' },
         { name: 'availableDates', label: t('available_dates'), type: 'text', required: true, section: 'Student Information' },
@@ -230,6 +300,8 @@ const EditStudent = () => {
             ),
         },
         parentSelectionField,
+        contractSelectionField,
+        schoolTypeSelectionField,
         {
             name: 'topics',
             label: 'Assign Topics',

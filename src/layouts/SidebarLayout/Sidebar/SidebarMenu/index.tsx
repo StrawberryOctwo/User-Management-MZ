@@ -322,7 +322,7 @@ function SidebarMenu() {
               </ProtectedListItem>
 
               <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher']}
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher','Parent']}
               >
                 <ListItem component="div">
                   <Button
@@ -338,7 +338,7 @@ function SidebarMenu() {
               </ProtectedListItem>
 
               <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin']}
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin','Parent','Student','LocationAdmin','Teacher']}
               >
                 <ListItem component="div">
                   <Button
@@ -369,14 +369,29 @@ function SidebarMenu() {
                 </ListItem>
               </ProtectedListItem>
               <ProtectedListItem
-                allowedRoles={['Parent']}
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin']}
               >
                 <ListItem component="div">
                   <Button
                     disableRipple
                     component={RouterLink}
                     onClick={closeSidebar}
-                    to="/management/parent-session-reports"
+                    to="/management/contracts"
+                    startIcon={<Topic />}
+                  >
+                    Contracts
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
+              <ProtectedListItem
+                allowedRoles={['Parent','Student']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/management/session-reports"
                     startIcon={<DescriptionOutlinedIcon />}
                   >
                     Session Reports
@@ -384,7 +399,7 @@ function SidebarMenu() {
                 </ListItem>
               </ProtectedListItem>
               <ProtectedListItem
-                allowedRoles={[ 'Parent']}
+                allowedRoles={['']}
               >
                 <ListItem component="div">
                   <Button

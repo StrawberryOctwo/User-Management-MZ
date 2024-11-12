@@ -1,15 +1,8 @@
 import { api } from "./api";
 
 // Create payment for student when session report is completed
-export const createPaymentForUser = async ({ userId, classSessionId,sessionType }) => {
-    try {
-        const response = await api.post('/payments/', {  userId, classSessionId,sessionType });
-        return response.data;
-    } catch (error) {
-        console.error('Error creating payment for user:', error);
-        throw error;
-    }
-};
+
+
 
 // Update payment status (pending to paid)
 export const updatePaymentStatus = async (paymentId, status) => {

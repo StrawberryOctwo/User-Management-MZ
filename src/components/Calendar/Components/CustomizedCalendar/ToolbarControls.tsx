@@ -1,12 +1,21 @@
-import React, { useState } from "react";
-import { Box, Button, IconButton, Typography, Slider, MenuItem, Select, TextField } from "@mui/material";
-import { ArrowLeft, ArrowRight } from "@mui/icons-material";
+import React, { useEffect, useState } from 'react';
+import {
+  Box,
+  Button,
+  IconButton,
+  Typography,
+  Slider,
+  MenuItem,
+  Select,
+  TextField
+} from '@mui/material';
+import { ArrowLeft, ArrowRight } from '@mui/icons-material';
 import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
-import moment from "moment";
-import { VIEW_OPTIONS } from "../../constants";
-import AddClassSessionModal from "../Appointment/AddClassSessionModal";
-import RoleBasedComponent from "src/components/ProtectedComponent";
+import moment from 'moment';
+import { VIEW_OPTIONS } from '../../constants';
+import AddClassSessionModal from '../Appointment/AddClassSessionModal';
+import RoleBasedComponent from 'src/components/ProtectedComponent';
 
 type ToolbarControlsProps = {
   date: Date;
@@ -19,9 +28,7 @@ type ToolbarControlsProps = {
   setView: any;
   view: string;
   dateText: any;
-
 };
-
 
 export default function ToolbarControls({
   date,
@@ -33,10 +40,10 @@ export default function ToolbarControls({
   onNextClick,
   setView,
   view,
-  dateText,
+  dateText
 }: ToolbarControlsProps) {
-  const PRIMARY_COLOR = "#17405d";
-  const SECONDARY_COLOR = "#246899";
+  const PRIMARY_COLOR = '#17405d';
+  const SECONDARY_COLOR = '#246899';
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
   // Handler to open the modal
@@ -55,7 +62,15 @@ export default function ToolbarControls({
   };
 
   return (
-    <Box display="flex" justifyContent="space-between" alignItems="center" mb={2} p={2} bgcolor="#f5f5f5" borderRadius={1}>
+    <Box
+      display="flex"
+      justifyContent="space-between"
+      alignItems="center"
+      mb={2}
+      p={2}
+      bgcolor="#f5f5f5"
+      borderRadius={1}
+    >
       <Box display="flex" alignItems="center" gap={2}>
         <IconButton size="small" onClick={() => setZoom(Math.max(zoom - 1, 4))}>
           <ZoomOutIcon />
@@ -67,7 +82,10 @@ export default function ToolbarControls({
           max={20}
           sx={{ width: 150, color: PRIMARY_COLOR }}
         />
-        <IconButton size="small" onClick={() => setZoom(Math.min(zoom + 1, 20))}>
+        <IconButton
+          size="small"
+          onClick={() => setZoom(Math.min(zoom + 1, 20))}
+        >
           <ZoomInIcon />
         </IconButton>
       </Box>
@@ -80,15 +98,19 @@ export default function ToolbarControls({
           InputProps={{
             style: {
               borderRadius: '4px',
-              borderColor: PRIMARY_COLOR,
-            },
+              borderColor: PRIMARY_COLOR
+            }
           }}
           size="small"
         />
       </Box>
 
       <Box display="flex" alignItems="center" gap={2}>
-        <Button onClick={onTodayClick} variant="outlined" sx={{ borderColor: PRIMARY_COLOR, color: PRIMARY_COLOR }}>
+        <Button
+          onClick={onTodayClick}
+          variant="outlined"
+          sx={{ borderColor: PRIMARY_COLOR, color: PRIMARY_COLOR }}
+        >
           Today
         </Button>
         <IconButton aria-label="Previous" onClick={onPrevClick}>
@@ -114,14 +136,14 @@ export default function ToolbarControls({
           <Button
             key={id}
             onClick={() => setView(id)}
-            variant={id === view ? "contained" : "outlined"}
+            variant={id === view ? 'contained' : 'outlined'}
             sx={{
               bgcolor: id === view ? PRIMARY_COLOR : 'transparent',
-              color: id === view ? "white" : PRIMARY_COLOR,
+              color: id === view ? 'white' : PRIMARY_COLOR,
               borderColor: PRIMARY_COLOR,
               '&:hover': {
-                bgcolor: id === view ? SECONDARY_COLOR : '#f0f0f0',
-              },
+                bgcolor: id === view ? SECONDARY_COLOR : '#f0f0f0'
+              }
             }}
           >
             {label}
@@ -129,11 +151,21 @@ export default function ToolbarControls({
         ))}
       </Box>
 
-
-      <RoleBasedComponent allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher']}>
+      <RoleBasedComponent
+        allowedRoles={[
+          'SuperAdmin',
+          'FranchiseAdmin',
+          'LocationAdmin',
+          'Teacher'
+        ]}
+      >
         <Button
           variant="contained"
-          sx={{ ml: 2, bgcolor: PRIMARY_COLOR, '&:hover': { bgcolor: SECONDARY_COLOR } }}
+          sx={{
+            ml: 2,
+            bgcolor: PRIMARY_COLOR,
+            '&:hover': { bgcolor: SECONDARY_COLOR }
+          }}
           onClick={handleOpenAddModal}
         >
           Add Class Session

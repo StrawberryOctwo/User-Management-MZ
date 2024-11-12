@@ -76,6 +76,8 @@ const CreateTeacher = () => {
                     contractStartDate: data.contractStartDate,
                     contractEndDate: data.contractEndDate,
                     hourlyRate: data.hourlyRate,
+                    rateMultiplier : data.rateMultiplier,
+                    sessionRateMultiplier : data.sessionRateMultiplier,
                     bank: data.bank,
                     iban: data.iban,
                     bic: data.bic,
@@ -120,6 +122,8 @@ const CreateTeacher = () => {
 
     const teacherFields = [
         { name: 'hourlyRate', label: 'Hourly Rate', type: 'number', required: true, section: 'Teacher Information' },
+        { name: 'rateMultiplier', label: 'rateMultiplier', type: 'number', required: true, section: 'Teacher Information' },
+        { name: 'sessionRateMultiplier', label: 'sessionRateMultiplier', type: 'number', required: true, section: 'Teacher Information' },
         { name: 'taxNumber', label: 'Tax Number', type: 'text', required: true, section: 'Teacher Information' },
         {
             name: 'employeeNumber',
