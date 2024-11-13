@@ -46,18 +46,25 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
   onSubmit,
   entityName,
   entintyFunction,
-  initialData = {},
+  initialData = {}
 }) => {
   const getInitialFormData = () => {
     return fields.reduce((acc, field) => {
       // Use initialValue from field config, fallback to initialData, or sensible default
-      acc[field.name] = field.initialValue ?? initialData[field.name] ?? (field.type === 'number' ? 0 : '');
+      acc[field.name] =
+        field.initialValue ??
+        initialData[field.name] ??
+        (field.type === 'number' ? 0 : '');
       return acc;
     }, {} as Record<string, any>);
   };
 
-  const [formData, setFormData] = useState<Record<string, any>>(getInitialFormData());
-  const [passwordVisibility, setPasswordVisibility] = useState<Record<string, boolean>>({});
+  const [formData, setFormData] = useState<Record<string, any>>(
+    getInitialFormData()
+  );
+  const [passwordVisibility, setPasswordVisibility] = useState<
+    Record<string, boolean>
+  >({});
 
   useEffect(() => {
     if (Object.keys(initialData).length > 0) {
@@ -71,7 +78,7 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
     const { name, value } = event.target;
     setFormData((prev) => ({
       ...prev,
-      [name!]: value,
+      [name!]: value
     }));
   };
 
@@ -80,10 +87,13 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
     try {
       const response = await onSubmit(formData);
       if (entintyFunction.toLowerCase() === 'add') {
-        setFormData(fields.reduce((acc, field) => {
-          acc[field.name] = field.initialValue ?? (field.type === 'number' ? 0 : '');
-          return acc;
-        }, {} as Record<string, any>));
+        setFormData(
+          fields.reduce((acc, field) => {
+            acc[field.name] =
+              field.initialValue ?? (field.type === 'number' ? 0 : '');
+            return acc;
+          }, {} as Record<string, any>)
+        );
       }
     } catch (error: any) {
       console.error(`Failed to ${entintyFunction} ${entityName}:`, error);
@@ -93,10 +103,9 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
   const togglePasswordVisibility = (fieldName: string) => {
     setPasswordVisibility((prev) => ({
       ...prev,
-      [fieldName]: !prev[fieldName],
+      [fieldName]: !prev[fieldName]
     }));
   };
-
 
   const groupedFields = fields.reduce((acc, field) => {
     const section = field.section || 'Other';
@@ -158,25 +167,32 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
                       onChange={field.onChange || handleChange}
                       required={field.required}
                       disabled={field.disabled}
-                      InputLabelProps={field.type === 'date' ? { shrink: true } : undefined}
+                      InputLabelProps={
+                        field.type === 'date' ? { shrink: true } : undefined
+                      }
                       InputProps={
                         field.type === 'password'
                           ? {
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <IconButton
-                                  onClick={() => togglePasswordVisibility(field.name)}
-                                  edge="end"
-                                >
-                                  {passwordVisibility[field.name] ? <VisibilityOff /> : <Visibility />}
-                                </IconButton>
-                              </InputAdornment>
-                            ),
-                          }
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <IconButton
+                                    onClick={() =>
+                                      togglePasswordVisibility(field.name)
+                                    }
+                                    edge="end"
+                                  >
+                                    {passwordVisibility[field.name] ? (
+                                      <VisibilityOff />
+                                    ) : (
+                                      <Visibility />
+                                    )}
+                                  </IconButton>
+                                </InputAdornment>
+                              )
+                            }
                           : undefined
                       }
                     />
-
                   )}
                 </Grid>
               ))}
@@ -184,7 +200,15 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
             {index < arr.length - 1 && <Divider sx={{ mt: 5, mb: 2 }} />}
           </Box>
         ))}
-        <Box sx={{ display: 'flex', justifyContent: 'flex-end', mb: 2, mt: 3, mr: 3 }}>
+        <Box
+          sx={{
+            display: 'flex',
+            justifyContent: 'flex-end',
+            mb: 2,
+            mt: 3,
+            mr: 3
+          }}
+        >
           <Button type="submit" variant="contained" color="primary">
             {entintyFunction} {entityName}
           </Button>

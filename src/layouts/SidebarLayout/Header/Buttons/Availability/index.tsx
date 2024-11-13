@@ -84,7 +84,6 @@ function HeaderAvailability() {
         try {
             await Promise.all(
                 daysOfWeek.map(async (day) => {
-                    console.log(availability[day])
                     const { id, startTime, endTime, checked } = availability[day];
                     if (checked || (!checked && startTime === '00:00:00' && endTime === '00:00:00')) {
                         await updateAvailabilityForSelf(id || 0, { dayOfWeek: day, startTime, endTime });

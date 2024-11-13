@@ -57,7 +57,6 @@ export default function StudentsContent() {
         if (error.response?.data?.message.includes('TokenExpiredError')) {
           // Handle token expiration
         } else {
-          console.log(error)
           setErrorMessage('Failed to load students. Please try again.');
         }
       }
