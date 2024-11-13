@@ -25,8 +25,9 @@ const StudentDetailCard: React.FC<StudentDetailCardProps> = ({
     classSessionId
 }) => {
     // Find the absence related to the specific class session
-    const sessionAbsence = student.absences?.find((absence: any) => absence.classSession.id === classSessionId) || null;
-    const absenceLabel = sessionAbsence ? (sessionAbsence.status ? 'Absent' : 'Present') : 'Present';
+    const sessionAbsence = student.absences
+
+    const absenceLabel = sessionAbsence[0]?.id ? 'Absent' : 'Present'
     return (
         <Card variant="outlined" sx={{ mb: 2, mt: 1 }}>
             <Box display="flex" justifyContent="space-between" alignItems="center" padding={1.5}>

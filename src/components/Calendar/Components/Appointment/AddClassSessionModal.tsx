@@ -96,7 +96,7 @@ export default function AddClassSessionModal({
   const validateTime = (date: Date | null, type: 'start' | 'end'): boolean => {
     if (date) {
       const hour = date.getHours();
-      if (hour < 9 || hour > 20) {
+      if (hour < 8 || hour > 20) {
         if (type === 'start') {
           setStartTimeError(t('errors.invalidStartTime'));
         } else {
@@ -174,7 +174,6 @@ export default function AddClassSessionModal({
         ...session,
         locationId: selectedLocation?.id
       }));
-      console.log(generatedSessions)
       onSave(generatedSessions);
     } else {
       onSave([sessionPayload]);
