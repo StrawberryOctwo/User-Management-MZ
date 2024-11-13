@@ -5,6 +5,7 @@ import HeaderLocalization from './Localization';
 import HeaderAvailability from './Availability';
 import withRole from 'src/hooks/withRole';
 import StudentExamsHeader from './StudentExam';
+import ToDoHeader from './ToDo';
 
 function HeaderButtons() {
   return (
@@ -15,6 +16,9 @@ function HeaderButtons() {
       </Box>
       <Box sx={{ mx: 0.5 }} component="span">
         <HeaderLocalization />
+      </Box>      
+      <Box sx={{ mx: 0.5 }} component="span">
+        <ToDoHeader />
       </Box>
       <Box sx={{ mx: 0.5 }} component="span">
         <ProtectedListItem
