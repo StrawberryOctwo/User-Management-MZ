@@ -1,4 +1,4 @@
-import { Box, ListItem } from '@mui/material';
+import { Box } from '@mui/material';
 import HeaderSearch from './Search';
 import HeaderNotifications from './Notifications';
 import HeaderLocalization from './Localization';
@@ -10,39 +10,24 @@ import AbsenceNotifications from './Absences';
 
 function HeaderButtons() {
   return (
-    <Box sx={{ mr: 1, display: 'flex', alignItems: 'center' }}>
+    <Box sx={{ mr: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
       <HeaderSearch />
-      <Box sx={{ mx: 0.5 }} component="span">
-        <HeaderNotifications />
-      </Box>
-      <Box sx={{ mx: 0.5 }} component="span">
-        <HeaderLocalization />
-      </Box>      
-      <Box sx={{ mx: 0.5 }} component="span">
-        <ToDoHeader />
-      </Box>
-      <Box sx={{ mx: 0.5 }} component="span">
-        <ProtectedListItem
-          allowedRoles={['Teacher']}
-        >
-          <HeaderAvailability />
-        </ProtectedListItem>
-      </Box>
-      <Box sx={{ mx: 0.5 }} component="span">
-        <ProtectedListItem
-          allowedRoles={['Student']}
-        ><StudentExamsHeader />
-        </ProtectedListItem>
-      </Box>
-      <Box sx={{ mx: 0.5 }} component="span">
-        <ProtectedListItem
-          allowedRoles={['Student']}
-        ><AbsenceNotifications />
-        </ProtectedListItem>
-      </Box>
+      <HeaderNotifications />
+      <HeaderLocalization />
+      <ToDoHeader />
+      <ProtectedBox allowedRoles={['Teacher']}>
+        <HeaderAvailability />
+      </ProtectedBox>
+      <ProtectedBox allowedRoles={['Student']}>
+        <StudentExamsHeader />
+      </ProtectedBox>
+      <ProtectedBox allowedRoles={['Student']}>
+        <AbsenceNotifications />
+      </ProtectedBox>
     </Box>
   );
 }
-const ProtectedListItem = withRole(ListItem);
+
+const ProtectedBox = withRole(Box);
 
 export default HeaderButtons;
