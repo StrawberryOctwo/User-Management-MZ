@@ -129,16 +129,11 @@ const ToDoHeader: React.FC = () => {
 
   return (
     <Box sx={{ position: 'relative', padding: 2 }}>
-      <Tooltip arrow title="Manage ToDos">
-        <Button
-          variant="contained"
-          color="primary"
-          startIcon={<AssignmentIcon />}
-          onClick={handleOpenDialog}
-        >
-          Manage ToDos
-        </Button>
-      </Tooltip>
+    <Tooltip arrow title="Manage ToDos">
+        <IconButton color="primary" onClick={handleOpenDialog}>
+            <AssignmentIcon />
+        </IconButton>
+    </Tooltip>
 
       <Dialog open={isDialogOpen} onClose={handleCloseDialog} fullWidth maxWidth="md">
         <DialogTitle>Manage My ToDos</DialogTitle>
