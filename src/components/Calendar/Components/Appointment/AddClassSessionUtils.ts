@@ -19,6 +19,7 @@ export interface ClassSession {
 }
 
 export const recurrenceOptions = [
+  { value: 'once', label: 'Once' },
   { value: 'weekly', label: 'Weekly' },
   { value: 'custom', label: 'Custom' }
 ];

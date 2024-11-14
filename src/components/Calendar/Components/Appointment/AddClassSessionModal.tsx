@@ -544,7 +544,8 @@ export default function AddClassSessionModal({
                 </ToggleButton>
               ))}
             </ToggleButtonGroup>
-            {recurrencePatternOption === 'weekly' && (
+            {(recurrencePatternOption === 'weekly' ||
+              recurrencePatternOption === 'once') && (
               <Box sx={{ mt: 2 }}>
                 {Object.keys(dayDetails)
                   .slice(0, 1)
