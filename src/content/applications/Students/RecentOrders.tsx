@@ -12,58 +12,65 @@ export default function StudentsContent() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
+  const [loadingStudents, setLoadingStudents] = useState(false);
+  const [userRoles, setUserRoles] = useState<string[]>([]); // State for userRoles
+
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(25);
-  const {userRoles} = useAuth()
-  const isMounted = useRef(false);
+  const { userRoles: authUserRoles, loading: authLoading } = useAuth();
+  
+
   const navigate = useNavigate();
 
+  // Set userRoles once when available
   useEffect(() => {
-    if (isMounted.current) {
-      loadStudents();
-    } else {
-      isMounted.current = true;
+    if (!authLoading && authUserRoles && !userRoles) {
+      setUserRoles(authUserRoles);
     }
-  }, [page, limit]);
+  }, [authLoading, authUserRoles]);
+
+  // Trigger loadStudents only when userRoles is stable
+  useEffect(() => {
+    if(userRoles.length ===0){
+      console.log(userRoles)
+      return}
+    if (userRoles.length >0) {
+      console.log("User Roles inside use effect:", userRoles);
+      loadStudents();
+    }
+  }, [userRoles]);
 
   const loadStudents = async (searchQuery = '') => {
- 
     setLoading(true);
     setErrorMessage(null);
+
     try {
       let result;
-      // PLEASE MR MZ FIX PLEASE
+      console.log("User Roles at load:", userRoles);
+
       if (userRoles && userRoles.includes('Parent')) {
         result = await fetchParentStudents(page + 1, limit, searchQuery);
       } else {
         result = await fetchStudents(page + 1, limit, searchQuery);
       }
-      
-      // Destructure `data` and `total` from the result
-      const { data, total } = result;
-      if (isMounted.current) {
-        // Merge firstName and lastName into fullName
-        const mergedData = data.map((student: any) => ({
-          ...student,
-          fullName: `${student.firstName} ${student.lastName}`.trim(),
-        }));
 
-        setStudents(mergedData);
-        setTotalCount(total);
-      }
+      const { data, total } = result;
+      const mergedData = data.map((student: any) => ({
+        ...student,
+        fullName: `${student.firstName} ${student.lastName}`.trim(),
+      }));
+
+      setStudents(mergedData);
+      setTotalCount(total);
     } catch (error: any) {
-      if (isMounted.current) {
-        if (error.response?.data?.message.includes('TokenExpiredError')) {
-          // Handle token expiration
-        } else {
-          setErrorMessage('Failed to load students. Please try again.');
-        }
-      }
+      setErrorMessage('Failed to load students. Please try again.');
     } finally {
-      if (isMounted.current) setLoading(false);
+      setLoading(false);
     }
   };
+  
+
 
 
   const handleEdit = (id: any) => {
@@ -82,9 +89,8 @@ export default function StudentsContent() {
       await deleteStudent(selectedIds);
       await loadStudents();
     } catch (error: any) {
-      if (isMounted.current) setErrorMessage('Failed to delete students.');
-    } finally {
-      if (isMounted.current) setLoading(false);
+      setErrorMessage('Failed to delete students.');
+    
     }
   };
 
