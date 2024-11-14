@@ -128,7 +128,10 @@ export const deleteClassSession = async (classSessionId: number[]) => {
   }
 };
 
-export async function toggleClassSessionActivation(ids: number[], isActive: boolean) {
+export async function toggleClassSessionActivation(
+  ids: number[],
+  isActive: boolean
+) {
   try {
     const response = await api.post('/class-sessions/toggle-activation', {
       ids: ids,
@@ -139,4 +142,4 @@ export async function toggleClassSessionActivation(ids: number[], isActive: bool
     console.error('Error deleting Class Session:', error);
     throw error;
   }
-};
+}

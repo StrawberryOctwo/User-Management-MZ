@@ -42,16 +42,16 @@ const CalendarContent: React.FC = () => {
       const role = roles.includes('SuperAdmin')
         ? 'SuperAdmin'
         : roles.includes('FranchiseAdmin')
-          ? 'FranchiseAdmin'
-          : roles.includes('LocationAdmin')
-            ? 'LocationAdmin'
-            : roles.includes('Teacher')
-              ? 'Teacher'
-              : roles.includes('Parent')
-                ? 'Parent'
-                : roles.includes('Student')
-                  ? 'Student'
-                  : null;
+        ? 'FranchiseAdmin'
+        : roles.includes('LocationAdmin')
+        ? 'LocationAdmin'
+        : roles.includes('Teacher')
+        ? 'Teacher'
+        : roles.includes('Parent')
+        ? 'Parent'
+        : roles.includes('Student')
+        ? 'Student'
+        : null;
       setStrongestRole(role);
     }
   }, [userRoles]);
@@ -91,9 +91,6 @@ const CalendarContent: React.FC = () => {
   ): EventItem[] => {
     return classSessions.map((session) => {
       const resource = session.name || 1;
-      const teacherName = session.teacher?.user
-        ? `${session.teacher.user.firstName} ${session.teacher.user.lastName}`
-        : 'Unknown Teacher';
 
       const studentsWithStatus = session.students.map((student) => ({
         firstName: student.firstName,
@@ -102,24 +99,22 @@ const CalendarContent: React.FC = () => {
       }));
 
       return {
-        start: moment(session.sessionStartDate).toDate(),
-        end: moment(session.sessionEndDate).toDate(),
         data: {
           appointment: {
             id: session.id,
-            status: session.isActive,
+            status: session.status,
             location: session.location?.name || 'Unknown Location',
             topic: session.topic?.name || 'Unknown Topic',
             resource: session.name || 'Unknown Teacher',
             address: session.location || 'Unknown address',
             className: session.name,
-            teacher: teacherName,
+            teacher: session.teacherName,
             studentCount: session.students.length,
             students: studentsWithStatus, // Array of first names of students
-            startTime: moment(session.sessionStartDate).format('HH:mm'),
-            endTime: moment(session.sessionEndDate).format('HH:mm'),
+            startTime: session.startTime,
+            endTime: session.endTime,
             sessionType: session.sessionType,
-            reportStatus: session.reportStatus,
+            reportStatus: session.reportStatus
           }
         },
         resourceId: resource
@@ -163,7 +158,7 @@ const CalendarContent: React.FC = () => {
           throw new Error('Invalid role');
       }
 
-      const events = transformClassSessionsToEvents(response.data);
+      const events = transformClassSessionsToEvents(response.sessionInstances);
       setClassSessionEvents(events);
     } catch (error) {
       console.error('Failed to load class sessions', error);
@@ -235,20 +230,18 @@ const CalendarContent: React.FC = () => {
     }
   }, [date, selectedFranchise, selectedLocations, strongestRole]);
 
- 
-
   return (
     <Box sx={{ position: 'relative', height: '74vh' }}>
       {['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin'].includes(
         strongestRole || ''
       ) && (
-          <FilterToolbar
-            onFranchiseChange={handleFranchiseChange}
-            onLocationsChange={handleLocationsChange}
-            selectedFranchise={selectedFranchise}
-            selectedLocations={selectedLocations}
-          />
-        )}
+        <FilterToolbar
+          onFranchiseChange={handleFranchiseChange}
+          onLocationsChange={handleLocationsChange}
+          selectedFranchise={selectedFranchise}
+          selectedLocations={selectedLocations}
+        />
+      )}
 
       <Box sx={{ position: 'relative', height: '100%', overflow: 'hidden' }}>
         <CustomizedCalendar

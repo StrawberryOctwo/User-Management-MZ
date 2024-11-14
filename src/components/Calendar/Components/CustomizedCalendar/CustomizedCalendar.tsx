@@ -237,8 +237,8 @@ export default function CustomizedCalendar({
         id: session.data.appointment.id,
         resourceId: session.resourceId,
         title: session.data.appointment.topic,
-        start: session.start,
-        end: session.end,
+        start: session.data.appointment.startTime,
+        end: session.data.appointment.endTime,
         status: session.data.appointment.status,
         extendedProps: {
           topicName: session.data.appointment.topic || 'No Topic',
@@ -319,6 +319,10 @@ export default function CustomizedCalendar({
   const renderEventContent = (eventInfo) => {
     return <EventItem eventInfo={eventInfo} />;
   };
+
+  useEffect(() => {
+    console.log('events', events);
+  }, [events]);
 
   return (
     <Box
