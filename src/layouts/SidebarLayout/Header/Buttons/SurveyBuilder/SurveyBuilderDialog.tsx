@@ -1,7 +1,7 @@
 // SurveyBuilderDialog.tsx
 import { Box, Dialog, Divider } from '@mui/material';
 import { DragDropContext } from 'react-beautiful-dnd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Header from './Header';
 import QuestionList from './QuestionList';
 import DropArea from './DropArea';
@@ -11,17 +11,30 @@ import { v4 as uuidv4 } from 'uuid';
 interface SurveyBuilderDialogProps {
   open: boolean;
   onClose: () => void;
+  survey?:Survey
+}
+interface Question {
+  id: string;
+  type: string;
+  text: string;
+  options: string[];
 }
 
+interface Survey {
+  id: string;
+  title: string;
+  questions: Question[];
+}
 const questionTypes = [
   { id: '1', type: 'TextInput' },
   { id: '2', type: 'Dropdown' },
   { id: '3', type: 'Checkbox' },
 ];
 
-function SurveyBuilderDialog({ open, onClose }: SurveyBuilderDialogProps) {
-  const [questions, setQuestions] = useState([]);
+function SurveyBuilderDialog({ open, onClose, survey }: SurveyBuilderDialogProps) {
+  const [questions, setQuestions] = useState(survey?.questions || []); // Initialize with survey data if in edit mode
 
+  console.log(questions,survey)
   const handleDeleteQuestion = (id) => {
     setQuestions(questions.filter((q) => q.id !== id));
   };
@@ -33,7 +46,12 @@ function SurveyBuilderDialog({ open, onClose }: SurveyBuilderDialogProps) {
       )
     );
   };
-
+  
+  useEffect(() => {
+    if (survey) {
+      setQuestions(survey.questions);
+    }
+  }, [survey]);
   const handleDragEnd = (result) => {
     const { source, destination } = result;
 
@@ -83,8 +101,13 @@ function SurveyBuilderDialog({ open, onClose }: SurveyBuilderDialogProps) {
             <DropArea questions={questions} onEdit={handleEditQuestion} onDelete={handleDeleteQuestion} />
           </Box>
           {/* Render the SurveySubmit component */}
-          <SurveySubmit questions={questions} onSubmitSuccess={handleSurveySubmitSuccess} />
-        </Box>
+          <SurveySubmit
+            surveyId={survey?.id} // Pass surveyId for updates
+            titleProp={survey?.title} // Set the initial title if editing
+            questions={questions}
+            onSubmitSuccess={handleSurveySubmitSuccess}
+          />     
+             </Box>
       </DragDropContext>
     </Dialog>
   );
