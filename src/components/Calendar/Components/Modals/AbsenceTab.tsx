@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
-import { Dialog, DialogActions, DialogContent, DialogTitle, Button, TextField, Typography, MenuItem, Select, FormControl, InputLabel, SelectChangeEvent } from '@mui/material';
-import { getAbsenceDetails, createOrUpdateAbsences } from 'src/services/absence';
+import {
+    Dialog, DialogActions, DialogContent, DialogTitle, Button,
+    TextField, Typography, MenuItem, Select, FormControl,
+    InputLabel, SelectChangeEvent, Switch, FormControlLabel, Box,
+    IconButton, List, ListItem, Paper
+} from '@mui/material';
+import { getAbsenceDetails, createAbsence, deleteAbsence, updateAbsenceStatus } from 'src/services/absence';
 import { calendarsharedService } from '../../CalendarSharedService';
+import WarningAmberIcon from '@mui/icons-material/WarningAmber';
+import PreviewIcon from '@mui/icons-material/Visibility';
+import { downloadFile } from 'src/services/fileUploadService';
 
 interface AbsenceTabProps {
   classSessionId: string;
@@ -11,119 +19,239 @@ interface AbsenceTabProps {
 }
 
 const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student, onClose }) => {
-  const [reason, setReason] = useState<string>('');
-  const [proof, setProof] = useState<string>('');
-  const [status, setStatus] = useState<boolean>(false); // Default to "Absent" (true)
-  const [loading, setLoading] = useState(false);
-  const [isEditMode, setIsEditMode] = useState(false);
-  const [absenceId, setAbsenceId] = useState<number | null>(null);
+    const [reason, setReason] = useState<string>('');
+    const [status, setStatus] = useState<boolean | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [absenceId, setAbsenceId] = useState<number | null>(null);
+    const [isStatusEditable, setIsStatusEditable] = useState(true);
+    const [confirmStatusChange, setConfirmStatusChange] = useState(false);
+    const [originalStatus, setOriginalStatus] = useState<boolean | null>(null);
+    const [files, setFiles] = useState<any[]>([]);
 
-  useEffect(() => {
-    if (isOpen && student) {
-      setLoading(true);
-      getAbsenceDetails(student.id, classSessionId)
-        .then((data) => {
-          if (data && typeof data === 'object') {
-            setReason(data.absences[0].reason || '');
-            setProof(data.absences[0].proof || '');
-            setStatus(data.absences[0].status ?? true);
-            setAbsenceId(data.absences[0].absenceId);
-            setIsEditMode(true);
-          } else {
-            setReason('');
-            setProof('');
-            setStatus(true);
-            setAbsenceId(null);
-            setIsEditMode(false);
-          }
-        })
-        .catch((error) => console.error('Failed to fetch absence details:', error))
-        .finally(() => setLoading(false));
-    } else if (!isOpen) {
-      setReason('');
-      setProof('');
-      setStatus(true);
-      setAbsenceId(null);
-      setIsEditMode(false);
-    }
-  }, [isOpen, student, classSessionId]);
+    useEffect(() => {
+        if (isOpen && student) {
+            setLoading(true);
+            getAbsenceDetails(student.id, classSessionId)
+                .then((data) => {
+                    if (data && data.absences?.length) {
+                        const absence = data.absences[0];
+                        setReason(absence.reason || '');
+                        setStatus(absence.status ?? null);
+                        setOriginalStatus(absence.status ?? null);
+                        setAbsenceId(absence.absenceId);
+                        setFiles(absence.files || []);
+                        setIsStatusEditable(!(absence.status !== null || !absence.reason));
+                    } else {
+                        resetForm();
+                    }
+                })
+                .catch((error) => console.error('Failed to fetch absence details:', error))
+                .finally(() => setLoading(false));
+        } else {
+            resetForm();
+        }
+    }, [isOpen, student, classSessionId]);
 
-  const handleSubmit = async () => {
-    try {
-      await createOrUpdateAbsences({
-        studentIds: [student.id],
-        reason,
-        proof,
-        status,
-        classSessionId,
-        absenceId: isEditMode ? absenceId : undefined,
-      });
-      calendarsharedService.emit('absenceUpdated');
-      onClose();
-    } catch (error) {
-      console.error('Failed to submit absence:', error);
-    }
-  };
+    const resetForm = () => {
+        setReason('');
+        setStatus(null);
+        setOriginalStatus(null);
+        setAbsenceId(null);
+        setIsStatusEditable(true);
+        setFiles([]);
+    };
 
-  const handleStatusChange = (event: SelectChangeEvent) => {
-    const newStatus = event.target.value === 'true';
-    setStatus(newStatus);
+    const handleToggleAbsent = async () => {
+        setLoading(true);
+        try {
+            if (absenceId) {
+                await deleteAbsence(absenceId);
+                resetForm();
+                calendarsharedService.emit('absenceUpdated');
+            } else {
+                const newAbsence = await createAbsence(student.id, Number(classSessionId));
+                setAbsenceId(newAbsence.absenceId);
+                setIsStatusEditable(true);
+                setReason(''); 
+                setStatus(null);
+                calendarsharedService.emit('absenceUpdated');
+            }
+        } catch (error) {
+            console.error('Failed to toggle absence:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
 
-    if (!newStatus) {
-      setReason('');
-      setProof('');
-    }
-  };
+    const handleStatusChange = (event: SelectChangeEvent) => {
+        const newStatus = event.target.value === 'true' ? true : event.target.value === 'false' ? false : null;
+        setStatus(newStatus);
+        setIsStatusEditable(newStatus === null && Boolean(reason));
 
-  return (
-    <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
-      <DialogTitle>
-        {isEditMode ? `Edit Absence for ${student?.user.firstName} ${student?.user.lastName}` : `Add Absence for ${student?.user.firstName} ${student?.user.lastName}`}
-      </DialogTitle>
-      <DialogContent sx={{ mt: 2 }}>
-        {loading ? (
-          <Typography>Loading absence data...</Typography>
-        ) : (
-          <>
-            <FormControl fullWidth sx={{ mb: 2 }}>
-              <InputLabel>Status</InputLabel>
-              <Select
-                label="Status"
-                value={status ? 'true' : 'false'}
-                onChange={handleStatusChange}
-              >
-                <MenuItem value="true">Absent</MenuItem>
-                <MenuItem value="false">Present</MenuItem>
-              </Select>
-            </FormControl>
+        if (newStatus !== null) {
+            setConfirmStatusChange(true);
+        }
+    };
 
-            <TextField
-              label="Reason"
-              value={reason}
-              onChange={(e) => setReason(e.target.value)}
-              fullWidth
-              sx={{ mb: 2 }}
-              disabled={!status}
-            />
-            <TextField
-              label="Proof"
-              value={proof}
-              onChange={(e) => setProof(e.target.value)}
-              fullWidth
-              sx={{ mb: 2 }}
-              disabled={!status}
-            />
-          </>
-        )}
-      </DialogContent>
-      <DialogActions>
-        <Button onClick={onClose} color="secondary">Cancel</Button>
-        <Button onClick={handleSubmit} color="primary">
-          {isEditMode ? 'Update Absence' : 'Add Absence'}
-        </Button>
-      </DialogActions>
-    </Dialog>
-  );
+    const handlePreviewFile = async (fileId: number) => {
+        try {
+            const { url } = await downloadFile(fileId);
+            window.open(url, '_blank');
+        } catch (error) {
+            console.error('Failed to preview file:', error);
+        }
+    };
+
+    const confirmStatusUpdate = async () => {
+        try {
+            await updateAbsenceStatus(absenceId!, status);
+            setOriginalStatus(status);
+            calendarsharedService.emit('absenceUpdated');
+        } catch (error) {
+            console.error('Failed to update absence status:', error);
+        }
+        setConfirmStatusChange(false);
+    };
+
+    const cancelStatusChange = () => {
+        setStatus(originalStatus);
+        setConfirmStatusChange(false);
+        setIsStatusEditable(true);
+    };
+
+    return (
+        <Dialog
+            open={isOpen}
+            onClose={() => {
+                onClose();
+                resetForm();
+            }}
+            maxWidth="sm"
+            fullWidth
+            PaperProps={{
+                sx: { overflowY: 'visible' }
+            }}
+        >
+            <DialogTitle>{absenceId ? `Edit Absence for ${student?.user.firstName} ${student?.user.lastName}` : `Add Absence for ${student?.user.firstName} ${student?.user.lastName}`}</DialogTitle>
+            <DialogContent sx={{ mt: 2 }}>
+                {loading ? (
+                    <Typography>Loading absence data...</Typography>
+                ) : (
+                    <>
+                    <Box display="flex" alignItems="center" justifyContent="space-between" width="100%">
+                        <Typography variant="h6" color={absenceId ? 'error.main' : 'success.main'} sx={{ flexShrink: 0 }}>
+                            {student?.user.firstName} {student?.user.lastName} is currently:
+                        </Typography>
+                        <Box display="flex" alignItems="center" flexShrink={0}>
+                            <FormControlLabel
+                                control={
+                                    <Switch
+                                        checked={Boolean(absenceId)}
+                                        onChange={handleToggleAbsent}
+                                        color={absenceId ? 'error' : 'success'}
+                                    />
+                                }
+                                label={
+                                    <Typography sx={{ fontWeight: 'bold', color: absenceId ? 'error.main' : 'success.main', whiteSpace: 'nowrap' }}>
+                                        {absenceId ? "Absent" : "Present"}
+                                    </Typography>
+                                }
+                                labelPlacement="start"
+                                sx={{ m: 0 }}
+                            />
+                        </Box>
+                    </Box>
+
+
+                        {absenceId && (
+                            <>
+                                <TextField
+                                    label="Reason for Absence"
+                                    value={reason}
+                                    fullWidth
+                                    sx={{ mb: 2 }}
+                                    disabled
+                                />
+                                <FormControl fullWidth sx={{ mb: 2 }}>
+                                    <InputLabel>Status</InputLabel>
+                                    <Select
+                                        label="Status"
+                                        value={status === null ? '' : status ? 'true' : 'false'}
+                                        onChange={handleStatusChange}
+                                        disabled={!isStatusEditable}
+                                    >
+                                        <MenuItem value="true">Accepted</MenuItem>
+                                        <MenuItem value="false">Rejected</MenuItem>
+                                        <MenuItem value="">Awaiting Student Proof</MenuItem>
+                                    </Select>
+                                </FormControl>
+                                <Typography variant="subtitle1" sx={{ mt: 2, mb: 1 }}>Files:</Typography>
+                                <List>
+                                    {files.length > 0 ? (
+                                        files.map((file) => (
+                                            <ListItem key={file.id} sx={{ p: 0 }}>
+                                                <Paper
+                                                    sx={{
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        p: 1,
+                                                        width: '100%',
+                                                        borderRadius: 1,
+                                                        boxShadow: 1,
+                                                        mb: 1,
+                                                        backgroundColor: 'grey.100'
+                                                    }}
+                                                >
+                                                    <Typography variant="body2" sx={{ flex: 1, ml: 1, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                                        {file.name}
+                                                    </Typography>
+                                                    <IconButton
+                                                        onClick={() => handlePreviewFile(file.id)}
+                                                        color="primary"
+                                                        aria-label="preview"
+                                                    >
+                                                        <PreviewIcon />
+                                                    </IconButton>
+                                                </Paper>
+                                            </ListItem>
+                                        ))
+                                    ) : (
+                                        <Typography variant="body2" color="textSecondary">No files attached to this absence.</Typography>
+                                    )}
+                                </List>
+                            </>
+                        )}
+                    </>
+                )}
+            </DialogContent>
+            <DialogActions>
+                <Button onClick={() => {
+                    onClose();
+                    resetForm();
+                }} color="secondary">Cancel</Button>
+            </DialogActions>
+
+            {confirmStatusChange && (
+                <Dialog open={confirmStatusChange} onClose={cancelStatusChange} maxWidth="xs" fullWidth>
+                    <DialogTitle>
+                        <WarningAmberIcon fontSize="large" color="error" sx={{ verticalAlign: 'middle', mr: 1 }} />
+                        Confirm Status Change
+                    </DialogTitle>
+                    <DialogContent>
+                        <Typography>
+                            Are you sure you want to {status === true ? "accept" : "reject"} this absence?
+                        </Typography>
+                    </DialogContent>
+                    <DialogActions>
+                        <Button onClick={cancelStatusChange} color="secondary">Cancel</Button>
+                        <Button onClick={confirmStatusUpdate} color="primary" variant="contained">
+                            Confirm
+                        </Button>
+                    </DialogActions>
+                </Dialog>
+            )}
+        </Dialog>
+    );
 };
 
 export default AbsenceTab;
