@@ -459,7 +459,7 @@ export default function AddClassSessionModal({
             placeholder="Search Location"
             initialValue={selectedLocation}
             width="100%"
-            disabled={true}
+            disabled={strongestRoles.includes('Teacher')?false:true}
           />
           {fieldErrors.locationId && (
             <Typography color="error" variant="body2" sx={{ mt: 1 }}>
