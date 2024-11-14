@@ -23,9 +23,9 @@ function ManagementUserSettings() {
   const [currentTab, setCurrentTab] = useState<string>('activity');
 
   const tabs = [
-    { value: 'activity', label: 'Activity' },
+    // { value: 'activity', label: 'Activity' },
     { value: 'edit_profile', label: 'Edit Profile' },
-    { value: 'notifications', label: 'Notifications' },
+    // { value: 'notifications', label: 'Notifications' },
     { value: 'security', label: 'Passwords/Security' }
   ];
 
@@ -64,9 +64,9 @@ function ManagementUserSettings() {
             </TabsWrapper>
           </Grid>
           <Grid item xs={12}>
-            {currentTab === 'activity' && <ActivityTab />}
+            {/* {currentTab === 'activity' && <ActivityTab />} */}
             {currentTab === 'edit_profile' && <EditProfileTab />}
-            {currentTab === 'notifications' && <NotificationsTab />}
+            {/* {currentTab === 'notifications' && <NotificationsTab />} */}
             {currentTab === 'security' && <SecurityTab />}
           </Grid>
         </Grid>
