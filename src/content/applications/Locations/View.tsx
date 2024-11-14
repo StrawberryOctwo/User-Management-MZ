@@ -40,6 +40,7 @@ const ViewLocationPage: React.FC = () => {
     const Fields = [
         { name: 'name', label: t('location_name'), section: t('general') },
         { name: 'address', label: t('address'), section: t('general') },
+        { name: 'city', label: t('city'), section: t('general') },
         { name: 'created_at', label: t('created_date'), section: t('general') },
         { name: 'franchise.name', label: t('franchise_name'), section: t('franchise') }, // Access nested field
         { name: 'franchise.ownerName', label: t('owner_name'), section: t('franchise') },
