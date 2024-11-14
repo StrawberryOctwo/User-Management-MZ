@@ -25,10 +25,10 @@ export const fetchContractPackageById = async (contractId?: string) => {
     }
 };
 
-export const fetchContractPackagesByEntity = async (page: number, limit: Number) => {
+export const fetchContractPackagesByEntity = async (page: number, limit: Number,search) => {
     try {
         const response = await api.get('/contract-packages/franchises', {
-            params: { page, limit },
+            params: { page, limit ,search},
         });
         return response.data;
     } catch (error) {
@@ -72,10 +72,10 @@ export const fetchDiscounts = async () => {
 
 
 // Fetch contract packages by franchise ID with pagination
-export const fetchContractPackagesByFranchise = async (franchiseId: number, page: number, limit: number) => {
+export const fetchContractPackagesByFranchise = async (franchiseId: number, page: number, limit: number,search:'') => {
     try {
         const response = await api.get(`/contract-packages/franchise/${franchiseId}`, {
-            params: { page, limit },
+            params: { page, limit,search },
         });
         return response.data;
     } catch (error) {
