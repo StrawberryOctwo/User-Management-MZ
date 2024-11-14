@@ -5,12 +5,14 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 
 interface MultiSelectWithCheckboxesProps {
     label: string;
-    fetchData: (query: string) => Promise<any[]>; // Function to fetch data based on the query
-    onSelect: (selectedItems: any[]) => void; // Callback when items are selected
-    displayProperty: string; // Property to display in the options
-    placeholder?: string; // Placeholder text
-    initialValue?: any[]; // Initial selected values for edit or pre-filled forms
-    width?: string | number; // Optional width prop for dynamic width
+    fetchData: (query: string) => Promise<any[]>;
+    onSelect: (selectedItems: any[]) => void;
+    displayProperty: string;
+    placeholder?: string;
+    initialValue?: any[];
+    width?: string | number;
+    hideSelected?: boolean;
+
 }
 
 const MultiSelectWithCheckboxes = forwardRef(({
@@ -21,6 +23,7 @@ const MultiSelectWithCheckboxes = forwardRef(({
     placeholder = 'Select...',
     initialValue = [],
     width = '95%',
+    hideSelected = false, // Default to false
 }: MultiSelectWithCheckboxesProps, ref) => {
     const [query, setQuery] = useState('');
     const [options, setOptions] = useState<any[]>(initialValue || []);
@@ -92,7 +95,8 @@ const MultiSelectWithCheckboxes = forwardRef(({
     return (
         <Autocomplete
             multiple
-            value={selectedItems}
+            value={selectedItems} // Use selectedItems to allow multiple selection
+            inputValue={hideSelected ? '' : query} // Clear input display when hideSelected is true
             options={options}
             disableCloseOnSelect
             getOptionLabel={(option) => getNestedProperty(option, displayProperty) || ''}
@@ -102,13 +106,14 @@ const MultiSelectWithCheckboxes = forwardRef(({
             onBlur={handleBlur} // Handle blur
             loading={loading}
             isOptionEqualToValue={(option, value) => option.id === value.id}
+            renderTags={() => null} // Prevent selected items from showing as tags
             renderOption={(props, option, { selected }) => (
                 <li {...props} key={option.id}>
                     <Checkbox
                         icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
                         checkedIcon={<CheckBoxIcon fontSize="small" />}
                         style={{ marginRight: 8 }}
-                        checked={selected}
+                        checked={selectedItems.some((item) => item.id === option.id)} // Keep checkboxes in the list checked
                     />
                     {getNestedProperty(option, displayProperty)}
                 </li>

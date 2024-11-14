@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
   Button,
@@ -31,9 +31,15 @@ import {
   Accordion,
 } from '@mui/material';
 import AssignmentIcon from '@mui/icons-material/Assignment';
-import { fetchToDosByAssignedBy, createToDo, toggleToDoCompletion, assignToDoToRole } from 'src/services/todoService';
+import { fetchToDosByAssignedBy, createToDo, toggleToDoCompletion, assignToDoToRole, assignToDoToUsers, fetchAssignedUsersForTodo } from 'src/services/todoService';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // Import the ExpandMoreIcon component from the appropriate package
 import RoleBasedComponent from 'src/components/ProtectedComponent';
+import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
+import { fetchFranchiseAdmins } from 'src/services/franchiseAdminService';
+import { fetchLocationAdmins } from 'src/services/locationAdminService';
+import { fetchStudents } from 'src/services/studentService';
+import { fetchTeachers } from 'src/services/teacherService';
+import { set } from 'date-fns';
 
 const ToDoHeader: React.FC = () => {
   const [todos, setTodos] = useState<any[]>([]);
@@ -45,6 +51,20 @@ const ToDoHeader: React.FC = () => {
   const [newPriority, setNewPriority] = useState('Medium');
   const [newDueDate, setNewDueDate] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [customRoleDialogOpen, setCustomRoleDialogOpen] = useState(false);
+  const [selectedCustomTodoId, setSelectedCustomTodoId] = useState<number | null>(null);
+  const [selectedUsers, setSelectedUsers] = useState({
+    FranchiseAdmin: [],
+    LocationAdmin: [],
+    Teacher: [],
+    Student: [],
+  });
+  const [availableUsers, setAvailableUsers] = useState({
+    FranchiseAdmin: [],
+    LocationAdmin: [],
+    Teacher: [],
+    Student: [],
+  }); // Separate state for fetched users
 
   const limit = 5; // Pagination limit per page
 
@@ -71,7 +91,17 @@ const ToDoHeader: React.FC = () => {
     setNewPriority('Medium');
     setNewDueDate('');
     setErrorMessage(null);
-    setTodos([]); // Clear the ToDos list when closing the dialog
+    setTodos([]);
+  };
+
+  const handleCloseCustomRoleDialog = () => {
+    setCustomRoleDialogOpen(false);
+    setSelectedUsers({
+      FranchiseAdmin: [],
+      LocationAdmin: [],
+      Teacher: [],
+      Student: [],
+    });
   };
 
   const handleAddToDo = async () => {
@@ -105,15 +135,57 @@ const ToDoHeader: React.FC = () => {
     }
   };
 
-  const handleAssignRole = async (todoId: number, role: string) => {
+  const handleOpenCustomRoleDialog = async (todoId: number) => {
+    setSelectedCustomTodoId(todoId);
+    setCustomRoleDialogOpen(true);
+
     try {
-      await assignToDoToRole(todoId, role);
-      loadToDos(page); // Refresh list to show updated assignment
+      const response = await fetchAssignedUsersForTodo(todoId);
+
+      if (response && Array.isArray(response.assignees)) {
+        // Manually assign users to roles based on your logic.
+        // Adjust the logic below according to your actual requirements.
+        const organizedUsers = {
+          FranchiseAdmin: response.assignees.filter(user => user.email.includes('franchise')),
+          LocationAdmin: response.assignees.filter(user => user.email.includes('location')),
+          Teacher: response.assignees.filter(user => user.email.includes('teacher')),
+          Student: response.assignees.filter(user => user.email.includes('student')),
+        };
+
+        console.log(organizedUsers)
+        setSelectedUsers(organizedUsers);
+      } else {
+        throw new Error('Assigned users data is not structured as expected');
+      }
     } catch (error) {
-      console.error('Failed to assign role to ToDo:', error);
-      setErrorMessage('Failed to assign role');
+      console.error('Failed to fetch assigned users:', error);
+      setErrorMessage('Failed to load assigned users');
     }
   };
+
+
+  const handleAssignRole = async (todoId: number, role: string) => {
+    if (role === 'Custom') {
+      setSelectedCustomTodoId(todoId);
+      handleOpenCustomRoleDialog(todoId); // Open custom dialog when "Custom" is selected
+    } else {
+      // Assign role directly if not "Custom"
+      await assignToDoToRole(todoId, role);
+      setTodos((prevTodos) =>
+        prevTodos.map((todo) =>
+          todo.id === todoId ? { ...todo, assignedRole: role } : todo
+        )
+      );
+    }
+  };
+
+  const handleRoleInputChange = (role: string, selectedItems) => {
+    setSelectedUsers((prev) => ({
+      ...prev,
+      [role]: [...prev[role], ...selectedItems.filter((item) => !prev[role].some((prevItem) => prevItem.id === item.id))]
+    }));
+  };
+
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
@@ -141,7 +213,7 @@ const ToDoHeader: React.FC = () => {
       </Tooltip>
 
       <Dialog open={isDialogOpen} onClose={handleCloseDialog} fullWidth maxWidth="md">
-        <DialogTitle>Manage My ToDos</DialogTitle>
+        <DialogTitle>Manage My Created ToDos</DialogTitle>
         <DialogContent dividers>
 
           <RoleBasedComponent allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher']}>
@@ -151,7 +223,9 @@ const ToDoHeader: React.FC = () => {
                 aria-controls="panel1-content"
                 id="panel1-header"
               >
-                Add New ToDo
+                <Typography variant="body1" fontWeight="bold">
+                  Add New ToDo
+                </Typography>
               </AccordionSummary>
               <AccordionDetails>
                 <Grid container spacing={2}>
@@ -203,6 +277,12 @@ const ToDoHeader: React.FC = () => {
                     </FormControl>
                   </Grid>
                 </Grid>
+                {/* Right-aligned Save ToDo button */}
+                <Box display="flex" justifyContent="flex-end" mt={2}>
+                  <Button onClick={handleAddToDo} color="primary" variant="contained">
+                    Save ToDo
+                  </Button>
+                </Box>
               </AccordionDetails>
             </Accordion>
             <Divider sx={{ my: 2 }} />
@@ -216,14 +296,11 @@ const ToDoHeader: React.FC = () => {
               aria-controls="panel1-content"
               id="panel1-header"
             >
-              View ToDos
+              <Typography variant="body1" fontWeight="bold">
+                View ToDos
+              </Typography>
             </AccordionSummary>
             <AccordionDetails>
-              {/* {errorMessage && (
-                <Typography color="error" variant="body2" sx={{ mb: 2 }}>
-                  {errorMessage}
-                </Typography>
-              )} */}
               <TableContainer component={Paper} elevation={3} sx={{ maxHeight: 400 }}>
                 <Table stickyHeader>
                   <TableHead>
@@ -253,7 +330,7 @@ const ToDoHeader: React.FC = () => {
                           {todo.dueDate ? new Date(todo.dueDate).toLocaleDateString() : 'No Due Date'}
                         </TableCell>
                         <TableCell>
-                          <FormControl fullWidth variant="outlined">
+                          <FormControl fullWidth variant="outlined" sx={{ minWidth: 140, mr: 2 }}>
                             <InputLabel>Assign Role</InputLabel>
                             <Select
                               label="Assign Role"
@@ -264,11 +341,13 @@ const ToDoHeader: React.FC = () => {
                               <MenuItem value="LocationAdmin">Location Admin</MenuItem>
                               <MenuItem value="Teacher">Teacher</MenuItem>
                               <MenuItem value="Student">Student</MenuItem>
+                              <MenuItem value="Custom">Custom</MenuItem> {/* Custom option */}
                             </Select>
                           </FormControl>
                         </TableCell>
                       </TableRow>
                     ))}
+
                     {todos.length === 0 && (
                       <TableRow>
                         <TableCell colSpan={5} align="center">
@@ -287,15 +366,105 @@ const ToDoHeader: React.FC = () => {
             </AccordionDetails>
           </Accordion>
         </DialogContent>
+      </Dialog>
+
+
+      <Dialog open={customRoleDialogOpen} onClose={handleCloseCustomRoleDialog} fullWidth>
+        <DialogTitle>Assign Custom Roles</DialogTitle>
+        <DialogContent dividers>
+          {['FranchiseAdmin', 'LocationAdmin', 'Teacher', 'Student'].map((role) => {
+            let allowedRoles = [];
+            let fetchData;
+            let label;
+
+            switch (role) {
+              case 'FranchiseAdmin':
+                allowedRoles = ['SuperAdmin'];
+                fetchData = (query) => fetchFranchiseAdmins(1, 5, query).then((data) => data.data);
+                label = 'Franchise Admins';
+                break;
+              case 'LocationAdmin':
+                allowedRoles = ['FranchiseAdmin'];
+                fetchData = (query) => fetchLocationAdmins(1, 5, query).then((data) => data.data);
+                label = 'Location Admins';
+                break;
+              case 'Teacher':
+                allowedRoles = ['FranchiseAdmin', 'LocationAdmin'];
+                fetchData = (query) => fetchTeachers(1, 5, query).then((data) => data.data);
+                label = 'Teachers';
+                break;
+              case 'Student':
+                allowedRoles = ['FranchiseAdmin', 'LocationAdmin', 'Teacher'];
+                fetchData = (query) => fetchStudents(1, 5, query).then((data) => data.data);
+                label = 'Students';
+                break;
+              default:
+                allowedRoles = [];
+                fetchData = () => Promise.resolve([]); // Default to empty data if role is not recognized
+                label = '';
+            }
+
+            return (
+              <RoleBasedComponent key={role} allowedRoles={allowedRoles}>
+                <Box sx={{ minWidth: 180, mb: 2 }}>
+                  <MultiSelectWithCheckboxes
+                    label={label}
+                    fetchData={fetchData}
+                    onSelect={(selectedItems) => handleRoleInputChange(role, selectedItems)}
+                    displayProperty="firstName"
+                    placeholder={`Type to search ${role.toLowerCase()}`}
+                    hideSelected
+                    initialValue={selectedUsers[role]}
+                  />
+                </Box>
+              </RoleBasedComponent>
+            );
+          })}
+
+          {/* Display selected users below all inputs */}
+          <Box mt={3}>
+            <Typography variant="h6">Selected Users:</Typography>
+            {Object.keys(selectedUsers).map((role) => (
+              selectedUsers[role].length > 0 && (
+                <Box key={role} mt={1}>
+                  <Typography variant="subtitle1">{role}:</Typography>
+                  <Box pl={2}>
+                    {selectedUsers[role].map((user) => (
+                      <Typography key={user.id} variant="body2">
+                        - {user.firstName} {user.lastName}
+                      </Typography>
+                    ))}
+                  </Box>
+                </Box>
+              )
+            ))}
+          </Box>
+        </DialogContent>
         <DialogActions>
-          <Button onClick={handleCloseDialog} color="secondary">
+          <Button onClick={handleCloseCustomRoleDialog} color="secondary">
             Cancel
           </Button>
-          <Button onClick={handleAddToDo} color="primary" variant="contained">
-            Save ToDo
+          <Button
+            onClick={async () => {
+              const allSelectedUserIds = Object.entries(selectedUsers).flatMap(([role, users]) =>
+                users.map((user) => (role === 'Teacher' || role === 'Student' ? user.userId : user.id))
+              );
+              try {
+                await assignToDoToUsers(selectedCustomTodoId, allSelectedUserIds);
+                console.log('ToDo successfully assigned to users');
+              } catch (error) {
+                console.error('Error assigning ToDo to users:', error);
+                setErrorMessage('Failed to assign ToDo to selected users');
+              }
+            }}
+            color="primary"
+            variant="contained"
+          >
+            Save
           </Button>
         </DialogActions>
       </Dialog>
+
     </Box>
   );
 };
