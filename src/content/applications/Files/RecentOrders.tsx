@@ -1,6 +1,7 @@
 import { Box, Button, CircularProgress } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router';
+import FileActions from 'src/components/Files/FileActions';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { fetchSelfFiles, deleteFiles } from 'src/services/fileUploadService';
@@ -44,26 +45,19 @@ export default function FileUploadContent() {
     {
       field: 'user',
       headerName: 'Uploaded By',
-      render: (rowData: any) => {
-        // Directly access firstName and lastName from rowData
-        const { firstName, lastName } = rowData;
-        if (firstName && lastName) {
-          return `${firstName} ${lastName}`;
-        }
-        return 'Unknown User';
-      }
+      render: (value, row) => `${row.user?.firstName || ''} ${row.user?.lastName || ''}`
     },
     {
       field: 'created_at',
       headerName: 'Created At',
-      render: (value: any) => new Date(value).toLocaleDateString()
+      render: (value) => new Date(value).toLocaleDateString()
+    },
+    {
+      field: 'actions',
+      headerName: 'File Actions',
+      render: (value, row) => <FileActions fileId={row.id} fileName={row.name} /> // Use FileActions here
     }
   ];
-
-
-
-
-
 
 
   const handleDelete = async () => {
