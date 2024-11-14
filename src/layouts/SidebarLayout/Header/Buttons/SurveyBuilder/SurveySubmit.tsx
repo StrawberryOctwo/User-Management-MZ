@@ -1,14 +1,22 @@
 import { Button, Box, Typography, TextField } from '@mui/material';
-import { useState } from 'react';
-import { createSurvey } from 'src/services/survey';
+import { useState, useEffect } from 'react';
+import { createSurvey, updateSurvey } from 'src/services/survey'; // Import both functions
 
 interface SurveySubmitProps {
-  questions: { text: string; type: string; options: string[] }[]; // Adjusted type for questions
+  surveyId?: string; // Optional surveyId for editing
+  titleProp?: string; // Initial title, if editing
+  questions: { text: string; type: string; options: string[] }[];
   onSubmitSuccess: () => void;
 }
 
-function SurveySubmit({ questions, onSubmitSuccess }: SurveySubmitProps) {
-  const [title, setTitle] = useState(''); // State for survey title
+function SurveySubmit({ surveyId, titleProp = '', questions, onSubmitSuccess }: SurveySubmitProps) {
+  const [title, setTitle] = useState(titleProp);
+
+  useEffect(() => {
+    if (titleProp) {
+      setTitle(titleProp); // Set title to survey title if editing
+    }
+  }, [titleProp]);
 
   const handleSubmit = async () => {
     if (!title.trim()) {
@@ -17,12 +25,21 @@ function SurveySubmit({ questions, onSubmitSuccess }: SurveySubmitProps) {
     }
 
     try {
-      const response = await createSurvey(title, questions); // Pass the title with questions
-      
-      if (response) {
-        console.log("Survey submitted successfully!");
-        onSubmitSuccess();
+      let response;
+      if (surveyId) {
+        // Update survey if surveyId exists
+        response = await updateSurvey(surveyId, title, questions);
+        if (response) {
+          console.log("Survey updated successfully!");
+        }
+      } else {
+        // Create new survey if no surveyId
+        response = await createSurvey(title, questions);
+        if (response) {
+          console.log("Survey submitted successfully!");
+        }
       }
+      onSubmitSuccess();
     } catch (error) {
       console.error("Error submitting survey:", error);
     }
@@ -44,7 +61,7 @@ function SurveySubmit({ questions, onSubmitSuccess }: SurveySubmitProps) {
       textAlign="center"
     >
       <Typography variant="h5" gutterBottom>
-        Review & Submit Your Survey
+        {surveyId ? "Update Survey" : "Review & Submit Your Survey"}
       </Typography>
       <TextField 
         fullWidth
@@ -55,7 +72,7 @@ function SurveySubmit({ questions, onSubmitSuccess }: SurveySubmitProps) {
         sx={{ mb: 2 }}
       />
       <Typography variant="body2" color="textSecondary" mb={1}>
-        Please review your questions before submitting. Click "Submit Survey" when you're ready.
+        Please review your questions before {surveyId ? "updating" : "submitting"}. 
       </Typography>
       <Button 
         variant="contained" 
@@ -63,7 +80,7 @@ function SurveySubmit({ questions, onSubmitSuccess }: SurveySubmitProps) {
         onClick={handleSubmit}
         sx={{ mt: 2, width: '50%' }}
       >
-        Submit Survey
+        {surveyId ? "Update Survey" : "Submit Survey"}
       </Button>
     </Box>
   );
