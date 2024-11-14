@@ -23,23 +23,19 @@ export default function StudentsContent() {
 
   const navigate = useNavigate();
 
-  // Set userRoles once when available
   useEffect(() => {
-    if (!authLoading && authUserRoles && !userRoles) {
+    // Only set userRoles if it is empty and authUserRoles is populated
+    if (!authLoading && authUserRoles && userRoles.length === 0) {
+      console.log("Setting userRoles:", authUserRoles);
       setUserRoles(authUserRoles);
     }
-  }, [authLoading, authUserRoles]);
 
-  // Trigger loadStudents only when userRoles is stable
-  useEffect(() => {
-    if(userRoles.length ===0){
-      console.log(userRoles)
-      return}
-    if (userRoles.length >0) {
-      console.log("User Roles inside use effect:", userRoles);
+    // Trigger loadStudents if userRoles is populated
+    if (userRoles.length > 0) {
+      console.log("User Roles inside useEffect:", userRoles);
       loadStudents();
     }
-  }, [userRoles]);
+  }, [authLoading, authUserRoles, userRoles]);
 
   const loadStudents = async (searchQuery = '') => {
     setLoading(true);
@@ -48,8 +44,8 @@ export default function StudentsContent() {
     try {
       let result;
       console.log("User Roles at load:", userRoles);
-
-      if (userRoles && userRoles.includes('Parent')) {
+      if(userRoles.length === 0){return}
+      if (userRoles.includes('Parent')) {
         result = await fetchParentStudents(page + 1, limit, searchQuery);
       } else {
         result = await fetchStudents(page + 1, limit, searchQuery);
