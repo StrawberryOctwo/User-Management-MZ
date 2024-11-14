@@ -26,9 +26,14 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  AccordionDetails,
+  AccordionSummary,
+  Accordion,
 } from '@mui/material';
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import { fetchToDosByAssignedBy, createToDo, toggleToDoCompletion, assignToDoToRole } from 'src/services/todoService';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // Import the ExpandMoreIcon component from the appropriate package
+import RoleBasedComponent from 'src/components/ProtectedComponent';
 
 const ToDoHeader: React.FC = () => {
   const [todos, setTodos] = useState<any[]>([]);
@@ -129,138 +134,158 @@ const ToDoHeader: React.FC = () => {
 
   return (
     <Box sx={{ position: 'relative', padding: 2 }}>
-    <Tooltip arrow title="Manage ToDos">
+      <Tooltip arrow title="Manage ToDos">
         <IconButton color="primary" onClick={handleOpenDialog}>
-            <AssignmentIcon />
+          <AssignmentIcon />
         </IconButton>
-    </Tooltip>
+      </Tooltip>
 
       <Dialog open={isDialogOpen} onClose={handleCloseDialog} fullWidth maxWidth="md">
         <DialogTitle>Manage My ToDos</DialogTitle>
         <DialogContent dividers>
-          {errorMessage && (
-            <Typography color="error" variant="body2" sx={{ mb: 2 }}>
-              {errorMessage}
-            </Typography>
-          )}
 
-          {/* ToDo Table */}
-          <TableContainer component={Paper} elevation={3} sx={{ maxHeight: 400 }}>
-            <Table stickyHeader>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Completed</TableCell>
-                  <TableCell>Title</TableCell>
-                  <TableCell>Priority</TableCell>
-                  <TableCell>Due Date</TableCell>
-                  <TableCell>Assigned Role</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {todos.map((todo) => (
-                  <TableRow key={todo.id}>
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={todo.completed}
-                        onChange={() => handleToggleCompletion(todo.id)}
-                        color="primary"
-                      />
-                    </TableCell>
-                    <TableCell>{todo.title}</TableCell>
-                    <TableCell>
-                      <Chip label={todo.priority} color={priorityColor(todo.priority)} size="small" />
-                    </TableCell>
-                    <TableCell>
-                      {todo.dueDate ? new Date(todo.dueDate).toLocaleDateString() : 'No Due Date'}
-                    </TableCell>
-                    <TableCell>
-                      <FormControl fullWidth variant="outlined">
-                        <InputLabel>Assign Role</InputLabel>
-                        <Select
-                          label="Assign Role"
-                          value={todo.assignedRole || ''}
-                          onChange={(e) => handleAssignRole(todo.id, e.target.value)}
-                        >
-                          <MenuItem value="FranchiseAdmin">Franchise Admin</MenuItem>
-                          <MenuItem value="LocationAdmin">Location Admin</MenuItem>
-                          <MenuItem value="Teacher">Teacher</MenuItem>
-                          <MenuItem value="Student">Student</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {todos.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={5} align="center">
-                      No ToDos found.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <RoleBasedComponent allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher']}>
+            <Accordion>
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />} // Use the imported ExpandMoreIcon component
+                aria-controls="panel1-content"
+                id="panel1-header"
+              >
+                Add New ToDo
+              </AccordionSummary>
+              <AccordionDetails>
+                <Grid container spacing={2}>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Title"
+                      variant="outlined"
+                      fullWidth
+                      value={newTitle}
+                      onChange={(e) => setNewTitle(e.target.value)}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <TextField
+                      label="Description"
+                      variant="outlined"
+                      fullWidth
+                      multiline
+                      rows={3}
+                      value={newDescription}
+                      onChange={(e) => setNewDescription(e.target.value)}
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <TextField
+                      label="Due Date"
+                      type="date"
+                      variant="outlined"
+                      fullWidth
+                      InputLabelProps={{ shrink: true }}
+                      value={newDueDate}
+                      onChange={(e) => setNewDueDate(e.target.value)}
+                      required
+                    />
+                  </Grid>
+                  <Grid item xs={6}>
+                    <FormControl fullWidth variant="outlined">
+                      <InputLabel>Priority</InputLabel>
+                      <Select
+                        label="Priority"
+                        value={newPriority}
+                        onChange={(e) => setNewPriority(e.target.value)}
+                      >
+                        <MenuItem value="Low">Low</MenuItem>
+                        <MenuItem value="Medium">Medium</MenuItem>
+                        <MenuItem value="High">High</MenuItem>
+                      </Select>
+                    </FormControl>
+                  </Grid>
+                </Grid>
+              </AccordionDetails>
+            </Accordion>
+            <Divider sx={{ my: 2 }} />
+          </RoleBasedComponent>
 
-          {/* Pagination */}
-          <Box display="flex" justifyContent="center" mt={2}>
-            <Pagination count={totalPages} page={page} onChange={handlePageChange} color="primary" />
-          </Box>
 
-          <Divider sx={{ my: 2 }} />
 
-          {/* Add ToDo Form */}
-          <Typography variant="h6" align="center" gutterBottom>
-            Add New ToDo
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                label="Title"
-                variant="outlined"
-                fullWidth
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
-                required
-              />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Description"
-                variant="outlined"
-                fullWidth
-                multiline
-                rows={3}
-                value={newDescription}
-                onChange={(e) => setNewDescription(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                label="Due Date"
-                type="date"
-                variant="outlined"
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                value={newDueDate}
-                onChange={(e) => setNewDueDate(e.target.value)}
-                required
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <FormControl fullWidth variant="outlined">
-                <InputLabel>Priority</InputLabel>
-                <Select
-                  label="Priority"
-                  value={newPriority}
-                  onChange={(e) => setNewPriority(e.target.value)}
-                >
-                  <MenuItem value="Low">Low</MenuItem>
-                  <MenuItem value="Medium">Medium</MenuItem>
-                  <MenuItem value="High">High</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
+          <Accordion defaultExpanded>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1-content"
+              id="panel1-header"
+            >
+              View ToDos
+            </AccordionSummary>
+            <AccordionDetails>
+              {/* {errorMessage && (
+                <Typography color="error" variant="body2" sx={{ mb: 2 }}>
+                  {errorMessage}
+                </Typography>
+              )} */}
+              <TableContainer component={Paper} elevation={3} sx={{ maxHeight: 400 }}>
+                <Table stickyHeader>
+                  <TableHead>
+                    <TableRow>
+                      <TableCell>Completed</TableCell>
+                      <TableCell>Title</TableCell>
+                      <TableCell>Priority</TableCell>
+                      <TableCell>Due Date</TableCell>
+                      <TableCell>Assigned Role</TableCell>
+                    </TableRow>
+                  </TableHead>
+                  <TableBody>
+                    {todos.map((todo) => (
+                      <TableRow key={todo.id}>
+                        <TableCell padding="checkbox">
+                          <Checkbox
+                            checked={todo.completed}
+                            onChange={() => handleToggleCompletion(todo.id)}
+                            color="primary"
+                          />
+                        </TableCell>
+                        <TableCell>{todo.title}</TableCell>
+                        <TableCell>
+                          <Chip label={todo.priority} color={priorityColor(todo.priority)} size="small" />
+                        </TableCell>
+                        <TableCell>
+                          {todo.dueDate ? new Date(todo.dueDate).toLocaleDateString() : 'No Due Date'}
+                        </TableCell>
+                        <TableCell>
+                          <FormControl fullWidth variant="outlined">
+                            <InputLabel>Assign Role</InputLabel>
+                            <Select
+                              label="Assign Role"
+                              value={todo.assignedRole || ''}
+                              onChange={(e) => handleAssignRole(todo.id, e.target.value)}
+                            >
+                              <MenuItem value="FranchiseAdmin">Franchise Admin</MenuItem>
+                              <MenuItem value="LocationAdmin">Location Admin</MenuItem>
+                              <MenuItem value="Teacher">Teacher</MenuItem>
+                              <MenuItem value="Student">Student</MenuItem>
+                            </Select>
+                          </FormControl>
+                        </TableCell>
+                      </TableRow>
+                    ))}
+                    {todos.length === 0 && (
+                      <TableRow>
+                        <TableCell colSpan={5} align="center">
+                          No ToDos found.
+                        </TableCell>
+                      </TableRow>
+                    )}
+                  </TableBody>
+                </Table>
+              </TableContainer>
+
+              {/* Pagination */}
+              <Box display="flex" justifyContent="center" mt={2}>
+                <Pagination count={totalPages} page={page} onChange={handlePageChange} color="primary" />
+              </Box>
+            </AccordionDetails>
+          </Accordion>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="secondary">
