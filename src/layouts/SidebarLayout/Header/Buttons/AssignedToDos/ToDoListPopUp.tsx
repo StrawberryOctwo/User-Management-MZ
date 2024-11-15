@@ -15,6 +15,9 @@ import {
   Pagination,
   Divider,
   Collapse,
+  styled,
+  alpha,
+  Badge,
 } from '@mui/material';
 import {
   Assignment as AssignmentIcon,
@@ -29,6 +32,7 @@ const HeaderToDoList: React.FC = () => {
   const [todos, setToDos] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
+  const [pendingToDoCount, setpendingCountTodos] = useState(0);
   const [searchQuery, setSearchQuery] = useState(localStorage.getItem('searchQuery') || '');
   const [priorityFilter, setPriorityFilter] = useState<string>(
     localStorage.getItem('priorityFilter') || 'All'
@@ -37,19 +41,43 @@ const HeaderToDoList: React.FC = () => {
   const [showPending, setShowPending] = useState(true);
   const [showCompleted, setShowCompleted] = useState(false);
 
+  const ToDoBadge = styled(Badge)(
+    ({ theme }) => `
+      
+      .MuiBadge-badge {
+          background-color: ${alpha(theme.palette.error.main, 0.1)};
+          color: ${theme.palette.error.main};
+          min-width: 16px; 
+          height: 16px;
+          padding: 0;
+  
+          &::after {
+              position: absolute;
+              top: 0;
+              left: 0;
+              width: 100%;
+              height: 100%;
+              border-radius: 50%;
+              box-shadow: 0 0 0 1px ${alpha(theme.palette.error.main, 0.3)};
+              content: "";
+          }
+      }
+  `
+  );
   const fetchTodos = async (currentPage = 1) => {
     setLoading(true);
     try {
       const response = await fetchToDosForSelf({
         page: currentPage,
-        limit: 10,
+        limit: 3,
         sort: 'priority',
         search: searchQuery,
         priority: priorityFilter !== 'All' ? priorityFilter : undefined,
       });
-      const { data, pageCount } = response;
+      const { data, pageCount,pendingCount } = response;
       setToDos(data || []);
       setTotalPages(pageCount);
+      setpendingCountTodos(pendingCount)
     } catch (error) {
       console.error('Error fetching tasks:', error);
     } finally {
@@ -169,7 +197,15 @@ const HeaderToDoList: React.FC = () => {
     <>
       <Tooltip title="View ToDos">
         <IconButton color="primary" onClick={handleOpen}>
+          <ToDoBadge
+            badgeContent={pendingToDoCount}
+            anchorOrigin={{
+              vertical: 'top',
+              horizontal: 'right'
+            }}
+          >
           <AssignmentIcon />
+          </ToDoBadge>
         </IconButton>
       </Tooltip>
       <Popover
