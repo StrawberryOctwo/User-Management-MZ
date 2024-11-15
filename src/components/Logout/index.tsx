@@ -13,7 +13,6 @@ const Logout: React.FC = () => {
         localStorage.removeItem('selectedFranchise');
         localStorage.removeItem('selectedLocations');
 
-        // Optionally clear session storage or local storage if needed
         sessionStorage.clear();
 
         // Redirect to the login page after logging out
