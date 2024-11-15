@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Box, Button, TextField, Grid, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
+import { createToDo } from 'src/services/todoService';
 
 interface AddToDoFormProps {
     onAdd: (title: string, description: string, priority: string, dueDate: string) => void;
@@ -12,12 +13,18 @@ const AddToDoForm: React.FC<AddToDoFormProps> = ({ onAdd }) => {
     const [dueDate, setDueDate] = useState('');
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    const handleAddToDo = () => {
+    const  handleAddToDo = async() => {
         if (!title || !dueDate) {
             setErrorMessage('ToDo title and due date are required.');
             return;
         }
-
+        await createToDo({
+            title: title,
+            description: description,
+            priority: priority,
+            dueDate: dueDate,
+          });
+ 
         onAdd(title, description, priority, dueDate);
         handleReset();
     };
