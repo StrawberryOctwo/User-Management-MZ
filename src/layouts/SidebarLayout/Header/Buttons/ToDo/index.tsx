@@ -148,7 +148,7 @@ const ToDoHeader: React.FC = () => {
   };
   const reloadTable = () => {
     loadToDos(page);
-};
+  };
   const handleRemoveUser = (role, userToRemove) => {
     setSelectedUsers((prev) => ({
       ...prev,
@@ -210,7 +210,7 @@ const ToDoHeader: React.FC = () => {
                 page={page}
                 totalPages={totalPages}
                 onPageChange={handlePageChange}
-                reloadTable={reloadTable} 
+                reloadTable={reloadTable}
               />
               <Box sx={{ position: 'relative', padding: 2 }}>
                 <CustomRoleDialog
@@ -222,6 +222,7 @@ const ToDoHeader: React.FC = () => {
                   assignToDoToUsers={assignToDoToUsers}
                   selectedCustomTodoId={selectedCustomTodoId}
                   fetchDataFunctions={fetchDataFunctions}
+                  onSave={reloadTable}
                 />
               </Box>
             </AccordionDetails>

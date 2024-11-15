@@ -22,6 +22,7 @@ interface CustomRoleDialogProps {
     assignToDoToUsers: (todoId: number | null, userIds: number[]) => Promise<void>;
     selectedCustomTodoId: number | null;
     fetchDataFunctions: { [role: string]: (query: string) => Promise<any[]> };
+    onSave: () => void;
 }
 
 const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
@@ -33,6 +34,7 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
     assignToDoToUsers,
     selectedCustomTodoId,
     fetchDataFunctions,
+    onSave,
 }) => {
     return (
         <Dialog open={open} onClose={onClose} fullWidth>
@@ -122,6 +124,7 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                         try {
                             await assignToDoToUsers(selectedCustomTodoId, allSelectedUserIds);
                             console.log('ToDo successfully assigned to users');
+                            onSave();
                         } catch (error) {
                             console.error('Error assigning ToDo to users:', error);
                         }

@@ -15,6 +15,7 @@ import {
     MenuItem,
 } from '@mui/material';
 import AddIcon from '@mui/icons-material/Add';
+import RoleBasedComponent from 'src/components/ProtectedComponent';
 
 interface ToDoTableProps {
     todos: any[];
@@ -23,7 +24,7 @@ interface ToDoTableProps {
     page: number;
     totalPages: number;
     onPageChange: (event: React.ChangeEvent<unknown>, value: number) => void;
-    reloadTable: () => void; // Function to reload table data after role assignment
+    reloadTable: () => void;
 }
 
 const ToDoTable: React.FC<ToDoTableProps> = ({
@@ -48,10 +49,10 @@ const ToDoTable: React.FC<ToDoTableProps> = ({
         setSelectedTodoId(null);
     };
 
-    const handleSelectRole = (role: string) => {
+    const handleSelectRole = async (role: string) => {
         if (selectedTodoId !== null) {
-            onAssignRole(selectedTodoId, role);
-            reloadTable(); // Reload table data after assigning role
+            await onAssignRole(selectedTodoId, role);
+            reloadTable();
         }
         handleCloseRoleMenu();
     };
@@ -66,6 +67,14 @@ const ToDoTable: React.FC<ToDoTableProps> = ({
             default:
                 return 'success';
         }
+    };
+
+    const allowedRolesMap: { [key: string]: string[] } = {
+        FranchiseAdmin: ['SuperAdmin'],
+        LocationAdmin: ['FranchiseAdmin'],
+        Teacher: ['FranchiseAdmin', 'LocationAdmin'],
+        Student: ['FranchiseAdmin', 'LocationAdmin', 'Teacher'],
+        Custom: ['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher'],
     };
 
     return (
@@ -122,14 +131,19 @@ const ToDoTable: React.FC<ToDoTableProps> = ({
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
                 onClose={handleCloseRoleMenu}
-                anchorOrigin={{ vertical: 'center', horizontal: 'right' }}
+                anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
                 transformOrigin={{ vertical: 'center', horizontal: 'left' }}
             >
-                <MenuItem onClick={() => handleSelectRole('FranchiseAdmin')}>Franchise Admin</MenuItem>
-                <MenuItem onClick={() => handleSelectRole('LocationAdmin')}>Location Admin</MenuItem>
-                <MenuItem onClick={() => handleSelectRole('Teacher')}>Teacher</MenuItem>
-                <MenuItem onClick={() => handleSelectRole('Student')}>Student</MenuItem>
-                <MenuItem onClick={() => handleSelectRole('Custom')}>Custom</MenuItem>
+                {Object.keys(allowedRolesMap).map((roleKey) => (
+                    <RoleBasedComponent key={roleKey} allowedRoles={allowedRolesMap[roleKey]}>
+                        <MenuItem onClick={() => handleSelectRole(roleKey)}>
+                            {roleKey === 'FranchiseAdmin' ? 'Franchise Admin' :
+                                roleKey === 'LocationAdmin' ? 'Location Admin' :
+                                    roleKey === 'Teacher' ? 'Teacher' :
+                                        roleKey === 'Student' ? 'Student' : 'Custom'}
+                        </MenuItem>
+                    </RoleBasedComponent>
+                ))}
             </Menu>
         </Box>
     );
