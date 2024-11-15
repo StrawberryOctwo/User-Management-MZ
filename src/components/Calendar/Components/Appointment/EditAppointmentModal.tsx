@@ -274,7 +274,7 @@ export default function EditAppointmentModal({
                 <InputLabel>Session Type</InputLabel>
                 <Select
                   label="Session Type"
-                  value={editedAppointment?.sessionType?.id }
+                  value={editedAppointment?.sessionType?.id}
                   onChange={(e) => {
                     const selectedType = sessionTypes.find(
                       (type) => type.id === e.target.value

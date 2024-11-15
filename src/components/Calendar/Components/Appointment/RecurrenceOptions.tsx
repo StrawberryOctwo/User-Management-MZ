@@ -8,7 +8,7 @@ import {
   ToggleButtonGroup,
   TextField
 } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { daysOfWeek, recurrenceOptions } from './AddClassSessionUtils';
 
 export default function RecurrenceOptions({
@@ -50,6 +50,8 @@ export default function RecurrenceOptions({
     const day = daysOfWeek.find((d) => d.value === dayValue);
     return day ? day.label : dayValue;
   };
+
+  const onlySelectedDay = Object.keys(dayDetails)[0];
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -108,15 +110,19 @@ export default function RecurrenceOptions({
       )}
 
       {/* Weekly Start Time and Duration */}
-      {recurrencePatternOption === 'weekly' && (
+      {recurrencePatternOption === 'weekly' && onlySelectedDay && (
         <Box sx={{ display: 'flex', gap: 2 }}>
           <TextField
             label="Start Time"
             type="time"
             fullWidth
-            value={dayDetails['weekly']?.startTime || ''}
+            value={dayDetails[onlySelectedDay]?.startTime || ''}
             onChange={(e) =>
-              handleDayDetailChange('weekly', 'startTime', e.target.value)
+              handleDayDetailChange(
+                onlySelectedDay,
+                'startTime',
+                e.target.value
+              )
             }
             InputLabelProps={{ shrink: true }}
           />
@@ -124,8 +130,10 @@ export default function RecurrenceOptions({
             label="Duration (mins)"
             type="number"
             fullWidth
-            value={dayDetails['weekly']?.duration || ''}
-            onChange={(e) => handleDurationChange('weekly', e.target.value)}
+            value={dayDetails[onlySelectedDay]?.duration || ''}
+            onChange={(e) =>
+              handleDurationChange(onlySelectedDay, e.target.value)
+            }
             InputLabelProps={{ shrink: true }}
             error={!!durationError['weekly']}
             helperText={durationError['weekly']}

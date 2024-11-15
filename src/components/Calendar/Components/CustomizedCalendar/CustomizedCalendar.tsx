@@ -320,10 +320,6 @@ export default function CustomizedCalendar({
     return <EventItem eventInfo={eventInfo} />;
   };
 
-  useEffect(() => {
-    console.log('events', events);
-  }, [events]);
-
   return (
     <Box
       display="flex"
