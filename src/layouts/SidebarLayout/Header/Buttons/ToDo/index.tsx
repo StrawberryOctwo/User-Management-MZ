@@ -40,6 +40,7 @@ import { fetchLocationAdmins } from 'src/services/locationAdminService';
 import { fetchStudents } from 'src/services/studentService';
 import { fetchTeachers } from 'src/services/teacherService';
 import { set } from 'date-fns';
+import CustomRoleDialog from './CustomRoleDialog';
 
 const ToDoHeader: React.FC = () => {
   const [todos, setTodos] = useState<any[]>([]);
@@ -198,10 +199,16 @@ const ToDoHeader: React.FC = () => {
     }));
   };
 
-
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
-    loadToDos(value); // Load the ToDos for the new page
+    loadToDos(value);
+  };
+
+  const fetchDataFunctions = {
+    FranchiseAdmin: (query) => fetchFranchiseAdmins(1, 5, query).then((data) => data.data),
+    LocationAdmin: (query) => fetchLocationAdmins(1, 5, query).then((data) => data.data),
+    Teacher: (query) => fetchTeachers(1, 5, query).then((data) => data.data),
+    Student: (query) => fetchStudents(1, 5, query).then((data) => data.data),
   };
 
   const priorityColor = (priority: string) => {
@@ -300,8 +307,6 @@ const ToDoHeader: React.FC = () => {
             <Divider sx={{ my: 2 }} />
           </RoleBasedComponent>
 
-
-
           <Accordion defaultExpanded>
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
@@ -371,6 +376,18 @@ const ToDoHeader: React.FC = () => {
                 </Table>
               </TableContainer>
 
+              <Box sx={{ position: 'relative', padding: 2 }}>
+                <CustomRoleDialog
+                  open={customRoleDialogOpen}
+                  onClose={handleCloseCustomRoleDialog}
+                  selectedUsers={selectedUsers}
+                  handleRoleInputChange={handleRoleInputChange}
+                  handleRemoveUser={handleRemoveUser}
+                  assignToDoToUsers={assignToDoToUsers}
+                  selectedCustomTodoId={selectedCustomTodoId}
+                  fetchDataFunctions={fetchDataFunctions}
+                />
+              </Box>
               {/* Pagination */}
               <Box display="flex" justifyContent="center" mt={2}>
                 <Pagination count={totalPages} page={page} onChange={handlePageChange} color="primary" />
@@ -379,125 +396,6 @@ const ToDoHeader: React.FC = () => {
           </Accordion>
         </DialogContent>
       </Dialog>
-
-
-      <Dialog open={customRoleDialogOpen} onClose={handleCloseCustomRoleDialog} fullWidth>
-        <DialogTitle>Assign Custom Roles</DialogTitle>
-        <DialogContent dividers>
-          {['FranchiseAdmin', 'LocationAdmin', 'Teacher', 'Student'].map((role) => {
-            let allowedRoles = [];
-            let fetchData;
-            let label;
-
-            switch (role) {
-              case 'FranchiseAdmin':
-                allowedRoles = ['SuperAdmin'];
-                fetchData = (query) => fetchFranchiseAdmins(1, 5, query).then((data) => data.data);
-                label = 'Franchise Admins';
-                break;
-              case 'LocationAdmin':
-                allowedRoles = ['FranchiseAdmin'];
-                fetchData = (query) => fetchLocationAdmins(1, 5, query).then((data) => data.data);
-                label = 'Location Admins';
-                break;
-              case 'Teacher':
-                allowedRoles = ['FranchiseAdmin', 'LocationAdmin'];
-                fetchData = (query) => fetchTeachers(1, 5, query).then((data) => data.data);
-                label = 'Teachers';
-                break;
-              case 'Student':
-                allowedRoles = ['FranchiseAdmin', 'LocationAdmin', 'Teacher'];
-                fetchData = (query) => fetchStudents(1, 5, query).then((data) => data.data);
-                label = 'Students';
-                break;
-              default:
-                allowedRoles = [];
-                fetchData = () => Promise.resolve([]);
-                label = '';
-            }
-
-            return (
-              <RoleBasedComponent key={role} allowedRoles={allowedRoles}>
-                <Box sx={{ minWidth: 180, mb: 2 }}>
-                  <MultiSelectWithCheckboxes
-                    label={label}
-                    fetchData={fetchData}
-                    onSelect={(selectedItems) => handleRoleInputChange(role, selectedItems)}
-                    displayProperty="firstName"
-                    placeholder={`Type to search ${role.toLowerCase()}`}
-                    hideSelected
-                    initialValue={selectedUsers[role]}
-                  />
-                </Box>
-              </RoleBasedComponent>
-            );
-          })}
-
-          {/* Display selected users below all inputs */}
-          <Box mt={3}>
-            <Typography variant="h6">Selected Users:</Typography>
-            {Object.keys(selectedUsers).map((role) =>
-              selectedUsers[role].length > 0 && (
-                <Box key={role} mt={1}>
-                  <Typography variant="subtitle1">{role}:</Typography>
-                  <Box pl={2}>
-                    {selectedUsers[role].map((user) => (
-                      <Box
-                        key={user.id}
-                        display="flex"
-                        alignItems="center"
-                        sx={{
-                          position: 'relative',
-                          '&:hover .remove-btn': { visibility: 'visible' },
-                        }}
-                      >
-                        <Typography variant="body2" sx={{ mr: 1 }}>
-                          - {user.firstName} {user.lastName}
-                        </Typography>
-                        <IconButton
-                          className="remove-btn"
-                          size="small"
-                          color="secondary"
-                          onClick={() => handleRemoveUser(role, user)}
-                          sx={{
-                            visibility: 'hidden', // Initially hidden, shown on hover
-                          }}
-                        >
-                          &times;
-                        </IconButton>
-                      </Box>
-                    ))}
-                  </Box>
-                </Box>
-              )
-            )}
-          </Box>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseCustomRoleDialog} color="secondary">
-            Cancel
-          </Button>
-          <Button
-            onClick={async () => {
-              const allSelectedUserIds = Object.entries(selectedUsers).flatMap(([role, users]) =>
-                users.map((user) => (role === 'Teacher' || role === 'Student' ? user.userId : user.id))
-              );
-              try {
-                await assignToDoToUsers(selectedCustomTodoId, allSelectedUserIds);
-                console.log('ToDo successfully assigned to users');
-              } catch (error) {
-                console.error('Error assigning ToDo to users:', error);
-                setErrorMessage('Failed to assign ToDo to selected users');
-              }
-            }}
-            color="primary"
-            variant="contained"
-          >
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
-
     </Box>
   );
 };
