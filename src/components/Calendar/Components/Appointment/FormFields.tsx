@@ -49,41 +49,41 @@ export default function FormFields({
       {/* Left Column */}
       <Grid item xs={12} md={6}>
         <Box sx={{ mb: 3 }}>
-          <FormControl fullWidth>
-            <InputLabel>Room</InputLabel>
-            <Select
-              label="Room"
-              value={newSession.name || ''}
-              onChange={(e) =>
-                setNewSession({ ...newSession, name: e.target.value })
+          <Box sx={{ mb: 3 }}>
+            <SingleSelectWithAutocomplete
+              width="100%"
+              label="Search Topic"
+              fetchData={(query) =>
+                fetchTopics(1, 5, query).then((response) => response.data)
               }
-            >
-              {Array.from({ length: 7 }, (_, index) => (
-                <MenuItem key={index} value={`R${index + 1}`}>
-                  {`R${index + 1}`}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
-        </Box>
+              onSelect={(topic) => {
+                setSelectedTopic(topic);
+                setNewSession({ ...newSession, topicId: topic?.id });
+              }}
+              displayProperty="name"
+              placeholder="Search Topic"
+              initialValue={selectedTopic}
+            />
+          </Box>
 
-        <Box sx={{ mb: 3 }}>
-          <FormControl fullWidth>
-            <InputLabel>Session Type</InputLabel>
-            <Select
-              label="Session Type"
-              value={newSession.sessionType}
-              onChange={(e) =>
-                setNewSession({ ...newSession, sessionType: e.target.value })
-              }
-            >
-              {sessionTypes.map((type) => (
-                <MenuItem key={type.id} value={type.id}>
-                  {type.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <Box sx={{ mb: 3 }}>
+            <FormControl fullWidth>
+              <InputLabel>Session Type</InputLabel>
+              <Select
+                label="Session Type"
+                value={newSession.sessionType}
+                onChange={(e) =>
+                  setNewSession({ ...newSession, sessionType: e.target.value })
+                }
+              >
+                {sessionTypes.map((type) => (
+                  <MenuItem key={type.id} value={type.id}>
+                    {type.name}
+                  </MenuItem>
+                ))}
+              </Select>
+            </FormControl>
+          </Box>
         </Box>
 
         <Box sx={{ mb: 3 }}>
@@ -139,7 +139,6 @@ export default function FormFields({
             initialValue={selectedStudents}
           />
         </Box>
-
         <Box sx={{ mb: 3 }}>
           <SingleSelectWithAutocomplete
             width="100%"
@@ -154,46 +153,34 @@ export default function FormFields({
           />
         </Box>
 
-        <Box sx={{ mb: 3 }}>
-          <SingleSelectWithAutocomplete
-            width="100%"
-            label="Search Topic"
-            fetchData={(query) =>
-              fetchTopics(1, 5, query).then((response) => response.data)
-            }
-            onSelect={(topic) => {
-              setSelectedTopic(topic);
-              setNewSession({ ...newSession, topicId: topic?.id });
-            }}
-            displayProperty="name"
-            placeholder="Search Topic"
-            initialValue={selectedTopic}
-          />
-        </Box>
-        <Box>
-          <TextField
-            label="Additional Notes"
-            fullWidth
-            multiline
-            rows={3}
-            value={newSession.note || ''}
+        <FormControl fullWidth>
+          <InputLabel>Room</InputLabel>
+          <Select
+            label="Room"
+            value={newSession.name || ''}
             onChange={(e) =>
-              setNewSession({ ...newSession, note: e.target.value })
+              setNewSession({ ...newSession, name: e.target.value })
             }
-          />
-        </Box>
+          >
+            {Array.from({ length: 7 }, (_, index) => (
+              <MenuItem key={index} value={`R${index + 1}`}>
+                {`R${index + 1}`}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
       </Grid>
 
       {/* Right Column */}
       <Grid item xs={12} md={6}>
-        <Box sx={{ mb: 3 }}>
+        <Box sx={{ mb: 1 }}>
           <DateFields
             newSession={newSession}
             setNewSession={setNewSession}
             fieldErrors={fieldErrors}
           />
         </Box>
-        <Box sx={{ mb: 3 }}>
+        <Box sx={{ mb: 1 }}>
           <FormControlLabel
             control={
               <Checkbox
