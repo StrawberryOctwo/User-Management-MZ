@@ -1,5 +1,11 @@
 import React from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, Button } from '@mui/material';
+import {
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button
+} from '@mui/material';
 import FormFields from './FormFields';
 
 interface AddClassSessionFormProps {
@@ -26,6 +32,7 @@ interface AddClassSessionFormProps {
   sessionTypes: any[];
   recurrencePatternOption: string; // Added
   setRecurrencePatternOption: React.Dispatch<React.SetStateAction<string>>; // Added
+  resetDayDetails: () => void; // Added
   dayDetails: { [key: string]: { startTime: string; duration: number } }; // Added
   handleDayDetailChange: (day: string, field: string, value: any) => void; // Added
   handleDayToggle: (
@@ -36,76 +43,81 @@ interface AddClassSessionFormProps {
 }
 
 const AddClassSessionForm: React.FC<AddClassSessionFormProps> = ({
-    isOpen,
-    handleClose,
-    handleSave,
-    newSession,
-    setNewSession,
-    selectedTeacher,
-    setSelectedTeacher,
-    selectedStudents,
-    setSelectedStudents,
-    selectedLocation,
-    setSelectedLocation,
-    selectedTopic,
-    setSelectedTopic,
-    strongestRoles,
-    userId,
-    fetchTeacherByUserId,
-    fetchTeachers,
-    fetchStudents,
-    fetchLocations,
-    fetchTopics,
-    sessionTypes,
-    recurrencePatternOption,
-    setRecurrencePatternOption,
-    dayDetails,
-    handleDayDetailChange,
-    handleDayToggle,
-    fieldErrors
-  }) => {
-    return (
-      <Dialog open={isOpen} onClose={handleClose} maxWidth="md" fullWidth>
-        <DialogTitle>Add Class Session</DialogTitle>
-        <DialogContent>
+  isOpen,
+  handleClose,
+  handleSave,
+  newSession,
+  setNewSession,
+  selectedTeacher,
+  setSelectedTeacher,
+  selectedStudents,
+  setSelectedStudents,
+  selectedLocation,
+  setSelectedLocation,
+  selectedTopic,
+  setSelectedTopic,
+  strongestRoles,
+  userId,
+  fetchTeacherByUserId,
+  fetchTeachers,
+  fetchStudents,
+  fetchLocations,
+  fetchTopics,
+  sessionTypes,
+  recurrencePatternOption,
+  setRecurrencePatternOption,
+  resetDayDetails,
+  dayDetails,
+  handleDayDetailChange,
+  handleDayToggle,
+  fieldErrors
+}) => {
+  return (
+    <Dialog open={isOpen} onClose={handleClose} maxWidth="lg" fullWidth>
+      <DialogTitle>Add Class Session</DialogTitle>
+      <DialogContent
+        sx={{
+          paddingBottom: 0
+        }}
+      >
         <FormFields
-            newSession={newSession}
-            setNewSession={setNewSession}
-            selectedTeacher={selectedTeacher}
-            setSelectedTeacher={setSelectedTeacher}
-            selectedStudents={selectedStudents}
-            setSelectedStudents={setSelectedStudents}
-            selectedLocation={selectedLocation}
-            setSelectedLocation={setSelectedLocation}
-            selectedTopic={selectedTopic}
-            setSelectedTopic={setSelectedTopic}
-            strongestRoles={strongestRoles}
-            userId={userId}
-            fetchTeacherByUserId={fetchTeacherByUserId}
-            fetchTeachers={fetchTeachers}
-            fetchStudents={fetchStudents}
-            fetchLocations={fetchLocations}
-            fetchTopics={fetchTopics}
-            sessionTypes={sessionTypes}
-            recurrencePatternOption={recurrencePatternOption}
-            setRecurrencePatternOption={setRecurrencePatternOption}
-            dayDetails={dayDetails}
-            handleDayDetailChange={handleDayDetailChange}
-            handleDayToggle={handleDayToggle}
-            fieldErrors={fieldErrors}
-            />
-
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleClose} color="secondary">
-            Cancel
-          </Button>
-          <Button onClick={handleSave} color="primary" variant="contained">
-            Save
-          </Button>
-        </DialogActions>
-      </Dialog>
-    );
-  };
+          newSession={newSession}
+          setNewSession={setNewSession}
+          selectedTeacher={selectedTeacher}
+          setSelectedTeacher={setSelectedTeacher}
+          selectedStudents={selectedStudents}
+          setSelectedStudents={setSelectedStudents}
+          selectedLocation={selectedLocation}
+          setSelectedLocation={setSelectedLocation}
+          selectedTopic={selectedTopic}
+          setSelectedTopic={setSelectedTopic}
+          strongestRoles={strongestRoles}
+          userId={userId}
+          fetchTeacherByUserId={fetchTeacherByUserId}
+          fetchTeachers={fetchTeachers}
+          fetchStudents={fetchStudents}
+          fetchLocations={fetchLocations}
+          fetchTopics={fetchTopics}
+          sessionTypes={sessionTypes}
+          recurrencePatternOption={recurrencePatternOption}
+          setRecurrencePatternOption={setRecurrencePatternOption}
+          resetDayDetails={resetDayDetails}
+          dayDetails={dayDetails}
+          handleDayDetailChange={handleDayDetailChange}
+          handleDayToggle={handleDayToggle}
+          fieldErrors={fieldErrors}
+        />
+      </DialogContent>
+      <DialogActions>
+        <Button onClick={handleClose} color="secondary">
+          Cancel
+        </Button>
+        <Button onClick={handleSave} color="primary" variant="contained">
+          Save
+        </Button>
+      </DialogActions>
+    </Dialog>
+  );
+};
 
 export default AddClassSessionForm;
