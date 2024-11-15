@@ -1,7 +1,5 @@
 import React, { useState, useEffect, useImperativeHandle, forwardRef } from 'react';
-import { Checkbox, TextField, Autocomplete, CircularProgress } from '@mui/material';
-import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
-import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import { TextField, Autocomplete, CircularProgress, Chip } from '@mui/material';
 
 interface MultiSelectWithCheckboxesNoSelectProps {
     label: string;
@@ -42,7 +40,6 @@ const MultiSelectWithCheckboxesNoSelect = forwardRef(({
     useEffect(() => {
         if (initialValue.length > 0) {
             setOptions((prevOptions) => {
-                // Ensure unique options by merging initial values and filtering out duplicates
                 const uniqueOptions = [
                     ...prevOptions,
                     ...initialValue.filter(
@@ -65,7 +62,6 @@ const MultiSelectWithCheckboxesNoSelect = forwardRef(({
                     const data = await fetchData(query);
                     if (active) {
                         setOptions((prevOptions) => {
-                            // Merge fetched data with selected items and ensure uniqueness by id
                             const uniqueOptions = [
                                 ...prevOptions,
                                 ...data.filter(
@@ -98,8 +94,12 @@ const MultiSelectWithCheckboxesNoSelect = forwardRef(({
     const handleBlur = () => setFocused(false);
 
     const handleChange = (event: any, value: any[]) => {
-        setSelectedItems(value);
-        onSelect(value);
+        const lastSelectedItem = value[value.length - 1];
+        if (!selectedItems.some((item) => item.id === lastSelectedItem.id)) {
+            const newSelectedItems = [...selectedItems, lastSelectedItem];
+            setSelectedItems(newSelectedItems);
+            onSelect(newSelectedItems);
+        }
     };
 
     const getNestedProperty = (option: any, path: string) =>
@@ -109,25 +109,30 @@ const MultiSelectWithCheckboxesNoSelect = forwardRef(({
         <Autocomplete
             multiple
             value={selectedItems}
-            inputValue={hideSelected ? '' : query}
             options={options}
             disableCloseOnSelect
+            filterSelectedOptions
             getOptionLabel={(option) => getNestedProperty(option, displayProperty) || ''}
             onChange={handleChange}
-            onInputChange={(event, newInputValue) => setQuery(newInputValue)}
+            onInputChange={(event, newInputValue) => {
+                setQuery(newInputValue); // Update query for search
+            }}
             onFocus={handleFocus}
             onBlur={handleBlur}
             loading={loading}
-            isOptionEqualToValue={(option, value) => option.id === value.id} // Ensures uniqueness by id
-            renderTags={() => null}
-            renderOption={(props, option, { selected }) => (
-                <li {...props} key={option.id}>
-                    <Checkbox
-                        icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
-                        checkedIcon={<CheckBoxIcon fontSize="small" />}
-                        style={{ marginRight: 8 }}
-                        checked={selected}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            renderTags={(value: readonly any[], getTagProps) =>
+                !hideSelected ? value.map((option, index) => (
+                    <Chip
+                        variant="outlined"
+                        label={getNestedProperty(option, displayProperty)}
+                        {...getTagProps({ index })}
+                        key={option.id}
                     />
+                )) : null
+            }
+            renderOption={(props, option) => (
+                <li {...props} key={option.id}>
                     {getNestedProperty(option, displayProperty)}
                 </li>
             )}
