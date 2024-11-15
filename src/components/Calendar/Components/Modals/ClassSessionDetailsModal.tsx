@@ -3,7 +3,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
   Button,
   Typography,
   Box,
@@ -12,24 +11,18 @@ import {
   CircularProgress,
   Tabs,
   Tab,
-  TextField,
   IconButton
 } from '@mui/material';
 import moment from 'moment';
 import {
-  deleteClassSession,
   fetchClassSessionById,
   getClassSessionReportsStatus,
   getStudentSessionReportStatus
 } from 'src/services/classSessionService';
 import AddSessionReportForm from './AddSessionReportForm';
 import ViewSessionReportForm from './ViewSessionReport';
-import ViewPaymentDetails from './ViewPaymentDetails'; // New Component for payment view
 import StudentDetailCard from './StudentDetailCArd';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
-import { getPaymentsForUserByClassSession } from 'src/services/paymentService'; // Fix the path if needed
-import { sessionTypeFunc } from 'src/utils/sessionType';
-import AbsenceForm from './AbsenceTab';
 import AbsenceTab from './AbsenceTab';
 import RoleBasedComponent from 'src/components/ProtectedComponent';
 import EditIcon from '@mui/icons-material/Edit';

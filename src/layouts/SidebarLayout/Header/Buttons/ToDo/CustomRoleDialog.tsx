@@ -11,7 +11,7 @@ import {
     IconButton,
 } from '@mui/material';
 import RoleBasedComponent from 'src/components/ProtectedComponent';
-import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
+import MultiSelectWithCheckboxesNoSelect from 'src/components/SearchBars/MultiSelectWithCkeckboxesNoSelect';
 
 interface CustomRoleDialogProps {
     open: boolean;
@@ -55,7 +55,7 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                     return (
                         <RoleBasedComponent key={role} allowedRoles={allowedRolesMap[role]}>
                             <Box sx={{ minWidth: 180, mb: 2 }}>
-                                <MultiSelectWithCheckboxes
+                                <MultiSelectWithCheckboxesNoSelect
                                     label={labelMap[role]}
                                     fetchData={fetchDataFunctions[role]}
                                     onSelect={(selectedItems) => handleRoleInputChange(role, selectedItems)}
@@ -95,7 +95,7 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                                                 color="secondary"
                                                 onClick={() => handleRemoveUser(role, user)}
                                                 sx={{
-                                                    visibility: 'hidden', // Initially hidden, shown on hover
+                                                    visibility: 'hidden',
                                                 }}
                                             >
                                                 &times;

@@ -3,17 +3,18 @@ import { Checkbox, TextField, Autocomplete, CircularProgress } from '@mui/materi
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
 
-interface MultiSelectWithCheckboxesProps {
+interface MultiSelectWithCheckboxesNoSelectProps {
     label: string;
-    fetchData: (query: string) => Promise<any[]>; // Function to fetch data based on the query
-    onSelect: (selectedItems: any[]) => void; // Callback when items are selected
-    displayProperty: string; // Property to display in the options
-    placeholder?: string; // Placeholder text
-    initialValue?: any[]; // Initial selected values for edit or pre-filled forms
-    width?: string | number; // Optional width prop for dynamic width
+    fetchData: (query: string) => Promise<any[]>;
+    onSelect: (selectedItems: any[]) => void;
+    displayProperty: string;
+    placeholder?: string;
+    initialValue?: any[];
+    width?: string | number;
+    hideSelected?: boolean;
 }
 
-const MultiSelectWithCheckboxes = forwardRef(({
+const MultiSelectWithCheckboxesNoSelect = forwardRef(({
     label,
     fetchData,
     onSelect,
@@ -21,12 +22,13 @@ const MultiSelectWithCheckboxes = forwardRef(({
     placeholder = 'Select...',
     initialValue = [],
     width = '95%',
-}: MultiSelectWithCheckboxesProps, ref) => {
+    hideSelected = false,
+}: MultiSelectWithCheckboxesNoSelectProps, ref) => {
     const [query, setQuery] = useState('');
-    const [options, setOptions] = useState<any[]>(initialValue || []);
+    const [options, setOptions] = useState<any[]>([]);
     const [selectedItems, setSelectedItems] = useState<any[]>(initialValue || []);
     const [loading, setLoading] = useState(false);
-    const [focused, setFocused] = useState(false); // Track focus state
+    const [focused, setFocused] = useState(false);
 
     useImperativeHandle(ref, () => ({
         reset: () => {
@@ -34,12 +36,21 @@ const MultiSelectWithCheckboxes = forwardRef(({
             setSelectedItems([]);
             setOptions([]);
         },
-        selectedItems, // Expose selectedItems
+        selectedItems,
     }));
 
     useEffect(() => {
         if (initialValue.length > 0) {
-            setOptions(initialValue);
+            setOptions((prevOptions) => {
+                // Ensure unique options by merging initial values and filtering out duplicates
+                const uniqueOptions = [
+                    ...prevOptions,
+                    ...initialValue.filter(
+                        (item) => !prevOptions.some((option) => option.id === item.id)
+                    ),
+                ];
+                return uniqueOptions;
+            });
             setSelectedItems(initialValue);
         }
     }, [initialValue]);
@@ -48,16 +59,21 @@ const MultiSelectWithCheckboxes = forwardRef(({
         let active = true;
 
         const fetchOptions = async () => {
-            if (focused) { // Only fetch options if the input is focused
+            if (focused) {
                 setLoading(true);
                 try {
                     const data = await fetchData(query);
                     if (active) {
-                        const mergedOptions = [
-                            ...selectedItems,
-                            ...data.filter(item => !selectedItems.some(selected => selected.id === item.id)),
-                        ];
-                        setOptions(mergedOptions);
+                        setOptions((prevOptions) => {
+                            // Merge fetched data with selected items and ensure uniqueness by id
+                            const uniqueOptions = [
+                                ...prevOptions,
+                                ...data.filter(
+                                    (item) => !prevOptions.some((option) => option.id === item.id)
+                                ),
+                            ];
+                            return uniqueOptions;
+                        });
                     }
                 } catch (error) {
                     console.error('Error fetching options:', error);
@@ -78,8 +94,8 @@ const MultiSelectWithCheckboxes = forwardRef(({
         };
     }, [focused, query, fetchData, selectedItems]);
 
-    const handleFocus = () => setFocused(true); // Set focus state
-    const handleBlur = () => setFocused(false); // Reset focus state on blur
+    const handleFocus = () => setFocused(true);
+    const handleBlur = () => setFocused(false);
 
     const handleChange = (event: any, value: any[]) => {
         setSelectedItems(value);
@@ -93,15 +109,17 @@ const MultiSelectWithCheckboxes = forwardRef(({
         <Autocomplete
             multiple
             value={selectedItems}
+            inputValue={hideSelected ? '' : query}
             options={options}
             disableCloseOnSelect
             getOptionLabel={(option) => getNestedProperty(option, displayProperty) || ''}
             onChange={handleChange}
             onInputChange={(event, newInputValue) => setQuery(newInputValue)}
-            onFocus={handleFocus} // Handle focus
-            onBlur={handleBlur} // Handle blur
+            onFocus={handleFocus}
+            onBlur={handleBlur}
             loading={loading}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option.id === value.id} // Ensures uniqueness by id
+            renderTags={() => null}
             renderOption={(props, option, { selected }) => (
                 <li {...props} key={option.id}>
                     <Checkbox
@@ -134,4 +152,4 @@ const MultiSelectWithCheckboxes = forwardRef(({
     );
 });
 
-export default MultiSelectWithCheckboxes;
+export default MultiSelectWithCheckboxesNoSelect;
