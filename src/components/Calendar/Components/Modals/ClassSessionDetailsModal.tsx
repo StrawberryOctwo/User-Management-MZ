@@ -12,7 +12,8 @@ import {
   CircularProgress,
   Tabs,
   Tab,
-  TextField
+  TextField,
+  IconButton
 } from '@mui/material';
 import moment from 'moment';
 import {
@@ -31,6 +32,9 @@ import { sessionTypeFunc } from 'src/utils/sessionType';
 import AbsenceForm from './AbsenceTab';
 import AbsenceTab from './AbsenceTab';
 import RoleBasedComponent from 'src/components/ProtectedComponent';
+import EditIcon from '@mui/icons-material/Edit';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 interface ClassSessionDetailsModalProps {
   isOpen: boolean;
@@ -203,7 +207,41 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       maxWidth={false}
       sx={{ '& .MuiDialog-paper': { width: '750px', maxWidth: '750px' } }} // Set the custom width
     >
-      <DialogTitle>Class Session Details</DialogTitle>
+      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        <Typography variant="h6">Class Session Details</Typography>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          {canEdit && (
+            <>
+              <IconButton
+                onClick={onEdit}
+                color="primary"
+                sx={{
+                  backgroundColor: '#f0f0f0',
+                  borderRadius: '50%',
+                  '&:hover': { backgroundColor: '#e0e0e0' }
+                }}
+              >
+                <EditIcon />
+              </IconButton>
+              <RoleBasedComponent
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher']}
+              >
+                <IconButton
+                  onClick={() => setDeactivateDialogOpen(true)}
+                  color={classSession?.isActive ? 'warning' : 'success'}
+                  sx={{
+                    backgroundColor: '#f0f0f0',
+                    borderRadius: '50%',
+                    '&:hover': { backgroundColor: '#e0e0e0' }
+                  }}
+                >
+                  {classSession?.isActive ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                </IconButton>
+              </RoleBasedComponent>
+            </>
+          )}
+        </Box>
+      </DialogTitle>
       <DialogContent sx={{ minHeight: '370px' }} className="djfhjdf">
         <Tabs
           value={tabIndex}
@@ -367,21 +405,8 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
           <Typography>No class session details available.</Typography>
         )}
       </DialogContent>
-      <DialogActions sx={{ marginBottom: 2 }}>
-        {/* <Box sx={{ flexGrow: 1, paddingLeft: 2 }}>
-          {canEdit && (
-            
-          )}
-        </Box> */}
+      {/* <DialogActions sx={{ marginBottom: 2 }}>
         <Box sx={{ paddingRight: 2 }}>
-          {/* <Button
-            onClick={onClose}
-            color="secondary"
-            style={{ padding: '8px 16px' }}
-            sx={{ marginRight: 1 }}
-          >
-            Close
-          </Button> */}
           {canEdit && (
             <Box sx={{ display: 'flex', gap: 1 }}>
               <Button
@@ -415,7 +440,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
             </Box>
           )}
         </Box>
-      </DialogActions>
+      </DialogActions> */}
 
       <ReusableDialog
         open={deleteDialogOpen}
