@@ -6,7 +6,7 @@ import {
   List,
   Card,
   Typography,
-  Checkbox,
+  Button,
   Tooltip,
   Chip,
   TextField,
@@ -14,12 +14,13 @@ import {
   CircularProgress,
   Pagination,
   Divider,
+  Collapse,
 } from '@mui/material';
 import {
   Assignment as AssignmentIcon,
   Search as SearchIcon,
-  Done as DoneIcon,
-  Pending as PendingIcon,
+  ExpandMore as ExpandMoreIcon,
+  ExpandLess as ExpandLessIcon,
 } from '@mui/icons-material';
 import { fetchToDosForSelf, toggleToDoCompletion } from 'src/services/todoService';
 
@@ -28,9 +29,13 @@ const HeaderToDoList: React.FC = () => {
   const [todos, setToDos] = useState([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
-  const [searchQuery, setSearchQuery] = useState('');
-  const [priorityFilter, setPriorityFilter] = useState<string>('All');
+  const [searchQuery, setSearchQuery] = useState(localStorage.getItem('searchQuery') || '');
+  const [priorityFilter, setPriorityFilter] = useState<string>(
+    localStorage.getItem('priorityFilter') || 'All'
+  );
   const [loading, setLoading] = useState(false);
+  const [showPending, setShowPending] = useState(true);
+  const [showCompleted, setShowCompleted] = useState(true);
 
   const fetchTodos = async (currentPage = 1) => {
     setLoading(true);
@@ -42,11 +47,11 @@ const HeaderToDoList: React.FC = () => {
         search: searchQuery,
         priority: priorityFilter !== 'All' ? priorityFilter : undefined,
       });
-      const { data, total, pageCount } = response;
+      const { data, pageCount } = response;
       setToDos(data || []);
       setTotalPages(pageCount);
     } catch (error) {
-      console.error('Error fetching ToDos:', error);
+      console.error('Error fetching tasks:', error);
     } finally {
       setLoading(false);
     }
@@ -55,6 +60,11 @@ const HeaderToDoList: React.FC = () => {
   useEffect(() => {
     fetchTodos(page);
   }, [page, priorityFilter, searchQuery]);
+
+  useEffect(() => {
+    localStorage.setItem('searchQuery', searchQuery);
+    localStorage.setItem('priorityFilter', priorityFilter);
+  }, [searchQuery, priorityFilter]);
 
   const handleOpen = (event: React.MouseEvent<HTMLButtonElement>) => {
     setAnchorEl(event.currentTarget);
@@ -73,7 +83,7 @@ const HeaderToDoList: React.FC = () => {
         )
       );
     } catch (error) {
-      console.error('Failed to toggle completion status:', error);
+      console.error('Failed to update task!', error);
     }
   };
 
@@ -99,6 +109,62 @@ const HeaderToDoList: React.FC = () => {
   const completedTodos = todos.filter((todo) => todo.completed);
   const pendingTodos = todos.filter((todo) => !todo.completed);
 
+  const renderTodoList = (list: any[], isCompleted: boolean) =>
+    list.map((todo) => (
+      <Card 
+        key={todo.id}
+        variant="outlined"
+        sx={{
+          mb: 2,
+          p: 2,
+          display: 'flex',
+          flexDirection: 'column',
+          gap: 1,
+          backgroundColor: isCompleted ? '#e8f5e9' : '#fffde7',
+        }}
+      >
+        <Box display="flex" justifyContent="space-between" alignItems="center">
+          <Typography
+            variant="body1"
+            sx={{
+              fontWeight: 500,
+              textDecoration: isCompleted ? 'line-through' : 'none',
+            }}
+          >
+            {todo.title}
+          </Typography>
+          <Chip label={todo.priority} color={getPriorityColor(todo.priority)} size="small" />
+        </Box>
+        <Typography variant="body2" color="text.secondary">
+          {todo.description || 'No description provided'}
+        </Typography>
+        <Box display="flex" justifyContent="space-between" mt={1}>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ fontStyle: 'italic' }}
+          >
+            Assigned By: {todo.assignedBy?.firstName} {todo.assignedBy?.lastName}
+          </Typography>
+          <Typography
+            variant="caption"
+            color="text.secondary"
+            sx={{ fontStyle: 'italic' }}
+          >
+            {formatDateGerman(todo.dueDate)}
+          </Typography>
+        </Box>
+        <Button
+          variant="text"
+          color={isCompleted ? 'secondary' : 'primary'}
+          sx={{ alignSelf: 'flex-end', mt: 1 }}
+          onClick={() => handleToggleComplete(todo.id)}
+        >
+          {isCompleted ? 'Reopen Task' : 'Mark as Complete'}
+        </Button>
+      </Card>
+    ));
+
   return (
     <>
       <Tooltip title="View ToDos">
@@ -116,16 +182,9 @@ const HeaderToDoList: React.FC = () => {
           sx: { width: 500, p: 2, borderRadius: 2 },
         }}
       >
-        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
-          <Typography variant="h6">My ToDos</Typography>
-          <Chip
-            label={`${todos.length} Tasks`}
-            color="primary"
-            size="small"
-            icon={<AssignmentIcon />}
-            sx={{ fontSize: '0.75rem' }}
-          />
-        </Box>
+        <Typography variant="h6" sx={{ mb: 2 }}>
+          My ToDos
+        </Typography>
         <Box display="flex" gap={1} mb={2}>
           <TextField
             label="Search"
@@ -156,142 +215,43 @@ const HeaderToDoList: React.FC = () => {
             <CircularProgress />
           </Box>
         ) : todos.length === 0 ? (
-          <Typography color="text.secondary" align="center" mt={2}>
-            No ToDos match your criteria.
-          </Typography>
+          <Box textAlign="center" py={4}>
+            <Typography variant="body2" color="text.secondary">
+              No ToDos match your criteria.
+            </Typography>
+          </Box>
         ) : (
-          <List>
-            {pendingTodos.length > 0 && (
-              <>
-                <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
-                  Pending Tasks
-                </Typography>
-                {pendingTodos.map((todo) => (
-                  <Card
-                    key={todo.id}
-                    variant="outlined"
-                    sx={{
-                      mb: 2,
-                      p: 2,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 1,
-                      backgroundColor: '#fff9c4', // Light yellow for pending
-                    }}
-                  >
-                    <Box display="flex" justifyContent="space-between" alignItems="center">
-                      <Box display="flex" alignItems="center">
-                        <Checkbox
-                          checked={todo.completed}
-                          onChange={() => handleToggleComplete(todo.id)}
-                          color="primary"
-                          sx={{
-                            '&.Mui-checked': { color: 'green' },
-                          }}
-                        />
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            fontWeight: 500,
-                          }}
-                        >
-                          {todo.title}
-                        </Typography>
-                      </Box>
-                      <Chip
-                        label={todo.priority}
-                        color={getPriorityColor(todo.priority)}
-                        size="small"
-                      />
-                    </Box>
-                    <Typography variant="body2" color="text.secondary">
-                      {todo.description || 'No description provided'}
-                    </Typography>
-                    <Box display="flex" justifyContent="space-between" mt={1}>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ fontStyle: 'italic' }}
-                      >
-                        Assigned By: {todo.assignedBy?.firstName} {todo.assignedBy?.lastName}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ fontStyle: 'italic' }}
-                      >
-                        {formatDateGerman(todo.dueDate)}
-                      </Typography>
-                    </Box>
-                  </Card>
-                ))}
-              </>
-            )}
-            {completedTodos.length > 0 && (
-              <>
-                <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 2, mb: 1 }}>
-                  Completed Tasks
-                </Typography>
-                {completedTodos.map((todo) => (
-                  <Card
-                    key={todo.id}
-                    variant="outlined"
-                    sx={{
-                      mb: 2,
-                      p: 2,
-                      display: 'flex',
-                      flexDirection: 'column',
-                      gap: 1,
-                      backgroundColor: '#e8f5e9', // Light green for completed
-                    }}
-                  >
-                    <Box display="flex" justifyContent="space-between" alignItems="center">
-                      <Box display="flex" alignItems="center">
-                        <Checkbox
-                          checked={todo.completed}
-                          onChange={() => handleToggleComplete(todo.id)}
-                          color="primary"
-                        />
-                        <Typography
-                          variant="body1"
-                          sx={{
-                            textDecoration: 'line-through',
-                            fontWeight: 500,
-                          }}
-                        >
-                          {todo.title}
-                        </Typography>
-                      </Box>
-                      <Chip
-                        label={todo.priority}
-                        color={getPriorityColor(todo.priority)}
-                        size="small"
-                      />
-                    </Box>
-                    <Typography variant="body2" color="text.secondary">
-                      {todo.description || 'No description provided'}
-                    </Typography>
-                    <Box display="flex" justifyContent="space-between" mt={1}>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ fontStyle: 'italic' }}
-                      >
-                        Assigned By: {todo.assignedBy?.firstName} {todo.assignedBy?.lastName}
-                      </Typography>
-                      <Typography
-                        variant="caption"
-                        color="text.secondary"
-                        sx={{ fontStyle: 'italic' }}
-                      >
-                        {formatDateGerman(todo.dueDate)}
-                      </Typography>
-                    </Box>
-                  </Card>
-                ))}
-              </>
-            )}
-          </List>
+          <>
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+              <Typography variant="subtitle2" color="text.secondary">
+                Pending Tasks
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => setShowPending((prev) => !prev)}
+              >
+                {showPending ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              </IconButton>
+            </Box>
+            <Collapse in={showPending}>
+              {renderTodoList(pendingTodos, false)}
+            </Collapse>
+            <Divider sx={{ my: 2 }} />
+            <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
+              <Typography variant="subtitle2" color="text.secondary">
+                Completed Tasks
+              </Typography>
+              <IconButton
+                size="small"
+                onClick={() => setShowCompleted((prev) => !prev)}
+              >
+                {showCompleted ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+              </IconButton>
+            </Box>
+            <Collapse in={showCompleted}>
+              {renderTodoList(completedTodos, true)}
+            </Collapse>
+          </>
         )}
         <Box display="flex" justifyContent="center" mt={2}>
           <Pagination
