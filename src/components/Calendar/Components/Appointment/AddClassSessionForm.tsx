@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Dialog,
   DialogTitle,
@@ -72,6 +72,38 @@ const AddClassSessionForm: React.FC<AddClassSessionFormProps> = ({
   handleDayToggle,
   fieldErrors
 }) => {
+  const [disabled, setDisabled] = useState(false);
+
+  useEffect(() => {
+    const validateForm = () => {
+      // Check if all required fields are filled
+      const isFormValid =
+        newSession.name &&
+        newSession.startDate &&
+        newSession.endDate &&
+        newSession.sessionType &&
+        selectedTeacher &&
+        selectedStudents.length > 0 &&
+        selectedLocation &&
+        selectedTopic &&
+        Object.keys(dayDetails).length > 0 &&
+        Object.values(dayDetails).every(
+          (detail) => detail.startTime && detail.duration
+        );
+
+      setDisabled(!isFormValid);
+    };
+
+    validateForm();
+  }, [
+    newSession,
+    selectedTeacher,
+    selectedStudents,
+    selectedLocation,
+    selectedTopic,
+    dayDetails
+  ]);
+
   return (
     <Dialog open={isOpen} onClose={handleClose} maxWidth="lg" fullWidth>
       <DialogTitle>Add Class Session</DialogTitle>
@@ -112,7 +144,12 @@ const AddClassSessionForm: React.FC<AddClassSessionFormProps> = ({
         <Button onClick={handleClose} color="secondary">
           Cancel
         </Button>
-        <Button onClick={handleSave} color="primary" variant="contained">
+        <Button
+          onClick={handleSave}
+          color="primary"
+          variant="contained"
+          disabled={disabled}
+        >
           Save
         </Button>
       </DialogActions>

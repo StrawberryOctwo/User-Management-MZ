@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { Button } from '@mui/material';
 import { useAuth } from 'src/hooks/useAuth';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import { fetchSessionTypes } from 'src/services/contractPackagesService';
@@ -61,6 +60,7 @@ export default function AddClassSessionModal({
   // Recurrence-related states
   const [recurrencePatternOption, setRecurrencePatternOption] =
     useState<string>('weekly');
+
   const [dayDetails, setDayDetails] = useState<{
     [key: string]: { startTime: string; duration: number };
   }>({});
@@ -109,15 +109,29 @@ export default function AddClassSessionModal({
   };
 
   const handleSave = () => {
+    // Ensure recurrencePatternOption is set
     newSession.recurrencePattern = recurrencePatternOption;
+    newSession.locationId = selectedLocation.id;
+
+    // Ensure dayDetails is correctly populated
+    if (!dayDetails || Object.keys(dayDetails).length === 0) {
+      console.error('dayDetails is empty or not defined:', dayDetails);
+      return;
+    }
+
+    // Map dayDetails to sessions
     newSession.sessions = Object.keys(dayDetails).map((day) => ({
       day,
       startTime: dayDetails[day].startTime,
       duration: dayDetails[day].duration
     }));
-    console.log('Saving session:', newSession);
+
+    // Call onSave with the newSession object
     onSave(newSession);
+
+    // Clear the form
     clearForm();
+    onClose();
   };
 
   const clearForm = () => {
