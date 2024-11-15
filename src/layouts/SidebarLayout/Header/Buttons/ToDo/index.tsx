@@ -186,6 +186,13 @@ const ToDoHeader: React.FC = () => {
     }));
   };
 
+  const handleRemoveUser = (role, userToRemove) => {
+    setSelectedUsers((prev) => ({
+      ...prev,
+      [role]: prev[role].filter((user) => user.id !== userToRemove.id),
+    }));
+  };
+
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
@@ -400,7 +407,7 @@ const ToDoHeader: React.FC = () => {
                 break;
               default:
                 allowedRoles = [];
-                fetchData = () => Promise.resolve([]); // Default to empty data if role is not recognized
+                fetchData = () => Promise.resolve([]);
                 label = '';
             }
 
@@ -424,20 +431,41 @@ const ToDoHeader: React.FC = () => {
           {/* Display selected users below all inputs */}
           <Box mt={3}>
             <Typography variant="h6">Selected Users:</Typography>
-            {Object.keys(selectedUsers).map((role) => (
+            {Object.keys(selectedUsers).map((role) =>
               selectedUsers[role].length > 0 && (
                 <Box key={role} mt={1}>
                   <Typography variant="subtitle1">{role}:</Typography>
                   <Box pl={2}>
                     {selectedUsers[role].map((user) => (
-                      <Typography key={user.id} variant="body2">
-                        - {user.firstName} {user.lastName}
-                      </Typography>
+                      <Box
+                        key={user.id}
+                        display="flex"
+                        alignItems="center"
+                        sx={{
+                          position: 'relative',
+                          '&:hover .remove-btn': { visibility: 'visible' },
+                        }}
+                      >
+                        <Typography variant="body2" sx={{ mr: 1 }}>
+                          - {user.firstName} {user.lastName}
+                        </Typography>
+                        <IconButton
+                          className="remove-btn"
+                          size="small"
+                          color="secondary"
+                          onClick={() => handleRemoveUser(role, user)}
+                          sx={{
+                            visibility: 'hidden', // Initially hidden, shown on hover
+                          }}
+                        >
+                          &times;
+                        </IconButton>
+                      </Box>
                     ))}
                   </Box>
                 </Box>
               )
-            ))}
+            )}
           </Box>
         </DialogContent>
         <DialogActions>
