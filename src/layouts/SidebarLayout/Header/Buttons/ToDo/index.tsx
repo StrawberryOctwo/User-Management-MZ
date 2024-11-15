@@ -128,6 +128,7 @@ const ToDoHeader: React.FC = () => {
   const handleAssignRole = async (todoId: number, role: string) => {
     if (role === 'Custom') {
       setSelectedCustomTodoId(todoId);
+      reloadTable()
       handleOpenCustomRoleDialog(todoId);
     } else {
       await assignToDoToRole(todoId, role);
@@ -145,7 +146,9 @@ const ToDoHeader: React.FC = () => {
       [role]: [...prev[role], ...selectedItems.filter((item) => !prev[role].some((prevItem) => prevItem.id === item.id))]
     }));
   };
-
+  const reloadTable = () => {
+    loadToDos(page);
+};
   const handleRemoveUser = (role, userToRemove) => {
     setSelectedUsers((prev) => ({
       ...prev,
@@ -207,6 +210,7 @@ const ToDoHeader: React.FC = () => {
                 page={page}
                 totalPages={totalPages}
                 onPageChange={handlePageChange}
+                reloadTable={reloadTable} 
               />
               <Box sx={{ position: 'relative', padding: 2 }}>
                 <CustomRoleDialog
