@@ -4,26 +4,24 @@ import {
   IconButton,
   Popover,
   List,
-  ListItem,
+  Card,
   Typography,
-  Divider,
   Checkbox,
   Tooltip,
   Chip,
   TextField,
   MenuItem,
-  Button,
-  Pagination,
   CircularProgress,
-  Card,
-  CardContent,
+  Pagination,
+  Divider,
 } from '@mui/material';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import PriorityHighIcon from '@mui/icons-material/PriorityHigh';
-import EventIcon from '@mui/icons-material/Event';
-import SearchIcon from '@mui/icons-material/Search';
+import {
+  Assignment as AssignmentIcon,
+  Search as SearchIcon,
+  Done as DoneIcon,
+  Pending as PendingIcon,
+} from '@mui/icons-material';
 import { fetchToDosForSelf, toggleToDoCompletion } from 'src/services/todoService';
-import { green } from '@mui/material/colors';
 
 const HeaderToDoList: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -44,7 +42,6 @@ const HeaderToDoList: React.FC = () => {
         search: searchQuery,
         priority: priorityFilter !== 'All' ? priorityFilter : undefined,
       });
-
       const { data, total, pageCount } = response;
       setToDos(data || []);
       setTotalPages(pageCount);
@@ -67,7 +64,7 @@ const HeaderToDoList: React.FC = () => {
     setAnchorEl(null);
   };
 
-  const handleToggleComplete = async (todoId: number, completed: boolean) => {
+  const handleToggleComplete = async (todoId: number) => {
     try {
       await toggleToDoCompletion(todoId);
       setToDos((prevTodos) =>
@@ -90,11 +87,17 @@ const HeaderToDoList: React.FC = () => {
         return 'error';
       case 'Medium':
         return 'warning';
-      case 'Low':
       default:
         return 'success';
     }
   };
+
+  const formatDateGerman = (date: string | null) => {
+    return date ? new Date(date).toLocaleDateString('de-DE') : 'Kein Fälligkeitsdatum';
+  };
+
+  const completedTodos = todos.filter((todo) => todo.completed);
+  const pendingTodos = todos.filter((todo) => !todo.completed);
 
   return (
     <>
@@ -110,33 +113,37 @@ const HeaderToDoList: React.FC = () => {
         anchorOrigin={{ vertical: 'bottom', horizontal: 'right' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
         PaperProps={{
-          sx: { width: 500, maxHeight: 600, overflow: 'auto', p: 3, borderRadius: 3 },
+          sx: { width: 500, p: 2, borderRadius: 2 },
         }}
       >
-        <Typography variant="h6" gutterBottom>
-          My ToDos
-        </Typography>
-        <Divider sx={{ mb: 2 }} />
-        <Box display="flex" gap={2} mb={2}>
+        <Box display="flex" justifyContent="space-between" alignItems="center" mb={2}>
+          <Typography variant="h6">My ToDos</Typography>
+          <Chip
+            label={`${todos.length} Tasks`}
+            color="primary"
+            size="small"
+            icon={<AssignmentIcon />}
+            sx={{ fontSize: '0.75rem' }}
+          />
+        </Box>
+        <Box display="flex" gap={1} mb={2}>
           <TextField
             label="Search"
-            variant="outlined"
             size="small"
             fullWidth
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
             InputProps={{
               startAdornment: <SearchIcon fontSize="small" sx={{ mr: 1 }} />,
             }}
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
           />
           <TextField
             select
             label="Priority"
-            variant="outlined"
             size="small"
-            fullWidth
             value={priorityFilter}
             onChange={(e) => setPriorityFilter(e.target.value)}
+            sx={{ minWidth: 120 }}
           >
             <MenuItem value="All">All</MenuItem>
             <MenuItem value="High">High</MenuItem>
@@ -149,96 +156,141 @@ const HeaderToDoList: React.FC = () => {
             <CircularProgress />
           </Box>
         ) : todos.length === 0 ? (
-          <Typography variant="body2" color="text.secondary" align="center" mt={2}>
-            No ToDos match your criteria
+          <Typography color="text.secondary" align="center" mt={2}>
+            No ToDos match your criteria.
           </Typography>
         ) : (
-          <List sx={{ overflow: 'auto' }}>
-            {todos.map((todo) => (
-            <Card key={todo.id} sx={{ mb: 2, boxShadow: 2 }}>
-            <CardContent>
-            <Box display="flex" justifyContent="space-between" alignItems="center">
-                <Box display="flex" alignItems="center" gap={1}>
-                <Checkbox
-                    checked={todo.completed}
-                    onChange={() => handleToggleComplete(todo.id, !todo.completed)}
-                    size="small"
-                    color="primary"
-                />
-                <Typography
-                    variant="subtitle1"
+          <List>
+            {pendingTodos.length > 0 && (
+              <>
+                <Typography variant="subtitle2" color="text.secondary" sx={{ mb: 1 }}>
+                  Pending Tasks
+                </Typography>
+                {pendingTodos.map((todo) => (
+                  <Card
+                    key={todo.id}
+                    variant="outlined"
                     sx={{
-                    textDecoration: todo.completed ? 'line-through' : 'none',
-                    fontWeight: 500,
+                      mb: 2,
+                      p: 2,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                      backgroundColor: '#fff9c4', // Light yellow for pending
                     }}
-                >
-                    {todo.title}
+                  >
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                      <Box display="flex" alignItems="center">
+                        <Checkbox
+                          checked={todo.completed}
+                          onChange={() => handleToggleComplete(todo.id)}
+                          color="primary"
+                          sx={{
+                            '&.Mui-checked': { color: 'green' },
+                          }}
+                        />
+                        <Typography
+                          variant="body1"
+                          sx={{
+                            fontWeight: 500,
+                          }}
+                        >
+                          {todo.title}
+                        </Typography>
+                      </Box>
+                      <Chip
+                        label={todo.priority}
+                        color={getPriorityColor(todo.priority)}
+                        size="small"
+                      />
+                    </Box>
+                    <Typography variant="body2" color="text.secondary">
+                      {todo.description || 'No description provided'}
+                    </Typography>
+                    <Box display="flex" justifyContent="space-between" mt={1}>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ fontStyle: 'italic' }}
+                      >
+                        Assigned By: {todo.assignedBy?.firstName} {todo.assignedBy?.lastName}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ fontStyle: 'italic' }}
+                      >
+                        {formatDateGerman(todo.dueDate)}
+                      </Typography>
+                    </Box>
+                  </Card>
+                ))}
+              </>
+            )}
+            {completedTodos.length > 0 && (
+              <>
+                <Typography variant="subtitle2" color="text.secondary" sx={{ mt: 2, mb: 1 }}>
+                  Completed Tasks
                 </Typography>
-                </Box>
-                <Chip
-                label={todo.priority}
-                color={getPriorityColor(todo.priority)}
-                size="small"
-                icon={<PriorityHighIcon />}
-                sx={{ fontSize: '0.75rem', fontWeight: 500 }}
-                />
-            </Box>
-            <Divider sx={{ my: 1.5 }} />
-            <Box display="flex" alignItems="center" gap={2} flexWrap="wrap">
-                <Box display="flex" alignItems="center" gap={1}>
-                <EventIcon fontSize="small" color="action" />
-                <Typography
-                    variant="body2"
-                    sx={{ fontWeight: 500, color: 'text.secondary',
-                        ml:2
-                     }}
-                >
-                    {todo.dueDate
-                    ? new Date(todo.dueDate).toLocaleDateString()
-                    : 'No Due Date'}
-                </Typography>
-                </Box>
-                <Box sx={{
-                    borderRadius: 1,
-                    backgroundColor: todo.completed? '#57CA221A':'#f5f5f5',
-                    
-                }}
-                color="primary">
-                <Typography
-                    variant="subtitle1"
+                {completedTodos.map((todo) => (
+                  <Card
+                    key={todo.id}
+                    variant="outlined"
                     sx={{
-                    fontWeight: 500,
+                      mb: 2,
+                      p: 2,
+                      display: 'flex',
+                      flexDirection: 'column',
+                      gap: 1,
+                      backgroundColor: '#e8f5e9', // Light green for completed
                     }}
-                >
-                    {todo.title}
-                </Typography>
-                <Typography
-                variant="body2"
-                sx={{
-                    flex: 1,
-                    color: 'text.secondary',
-                    p: 1,
-                    borderRadius: 1,
-                }}
-                >
-                {todo.description || 'No description available'}
-                </Typography>
-               
-                </Box>
-
-            </Box>
-            <Box display="flex" justifyContent="space-between" alignItems="center" mt={1}>
-                <Typography
-                variant="caption"
-                color="text.secondary"
-                sx={{ fontStyle: 'italic' }}
-                >
-                Assigned by: {todo.assignedBy.firstName} {todo.assignedBy.lastName}
-                </Typography>
-            </Box>
-            </CardContent>
-            </Card>
-            ))}
+                  >
+                    <Box display="flex" justifyContent="space-between" alignItems="center">
+                      <Box display="flex" alignItems="center">
+                        <Checkbox
+                          checked={todo.completed}
+                          onChange={() => handleToggleComplete(todo.id)}
+                          color="primary"
+                        />
+                        <Typography
+                          variant="body1"
+                          sx={{
+                            textDecoration: 'line-through',
+                            fontWeight: 500,
+                          }}
+                        >
+                          {todo.title}
+                        </Typography>
+                      </Box>
+                      <Chip
+                        label={todo.priority}
+                        color={getPriorityColor(todo.priority)}
+                        size="small"
+                      />
+                    </Box>
+                    <Typography variant="body2" color="text.secondary">
+                      {todo.description || 'No description provided'}
+                    </Typography>
+                    <Box display="flex" justifyContent="space-between" mt={1}>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ fontStyle: 'italic' }}
+                      >
+                        Assigned By: {todo.assignedBy?.firstName} {todo.assignedBy?.lastName}
+                      </Typography>
+                      <Typography
+                        variant="caption"
+                        color="text.secondary"
+                        sx={{ fontStyle: 'italic' }}
+                      >
+                        {formatDateGerman(todo.dueDate)}
+                      </Typography>
+                    </Box>
+                  </Card>
+                ))}
+              </>
+            )}
           </List>
         )}
         <Box display="flex" justifyContent="center" mt={2}>
@@ -246,7 +298,7 @@ const HeaderToDoList: React.FC = () => {
             count={totalPages}
             page={page}
             onChange={handlePageChange}
-            color="primary"
+            size="small"
           />
         </Box>
       </Popover>
