@@ -3,7 +3,7 @@ import { Box, Button, TextField, Grid, FormControl, InputLabel, Select, MenuItem
 import { createToDo } from 'src/services/todoService';
 
 interface AddToDoFormProps {
-    onAdd: (title: string, description: string, priority: string, dueDate: string) => void;
+    onAdd: () => void;
 }
 
 const AddToDoForm: React.FC<AddToDoFormProps> = ({ onAdd }) => {
@@ -13,7 +13,7 @@ const AddToDoForm: React.FC<AddToDoFormProps> = ({ onAdd }) => {
     const [dueDate, setDueDate] = useState('');
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    const  handleAddToDo = async() => {
+    const handleAddToDo = async () => {
         if (!title || !dueDate) {
             setErrorMessage('ToDo title and due date are required.');
             return;
@@ -23,9 +23,9 @@ const AddToDoForm: React.FC<AddToDoFormProps> = ({ onAdd }) => {
             description: description,
             priority: priority,
             dueDate: dueDate,
-          });
- 
-        onAdd(title, description, priority, dueDate);
+        });
+
+        onAdd();
         handleReset();
     };
 

@@ -81,26 +81,6 @@ const ToDoHeader: React.FC = () => {
     });
   };
 
-  const handleAddToDo = async () => {
-    if (!newTitle || !newDueDate) {
-      setErrorMessage('ToDo title and due date are required.');
-      return;
-    }
-
-    try {
-      await createToDo({
-        title: newTitle,
-        description: newDescription,
-        priority: newPriority,
-        dueDate: newDueDate,
-      });
-      loadToDos(page);
-    } catch (error) {
-      console.error('Failed to add ToDo:', error);
-      setErrorMessage('Failed to add ToDo');
-    }
-  };
-
   const handleToggleCompletion = async (todoId: number) => {
     try {
       await toggleToDoCompletion(todoId);
@@ -126,7 +106,6 @@ const ToDoHeader: React.FC = () => {
           Student: [],
         };
 
-        // Organize users based on roles
         response.assignees.forEach(user => {
           user.roles.forEach(role => {
             if (organizedUsers[role]) {
@@ -186,18 +165,6 @@ const ToDoHeader: React.FC = () => {
     Student: (query) => fetchStudents(1, 5, query).then((data) => data.data),
   };
 
-  const priorityColor = (priority: string) => {
-    switch (priority) {
-      case 'High':
-        return 'error';
-      case 'Medium':
-        return 'warning';
-      case 'Low':
-      default:
-        return 'success';
-    }
-  };
-
   return (
     <Box sx={{ position: 'relative', padding: 2 }}>
       <Tooltip arrow title="Manage ToDos">
@@ -216,7 +183,7 @@ const ToDoHeader: React.FC = () => {
                 <Typography variant="body1" fontWeight="bold">Add New ToDo</Typography>
               </AccordionSummary>
               <AccordionDetails>
-                <AddToDoForm onAdd={handleAddToDo} />
+                <AddToDoForm onAdd={() => loadToDos(page)} />
               </AccordionDetails>
             </Accordion>
             <Divider sx={{ my: 2 }} />
