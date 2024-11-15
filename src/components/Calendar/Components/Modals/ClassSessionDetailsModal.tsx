@@ -28,6 +28,7 @@ import RoleBasedComponent from 'src/components/ProtectedComponent';
 import EditIcon from '@mui/icons-material/Edit';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
+import { calculateEndTimeInMinutes } from 'src/utils/teacherUtils';
 
 interface ClassSessionDetailsModalProps {
   isOpen: boolean;
@@ -257,7 +258,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
               <Card variant="outlined" sx={{ mb: 3 }}>
                 <CardContent>
                   <Typography variant="subtitle1">
-                    <strong>Session Name:</strong> {classSession.name}
+                    <strong>Session Name:</strong> {classSession.classSession.name}
                   </Typography>
                   <Typography variant="subtitle1">
                     <strong>Teacher:</strong>{' '}
@@ -265,22 +266,22 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                     {classSession.teacher?.user?.lastName}
                   </Typography>
                   <Typography variant="subtitle1">
-                    <strong>Topic:</strong> {classSession.topic?.name}
+                    <strong>Topic:</strong> {classSession.classSession.topic?.name}
                   </Typography>
                   <Typography variant="subtitle1">
                     <strong>Location:</strong> {classSession.location.name}
                   </Typography>
                   <Typography variant="subtitle1">
                     <strong>Session Type:</strong>{' '}
-                    {classSession?.sessionType?.name}
+                    {classSession?.classSession?.sessionType?.name}
                   </Typography>
                   <Typography variant="subtitle1">
                     <strong>Start Time:</strong>{' '}
-                    {moment(classSession.sessionStartDate).format('LLL')}
+                    {classSession.startTime.slice(0, 5)}
                   </Typography>
                   <Typography variant="subtitle1">
                     <strong>End Time:</strong>{' '}
-                    {moment(classSession.sessionEndDate).format('LLL')}
+                    {calculateEndTimeInMinutes(classSession.startTime, classSession.duration)}
                   </Typography>
                 </CardContent>
                 <CardContent>

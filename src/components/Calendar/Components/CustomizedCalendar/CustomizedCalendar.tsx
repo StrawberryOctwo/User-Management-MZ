@@ -350,8 +350,8 @@ export default function CustomizedCalendar({
         resources={resources}
         events={events}
         eventContent={renderEventContent}
-        slotMinTime="08:00:00"
-        slotMaxTime="18:00:00"
+        slotMinTime="12:00:00"
+        slotMaxTime="20:00:00"
         resourceAreaWidth="120px"
         selectable={true}
         datesSet={(info) => {

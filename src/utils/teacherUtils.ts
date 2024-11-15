@@ -21,3 +21,18 @@ export const generateEmployeeNumber = (firstName: string, lastName: string, dob:
   // Return the unique employee number
   return employeeNumber;
 };
+export function calculateEndTimeInMinutes(startTime: string, durationMinutes: number): string {
+  // Split the startTime into hours and minutes
+  const [hours, minutes] = startTime.split(":").map(Number);
+
+  // Create a Date object for the start time
+  const startDate = new Date();
+  startDate.setHours(hours, minutes, 0, 0); // Set the time to hours and minutes
+
+  // Add the duration in minutes
+  startDate.setMinutes(startDate.getMinutes() + durationMinutes);
+
+  // Format the end time as HH:mm
+  const endTime = startDate.toTimeString().slice(0, 5); // Extract HH:mm from the time string
+  return endTime;
+}
