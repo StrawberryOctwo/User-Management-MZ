@@ -29,12 +29,12 @@ export default function ViewTopicPage() { // Updated component name
     setErrorMessage(null); // Clear any previous error message
     try {
       const { data, total } = await fetchTopics(page + 1, limit, searchQuery);
-      const flattenedTopics = data.map((topic: { id: any; name: any; description: any; franchise: { name: any; }; created_at: string }) => ({
+      const flattenedTopics = data.map((topic: { id: any; name: any; description: any; franchise: { name: any; }; createdAt: string }) => ({
         id: topic.id,
         name: topic.name,
         description: topic.description,
         franchiseName: topic.franchise?.name || 'N/A', // Flatten the franchise name
-        created_at: topic.created_at, // Retain the created_at field
+        createdAt: topic.createdAt, // Retain the createdAt field
       }));
       setTopics(flattenedTopics); // Set the transformed topics
       setTotalCount(total);
@@ -51,7 +51,7 @@ export default function ViewTopicPage() { // Updated component name
     { field: 'name', headerName: 'Topic Name' }, // Topic name
     { field: 'description', headerName: 'Description' }, // Topic description
     { field: 'franchiseName', headerName: 'Franchise' }, // Franchise name (flattened)
-    { field: 'created_at', headerName: 'Created At', render: (value: any) => new Date(value).toLocaleDateString() }, // Created date
+    { field: 'createdAt', headerName: 'Created At', render: (value: any) => new Date(value).toLocaleDateString() }, // Created date
   ];
   const handleEdit = (id: any) => {
     navigate(`edit/${id}`);

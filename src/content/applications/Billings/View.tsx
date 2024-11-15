@@ -100,7 +100,7 @@ const ViewFranchisePage: React.FC = () => {
 
     const transformedData = {
         ...franchise,
-        'created_at': franchise?.created_at ? format(new Date(franchise.created_at), 'PPpp') : '',
+        'createdAt': franchise?.createdAt ? format(new Date(franchise.createdAt), 'PPpp') : '',
     };
 
     return (

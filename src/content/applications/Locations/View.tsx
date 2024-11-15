@@ -34,14 +34,14 @@ const ViewLocationPage: React.FC = () => {
         }
     }, [id, t]);
 
-    const formattedCreatedAt = location ? format(new Date(location.created_at), 'PPpp') : '';
+    const formattedCreatedAt = location ? format(new Date(location.createdAt), 'PPpp') : '';
 
     // Define fields for the ReusableDetails component
     const Fields = [
         { name: 'name', label: t('location_name'), section: t('general') },
         { name: 'address', label: t('address'), section: t('general') },
         { name: 'city', label: t('city'), section: t('general') },
-        { name: 'created_at', label: t('created_date'), section: t('general') },
+        { name: 'createdAt', label: t('created_date'), section: t('general') },
         { name: 'franchise.name', label: t('franchise_name'), section: t('franchise') }, // Access nested field
         { name: 'franchise.ownerName', label: t('owner_name'), section: t('franchise') },
         { name: 'franchise.cardHolderName', label: t('card_holder_name'), section: t('franchise') },
@@ -144,7 +144,7 @@ const ViewLocationPage: React.FC = () => {
         'franchise.cardHolderName': location?.franchise?.cardHolderName,
         'franchise.status': location?.franchise?.status,
         'franchise.totalEmployees': location?.franchise?.totalEmployees,
-        'created_at': formattedCreatedAt, // Already formatted date
+        'createdAt': formattedCreatedAt, // Already formatted date
         'teachers': location?.teachers?.map((teacher: any) => ({
             ...teacher,
             contractStartDate: teacher.contractStartDate ? format(new Date(teacher.contractStartDate), 'dd-MM-yyyy') : '', // Format date
