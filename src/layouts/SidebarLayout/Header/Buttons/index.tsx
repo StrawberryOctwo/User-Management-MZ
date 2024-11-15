@@ -7,6 +7,9 @@ import withRole from 'src/hooks/withRole';
 import StudentExamsHeader from './StudentExam';
 import ToDoHeader from './ToDo';
 import AbsenceNotifications from './Absences';
+import SurveyBuilder from './SurveyBuilder/SurveyBuilder';
+import SurveyNotifications from './Survey';
+import ViewSurveysTable from './SurveyBuilder/ViewSurveysTable';
 
 function HeaderButtons() {
   return (
@@ -14,6 +17,11 @@ function HeaderButtons() {
       <HeaderSearch />
       <HeaderNotifications />
       <HeaderLocalization />
+      <SurveyNotifications />
+      <ViewSurveysTable />
+      <ProtectedBox allowedRoles={['SuperAdmin']}>
+      <SurveyBuilder />
+      </ProtectedBox>
       <ToDoHeader />
       <ProtectedBox allowedRoles={['Teacher']}>
         <HeaderAvailability />

@@ -25,6 +25,7 @@ export default function EditLocation() {
             const flattenedData = {
                 name: fetchedData.name,
                 address: fetchedData.address,
+                city: fetchedData.city,
                 postal_code: fetchedData.postal_code,
             };
 
@@ -56,6 +57,7 @@ export default function EditLocation() {
             const payload = {
                 name: data['name'],
                 address: data['address'],
+                city: data['city'],
                 postal_code: data['postal_code'],
                 franchiseId: selectedFranchise.id, // Use single franchise ID in the payload
             };
@@ -77,6 +79,7 @@ export default function EditLocation() {
     const locationFields = [
         { name: 'name', label: t('location_name'), type: 'text', required: true, section: 'Location Information' },
         { name: 'address', label: t('address'), type: 'text', required: true, section: 'Location Information' },
+        { name: 'city', label: t('city'), type: 'text', required: true, section: 'Location Information' },
         { name: 'postal_code', label: t('postal_code'), type: 'text', required: true, section: 'Location Information' },
         {
             name: 'franchises',

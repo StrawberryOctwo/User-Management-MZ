@@ -27,6 +27,7 @@ export default function CreateLocation() {
             const payload = {
                 name: data['name'],
                 address: data['address'],
+                city: data['city'],
                 postalCode: data['postalCode'],
                 franchiseId: selectedFranchise.id, // Use single franchise ID in the payload
             };
@@ -50,6 +51,7 @@ export default function CreateLocation() {
     const locationFields = [
         { name: 'name', label: t('location_name'), type: 'text', required: true, section: 'Location Information' },
         { name: 'address', label: t('address'), type: 'text', required: true, section: 'Location Information' },
+        { name: 'city', label: t('city'), type: 'text', required: true, section: 'Location Information' },
         { name: 'postalCode', label: t('postal_code'), type: 'text', required: true, section: 'Location Information' },
         {
             name: 'franchises',
