@@ -45,7 +45,7 @@ export default function ViewFranchisePage() {
     { field: 'ownerName', headerName: 'Owner Name' },
     { field: 'status', headerName: 'Status', render: (value: any) => (value === '1' ? '1' : '0') },
     { field: 'totalEmployees', headerName: 'Total Employees' },
-    { field: 'created_at', headerName: 'Created At', render: (value: any) => new Date(value).toLocaleDateString() },
+    { field: 'createdAt', headerName: 'Created At', render: (value: any) => new Date(value).toLocaleDateString() },
   ];
 
   const handleEdit = (id: any) => {

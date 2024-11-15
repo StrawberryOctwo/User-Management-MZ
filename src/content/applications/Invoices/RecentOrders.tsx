@@ -70,7 +70,7 @@ export default function ViewInvoices() {
     { field: 'totalAmount', headerName: 'Total Amount' },
     { field: 'status', headerName: 'Status' },
     {
-      field: 'created_at',
+      field: 'createdAt',
       headerName: 'Created At',
       render: (value: any) => new Date(value).toLocaleString(),
     },

@@ -1,34 +1,28 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Box,
-  Button,
   Dialog,
-  DialogActions,
   DialogContent,
   DialogTitle,
   IconButton,
   Typography,
-  TextField,
-  Pagination,
   Tooltip,
   Divider,
-  Paper,
-  Grid,
-  Checkbox,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
+  AccordionDetails,
+  AccordionSummary,
+  Accordion,
 } from '@mui/material';
 import AssignmentIcon from '@mui/icons-material/Assignment';
-import { fetchToDosByAssignedBy, createToDo, toggleToDoCompletion, assignToDoToRole } from 'src/services/todoService';
+import { fetchToDosByAssignedBy, createToDo, toggleToDoCompletion, assignToDoToRole, assignToDoToUsers, fetchAssignedUsersForTodo } from 'src/services/todoService';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import RoleBasedComponent from 'src/components/ProtectedComponent';
+import { fetchFranchiseAdmins } from 'src/services/franchiseAdminService';
+import { fetchLocationAdmins } from 'src/services/locationAdminService';
+import { fetchStudents } from 'src/services/studentService';
+import { fetchTeachers } from 'src/services/teacherService';
+import CustomRoleDialog from './CustomRoleDialog';
+import AddToDoForm from './AddToDoForm';
+import ToDoTable from './ToDoTable';
 
 const ToDoHeader: React.FC = () => {
   const [todos, setTodos] = useState<any[]>([]);
@@ -40,8 +34,16 @@ const ToDoHeader: React.FC = () => {
   const [newPriority, setNewPriority] = useState('Medium');
   const [newDueDate, setNewDueDate] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [customRoleDialogOpen, setCustomRoleDialogOpen] = useState(false);
+  const [selectedCustomTodoId, setSelectedCustomTodoId] = useState<number | null>(null);
+  const [selectedUsers, setSelectedUsers] = useState({
+    FranchiseAdmin: [],
+    LocationAdmin: [],
+    Teacher: [],
+    Student: [],
+  });
 
-  const limit = 5; // Pagination limit per page
+  const limit = 5;
 
   const loadToDos = async (pageNumber: number) => {
     try {
@@ -56,7 +58,7 @@ const ToDoHeader: React.FC = () => {
 
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
-    loadToDos(page); // Load ToDos only when dialog is opened
+    loadToDos(page);
   };
 
   const handleCloseDialog = () => {
@@ -66,210 +68,165 @@ const ToDoHeader: React.FC = () => {
     setNewPriority('Medium');
     setNewDueDate('');
     setErrorMessage(null);
-    setTodos([]); // Clear the ToDos list when closing the dialog
+    setTodos([]);
   };
 
-  const handleAddToDo = async () => {
-    if (!newTitle || !newDueDate) {
-      setErrorMessage('ToDo title and due date are required.');
-      return;
-    }
-
-    try {
-      await createToDo({
-        title: newTitle,
-        description: newDescription,
-        priority: newPriority,
-        dueDate: newDueDate,
-      });
-      handleCloseDialog();
-      loadToDos(page); // Refresh ToDo list
-    } catch (error) {
-      console.error('Failed to add ToDo:', error);
-      setErrorMessage('Failed to add ToDo');
-    }
+  const handleCloseCustomRoleDialog = () => {
+    setCustomRoleDialogOpen(false);
+    setSelectedUsers({
+      FranchiseAdmin: [],
+      LocationAdmin: [],
+      Teacher: [],
+      Student: [],
+    });
   };
 
   const handleToggleCompletion = async (todoId: number) => {
     try {
       await toggleToDoCompletion(todoId);
-      loadToDos(page); // Refresh list to show updated status
+      loadToDos(page);
     } catch (error) {
       console.error('Failed to toggle ToDo completion:', error);
       setErrorMessage('Failed to update ToDo');
     }
   };
 
-  const handleAssignRole = async (todoId: number, role: string) => {
+  const handleOpenCustomRoleDialog = async (todoId: number) => {
+    setSelectedCustomTodoId(todoId);
+    setCustomRoleDialogOpen(true);
+
     try {
-      await assignToDoToRole(todoId, role);
-      loadToDos(page); // Refresh list to show updated assignment
+      const response = await fetchAssignedUsersForTodo(todoId);
+
+      if (response && Array.isArray(response.assignees)) {
+        const organizedUsers = {
+          FranchiseAdmin: [],
+          LocationAdmin: [],
+          Teacher: [],
+          Student: [],
+        };
+
+        response.assignees.forEach(user => {
+          user.roles.forEach(role => {
+            if (organizedUsers[role]) {
+              organizedUsers[role].push(user);
+            }
+          });
+        });
+
+        setSelectedUsers(organizedUsers);
+      } else {
+        throw new Error('Assigned users data is not structured as expected');
+      }
     } catch (error) {
-      console.error('Failed to assign role to ToDo:', error);
-      setErrorMessage('Failed to assign role');
+      console.error('Failed to fetch assigned users:', error);
+      setErrorMessage('Failed to load assigned users');
     }
+  };
+
+
+  const handleAssignRole = async (todoId: number, role: string) => {
+    if (role === 'Custom') {
+      setSelectedCustomTodoId(todoId);
+      reloadTable()
+      handleOpenCustomRoleDialog(todoId);
+    } else {
+      await assignToDoToRole(todoId, role);
+      setTodos((prevTodos) =>
+        prevTodos.map((todo) =>
+          todo.id === todoId ? { ...todo, assignedRole: role } : todo
+        )
+      );
+    }
+  };
+
+  const handleRoleInputChange = (role: string, selectedItems) => {
+    setSelectedUsers((prev) => ({
+      ...prev,
+      [role]: [...prev[role], ...selectedItems.filter((item) => !prev[role].some((prevItem) => prevItem.id === item.id))]
+    }));
+  };
+  const reloadTable = () => {
+    loadToDos(page);
+};
+  const handleRemoveUser = (role, userToRemove) => {
+    setSelectedUsers((prev) => ({
+      ...prev,
+      [role]: prev[role].filter((user) => user.id !== userToRemove.id),
+    }));
   };
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
-    loadToDos(value); // Load the ToDos for the new page
+    loadToDos(value);
   };
 
-  const priorityColor = (priority: string) => {
-    switch (priority) {
-      case 'High':
-        return 'error';
-      case 'Medium':
-        return 'warning';
-      case 'Low':
-      default:
-        return 'success';
-    }
+  const fetchDataFunctions = {
+    FranchiseAdmin: (query) => fetchFranchiseAdmins(1, 5, query).then((data) => data.data),
+    LocationAdmin: (query) => fetchLocationAdmins(1, 5, query).then((data) => data.data),
+    Teacher: (query) => fetchTeachers(1, 5, query).then((data) => data.data),
+    Student: (query) => fetchStudents(1, 5, query).then((data) => data.data),
   };
 
   return (
     <Box sx={{ position: 'relative', padding: 2 }}>
-    <Tooltip arrow title="Manage ToDos">
+      <Tooltip arrow title="Manage ToDos">
         <IconButton color="primary" onClick={handleOpenDialog}>
-            <AssignmentIcon />
+          <AssignmentIcon />
         </IconButton>
-    </Tooltip>
+      </Tooltip>
 
       <Dialog open={isDialogOpen} onClose={handleCloseDialog} fullWidth maxWidth="md">
-        <DialogTitle>Manage My ToDos</DialogTitle>
+        <DialogTitle>Manage My Created ToDos</DialogTitle>
         <DialogContent dividers>
-          {errorMessage && (
-            <Typography color="error" variant="body2" sx={{ mb: 2 }}>
-              {errorMessage}
-            </Typography>
-          )}
 
-          {/* ToDo Table */}
-          <TableContainer component={Paper} elevation={3} sx={{ maxHeight: 400 }}>
-            <Table stickyHeader>
-              <TableHead>
-                <TableRow>
-                  <TableCell>Completed</TableCell>
-                  <TableCell>Title</TableCell>
-                  <TableCell>Priority</TableCell>
-                  <TableCell>Due Date</TableCell>
-                  <TableCell>Assigned Role</TableCell>
-                </TableRow>
-              </TableHead>
-              <TableBody>
-                {todos.map((todo) => (
-                  <TableRow key={todo.id}>
-                    <TableCell padding="checkbox">
-                      <Checkbox
-                        checked={todo.completed}
-                        onChange={() => handleToggleCompletion(todo.id)}
-                        color="primary"
-                      />
-                    </TableCell>
-                    <TableCell>{todo.title}</TableCell>
-                    <TableCell>
-                      <Chip label={todo.priority} color={priorityColor(todo.priority)} size="small" />
-                    </TableCell>
-                    <TableCell>
-                      {todo.dueDate ? new Date(todo.dueDate).toLocaleDateString() : 'No Due Date'}
-                    </TableCell>
-                    <TableCell>
-                      <FormControl fullWidth variant="outlined">
-                        <InputLabel>Assign Role</InputLabel>
-                        <Select
-                          label="Assign Role"
-                          value={todo.assignedRole || ''}
-                          onChange={(e) => handleAssignRole(todo.id, e.target.value)}
-                        >
-                          <MenuItem value="FranchiseAdmin">Franchise Admin</MenuItem>
-                          <MenuItem value="LocationAdmin">Location Admin</MenuItem>
-                          <MenuItem value="Teacher">Teacher</MenuItem>
-                          <MenuItem value="Student">Student</MenuItem>
-                        </Select>
-                      </FormControl>
-                    </TableCell>
-                  </TableRow>
-                ))}
-                {todos.length === 0 && (
-                  <TableRow>
-                    <TableCell colSpan={5} align="center">
-                      No ToDos found.
-                    </TableCell>
-                  </TableRow>
-                )}
-              </TableBody>
-            </Table>
-          </TableContainer>
+          <RoleBasedComponent allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher']}>
+            <Accordion>
+              <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1-content" id="panel1-header">
+                <Typography variant="body1" fontWeight="bold">Add New ToDo</Typography>
+              </AccordionSummary>
+              <AccordionDetails>
+                <AddToDoForm onAdd={() => loadToDos(page)} />
+              </AccordionDetails>
+            </Accordion>
+            <Divider sx={{ my: 2 }} />
+          </RoleBasedComponent>
 
-          {/* Pagination */}
-          <Box display="flex" justifyContent="center" mt={2}>
-            <Pagination count={totalPages} page={page} onChange={handlePageChange} color="primary" />
-          </Box>
-
-          <Divider sx={{ my: 2 }} />
-
-          {/* Add ToDo Form */}
-          <Typography variant="h6" align="center" gutterBottom>
-            Add New ToDo
-          </Typography>
-          <Grid container spacing={2}>
-            <Grid item xs={12}>
-              <TextField
-                label="Title"
-                variant="outlined"
-                fullWidth
-                value={newTitle}
-                onChange={(e) => setNewTitle(e.target.value)}
-                required
+          <Accordion defaultExpanded>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls="panel1-content"
+              id="panel1-header"
+            >
+              <Typography variant="body1" fontWeight="bold">
+                View ToDos
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
+              <ToDoTable
+                todos={todos}
+                onToggleCompletion={handleToggleCompletion}
+                onAssignRole={handleAssignRole}
+                page={page}
+                totalPages={totalPages}
+                onPageChange={handlePageChange}
+                reloadTable={reloadTable} 
               />
-            </Grid>
-            <Grid item xs={12}>
-              <TextField
-                label="Description"
-                variant="outlined"
-                fullWidth
-                multiline
-                rows={3}
-                value={newDescription}
-                onChange={(e) => setNewDescription(e.target.value)}
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <TextField
-                label="Due Date"
-                type="date"
-                variant="outlined"
-                fullWidth
-                InputLabelProps={{ shrink: true }}
-                value={newDueDate}
-                onChange={(e) => setNewDueDate(e.target.value)}
-                required
-              />
-            </Grid>
-            <Grid item xs={6}>
-              <FormControl fullWidth variant="outlined">
-                <InputLabel>Priority</InputLabel>
-                <Select
-                  label="Priority"
-                  value={newPriority}
-                  onChange={(e) => setNewPriority(e.target.value)}
-                >
-                  <MenuItem value="Low">Low</MenuItem>
-                  <MenuItem value="Medium">Medium</MenuItem>
-                  <MenuItem value="High">High</MenuItem>
-                </Select>
-              </FormControl>
-            </Grid>
-          </Grid>
+              <Box sx={{ position: 'relative', padding: 2 }}>
+                <CustomRoleDialog
+                  open={customRoleDialogOpen}
+                  onClose={handleCloseCustomRoleDialog}
+                  selectedUsers={selectedUsers}
+                  handleRoleInputChange={handleRoleInputChange}
+                  handleRemoveUser={handleRemoveUser}
+                  assignToDoToUsers={assignToDoToUsers}
+                  selectedCustomTodoId={selectedCustomTodoId}
+                  fetchDataFunctions={fetchDataFunctions}
+                />
+              </Box>
+            </AccordionDetails>
+          </Accordion>
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} color="secondary">
-            Cancel
-          </Button>
-          <Button onClick={handleAddToDo} color="primary" variant="contained">
-            Save ToDo
-          </Button>
-        </DialogActions>
       </Dialog>
     </Box>
   );

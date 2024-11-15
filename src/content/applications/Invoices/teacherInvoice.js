@@ -6,7 +6,7 @@ const generateTeacherInvoicePDF = async (invoice, teacher, preview = false) => {
 
     // Calculate total hours worked based on invoice data
     const hoursWorked = (invoice.totalAmount / teacher.hourlyRate).toFixed(2);
-    const invoiceDate = new Date(invoice.created_at);
+    const invoiceDate = new Date(invoice.createdAt);
     const month = invoiceDate.toLocaleString('default', { month: 'long', year: 'numeric' });
 
     element.innerHTML = `

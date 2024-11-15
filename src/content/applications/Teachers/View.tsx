@@ -108,7 +108,7 @@ const ViewTeacherPage: React.FC = () => {
                 { field: 'franchise.name', headerName: t('franchise_name'), flex: 1 },
                 { field: 'address', headerName: t('address'), flex: 1 },
                 { field: 'postalCode', headerName: t('postal_code'), flex: 1 },
-                { field: 'created_at', headerName: t('created_date'), flex: 1 },
+                { field: 'createdAt', headerName: t('created_date'), flex: 1 },
                 {
                     field: 'actions',
                     headerName: t('actions'),
@@ -166,7 +166,7 @@ const ViewTeacherPage: React.FC = () => {
         'locations': teacher?.locations.map((location: any) => ({
             ...location,
             'franchise.name': location?.franchise?.name,
-            created_at: location.created_at ? format(new Date(location.created_at), 'dd-MM-yyyy') : '',
+            createdAt: location.createdAt ? format(new Date(location.createdAt), 'dd-MM-yyyy') : '',
         })),
         'topics': teacher?.topics,
         'documents': documents,

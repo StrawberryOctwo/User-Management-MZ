@@ -265,7 +265,7 @@ const EditStudent = () => {
       <SingleSelectWithAutocomplete
         label="Search Contracts"
         fetchData={(query) =>
-          fetchContractPackagesByEntity(1, 5).then((data) => data.data)
+          fetchContractPackagesByEntity(1, 5, query).then((data) => data.data)
         }
         onSelect={handleContractSelect}
         displayProperty="name"
@@ -274,6 +274,7 @@ const EditStudent = () => {
       />
     )
   };
+  
   const parentSelectionField = {
     name: 'parent',
     label: 'Select Parent',

@@ -126,5 +126,8 @@
   "tutor_remarks": "Tutor Remarks",
   "amount": "Amount",
   "payment_date": "Payment Date",
-  "payment_status": "Payment Status"
+  "payment_status": "Payment Status",
+
+
+  "download": "Download"
 }

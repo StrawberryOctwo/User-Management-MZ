@@ -194,7 +194,7 @@ export default function ReusableTable({
                         <TableCell key={column.field}>
                             {column.field === 'status' ? (
                                 getStatusLabel(row[column.field])
-                            ) : column.field === 'created_at' ? (
+                            ) : column.field === 'createdAt' ? (
                                 <Typography
                                     variant="body2"
                                     color="text.secondary"

@@ -53,7 +53,7 @@ const ViewStudentPage: React.FC = () => {
         studentData.availableDates
       ).map(capitalizeFirstLetter);
       studentData.contractEndDate = formatDate(studentData.contractEndDate);
-      studentData.created_at = formatDate(studentData.created_at);
+      studentData.createdAt = formatDate(studentData.createdAt);
       studentData.user.dob = formatDate(studentData.user.dob);
 
       setStudent(studentData);
@@ -171,7 +171,7 @@ const ViewStudentPage: React.FC = () => {
       isTextArray: true // Display available dates as comma-separated
     },
     {
-      name: 'created_at',
+      name: 'createdAt',
       label: t('created_date'),
       section: t('student_details')
     },

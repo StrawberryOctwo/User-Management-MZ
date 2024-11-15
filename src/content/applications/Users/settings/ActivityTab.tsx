@@ -1,117 +1,96 @@
 import {
   Box,
-  CardMedia,
-  Typography,
   Card,
   CardHeader,
-  Divider,
+  CardContent,
+  Typography,
   Avatar,
-  IconButton,
-  Button,
-  CardActions,
-  Link
+  Divider,
+  List,
+  ListItem,
+  ListItemText
 } from '@mui/material';
-import { styled } from '@mui/material/styles';
+import { useEffect, useState } from 'react';
 
-import MoreHorizTwoToneIcon from '@mui/icons-material/MoreHorizTwoTone';
-import ThumbUpAltTwoToneIcon from '@mui/icons-material/ThumbUpAltTwoTone';
-import CommentTwoToneIcon from '@mui/icons-material/CommentTwoTone';
-import ShareTwoToneIcon from '@mui/icons-material/ShareTwoTone';
-import Text from 'src/components/Text';
+interface UserInfo {
+  id: number;
+  firstName: string;
+  lastName: string;
+  dob: string;
+  email: string;
+  address: string;
+  postalCode: string;
+  phoneNumber: string;
+}
 
-const CardActionsWrapper = styled(CardActions)(
-  ({ theme }) => `
-     background: ${theme.colors.alpha.black[5]};
-     padding: ${theme.spacing(3)};
-`
-);
+function GeneralInfoTab() {
+  const [userInfo, setUserInfo] = useState<UserInfo | null>(null);
 
-function ActivityTab() {
+  useEffect(() => {
+    // Placeholder fetch for user info
+    const fetchData = async () => {
+      const data = {
+        id: 1,
+        firstName: "John",
+        lastName: "Doe",
+        dob: "1990-05-15",
+        email: "john.doe@example.com",
+        address: "123 Elm Street",
+        postalCode: "90210",
+        phoneNumber: "123-456-7890"
+      };
+      setUserInfo(data);
+    };
+
+    fetchData();
+  }, []);
+
+  if (!userInfo) return null;
+
   return (
     <Card>
       <CardHeader
-        avatar={<Avatar src="/static/images/avatars/5.jpg" />}
-        action={
-          <IconButton color="primary">
-            <MoreHorizTwoToneIcon fontSize="medium" />
-          </IconButton>
-        }
-        titleTypographyProps={{ variant: 'h4' }}
-        subheaderTypographyProps={{ variant: 'subtitle2' }}
-        title="Allison Lipshutz"
-        subheader={
-          <>
-            Managing Partner,{' '}
-            <Link href="#" underline="hover">
-              #software
-            </Link>
-            ,{' '}
-            <Link href="#" underline="hover">
-              #managers
-            </Link>
-            , Google Inc.
-          </>
-        }
+        avatar={<Avatar>{userInfo.firstName[0]}{userInfo.lastName[0]}</Avatar>}
+        title={`${userInfo.firstName} ${userInfo.lastName}`}
+        subheader="General Information"
       />
-      <Box px={3} pb={2}>
-        <Typography variant="h4" fontWeight="normal">
-          Welcome to organizing your remote office for maximum productivity.
-        </Typography>
-      </Box>
-      <CardMedia
-        sx={{ minHeight: 280 }}
-        image="/static/images/placeholders/covers/6.jpg"
-        title="Card Cover"
-      />
-      <Box p={3}>
-        <Typography variant="h2" sx={{ pb: 1 }}>
-          Organizing Your Remote Office for Maximum Productivity
-        </Typography>
-        <Typography variant="subtitle2">
-          <Link href="#" underline="hover">
-            example.com
-          </Link>{' '}
-          • 4 mins read
-        </Typography>
-      </Box>
       <Divider />
-      <CardActionsWrapper
-        sx={{
-          display: { xs: 'block', md: 'flex' },
-          alignItems: 'center',
-          justifyContent: 'space-between'
-        }}
-      >
-        <Box>
-          <Button startIcon={<ThumbUpAltTwoToneIcon />} variant="contained">
-            Like
-          </Button>
-          <Button
-            startIcon={<CommentTwoToneIcon />}
-            variant="outlined"
-            sx={{ mx: 2 }}
-          >
-            Comment
-          </Button>
-          <Button startIcon={<ShareTwoToneIcon />} variant="outlined">
-            Share
-          </Button>
-        </Box>
-        <Box sx={{ mt: { xs: 2, md: 0 } }}>
-          <Typography variant="subtitle2" component="span">
-            <Text color="black">
-              <b>485</b>
-            </Text>{' '}
-            reactions •{' '}
-            <Text color="black">
-              <b>63</b>
-            </Text>{' '}
-            comments
-          </Typography>
-        </Box>
-      </CardActionsWrapper>
+      <CardContent>
+        <List>
+          <ListItem>
+            <ListItemText
+              primary="Date of Birth"
+              secondary={userInfo.dob}
+            />
+          </ListItem>
+          <ListItem>
+            <ListItemText
+              primary="Email"
+              secondary={userInfo.email}
+            />
+          </ListItem>
+          <ListItem>
+            <ListItemText
+              primary="Address"
+              secondary={userInfo.address}
+            />
+          </ListItem>
+          <ListItem>
+            <ListItemText
+              primary="Postal Code"
+              secondary={userInfo.postalCode}
+            />
+          </ListItem>
+          <ListItem>
+            <ListItemText
+              primary="Phone Number"
+              secondary={userInfo.phoneNumber}
+            />
+          </ListItem>
+        </List>
+      </CardContent>
     </Card>
   );
 }
 
-export default ActivityTab;
+export default GeneralInfoTab;

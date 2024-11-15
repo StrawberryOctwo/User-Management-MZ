@@ -4,8 +4,8 @@ const generateParentInvoicePDF = async (invoice, preview = false) => {
     const element = document.createElement('div');
 
     // Formatting details
-    const invoiceDate = new Date(invoice.created_at).toLocaleDateString('de-DE');
-    const monthYear = new Date(invoice.created_at).toLocaleString('default', { month: 'long', year: 'numeric' });
+    const invoiceDate = new Date(invoice.createdAt).toLocaleDateString('de-DE');
+    const monthYear = new Date(invoice.createdAt).toLocaleString('default', { month: 'long', year: 'numeric' });
     const studentName = `${invoice.student.user.firstName} ${invoice.student.user.lastName}`;
     const totalAmount = Number(invoice.totalAmount).toFixed(2);
     const parentName = `${invoice.user.firstName} ${invoice.user.lastName}`;

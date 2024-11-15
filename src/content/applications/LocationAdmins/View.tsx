@@ -54,7 +54,7 @@ const ViewLocationAdmin: React.FC = () => {
                 { field: 'name', headerName: t('location_name'), flex: 1 },
                 { field: 'address', headerName: t('address'), flex: 1 },
                 { field: 'postalCode', headerName: t('postal_code'), flex: 1 },
-                { field: 'created_at', headerName: t('created_date'), flex: 1 },
+                { field: 'createdAt', headerName: t('created_date'), flex: 1 },
                 {
                     field: 'actions',
                     headerName: t('actions'),
