@@ -143,16 +143,22 @@ const ToDoHeader: React.FC = () => {
       const response = await fetchAssignedUsersForTodo(todoId);
 
       if (response && Array.isArray(response.assignees)) {
-        // Manually assign users to roles based on your logic.
-        // Adjust the logic below according to your actual requirements.
         const organizedUsers = {
-          FranchiseAdmin: response.assignees.filter(user => user.email.includes('franchise')),
-          LocationAdmin: response.assignees.filter(user => user.email.includes('location')),
-          Teacher: response.assignees.filter(user => user.email.includes('teacher')),
-          Student: response.assignees.filter(user => user.email.includes('student')),
+          FranchiseAdmin: [],
+          LocationAdmin: [],
+          Teacher: [],
+          Student: [],
         };
 
-        console.log(organizedUsers)
+        // Organize users based on roles
+        response.assignees.forEach(user => {
+          user.roles.forEach(role => {
+            if (organizedUsers[role]) {
+              organizedUsers[role].push(user);
+            }
+          });
+        });
+
         setSelectedUsers(organizedUsers);
       } else {
         throw new Error('Assigned users data is not structured as expected');
@@ -167,9 +173,8 @@ const ToDoHeader: React.FC = () => {
   const handleAssignRole = async (todoId: number, role: string) => {
     if (role === 'Custom') {
       setSelectedCustomTodoId(todoId);
-      handleOpenCustomRoleDialog(todoId); // Open custom dialog when "Custom" is selected
+      handleOpenCustomRoleDialog(todoId);
     } else {
-      // Assign role directly if not "Custom"
       await assignToDoToRole(todoId, role);
       setTodos((prevTodos) =>
         prevTodos.map((todo) =>
