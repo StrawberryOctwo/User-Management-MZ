@@ -114,7 +114,8 @@ const CalendarContent: React.FC = () => {
             startTime: session.startTime,
             endTime: session.endTime,
             sessionType: session.sessionType,
-            reportStatus: session.reportStatus
+            reportStatus: session.reportStatus,
+            date: session.date,
           }
         },
         resourceId: resource

@@ -233,12 +233,14 @@ export default function CustomizedCalendar({
       const formattedTeacher = `${firstName[0]}. ${lastName}`;
       const hasOverlap = checkOverlap(session, classSessionEvents);
 
+      console.log('Session:', session);
+
       return {
         id: session.data.appointment.id,
         resourceId: session.resourceId,
         title: session.data.appointment.topic,
-        start: session.data.appointment.startTime,
-        end: session.data.appointment.endTime,
+        start: `${session.data.appointment.date}T${session.data.appointment.startTime}`,
+        end: `${session.data.appointment.date}T${session.data.appointment.endTime}`,
         status: session.data.appointment.status,
         extendedProps: {
           topicName: session.data.appointment.topic || 'No Topic',
@@ -316,7 +318,7 @@ export default function CustomizedCalendar({
     { id: 'R7', title: 'Room 7' }
   ];
 
-  const renderEventContent = (eventInfo) => {
+  const renderEventContent = (eventInfo: any) => {
     return <EventItem eventInfo={eventInfo} />;
   };
 
