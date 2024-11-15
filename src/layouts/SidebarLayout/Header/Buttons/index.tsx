@@ -10,6 +10,7 @@ import AbsenceNotifications from './Absences';
 import SurveyBuilder from './SurveyBuilder/SurveyBuilder';
 import SurveyNotifications from './Survey';
 import ViewSurveysTable from './SurveyBuilder/ViewSurveysTable';
+import HeaderToDoList from './AssignedToDos/ToDoListPopUp';
 
 function HeaderButtons() {
   return (
@@ -18,6 +19,7 @@ function HeaderButtons() {
       <HeaderNotifications />
       <HeaderLocalization />
       <SurveyNotifications />
+      <HeaderToDoList/>
       <ProtectedBox allowedRoles={['SuperAdmin']}>
       <ViewSurveysTable />
       </ProtectedBox>

@@ -49,17 +49,33 @@ export const fetchToDos = async (page: number = 1, limit: number = 10, search = 
 };
 
 // Service to fetch ToDos assigned to the current authenticated user
-export const fetchToDosForSelf = async (page: number = 1, limit: number = 10) => {
-  try {
-    const response = await api.get('/todos/self', {
-      params: { page, limit },
-    });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching ToDos for self:', error);
-    throw error;
-  }
+export const fetchToDosForSelf = async ({
+  page,
+  limit,
+  sort,
+  search,
+  priority,
+}: {
+  page: number;
+  limit: number;
+  sort: string;
+  search?: string;
+  priority?: string;
+}) => {
+  const params = new URLSearchParams({
+    page: String(page),
+    limit: String(limit),
+    sort,
+  });
+
+  if (search) params.append('search', search);
+  if (priority) params.append('priority', priority);
+
+  const response = await api.get(`/todos/self?${params.toString()}`);
+  return response.data;
 };
+
+
 
 // Service to assign a ToDo to a role
 export const assignToDoToRole = async (todoId: number, role: string) => {
@@ -82,6 +98,21 @@ export const toggleToDoCompletion = async (todoId: number) => {
     throw error;
   }
 };
+
+// const handleClearCompleted = async () => {
+//   const completedIds = todos.filter((todo) => todo.completed).map((todo) => todo.id);
+//   setToDos((prevTodos) => prevTodos.filter((todo) => !todo.completed));
+//   try {
+//     await fetch('/api/todos/clear-completed', {
+//       method: 'POST',
+//       headers: { 'Content-Type': 'application/json' },
+//       body: JSON.stringify({ ids: completedIds }),
+//     });
+//   } catch (error) {
+//     console.error('Failed to clear completed todos:', error);
+//   }
+// };
+
 
 // Service to delete a ToDo
 export const deleteToDo = async (todoId: number) => {
