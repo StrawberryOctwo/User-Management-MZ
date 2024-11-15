@@ -1,10 +1,14 @@
 import React from 'react';
-import { Box, TextField } from '@mui/material';
+import { Box, InputLabel, TextField } from '@mui/material';
 import moment from 'moment';
 
 export default function DateFields({ newSession, setNewSession, fieldErrors }) {
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      {/* <InputLabel>
+        Fill in the dates the sessions start on and end on
+      </InputLabel> */}
+
       {/* Start Date */}
       <TextField
         label="Start Date"
@@ -15,7 +19,7 @@ export default function DateFields({ newSession, setNewSession, fieldErrors }) {
           const newStartDate = new Date(e.target.value);
           setNewSession({
             ...newSession,
-            startDate: newStartDate,
+            startDate: newStartDate
           });
         }}
         error={!!fieldErrors.startDate}
@@ -32,7 +36,7 @@ export default function DateFields({ newSession, setNewSession, fieldErrors }) {
           const newEndDate = new Date(e.target.value);
           setNewSession({
             ...newSession,
-            endDate: newEndDate,
+            endDate: newEndDate
           });
         }}
         error={!!fieldErrors.endDate}

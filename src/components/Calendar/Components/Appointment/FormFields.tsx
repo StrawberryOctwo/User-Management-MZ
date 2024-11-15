@@ -10,6 +10,7 @@ import {
   FormControlLabel,
   Switch,
   Typography,
+  Checkbox
 } from '@mui/material';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
@@ -37,28 +38,17 @@ export default function FormFields({
   sessionTypes,
   recurrencePatternOption,
   setRecurrencePatternOption,
+  resetDayDetails,
   dayDetails,
   handleDayDetailChange,
   handleDayToggle,
-  fieldErrors,
+  fieldErrors
 }) {
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        flexDirection: 'column',
-        gap: 2,
-        width: '90vw', // Slightly increased width for modal
-        maxWidth: '900px', // Set a max width for large screens
-        padding: 3, // Reduced padding around the content
-        boxSizing: 'border-box',
-      }}
-    >
-
-      {/* Two-column layout */}
-      <Grid container spacing={2}> {/* Reduced spacing */}
-        {/* Left Column */}
-        <Grid item xs={12} md={6}>
+    <Grid container spacing={14} p={1}>
+      {/* Left Column */}
+      <Grid item xs={12} md={6}>
+        <Box sx={{ mb: 3 }}>
           <FormControl fullWidth>
             <InputLabel>Room</InputLabel>
             <Select
@@ -75,8 +65,10 @@ export default function FormFields({
               ))}
             </Select>
           </FormControl>
+        </Box>
 
-          <FormControl fullWidth sx={{ mt: 2 }}>
+        <Box sx={{ mb: 3 }}>
+          <FormControl fullWidth>
             <InputLabel>Session Type</InputLabel>
             <Select
               label="Session Type"
@@ -92,7 +84,9 @@ export default function FormFields({
               ))}
             </Select>
           </FormControl>
+        </Box>
 
+        <Box sx={{ mb: 3 }}>
           <SingleSelectWithAutocomplete
             width="100%"
             label="Search Teacher"
@@ -101,13 +95,13 @@ export default function FormFields({
                 ? fetchTeacherByUserId(userId).then((teacher) => [
                     {
                       ...teacher,
-                      fullName: `${teacher.user.firstName} ${teacher.user.lastName}`,
-                    },
+                      fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
+                    }
                   ])
                 : fetchTeachers(1, 5, query).then((data) =>
                     data.data.map((teacher) => ({
                       ...teacher,
-                      fullName: `${teacher.firstName} ${teacher.lastName}`,
+                      fullName: `${teacher.firstName} ${teacher.lastName}`
                     }))
                   )
             }
@@ -119,7 +113,9 @@ export default function FormFields({
             placeholder="Search Teacher"
             initialValue={selectedTeacher}
           />
+        </Box>
 
+        <Box sx={{ mb: 3 }}>
           <MultiSelectWithCheckboxes
             width="100%"
             label="Search Students"
@@ -127,7 +123,7 @@ export default function FormFields({
               fetchStudents(1, 5, query).then((data) =>
                 data.data.map((student) => ({
                   ...student,
-                  fullName: `${student.firstName} ${student.lastName}`,
+                  fullName: `${student.firstName} ${student.lastName}`
                 }))
               )
             }
@@ -135,14 +131,16 @@ export default function FormFields({
               setSelectedStudents(selectedItems);
               setNewSession({
                 ...newSession,
-                studentIds: selectedItems.map((item) => item.id),
+                studentIds: selectedItems.map((item) => item.id)
               });
             }}
             displayProperty="fullName"
             placeholder="Enter student name"
             initialValue={selectedStudents}
           />
+        </Box>
 
+        <Box sx={{ mb: 3 }}>
           <SingleSelectWithAutocomplete
             width="100%"
             label="Select Location"
@@ -154,7 +152,9 @@ export default function FormFields({
             placeholder="Search Location"
             initialValue={selectedLocation}
           />
+        </Box>
 
+        <Box sx={{ mb: 3 }}>
           <SingleSelectWithAutocomplete
             width="100%"
             label="Search Topic"
@@ -169,53 +169,59 @@ export default function FormFields({
             placeholder="Search Topic"
             initialValue={selectedTopic}
           />
+        </Box>
+        <Box>
+          <TextField
+            label="Additional Notes"
+            fullWidth
+            multiline
+            rows={3}
+            value={newSession.note || ''}
+            onChange={(e) =>
+              setNewSession({ ...newSession, note: e.target.value })
+            }
+          />
+        </Box>
+      </Grid>
 
+      {/* Right Column */}
+      <Grid item xs={12} md={6}>
+        <Box sx={{ mb: 3 }}>
           <DateFields
             newSession={newSession}
             setNewSession={setNewSession}
             fieldErrors={fieldErrors}
           />
-        </Grid>
-
-        {/* Right Column */}
-        <Grid item xs={12} md={6}>
+        </Box>
+        <Box sx={{ mb: 3 }}>
+          <FormControlLabel
+            control={
+              <Checkbox
+                checked={newSession.isHolidayCourse}
+                onChange={(e) =>
+                  setNewSession({
+                    ...newSession,
+                    isHolidayCourse: e.target.checked
+                  })
+                }
+              />
+            }
+            label="Holiday Course"
+            labelPlacement="start"
+            sx={{ ml: 0 }}
+          />
+        </Box>
+        <Box>
           <RecurrenceOptions
             recurrencePatternOption={recurrencePatternOption}
             handleRecurrenceChange={setRecurrencePatternOption}
             handleDayToggle={handleDayToggle}
             dayDetails={dayDetails}
             handleDayDetailChange={handleDayDetailChange}
+            resetDayDetails={resetDayDetails}
           />
-
-          <TextField
-            label="Additional Notes"
-            fullWidth
-            multiline
-            rows={4} // Reduced number of rows to save space
-            value={newSession.note || ''}
-            onChange={(e) =>
-              setNewSession({ ...newSession, note: e.target.value })
-            }
-            sx={{ mt: 4 }}
-          />
-
-          <FormControlLabel
-            control={
-              <Switch
-                checked={newSession.isHolidayCourse}
-                onChange={(e) =>
-                  setNewSession({
-                    ...newSession,
-                    isHolidayCourse: e.target.checked,
-                  })
-                }
-              />
-            }
-            label="Is Holiday Course"
-            sx={{ mt: 3 }}
-          />
-        </Grid>
+        </Box>
       </Grid>
-    </Box>
+    </Grid>
   );
 }

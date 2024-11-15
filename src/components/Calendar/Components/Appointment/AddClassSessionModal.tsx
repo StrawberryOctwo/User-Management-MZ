@@ -6,7 +6,10 @@ import { fetchSessionTypes } from 'src/services/contractPackagesService';
 import AddClassSessionDialog from './AddClassSessionForm';
 import { fetchLocations } from 'src/services/locationService';
 import { fetchStudents } from 'src/services/studentService';
-import { fetchTeacherByUserId, fetchTeachers } from 'src/services/teacherService';
+import {
+  fetchTeacherByUserId,
+  fetchTeachers
+} from 'src/services/teacherService';
 import { fetchTopics } from 'src/services/topicService';
 
 interface AddClassSessionModalProps {
@@ -24,7 +27,7 @@ export default function AddClassSessionModal({
   onSave,
   roomId,
   passedLocations = [],
-  startTime,
+  startTime
 }: AddClassSessionModalProps) {
   // Auth states
   const { userId, userRoles } = useAuth();
@@ -48,35 +51,59 @@ export default function AddClassSessionModal({
     teacherId: 0,
     topicId: 0,
     locationId: passedLocations[0]?.id || 0,
-    studentIds: [],
+    studentIds: []
   });
 
-  const [fieldErrors, setFieldErrors] = useState<{ [key: string]: string | null }>({});
+  const [fieldErrors, setFieldErrors] = useState<{
+    [key: string]: string | null;
+  }>({});
 
   // Recurrence-related states
-  const [recurrencePatternOption, setRecurrencePatternOption] = useState<string>('once');
-  const [dayDetails, setDayDetails] = useState<{ [key: string]: { startTime: string; duration: number } }>({});
+  const [recurrencePatternOption, setRecurrencePatternOption] =
+    useState<string>('weekly');
+  const [dayDetails, setDayDetails] = useState<{
+    [key: string]: { startTime: string; duration: number };
+  }>({});
 
   const handleDayDetailChange = (day: string, field: string, value: any) => {
     setDayDetails((prev) => ({
       ...prev,
-      [day]: { ...prev[day], [field]: value },
+      [day]: { ...prev[day], [field]: value }
     }));
   };
 
-  const handleDayToggle = (event: React.MouseEvent<HTMLElement>, newDays: string[]) => {
+  const resetDayDetails = () => {
+    setDayDetails({});
+  };
+
+  const handleDayToggle = (
+    event: React.MouseEvent<HTMLElement>,
+    newDays: string | string[] | null
+  ) => {
+    // Ensure newDays is always an array
+    const selectedDays = Array.isArray(newDays)
+      ? newDays
+      : newDays
+      ? [newDays]
+      : [];
+
     setDayDetails((prev) => {
       const updatedDetails = { ...prev };
-      newDays.forEach((day) => {
+
+      // Add new days to dayDetails
+      selectedDays.forEach((day) => {
         if (!updatedDetails[day]) {
           updatedDetails[day] = { startTime: '', duration: 0 };
         }
       });
+
+      // Remove days that are no longer selected
       Object.keys(updatedDetails).forEach((day) => {
-        if (!newDays.includes(day)) {
+        if (!selectedDays.includes(day)) {
           delete updatedDetails[day];
         }
       });
+
       return updatedDetails;
     });
   };
@@ -86,7 +113,7 @@ export default function AddClassSessionModal({
     newSession.sessions = Object.keys(dayDetails).map((day) => ({
       day,
       startTime: dayDetails[day].startTime,
-      duration: dayDetails[day].duration,
+      duration: dayDetails[day].duration
     }));
     console.log('Saving session:', newSession);
     onSave(newSession);
@@ -108,7 +135,7 @@ export default function AddClassSessionModal({
       teacherId: 0,
       topicId: 0,
       locationId: passedLocations[0]?.id || 0,
-      studentIds: [],
+      studentIds: []
     });
     setFieldErrors({});
     setRecurrencePatternOption('none');
@@ -158,6 +185,7 @@ export default function AddClassSessionModal({
       sessionTypes={sessionTypes}
       recurrencePatternOption={recurrencePatternOption}
       setRecurrencePatternOption={setRecurrencePatternOption}
+      resetDayDetails={resetDayDetails}
       dayDetails={dayDetails}
       handleDayDetailChange={handleDayDetailChange}
       handleDayToggle={handleDayToggle}
