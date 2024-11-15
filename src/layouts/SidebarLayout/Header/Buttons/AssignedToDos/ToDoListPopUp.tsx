@@ -35,7 +35,7 @@ const HeaderToDoList: React.FC = () => {
   );
   const [loading, setLoading] = useState(false);
   const [showPending, setShowPending] = useState(true);
-  const [showCompleted, setShowCompleted] = useState(true);
+  const [showCompleted, setShowCompleted] = useState(false);
 
   const fetchTodos = async (currentPage = 1) => {
     setLoading(true);
@@ -111,7 +111,7 @@ const HeaderToDoList: React.FC = () => {
 
   const renderTodoList = (list: any[], isCompleted: boolean) =>
     list.map((todo) => (
-      <Card 
+      <Card
         key={todo.id}
         variant="outlined"
         sx={{
@@ -157,7 +157,7 @@ const HeaderToDoList: React.FC = () => {
         <Button
           variant="text"
           color={isCompleted ? 'secondary' : 'primary'}
-          sx={{ alignSelf: 'flex-end', mt: 1 }}
+          sx={{ alignSelf: 'flex-end' }}
           onClick={() => handleToggleComplete(todo.id)}
         >
           {isCompleted ? 'Reopen Task' : 'Mark as Complete'}
