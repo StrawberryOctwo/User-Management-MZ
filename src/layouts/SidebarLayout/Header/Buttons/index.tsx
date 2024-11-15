@@ -18,7 +18,9 @@ function HeaderButtons() {
       <HeaderNotifications />
       <HeaderLocalization />
       <SurveyNotifications />
+      <ProtectedBox allowedRoles={['SuperAdmin']}>
       <ViewSurveysTable />
+      </ProtectedBox>
       <ProtectedBox allowedRoles={['SuperAdmin']}>
       <SurveyBuilder />
       </ProtectedBox>
