@@ -49,12 +49,6 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
   };
 
   const onSave = () => {
-    // Ensure dayDetails is correctly populated
-    if (!session.dayDetails || Object.keys(session.dayDetails).length === 0) {
-      console.error('dayDetails is empty or not defined:', session.dayDetails);
-      return;
-    }
-
     // Map dayDetails to sessions
     const updatedSessions = Object.keys(session.dayDetails).map((day) => ({
       day,
@@ -68,12 +62,10 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
       sessions: updatedSessions
     };
 
-    // Call addClassSession with the new session object
     if (tabIndex === 0) {
-      updateClassSession(appointmentId, newSessionObject);
-    } else if (tabIndex === 1) {
-      // Call updateClassSession with the new session object
       updateSessionInstance(appointmentId, editInstance);
+    } else if (tabIndex === 1) {
+      updateClassSession(appointmentId, newSessionObject);
     }
 
     onClose();
