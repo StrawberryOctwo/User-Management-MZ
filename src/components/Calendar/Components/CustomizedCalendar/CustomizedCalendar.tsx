@@ -1,17 +1,11 @@
-import React, {
-  useState,
-  useCallback,
-  useMemo,
-  useEffect
-} from 'react';
+import React, { useState, useCallback, useMemo, useEffect } from 'react';
 import { Box } from '@mui/material';
 import moment from 'moment';
 import { Views } from 'react-big-calendar';
-
 import 'react-datepicker/dist/react-datepicker.css';
 import './index.css';
-import EditAppointmentModal from '../Appointment/EditAppointmentModal';
-import AddClassSessionModal from '../Appointment/AddClassSessionModal';
+import EditAppointmentModal from '../Appointment/EditClassSession/EditAppointmentModal';
+import AddClassSessionModal from '../Appointment/AddClassSession/AddClassSessionModal';
 import ClassSessionDetailsModal from '../Modals/ClassSessionDetailsModal';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import { useAuth } from 'src/hooks/useAuth';
@@ -21,7 +15,7 @@ import {
 } from 'src/services/classSessionService';
 import FullCalendar from '@fullcalendar/react';
 import resourceTimelinePlugin from '@fullcalendar/resource-timeline';
-import EventItem from '../Appointment/EventItem';
+import EventItem from '../Appointment/EventItem/EventItem';
 import interactionPlugin from '@fullcalendar/interaction';
 import EventTypeSelectionModal from '../Modals/EventTypeSelectionModal';
 import ToDoModal from '../Modals/ToDoModal';
@@ -38,7 +32,6 @@ type Keys = keyof typeof Views;
 type DemoProps = {
   classSessionEvents: any[];
   onDateChange: (date: string) => void;
-  handleSaveClassSession: (newSession: any) => void;
   loadClassSessions: () => void;
   selectedLocations: any[];
 };
@@ -46,7 +39,6 @@ type DemoProps = {
 export default function CustomizedCalendar({
   classSessionEvents,
   onDateChange,
-  handleSaveClassSession,
   loadClassSessions,
   selectedLocations
 }: DemoProps) {
@@ -384,14 +376,11 @@ export default function CustomizedCalendar({
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         appointmentId={selectedAppointment}
-        onSave={handleSaveClassSession}
-        loadClassSessions={loadClassSessions}
       />
 
       <AddClassSessionModal
         isOpen={isAddModalOpen}
         onClose={handleCloseAddModal}
-        onSave={handleSaveClassSession}
         startTime={selectedRange.start}
         roomId={selectedRoom}
         passedLocations={selectedLocations}

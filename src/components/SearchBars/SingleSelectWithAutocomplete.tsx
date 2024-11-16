@@ -89,7 +89,7 @@ const SingleSelectWithAutocomplete = forwardRef(
     return (
       <Autocomplete
         options={options}
-        getOptionLabel={(option) => option[displayProperty]}
+        getOptionLabel={(option) => option[displayProperty] || ''}
         onChange={handleChange}
         onInputChange={(event, newInputValue) => setQuery(newInputValue)}
         loading={loading}

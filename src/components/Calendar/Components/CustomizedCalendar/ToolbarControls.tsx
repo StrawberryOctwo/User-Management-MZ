@@ -14,7 +14,7 @@ import ZoomInIcon from '@mui/icons-material/ZoomIn';
 import ZoomOutIcon from '@mui/icons-material/ZoomOut';
 import moment from 'moment';
 import { VIEW_OPTIONS } from '../../constants';
-import AddClassSessionModal from '../Appointment/AddClassSessionModal';
+import AddClassSessionModal from '../Appointment/AddClassSession/AddClassSessionModal';
 import RoleBasedComponent from 'src/components/ProtectedComponent';
 
 type ToolbarControlsProps = {
@@ -176,7 +176,6 @@ export default function ToolbarControls({
       <AddClassSessionModal
         isOpen={isAddModalOpen}
         onClose={handleCloseAddModal}
-        onSave={handleSaveClassSession}
         startTime={date}
       />
     </Box>

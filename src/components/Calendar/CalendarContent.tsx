@@ -11,7 +11,6 @@ import CalendarLegend from './Components/CalendarLegend';
 import { useAuth } from 'src/hooks/useAuth';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import {
-  addClassSessions,
   fetchClassSessions,
   fetchParentClassSessions,
   fetchUserClassSessions
@@ -116,7 +115,7 @@ const CalendarContent: React.FC = () => {
             endTime: session.endTime,
             sessionType: session.sessionType,
             reportStatus: session.reportStatus,
-            date: session.date,
+            date: session.date
           }
         },
         resourceId: resource
@@ -184,14 +183,6 @@ const CalendarContent: React.FC = () => {
     };
   }, []);
 
-  const handleSaveClassSession = async (session: Object) => {
-    try {
-      await addClassSessions(session);
-    } catch (error) {
-      console.error('Failed to add class session:', error);
-    }
-  };
-
   const handleFranchiseChange = (franchise: any) => {
     setSelectedFranchise(franchise);
     setSelectedLocations([]);
@@ -241,7 +232,6 @@ const CalendarContent: React.FC = () => {
         <CustomizedCalendar
           classSessionEvents={classSessionEvents}
           onDateChange={setDate}
-          handleSaveClassSession={handleSaveClassSession}
           loadClassSessions={loadClassSessions}
           selectedLocations={selectedLocations}
         />

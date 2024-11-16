@@ -9,14 +9,16 @@ import {
   TextField
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { daysOfWeek, recurrenceOptions } from './AddClassSessionUtils';
+import {
+  daysOfWeek,
+  recurrenceOptions
+} from '../AddClassSession/AddClassSessionUtils';
 
 export default function RecurrenceOptions({
-  recurrencePatternOption,
+  recurrenceOption,
   handleRecurrenceChange,
-  handleDayToggle,
   dayDetails,
-  handleDayDetailChange,
+  setDayDetail,
   resetDayDetails
 }) {
   const [durationError, setDurationError] = useState<Record<string, string>>(
@@ -33,7 +35,7 @@ export default function RecurrenceOptions({
 
     // Temporarily allow input but show error if invalid
     if (value === '' || !Number.isNaN(numericValue)) {
-      handleDayDetailChange(day, 'duration', numericValue);
+      setDayDetail(day, 'duration', numericValue);
 
       if (validateDuration(value)) {
         setDurationError((prev) => ({ ...prev, [day]: '' })); // Clear error
@@ -53,6 +55,56 @@ export default function RecurrenceOptions({
 
   const onlySelectedDay = Object.keys(dayDetails)[0];
 
+  const handleDayToggle = (
+    event: React.MouseEvent<HTMLElement>,
+    newDay: string | string[]
+  ) => {
+    let updatedDayDetails = { ...dayDetails };
+
+    if (recurrenceOption === 'weekly') {
+      // Allow only one day to be selected for 'weekly'
+      if (!newDay || newDay.length === 0) {
+        // If unselecting the currently selected day
+        updatedDayDetails = {};
+      } else {
+        if (typeof newDay === 'string') {
+          updatedDayDetails = {
+            [newDay]: updatedDayDetails[newDay] || {
+              startTime: '',
+              duration: 0
+            }
+          };
+        }
+      }
+    } else {
+      // Allow multiple days for other recurrence options
+      if (!Array.isArray(newDay)) {
+        newDay = [newDay];
+      }
+
+      // Add new days
+      newDay.forEach((day) => {
+        if (!updatedDayDetails[day]) {
+          updatedDayDetails[day] = { startTime: '', duration: 0 };
+        }
+      });
+
+      // Remove unselected days
+      Object.keys(updatedDayDetails).forEach((day) => {
+        if (!newDay.includes(day)) {
+          delete updatedDayDetails[day];
+        }
+      });
+    }
+
+    // Update dayDetails using setDayDetail for each day
+    resetDayDetails(); // Clear all existing day details
+    Object.keys(updatedDayDetails).forEach((day) => {
+      setDayDetail(day, 'startTime', updatedDayDetails[day].startTime);
+      setDayDetail(day, 'duration', updatedDayDetails[day].duration);
+    });
+  };
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* Recurrence Pattern Selection */}
@@ -61,9 +113,9 @@ export default function RecurrenceOptions({
         <RadioGroup
           row
           name="recurrence-pattern"
-          value={recurrencePatternOption}
+          value={recurrenceOption}
           onChange={(e) => {
-            handleRecurrenceChange(e.target.value);
+            handleRecurrenceChange(e);
             resetDayDetails();
           }}
         >
@@ -78,39 +130,33 @@ export default function RecurrenceOptions({
         </RadioGroup>
       </Box>
 
-      {/* Show Days Selection for Weekly or Custom */}
-      {recurrencePatternOption !== 'once' && (
-        <>
-          <Typography variant="subtitle1">Select Days</Typography>
-          <ToggleButtonGroup
-            value={Object.keys(dayDetails)}
-            onChange={handleDayToggle}
-            aria-label="days of the week"
-            exclusive={recurrencePatternOption === 'weekly'} // Allow one day for weekly
-            sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.2 }} // Adjust for wrapping and spacing
+      <ToggleButtonGroup
+        value={Object.keys(dayDetails)}
+        onChange={handleDayToggle}
+        aria-label="days of the week"
+        exclusive={recurrenceOption === 'weekly'}
+        sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.2 }}
+      >
+        {daysOfWeek.map((day) => (
+          <ToggleButton
+            key={day.value}
+            value={day.value}
+            aria-label={day.label}
+            sx={{
+              width: 51,
+              height: 51,
+              fontSize: '0.8rem',
+              padding: '0.5rem',
+              borderRadius: 1
+            }}
           >
-            {daysOfWeek.map((day) => (
-              <ToggleButton
-                key={day.value}
-                value={day.value}
-                aria-label={day.label}
-                sx={{
-                  width: 51,
-                  height: 51,
-                  fontSize: '0.8rem',
-                  padding: '0.5rem',
-                  borderRadius: 1
-                }}
-              >
-                {day.label.slice(0, 3).toUpperCase()}
-              </ToggleButton>
-            ))}
-          </ToggleButtonGroup>
-        </>
-      )}
+            {day.label.slice(0, 3).toUpperCase()}
+          </ToggleButton>
+        ))}
+      </ToggleButtonGroup>
 
       {/* Weekly Start Time and Duration */}
-      {recurrencePatternOption === 'weekly' && onlySelectedDay && (
+      {recurrenceOption === 'weekly' && onlySelectedDay && (
         <Box sx={{ display: 'flex', gap: 2 }}>
           <TextField
             label="Start Time"
@@ -118,11 +164,7 @@ export default function RecurrenceOptions({
             fullWidth
             value={dayDetails[onlySelectedDay]?.startTime || ''}
             onChange={(e) =>
-              handleDayDetailChange(
-                onlySelectedDay,
-                'startTime',
-                e.target.value
-              )
+              setDayDetail(onlySelectedDay, 'startTime', e.target.value)
             }
             InputLabelProps={{ shrink: true }}
           />
@@ -142,7 +184,7 @@ export default function RecurrenceOptions({
       )}
 
       {/* Custom Start Time and Duration */}
-      {recurrencePatternOption === 'custom' &&
+      {recurrenceOption === 'custom' &&
         Object.keys(dayDetails).map((day) => (
           <Box key={day} sx={{ display: 'flex', gap: 2 }}>
             <TextField
@@ -150,9 +192,7 @@ export default function RecurrenceOptions({
               type="time"
               fullWidth
               value={dayDetails[day]?.startTime || ''}
-              onChange={(e) =>
-                handleDayDetailChange(day, 'startTime', e.target.value)
-              }
+              onChange={(e) => setDayDetail(day, 'startTime', e.target.value)}
               InputLabelProps={{ shrink: true }}
             />
             <TextField

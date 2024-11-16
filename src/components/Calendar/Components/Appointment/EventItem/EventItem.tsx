@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import './EventItem.css';
-import { ReactComponent as OnlineIcon } from '../../assets/icons/OnlineIcon.svg';
-import { ReactComponent as GroupIcon } from '../../assets/icons/GroupIcon.svg';
-import { ReactComponent as UserIcon } from '../../assets/icons/UserIcon.svg';
+import { ReactComponent as OnlineIcon } from '../../../assets/icons/OnlineIcon.svg';
+import { ReactComponent as GroupIcon } from '../../../assets/icons/GroupIcon.svg';
+import { ReactComponent as UserIcon } from '../../../assets/icons/UserIcon.svg';
 import { Warning as WarningIcon } from '@mui/icons-material'; // Warning icon
 import { Button, Menu, MenuItem } from '@mui/material';
 import TvIcon from '@mui/icons-material/Tv';

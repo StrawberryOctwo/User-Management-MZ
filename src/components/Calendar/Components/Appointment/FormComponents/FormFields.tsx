@@ -1,4 +1,3 @@
-import React, { useEffect } from 'react';
 import {
   Box,
   Grid,
@@ -13,34 +12,100 @@ import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWith
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
 import RecurrenceOptions from './RecurrenceOptions';
 import DateFields from './DateFields';
+import { useSession } from '../../SessionContext';
+import { fetchTopics } from 'src/services/topicService';
+import { useEffect, useState } from 'react';
+import { fetchSessionTypes } from 'src/services/contractPackagesService';
+import {
+  fetchTeacherByUserId,
+  fetchTeachers
+} from 'src/services/teacherService';
+import { fetchStudents } from 'src/services/studentService';
+import { fetchLocations } from 'src/services/locationService';
 
 export default function FormFields({
-  newSession,
-  setNewSession,
-  selectedTeacher,
-  setSelectedTeacher,
-  selectedStudents,
-  setSelectedStudents,
-  selectedLocation,
-  setSelectedLocation,
-  selectedTopic,
-  setSelectedTopic,
   strongestRoles,
   userId,
-  fetchTeacherByUserId,
-  fetchTeachers,
-  fetchStudents,
-  fetchLocations,
-  fetchTopics,
-  sessionTypes,
-  recurrencePatternOption,
-  setRecurrencePatternOption,
-  resetDayDetails,
-  dayDetails,
-  handleDayDetailChange,
-  handleDayToggle,
-  fieldErrors
+  roomId,
+  editSession
 }) {
+  const {
+    session,
+    setSession,
+    setSessionField,
+    setDayDetail,
+    resetDayDetails
+  } = useSession();
+
+  const [sessionTypes, setSessionTypes] = useState([]);
+  const [selectedTopic, setSelectedTopic] = useState(null);
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
+  const [selectedStudents, setSelectedStudents] = useState([]);
+  const [selectedLocation, setSelectedLocation] = useState(null);
+
+  useEffect(() => {
+    if (editSession) {
+      // setSession(editSession);
+      console.log('editSession:', editSession);
+      // setSessionField('topicId', editSession.topic?.id);
+      // setSessionField('sessionType', editSession.sessionType?.id);
+      // setSessionField('teacherId', editSession.teacherId);
+      // setSessionField('locationId', editSession.location?.id);
+      // // setSessionField('studentIds', editSession.students.map((s) => s?.id));
+      // setSessionField('name', editSession.name);
+
+    }
+  }, []);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      const sessionTypesResponse = await fetchSessionTypes();
+      setSessionTypes(sessionTypesResponse || []);
+
+      if (session.topicId) {
+        const topicsResponse = await fetchTopics(1, 5, '');
+        const topic = topicsResponse.data.find((t) => t.id === session.topicId);
+        setSelectedTopic(topic);
+      }
+
+      if (session.teacherId) {
+        const teacher = await fetchTeacherByUserId(session.teacherId);
+        setSelectedTeacher({
+          ...teacher,
+          fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
+        });
+      }
+
+      if (session.studentIds.length > 0) {
+        const studentsResponse = await fetchStudents(1, 5, '');
+        const students = studentsResponse.data.filter((student) =>
+          session.studentIds.includes(student.id)
+        );
+        setSelectedStudents(
+          students.map((student) => ({
+            ...student,
+            fullName: `${student.firstName} ${student.lastName}`
+          }))
+        );
+      }
+
+      if (session.locationId) {
+        const locationsResponse = await fetchLocations(1, 5, '');
+        const location = locationsResponse.data.find(
+          (loc) => loc.id === session.locationId
+        );
+        setSelectedLocation(location);
+      }
+    };
+
+    fetchData();
+  }, [
+    session.topicId,
+    session.teacherId,
+    session.studentIds,
+    session.locationId
+  ]);
+
   return (
     <Grid container spacing={14} p={1}>
       {/* Left Column */}
@@ -54,8 +119,7 @@ export default function FormFields({
                 fetchTopics(1, 5, query).then((response) => response.data)
               }
               onSelect={(topic) => {
-                setSelectedTopic(topic);
-                setNewSession({ ...newSession, topicId: topic?.id });
+                setSession({ ...session, topicId: topic?.id });
               }}
               displayProperty="name"
               placeholder="Search Topic"
@@ -68,9 +132,9 @@ export default function FormFields({
               <InputLabel>Session Type</InputLabel>
               <Select
                 label="Session Type"
-                value={newSession.sessionType}
+                value={session.sessionType}
                 onChange={(e) =>
-                  setNewSession({ ...newSession, sessionType: e.target.value })
+                  setSession({ ...session, sessionType: e.target.value })
                 }
               >
                 {sessionTypes.map((type) => (
@@ -103,8 +167,7 @@ export default function FormFields({
                 )
             }
             onSelect={(teacher) => {
-              setSelectedTeacher(teacher);
-              setNewSession({ ...newSession, teacherId: teacher?.id });
+              setSession({ ...session, teacherId: teacher?.id });
             }}
             displayProperty="fullName"
             placeholder="Search Teacher"
@@ -125,9 +188,8 @@ export default function FormFields({
               )
             }
             onSelect={(selectedItems) => {
-              setSelectedStudents(selectedItems);
-              setNewSession({
-                ...newSession,
+              setSession({
+                ...session,
                 studentIds: selectedItems.map((item) => item.id)
               });
             }}
@@ -143,7 +205,9 @@ export default function FormFields({
             fetchData={(query) =>
               fetchLocations(1, 5, query).then((data) => data.data)
             }
-            onSelect={(location) => setSelectedLocation(location)}
+            onSelect={(location) => {
+              setSession({ ...session, locationId: location?.id });
+            }}
             displayProperty="name"
             placeholder="Search Location"
             initialValue={selectedLocation}
@@ -155,10 +219,8 @@ export default function FormFields({
           <InputLabel>Room</InputLabel>
           <Select
             label="Room"
-            value={newSession.name || ''}
-            onChange={(e) =>
-              setNewSession({ ...newSession, name: e.target.value })
-            }
+            value={session.name || ''}
+            onChange={(e) => setSession({ ...session, name: e.target.value })}
           >
             {Array.from({ length: 7 }, (_, index) => (
               <MenuItem key={index} value={`R${index + 1}`}>
@@ -172,20 +234,16 @@ export default function FormFields({
       {/* Right Column */}
       <Grid item xs={12} md={6}>
         <Box sx={{ mb: 1 }}>
-          <DateFields
-            newSession={newSession}
-            setNewSession={setNewSession}
-            fieldErrors={fieldErrors}
-          />
+          <DateFields session={session} setSession={setSession} />
         </Box>
         <Box sx={{ mb: 1 }}>
           <FormControlLabel
             control={
               <Checkbox
-                checked={newSession.isHolidayCourse}
+                checked={session.isHolidayCourse}
                 onChange={(e) =>
-                  setNewSession({
-                    ...newSession,
+                  setSession({
+                    ...session,
                     isHolidayCourse: e.target.checked
                   })
                 }
@@ -198,11 +256,17 @@ export default function FormFields({
         </Box>
         <Box>
           <RecurrenceOptions
-            recurrencePatternOption={recurrencePatternOption}
-            handleRecurrenceChange={setRecurrencePatternOption}
-            handleDayToggle={handleDayToggle}
-            dayDetails={dayDetails}
-            handleDayDetailChange={handleDayDetailChange}
+            recurrenceOption={session.recurrenceOption}
+            handleRecurrenceChange={(
+              e: React.ChangeEvent<{ value: unknown }>
+            ) =>
+              setSession({
+                ...session,
+                recurrenceOption: e.target.value as string
+              })
+            }
+            dayDetails={session.dayDetails}
+            setDayDetail={setDayDetail}
             resetDayDetails={resetDayDetails}
           />
         </Box>

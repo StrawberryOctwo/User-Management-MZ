@@ -54,7 +54,7 @@ export const fetchParentClassSessions = async (
   }
 };
 
-export const addClassSessions = async (classData: any) => {
+export const addClassSession = async (classData: any) => {
   try {
     const response = await api.post('/class-session', classData);
     return response.data;
@@ -83,6 +83,7 @@ export const updateClassSession = async (id: string, updatedData: any) => {
     throw error;
   }
 };
+
 export const getClassSessionReportsStatus = async (classSessionId: string) => {
   try {
     const response = await api.get(
