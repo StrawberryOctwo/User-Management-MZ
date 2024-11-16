@@ -42,16 +42,16 @@ const CalendarContent: React.FC = () => {
       const role = roles.includes('SuperAdmin')
         ? 'SuperAdmin'
         : roles.includes('FranchiseAdmin')
-        ? 'FranchiseAdmin'
-        : roles.includes('LocationAdmin')
-        ? 'LocationAdmin'
-        : roles.includes('Teacher')
-        ? 'Teacher'
-        : roles.includes('Parent')
-        ? 'Parent'
-        : roles.includes('Student')
-        ? 'Student'
-        : null;
+          ? 'FranchiseAdmin'
+          : roles.includes('LocationAdmin')
+            ? 'LocationAdmin'
+            : roles.includes('Teacher')
+              ? 'Teacher'
+              : roles.includes('Parent')
+                ? 'Parent'
+                : roles.includes('Student')
+                  ? 'Student'
+                  : null;
       setStrongestRole(role);
     }
   }, [userRoles]);
@@ -110,7 +110,7 @@ const CalendarContent: React.FC = () => {
             className: session.name,
             teacher: session.teacherName,
             studentCount: session.students.length,
-            students: studentsWithStatus, // Array of first names of students
+            students: studentsWithStatus,
             startTime: session.startTime,
             endTime: session.endTime,
             sessionType: session.sessionType,
@@ -138,7 +138,9 @@ const CalendarContent: React.FC = () => {
             date,
             date
           );
-          break;
+          if (JSON.stringify(response.userLocations) !== JSON.stringify(selectedLocations)) {
+            setSelectedLocations(response.userLocations);
+          } break;
         case 'Parent':
           response = await fetchParentClassSessions(
             userId?.toString() || '',
@@ -226,13 +228,13 @@ const CalendarContent: React.FC = () => {
       {['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin'].includes(
         strongestRole || ''
       ) && (
-        <FilterToolbar
-          onFranchiseChange={handleFranchiseChange}
-          onLocationsChange={handleLocationsChange}
-          selectedFranchise={selectedFranchise}
-          selectedLocations={selectedLocations}
-        />
-      )}
+          <FilterToolbar
+            onFranchiseChange={handleFranchiseChange}
+            onLocationsChange={handleLocationsChange}
+            selectedFranchise={selectedFranchise}
+            selectedLocations={selectedLocations}
+          />
+        )}
 
       <Box sx={{ position: 'relative', height: '100%', overflow: 'hidden' }}>
         <CustomizedCalendar

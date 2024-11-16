@@ -18,7 +18,6 @@ const EventItem = ({ eventInfo }) => {
     status,
     reportStatus
   } = eventInfo.event.extendedProps;
-  console.log("eventInfo", eventInfo);
   const startTime = moment(eventInfo.event.start).format('HH:mm');
   const endTime = moment(eventInfo.event.end).format('HH:mm');
   const sessionTypeName = sessionType?.name;
