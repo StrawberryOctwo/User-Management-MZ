@@ -84,6 +84,16 @@ export const updateClassSession = async (id: string, updatedData: any) => {
   }
 };
 
+export const updateSessionInstance = async (id: string, updatedData: any) => {
+  try {
+    const response = await api.put(`/session-instance/${id}`, updatedData);
+    return response.data;
+  } catch (error) {
+    console.error(`Error updating class session with id ${id}:`, error);
+    throw error;
+  }
+};
+
 export const getClassSessionReportsStatus = async (classSessionId: string) => {
   try {
     const response = await api.get(

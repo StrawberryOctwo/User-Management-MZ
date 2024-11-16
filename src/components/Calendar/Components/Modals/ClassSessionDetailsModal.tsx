@@ -201,7 +201,13 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       maxWidth={false}
       sx={{ '& .MuiDialog-paper': { width: '750px', maxWidth: '750px' } }} // Set the custom width
     >
-      <DialogTitle sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+      <DialogTitle
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}
+      >
         <Typography variant="h6">Class Session Details</Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
           {canEdit && (
@@ -218,7 +224,12 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                 <EditIcon />
               </IconButton>
               <RoleBasedComponent
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher']}
+                allowedRoles={[
+                  'SuperAdmin',
+                  'FranchiseAdmin',
+                  'LocationAdmin',
+                  'Teacher'
+                ]}
               >
                 <IconButton
                   onClick={() => setDeactivateDialogOpen(true)}
@@ -229,7 +240,11 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                     '&:hover': { backgroundColor: '#e0e0e0' }
                   }}
                 >
-                  {classSession?.isActive ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                  {classSession?.isActive ? (
+                    <VisibilityOffIcon />
+                  ) : (
+                    <VisibilityIcon />
+                  )}
                 </IconButton>
               </RoleBasedComponent>
             </>
@@ -258,7 +273,8 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
               <Card variant="outlined" sx={{ mb: 3 }}>
                 <CardContent>
                   <Typography variant="subtitle1">
-                    <strong>Session Name:</strong> {classSession.classSession.name}
+                    <strong>Session Name:</strong>{' '}
+                    {classSession.classSession.name}
                   </Typography>
                   <Typography variant="subtitle1">
                     <strong>Teacher:</strong>{' '}
@@ -266,7 +282,8 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                     {classSession.teacher?.user?.lastName}
                   </Typography>
                   <Typography variant="subtitle1">
-                    <strong>Topic:</strong> {classSession.classSession.topic?.name}
+                    <strong>Topic:</strong>{' '}
+                    {classSession.classSession.topic?.name}
                   </Typography>
                   <Typography variant="subtitle1">
                     <strong>Location:</strong> {classSession.location.name}
@@ -281,7 +298,10 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                   </Typography>
                   <Typography variant="subtitle1">
                     <strong>End Time:</strong>{' '}
-                    {calculateEndTimeInMinutes(classSession.startTime, classSession.duration)}
+                    {calculateEndTimeInMinutes(
+                      classSession.startTime,
+                      classSession.duration
+                    )}
                   </Typography>
                 </CardContent>
                 <CardContent>
@@ -305,7 +325,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                       }
                     }}
                   >
-                    {classSession.note}
+                    {classSession.note || 'No notes available.'}
                   </Typography>
                 </CardContent>
               </Card>
@@ -464,8 +484,9 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       </ReusableDialog>
       <ReusableDialog
         open={deactivateDialogOpen}
-        title={`Confirm ${classSession?.isActive ? 'Deactivation' : 'Reactivation'
-          }`}
+        title={`Confirm ${
+          classSession?.isActive ? 'Deactivation' : 'Reactivation'
+        }`}
         onClose={() => setDeactivateDialogOpen(false)}
         actions={
           <>

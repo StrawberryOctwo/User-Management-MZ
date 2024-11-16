@@ -44,19 +44,6 @@ export default function FormFields({
   const [selectedLocation, setSelectedLocation] = useState(null);
 
   useEffect(() => {
-    if (editSession) {
-      // setSession(editSession);
-      console.log('editSession:', editSession);
-      // setSessionField('topicId', editSession.topic?.id);
-      // setSessionField('sessionType', editSession.sessionType?.id);
-      // setSessionField('teacherId', editSession.teacherId);
-      // setSessionField('locationId', editSession.location?.id);
-      // // setSessionField('studentIds', editSession.students.map((s) => s?.id));
-      // setSessionField('name', editSession.name);
-    }
-  }, []);
-
-  useEffect(() => {
     const fetchData = async () => {
       const sessionTypesResponse = await fetchSessionTypes();
       setSessionTypes(sessionTypesResponse || []);
@@ -106,7 +93,7 @@ export default function FormFields({
   ]);
 
   return (
-    <Grid container spacing={14} p={1}>
+    <Grid container spacing={10} p={1}>
       {/* Left Column */}
       <Grid item xs={12} md={6}>
         <Box sx={{ mb: 3 }}>

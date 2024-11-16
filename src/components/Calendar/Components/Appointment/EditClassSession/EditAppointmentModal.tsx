@@ -14,8 +14,10 @@ import { useSession } from '../../SessionContext';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import {
   fetchClassSessionById,
-  updateClassSession
+  updateClassSession,
+  updateSessionInstance
 } from 'src/services/classSessionService';
+import EditSessionInstanceTab from './EditSessionInstanceTab';
 
 interface EditClassSessionModalProps {
   isOpen: boolean;
@@ -35,6 +37,7 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
   appointmentId
 }) => {
   const [editSession, setEditSession] = useState({});
+  const [editInstance, setEditInstance] = useState({});
   const { userId, userRoles } = useAuth();
   const { session, clearSession } = useSession();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
@@ -66,10 +69,13 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
     };
 
     // Call addClassSession with the new session object
-    updateClassSession(appointmentId, newSessionObject);
+    if (tabIndex === 0) {
+      updateClassSession(appointmentId, newSessionObject);
+    } else if (tabIndex === 1) {
+      // Call updateClassSession with the new session object
+      updateSessionInstance(appointmentId, editInstance);
+    }
 
-    // Clear the form
-    clearSession();
     onClose();
   };
 
@@ -79,7 +85,7 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} maxWidth="lg" fullWidth>
+    <Dialog open={isOpen} onClose={handleClose} maxWidth="md" fullWidth>
       <Tabs
         value={tabIndex}
         onChange={handleTabChange}
@@ -89,8 +95,8 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
           ml: 4
         }}
       >
-        <Tab label="Edit Class (All Sessions)" />
         <Tab label="Edit Current Session" />
+        <Tab label="Edit Class (All Sessions)" />
       </Tabs>
       <DialogContent
         sx={{
@@ -98,11 +104,9 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
         }}
       >
         {tabIndex === 0 && (
-          <FormFields
-            strongestRoles={strongestRoles}
-            userId={userId}
-            roomId={roomId}
-            editSession={editSession}
+          <EditSessionInstanceTab
+            session={editInstance}
+            setSession={setEditInstance}
           />
         )}
         {tabIndex === 1 && (
