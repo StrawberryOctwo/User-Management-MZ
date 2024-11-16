@@ -92,10 +92,11 @@ const CalendarContent: React.FC = () => {
     return classSessions.map((session) => {
       const resource = session.name || 1;
 
+      console.log('students', session);
       const studentsWithStatus = session.students.map((student) => ({
         firstName: student.firstName,
-        absenceStatus: student.absenceStatus,
-        gradeLevel: student.gradeLevel
+        gradeLevel: student.gradeLevel,
+        absenceStatus: student.absences.length > 0 ? true : false,
       }));
 
       return {
