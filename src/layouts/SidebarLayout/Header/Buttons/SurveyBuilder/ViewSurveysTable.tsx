@@ -83,7 +83,7 @@ function ViewSurveysTable() {
   };
 
   const handleRowsPerPageChange = (event) => {
-    setRowsPerPage(parseInt(event.target.value, 10));
+    setRowsPerPage(parseInt(event.target.value, 5));
     setPage(1);
   };
 
