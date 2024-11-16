@@ -36,9 +36,8 @@ export default function AddClassSessionModal({
   const [selectedStudents, setSelectedStudents] = useState<any[]>([]);
   const [selectedTeacher, setSelectedTeacher] = useState<any | null>(null);
   const [selectedTopic, setSelectedTopic] = useState<any | null>(null);
-  const [selectedLocation, setSelectedLocation] = useState<any | null>(
-    passedLocations[0] || null
-  );
+  const [selectedLocation, setSelectedLocation] = useState<any | null>(null); // Initialize as null
+
   const [sessionTypes, setSessionTypes] = useState<any[]>([]);
   const [newSession, setNewSession] = useState<any>({
     name: roomId || '',
@@ -84,8 +83,8 @@ export default function AddClassSessionModal({
     const selectedDays = Array.isArray(newDays)
       ? newDays
       : newDays
-      ? [newDays]
-      : [];
+        ? [newDays]
+        : [];
 
     setDayDetails((prev) => {
       const updatedDetails = { ...prev };
@@ -156,6 +155,11 @@ export default function AddClassSessionModal({
     setDayDetails({});
   };
 
+  const handleClose = () => {
+    clearForm();
+    onClose();
+  };
+
   useEffect(() => {
     const fetchData = async () => {
       const types = await fetchSessionTypes();
@@ -168,10 +172,15 @@ export default function AddClassSessionModal({
     }
   }, [roomId]);
 
-  const handleClose = () => {
-    clearForm();
-    onClose();
-  };
+  useEffect(() => {
+    if (passedLocations.length > 0) {
+      setSelectedLocation(passedLocations[0]);
+      setNewSession((prev) => ({
+        ...prev,
+        locationId: passedLocations[0]?.id || 0
+      }));
+    }
+  }, [passedLocations]);
 
   return (
     <AddClassSessionDialog
