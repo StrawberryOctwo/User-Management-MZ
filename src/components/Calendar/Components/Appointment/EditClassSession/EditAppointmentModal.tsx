@@ -4,7 +4,9 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Button
+  Button,
+  Tab,
+  Tabs
 } from '@mui/material';
 import FormFields from '../FormComponents/FormFields';
 import { useAuth } from 'src/hooks/useAuth';
@@ -37,6 +39,11 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
   const { session, clearSession } = useSession();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
   const [disabled, setDisabled] = useState(false);
+  const [tabIndex, setTabIndex] = useState(0);
+
+  const handleTabChange = (event, newValue) => {
+    setTabIndex(newValue);
+  };
 
   const onSave = () => {
     // Ensure dayDetails is correctly populated
@@ -73,18 +80,39 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
 
   return (
     <Dialog open={isOpen} onClose={handleClose} maxWidth="lg" fullWidth>
-      <DialogTitle>Edit Class Session</DialogTitle>
+      <Tabs
+        value={tabIndex}
+        onChange={handleTabChange}
+        aria-label="edit tabs"
+        sx={{
+          mt: 2,
+          ml: 4
+        }}
+      >
+        <Tab label="Edit Class (All Sessions)" />
+        <Tab label="Edit Current Session" />
+      </Tabs>
       <DialogContent
         sx={{
           paddingBottom: 0
         }}
       >
-        <FormFields
-          strongestRoles={strongestRoles}
-          userId={userId}
-          roomId={roomId}
-          editSession={editSession}
-        />
+        {tabIndex === 0 && (
+          <FormFields
+            strongestRoles={strongestRoles}
+            userId={userId}
+            roomId={roomId}
+            editSession={editSession}
+          />
+        )}
+        {tabIndex === 1 && (
+          <FormFields
+            strongestRoles={strongestRoles}
+            userId={userId}
+            roomId={roomId}
+            editSession={editSession}
+          />
+        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="secondary">
