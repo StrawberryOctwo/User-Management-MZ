@@ -308,15 +308,21 @@ export default function CustomizedCalendar({
     console.log('Saving To-Do:', todo);
   };
 
-  const resources = [
-    { id: 'R1', title: 'Room 1' },
-    { id: 'R2', title: 'Room 2' },
-    { id: 'R3', title: 'Room 3' },
-    { id: 'R4', title: 'Room 4' },
-    { id: 'R5', title: 'Room 5' },
-    { id: 'R6', title: 'Room 6' },
-    { id: 'R7', title: 'Room 7' }
-  ];
+  const resources = useMemo(() => {
+    const maxRooms = selectedLocations.reduce(
+      (max, location) => Math.max(max, location.numberOfRooms || 0),
+      0
+    );
+
+    const unsortedResources = Array.from({ length: maxRooms }, (_, index) => ({
+      id: `R${index + 1}`,
+      title: `Room ${index + 1}`,
+      sortOrder: index + 1 // Custom field for numerical sorting
+    }));
+
+    return unsortedResources.sort((a, b) => a.sortOrder - b.sortOrder);
+  }, [selectedLocations]);
+
 
   const renderEventContent = (eventInfo: any) => {
     return <EventItem eventInfo={eventInfo} />;
@@ -348,12 +354,18 @@ export default function CustomizedCalendar({
           }
         }}
         resources={resources}
+        resourceOrder="sortOrder"
         events={events}
         eventContent={renderEventContent}
-        slotMinTime="12:00:00"
-        slotMaxTime="20:00:00"
+        slotMinTime="12:00:00" // Start time at 12:00
+        slotMaxTime="19:00:00" // End time at 19:00
         resourceAreaWidth="120px"
         selectable={true}
+        slotLabelFormat={{
+          hour: '2-digit', // Display two digits for hours
+          minute: '2-digit', // Display two digits for minutes
+          hour12: false // Use 24-hour format
+        }}
         datesSet={(info) => {
           onDateChange(moment(info.start).format('YYYY-MM-DD'));
         }}

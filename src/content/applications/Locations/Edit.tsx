@@ -27,6 +27,7 @@ export default function EditLocation() {
                 address: fetchedData.address,
                 city: fetchedData.city,
                 postal_code: fetchedData.postal_code,
+                numberOfRooms: fetchedData.numberOfRooms,
             };
 
             setLocationData(flattenedData);
@@ -59,10 +60,11 @@ export default function EditLocation() {
                 address: data['address'],
                 city: data['city'],
                 postal_code: data['postal_code'],
-                franchiseId: selectedFranchise.id, // Use single franchise ID in the payload
+                franchiseId: selectedFranchise.id,
+                numberOfRooms: data['numberOfRooms'],
             };
 
-            const response = await updateLocation(Number(id), payload); // Call your API service with the structured payload
+            const response = await updateLocation(Number(id), payload);
 
             // Refetch the location data after successful update
             await fetchLocation();
@@ -81,6 +83,7 @@ export default function EditLocation() {
         { name: 'address', label: t('address'), type: 'text', required: true, section: 'Location Information' },
         { name: 'city', label: t('city'), type: 'text', required: true, section: 'Location Information' },
         { name: 'postal_code', label: t('postal_code'), type: 'text', required: true, section: 'Location Information' },
+        { name: 'numberOfRooms', label: t('number_of_rooms'), type: 'number', required: true, section: 'Location Information' },
         {
             name: 'franchises',
             label: 'Franchise',

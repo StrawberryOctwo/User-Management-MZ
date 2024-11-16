@@ -10,7 +10,8 @@ interface MultiSelectWithCheckboxesProps {
     displayProperty: string; // Property to display in the options
     placeholder?: string; // Placeholder text
     initialValue?: any[]; // Initial selected values for edit or pre-filled forms
-    width?: string | number; // Optional width prop for dynamic width
+    width?: string | number;
+    disabled?: boolean;
 }
 
 const MultiSelectWithCheckboxes = forwardRef(({
@@ -21,6 +22,7 @@ const MultiSelectWithCheckboxes = forwardRef(({
     placeholder = 'Select...',
     initialValue = [],
     width = '95%',
+    disabled = false
 }: MultiSelectWithCheckboxesProps, ref) => {
     const [query, setQuery] = useState('');
     const [options, setOptions] = useState<any[]>(initialValue || []);
@@ -48,7 +50,7 @@ const MultiSelectWithCheckboxes = forwardRef(({
         let active = true;
 
         const fetchOptions = async () => {
-            if (focused) { // Only fetch options if the input is focused
+            if (focused && !disabled) {
                 setLoading(true);
                 try {
                     const data = await fetchData(query);
@@ -76,7 +78,7 @@ const MultiSelectWithCheckboxes = forwardRef(({
         return () => {
             active = false;
         };
-    }, [focused, query, fetchData, selectedItems]);
+    }, [focused, query, fetchData, selectedItems, disabled]);
 
     const handleFocus = () => setFocused(true); // Set focus state
     const handleBlur = () => setFocused(false); // Reset focus state on blur
@@ -130,6 +132,7 @@ const MultiSelectWithCheckboxes = forwardRef(({
                 />
             )}
             style={{ width }}
+            disabled={disabled}
         />
     );
 });
