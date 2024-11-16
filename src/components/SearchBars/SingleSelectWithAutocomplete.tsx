@@ -8,13 +8,13 @@ import { TextField, Autocomplete, CircularProgress } from '@mui/material';
 
 interface SingleSelectWithAutocompleteProps {
   label: string;
-  fetchData: (query: string) => Promise<any[]>; // Function to fetch data based on the query
-  onSelect: (selectedItem: any) => void; // Callback when an item is selected
-  displayProperty: string; // Property to display in the options
-  placeholder?: string; // Placeholder text
-  disabled?: boolean; // Disabled state
-  initialValue?: any; // Initial selected value for the input
-  width?: string | number; // Optional width prop for dynamic width
+  fetchData: (query: string) => Promise<any[]>;
+  onSelect: (selectedItem: any) => void;
+  displayProperty: string;
+  placeholder?: string;
+  disabled?: boolean;
+  initialValue?: any;
+  width?: string | number;
 }
 
 const SingleSelectWithAutocomplete = forwardRef(
@@ -35,7 +35,7 @@ const SingleSelectWithAutocomplete = forwardRef(
     const [options, setOptions] = useState<any[]>([]);
     const [selectedItem, setSelectedItem] = useState<any | null>(initialValue);
     const [loading, setLoading] = useState(false);
-    const [focused, setFocused] = useState(false); // Track focus state
+    const [focused, setFocused] = useState(false);
 
     useImperativeHandle(ref, () => ({
       reset: () => {
@@ -46,7 +46,6 @@ const SingleSelectWithAutocomplete = forwardRef(
     }));
 
     useEffect(() => {
-      // Update selected item when initialValue changes
       setSelectedItem(initialValue);
     }, [initialValue]);
 
@@ -55,16 +54,15 @@ const SingleSelectWithAutocomplete = forwardRef(
 
       const fetchOptions = async () => {
         if (focused) {
-          // Ensure API is called only when focused
           setLoading(true);
           try {
             const data = await fetchData(query);
             if (active) {
-              setOptions(Array.isArray(data) ? data : []); // Ensure data is an array
+              setOptions(Array.isArray(data) ? data : []);
             }
           } catch (error) {
             console.error('Error fetching options:', error);
-            setOptions([]); // Set options to an empty array on error
+            setOptions([]);
           } finally {
             if (active) {
               setLoading(false);
@@ -78,10 +76,10 @@ const SingleSelectWithAutocomplete = forwardRef(
       return () => {
         active = false;
       };
-    }, [focused, query, fetchData]); // Only refetch when focused or query changes
+    }, [focused, query, fetchData]);
 
-    const handleFocus = () => setFocused(true); // Set focus state when focused
-    const handleBlur = () => setFocused(false); // Reset focus state when blurred
+    const handleFocus = () => setFocused(true);
+    const handleBlur = () => setFocused(false);
 
     const handleChange = (event: any, value: any) => {
       setSelectedItem(value);
@@ -100,8 +98,8 @@ const SingleSelectWithAutocomplete = forwardRef(
           option[displayProperty] === value[displayProperty]
         }
         disabled={disabled}
-        onFocus={handleFocus} // Add focus handler
-        onBlur={handleBlur} // Add blur handler
+        onFocus={handleFocus}
+        onBlur={handleBlur}
         renderInput={(params) => (
           <TextField
             {...params}

@@ -6,10 +6,7 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  TextField,
   FormControlLabel,
-  Switch,
-  Typography,
   Checkbox
 } from '@mui/material';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
@@ -93,17 +90,17 @@ export default function FormFields({
             fetchData={(query) =>
               strongestRoles.includes('Teacher')
                 ? fetchTeacherByUserId(userId).then((teacher) => [
-                    {
-                      ...teacher,
-                      fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
-                    }
-                  ])
+                  {
+                    ...teacher,
+                    fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
+                  }
+                ])
                 : fetchTeachers(1, 5, query).then((data) =>
-                    data.data.map((teacher) => ({
-                      ...teacher,
-                      fullName: `${teacher.firstName} ${teacher.lastName}`
-                    }))
-                  )
+                  data.data.map((teacher) => ({
+                    ...teacher,
+                    fullName: `${teacher.firstName} ${teacher.lastName}`
+                  }))
+                )
             }
             onSelect={(teacher) => {
               setSelectedTeacher(teacher);
@@ -150,6 +147,7 @@ export default function FormFields({
             displayProperty="name"
             placeholder="Search Location"
             initialValue={selectedLocation}
+            disabled={!strongestRoles.includes('Teacher')}
           />
         </Box>
 

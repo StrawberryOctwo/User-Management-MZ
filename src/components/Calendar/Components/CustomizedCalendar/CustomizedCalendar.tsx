@@ -2,13 +2,11 @@ import React, {
   useState,
   useCallback,
   useMemo,
-  cloneElement,
   useEffect
 } from 'react';
 import { Box } from '@mui/material';
 import moment from 'moment';
-import { EventProps, Views } from 'react-big-calendar';
-import Calendar from '../Calendar';
+import { Views } from 'react-big-calendar';
 
 import 'react-datepicker/dist/react-datepicker.css';
 import './index.css';
@@ -24,9 +22,6 @@ import {
 import FullCalendar from '@fullcalendar/react';
 import resourceTimelinePlugin from '@fullcalendar/resource-timeline';
 import EventItem from '../Appointment/EventItem';
-
-import dayGridPlugin from '@fullcalendar/daygrid';
-import timeGridPlugin from '@fullcalendar/timegrid';
 import interactionPlugin from '@fullcalendar/interaction';
 import EventTypeSelectionModal from '../Modals/EventTypeSelectionModal';
 import ToDoModal from '../Modals/ToDoModal';
@@ -92,38 +87,38 @@ export default function CustomizedCalendar({
   const { userRoles } = useAuth();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
 
-  const onPrevClick = useCallback(() => {
-    if (view === Views.DAY) {
-      setDate(moment(date).subtract(1, 'd').toDate());
-    } else if (view === Views.WEEK) {
-      setDate(moment(date).subtract(1, 'w').toDate());
-    } else {
-      setDate(moment(date).subtract(1, 'M').toDate());
-    }
-  }, [view, date]);
-
-  const onNextClick = useCallback(() => {
-    if (view === Views.DAY) {
-      setDate(moment(date).add(1, 'd').toDate());
-    } else if (view === Views.WEEK) {
-      setDate(moment(date).add(1, 'w').toDate());
-    } else {
-      setDate(moment(date).add(1, 'M').toDate());
-    }
-  }, [view, date]);
-
-  const dateText = useMemo(() => {
-    if (view === Views.DAY) return moment(date).format('dddd, MMMM DD');
-    if (view === Views.WEEK) {
-      const from = moment(date)?.startOf('week');
-      const to = moment(date)?.endOf('week');
-      return `${from.format('MMMM DD')} to ${to.format('MMMM DD')}`;
-    }
-  }, [view, date]);
-
-  const onTodayClick = useCallback(() => {
-    setDate(moment().toDate());
-  }, []);
+  /*   const onPrevClick = useCallback(() => {
+      if (view === Views.DAY) {
+        setDate(moment(date).subtract(1, 'd').toDate());
+      } else if (view === Views.WEEK) {
+        setDate(moment(date).subtract(1, 'w').toDate());
+      } else {
+        setDate(moment(date).subtract(1, 'M').toDate());
+      }
+    }, [view, date]);
+  
+    const onNextClick = useCallback(() => {
+      if (view === Views.DAY) {
+        setDate(moment(date).add(1, 'd').toDate());
+      } else if (view === Views.WEEK) {
+        setDate(moment(date).add(1, 'w').toDate());
+      } else {
+        setDate(moment(date).add(1, 'M').toDate());
+      }
+    }, [view, date]);
+  
+    const dateText = useMemo(() => {
+      if (view === Views.DAY) return moment(date).format('dddd, MMMM DD');
+      if (view === Views.WEEK) {
+        const from = moment(date)?.startOf('week');
+        const to = moment(date)?.endOf('week');
+        return `${from.format('MMMM DD')} to ${to.format('MMMM DD')}`;
+      }
+    }, [view, date]);
+  
+    const onTodayClick = useCallback(() => {
+      setDate(moment().toDate());
+    }, []); */
 
   const handleEventClick = (event: any) => {
     const eventEndDate = new Date(event.end);
@@ -233,8 +228,6 @@ export default function CustomizedCalendar({
       const formattedTeacher = `${firstName[0]}. ${lastName}`;
       const hasOverlap = checkOverlap(session, classSessionEvents);
 
-      console.log('Session:', session);
-
       return {
         id: session.data.appointment.id,
         resourceId: session.resourceId,
@@ -261,12 +254,14 @@ export default function CustomizedCalendar({
     if (strongestRoles[0] == 'Student' || strongestRoles[0] == 'Parent') {
       return;
     }
-    if (selectedLocations.length > 1) {
-      showMessage(
-        'Please select a single location to add a class session.',
-        'error'
-      );
-      return;
+    if (strongestRoles[0] != 'Teacher') {
+      if (selectedLocations.length > 1) {
+        showMessage(
+          'Please select a single location to add a class session.',
+          'error'
+        );
+        return;
+      }
     }
     setSelectedRoom(roomId);
     setSelectedRange({ start, end });
@@ -317,12 +312,11 @@ export default function CustomizedCalendar({
     const unsortedResources = Array.from({ length: maxRooms }, (_, index) => ({
       id: `R${index + 1}`,
       title: `Room ${index + 1}`,
-      sortOrder: index + 1 // Custom field for numerical sorting
+      sortOrder: index + 1
     }));
 
     return unsortedResources.sort((a, b) => a.sortOrder - b.sortOrder);
   }, [selectedLocations]);
-
 
   const renderEventContent = (eventInfo: any) => {
     return <EventItem eventInfo={eventInfo} />;
@@ -357,14 +351,14 @@ export default function CustomizedCalendar({
         resourceOrder="sortOrder"
         events={events}
         eventContent={renderEventContent}
-        slotMinTime="12:00:00" // Start time at 12:00
-        slotMaxTime="19:00:00" // End time at 19:00
+        slotMinTime="12:00:00"
+        slotMaxTime="19:00:00"
         resourceAreaWidth="120px"
         selectable={true}
         slotLabelFormat={{
-          hour: '2-digit', // Display two digits for hours
-          minute: '2-digit', // Display two digits for minutes
-          hour12: false // Use 24-hour format
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: false
         }}
         datesSet={(info) => {
           onDateChange(moment(info.start).format('YYYY-MM-DD'));
