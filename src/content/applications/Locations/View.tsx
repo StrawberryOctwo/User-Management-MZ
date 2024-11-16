@@ -113,7 +113,6 @@ const ViewLocationPage: React.FC = () => {
             columns: [
                 { field: 'firstName', headerName: t('first_name'), flex: 1 },
                 { field: 'lastName', headerName: t('last_name'), flex: 1 },
-                { field: 'payPerHour', headerName: t('pay_per_hour'), flex: 1 },
                 { field: 'status', headerName: t('status'), flex: 1 },
                 { field: 'contractType', headerName: t('contract_type'), flex: 1 },
                 { field: 'contractEndDate', headerName: t('contract_end_date'), flex: 1 },

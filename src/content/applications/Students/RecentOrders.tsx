@@ -115,9 +115,7 @@ export default function StudentsContent() {
           { field: 'fullName', headerName: 'Full Name' },
           { field: 'email', headerName: 'Email' },
           { field: 'gradeLevel', headerName: 'Grade Level' },
-          { field: 'status', headerName: 'Status' },
-          { field: 'payPerHour', headerName: 'Pay Per Hour' },
-        ]}
+          { field: 'status', headerName: 'Status' },        ]}
         title="Student List"
         onEdit={handleEdit}
         onView={handleView}
