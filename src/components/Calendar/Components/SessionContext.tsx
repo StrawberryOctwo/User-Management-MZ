@@ -6,7 +6,7 @@ interface DayDetail {
 }
 
 interface Session {
-  name: string;
+  room: string;
   startDate: Date;
   endDate: Date;
   note: string;
@@ -32,7 +32,7 @@ interface SessionContextProps {
 }
 
 const defaultSession: Session = {
-  name: '',
+  room: '',
   startDate: new Date(),
   endDate: (() => {
     const date = new Date();

@@ -53,7 +53,6 @@ export default function FormFields({
       // setSessionField('locationId', editSession.location?.id);
       // // setSessionField('studentIds', editSession.students.map((s) => s?.id));
       // setSessionField('name', editSession.name);
-
     }
   }, []);
 
@@ -154,17 +153,17 @@ export default function FormFields({
             fetchData={(query) =>
               strongestRoles.includes('Teacher')
                 ? fetchTeacherByUserId(userId).then((teacher) => [
-                  {
-                    ...teacher,
-                    fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
-                  }
-                ])
+                    {
+                      ...teacher,
+                      fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
+                    }
+                  ])
                 : fetchTeachers(1, 5, query).then((data) =>
-                  data.data.map((teacher) => ({
-                    ...teacher,
-                    fullName: `${teacher.firstName} ${teacher.lastName}`
-                  }))
-                )
+                    data.data.map((teacher) => ({
+                      ...teacher,
+                      fullName: `${teacher.firstName} ${teacher.lastName}`
+                    }))
+                  )
             }
             onSelect={(teacher) => {
               setSession({ ...session, teacherId: teacher?.id });
@@ -219,8 +218,8 @@ export default function FormFields({
           <InputLabel>Room</InputLabel>
           <Select
             label="Room"
-            value={session.name || ''}
-            onChange={(e) => setSession({ ...session, name: e.target.value })}
+            value={session.room || ''}
+            onChange={(e) => setSession({ ...session, room: e.target.value })}
           >
             {Array.from({ length: 7 }, (_, index) => (
               <MenuItem key={index} value={`R${index + 1}`}>

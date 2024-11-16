@@ -41,16 +41,16 @@ const CalendarContent: React.FC = () => {
       const role = roles.includes('SuperAdmin')
         ? 'SuperAdmin'
         : roles.includes('FranchiseAdmin')
-          ? 'FranchiseAdmin'
-          : roles.includes('LocationAdmin')
-            ? 'LocationAdmin'
-            : roles.includes('Teacher')
-              ? 'Teacher'
-              : roles.includes('Parent')
-                ? 'Parent'
-                : roles.includes('Student')
-                  ? 'Student'
-                  : null;
+        ? 'FranchiseAdmin'
+        : roles.includes('LocationAdmin')
+        ? 'LocationAdmin'
+        : roles.includes('Teacher')
+        ? 'Teacher'
+        : roles.includes('Parent')
+        ? 'Parent'
+        : roles.includes('Student')
+        ? 'Student'
+        : null;
       setStrongestRole(role);
     }
   }, [userRoles]);
@@ -89,14 +89,19 @@ const CalendarContent: React.FC = () => {
     classSessions: any[]
   ): EventItem[] => {
     return classSessions.map((session) => {
-      const resource = session.name || 1;
+      const resource = session.room || 'R2';
 
-      console.log('students', session);
-      const studentsWithStatus = session.students.map((student) => ({
-        firstName: student.firstName,
-        gradeLevel: student.gradeLevel,
-        absenceStatus: student.absences.length > 0 ? true : false,
-      }));
+      const studentsWithStatus = session.students.map(
+        (student: {
+          firstName: string;
+          gradeLevel: string;
+          abscenceStatus: boolean;
+        }) => ({
+          firstName: student.firstName,
+          gradeLevel: student.gradeLevel,
+          absenceStatus: student.abscenceStatus
+        })
+      );
 
       return {
         data: {
@@ -105,9 +110,9 @@ const CalendarContent: React.FC = () => {
             status: session.status,
             location: session.location?.name || 'Unknown Location',
             topic: session.topic?.name || 'Unknown Topic',
-            resource: session.name || 'Unknown Teacher',
+            resource: session.room || 'Unknown Teacher',
             address: session.location || 'Unknown address',
-            className: session.name,
+            className: session.room,
             teacher: session.teacherName,
             studentCount: session.students.length,
             students: studentsWithStatus,
@@ -129,7 +134,9 @@ const CalendarContent: React.FC = () => {
 
     try {
       let response;
-      const locationIds = locations.map((location) => location.id);
+      const validLocations = Array.isArray(locations) ? locations : [];
+      const locationIds = validLocations.map((location) => location.id);
+
       switch (strongestRole) {
         case 'Teacher':
         case 'Student':
@@ -138,9 +145,13 @@ const CalendarContent: React.FC = () => {
             date,
             date
           );
-          if (JSON.stringify(response.userLocations) !== JSON.stringify(selectedLocations)) {
+          if (
+            JSON.stringify(response.userLocations) !==
+            JSON.stringify(selectedLocations)
+          ) {
             setSelectedLocations(response.userLocations);
-          } break;
+          }
+          break;
         case 'Parent':
           response = await fetchParentClassSessions(
             userId?.toString() || '',
@@ -151,7 +162,7 @@ const CalendarContent: React.FC = () => {
         case 'SuperAdmin':
         case 'FranchiseAdmin':
         case 'LocationAdmin':
-          if (locations.length === 0) {
+          if (validLocations.length === 0) {
             return;
           }
           response = await fetchClassSessions(date, date, locationIds);
@@ -220,13 +231,13 @@ const CalendarContent: React.FC = () => {
       {['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin'].includes(
         strongestRole || ''
       ) && (
-          <FilterToolbar
-            onFranchiseChange={handleFranchiseChange}
-            onLocationsChange={handleLocationsChange}
-            selectedFranchise={selectedFranchise}
-            selectedLocations={selectedLocations}
-          />
-        )}
+        <FilterToolbar
+          onFranchiseChange={handleFranchiseChange}
+          onLocationsChange={handleLocationsChange}
+          selectedFranchise={selectedFranchise}
+          selectedLocations={selectedLocations}
+        />
+      )}
 
       <Box sx={{ position: 'relative', height: '100%', overflow: 'hidden' }}>
         <CustomizedCalendar

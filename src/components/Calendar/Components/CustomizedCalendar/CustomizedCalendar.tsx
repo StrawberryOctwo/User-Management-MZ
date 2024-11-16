@@ -242,6 +242,7 @@ export default function CustomizedCalendar({
     setEvents(mappedEvents);
   }, [classSessionEvents]);
 
+
   const handleOpenAddModal = (start: Date, end: Date, roomId: string) => {
     if (strongestRoles[0] == 'Student' || strongestRoles[0] == 'Parent') {
       return;
