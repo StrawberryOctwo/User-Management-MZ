@@ -12,7 +12,7 @@ import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWith
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
 import RecurrenceOptions from './RecurrenceOptions';
 import DateFields from './DateFields';
-import { useSession } from '../../SessionContext';
+import { useSession } from '../../../contexts/SessionContext';
 import { fetchTopics } from 'src/services/topicService';
 import { useEffect, useState } from 'react';
 import { fetchSessionTypes } from 'src/services/contractPackagesService';
@@ -27,7 +27,8 @@ export default function FormFields({
   strongestRoles,
   userId,
   roomId,
-  editSession
+  editSession,
+  passedLocations
 }) {
   const {
     session,
@@ -37,100 +38,89 @@ export default function FormFields({
     resetDayDetails
   } = useSession();
 
-  const [sessionTypes, setSessionTypes] = useState([]);
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState(null);
 
+
   useEffect(() => {
-    const fetchData = async () => {
-      const sessionTypesResponse = await fetchSessionTypes();
-      setSessionTypes(sessionTypesResponse || []);
+    console.log('editSession:', editSession);
+    if (editSession) {
+      const { classSession, teacher, location, students } = editSession;
 
-      if (session.topicId) {
-        const topicsResponse = await fetchTopics(1, 5, '');
-        const topic = topicsResponse.data.find((t) => t.id === session.topicId);
-        setSelectedTopic(topic);
-      }
+      setSession((prevSession) => ({
+        ...prevSession, // Preserve existing properties
+        topicId: classSession?.topic?.id || null,
+        sessionType: classSession?.sessionType?.id || null,
+        teacherId: teacher?.id || null,
+        locationId: location?.id || null,
+        studentIds: students?.map((s) => s.id) || [],
+        room: editSession.room || '',
+        startDate: editSession.date || prevSession.startDate,
+        endDate: editSession.date || prevSession.endDate,
+        note: editSession.note || prevSession.note,
+        isHolidayCourse: classSession?.isHolidayCourse || false,
+        recurrenceOption: prevSession.recurrenceOption, // Preserve existing
+        dayDetails: prevSession.dayDetails, // Preserve existing
+      }));
 
-      if (session.teacherId) {
-        const teacher = await fetchTeacherByUserId(session.teacherId);
-        setSelectedTeacher({
-          ...teacher,
-          fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
-        });
-      }
+      // Prepopulate input states
+      setSelectedTopic({
+        id: classSession?.topic?.id,
+        name: classSession?.topic?.name,
+      });
+      setSelectedTeacher({
+        id: teacher?.id,
+        fullName: `${teacher?.user?.firstName} ${teacher?.user?.lastName}`,
+      });
+      setSelectedStudents(
+        students?.map((student) => ({
+          id: student.id,
+          fullName: `${student.user?.firstName} ${student.user?.lastName}`,
+        })) || []
+      );
+      setSelectedLocation({
+        id: location?.id,
+        name: location?.name,
+      });
+    }
+  }, [editSession, setSession]);
 
-      if (session.studentIds.length > 0) {
-        const studentsResponse = await fetchStudents(1, 5, '');
-        const students = studentsResponse.data.filter((student) =>
-          session.studentIds.includes(student.id)
-        );
-        setSelectedStudents(
-          students.map((student) => ({
-            ...student,
-            fullName: `${student.firstName} ${student.lastName}`
-          }))
-        );
-      }
-
-      if (session.locationId) {
-        const locationsResponse = await fetchLocations(1, 5, '');
-        const location = locationsResponse.data.find(
-          (loc) => loc.id === session.locationId
-        );
-        setSelectedLocation(location);
-      }
-    };
-
-    fetchData();
-  }, [
-    session.topicId,
-    session.teacherId,
-    session.studentIds,
-    session.locationId
-  ]);
 
   return (
     <Grid container spacing={10} p={1}>
       {/* Left Column */}
       <Grid item xs={12} md={6}>
         <Box sx={{ mb: 3 }}>
-          <Box sx={{ mb: 3 }}>
-            <SingleSelectWithAutocomplete
-              width="100%"
-              label="Search Topic"
-              fetchData={(query) =>
-                fetchTopics(1, 5, query).then((response) => response.data)
-              }
-              onSelect={(topic) => {
-                setSession({ ...session, topicId: topic?.id });
-              }}
-              displayProperty="name"
-              placeholder="Search Topic"
-              initialValue={selectedTopic}
-            />
-          </Box>
+          <SingleSelectWithAutocomplete
+            width="100%"
+            label="Search Topic"
+            fetchData={(query) =>
+              fetchTopics(1, 5, query).then((response) => response.data)
+            }
+            onSelect={(topic) => setSession({ ...session, topicId: topic?.id })}
+            displayProperty="name"
+            placeholder="Search Topic"
+            initialValue={selectedTopic}
+          />
+        </Box>
 
-          <Box sx={{ mb: 3 }}>
-            <FormControl fullWidth>
-              <InputLabel>Session Type</InputLabel>
-              <Select
-                label="Session Type"
-                value={session.sessionType}
-                onChange={(e) =>
-                  setSession({ ...session, sessionType: e.target.value })
-                }
-              >
-                {sessionTypes.map((type) => (
-                  <MenuItem key={type.id} value={type.id}>
-                    {type.name}
-                  </MenuItem>
-                ))}
-              </Select>
-            </FormControl>
-          </Box>
+        <Box sx={{ mb: 3 }}>
+          <FormControl fullWidth>
+            <InputLabel>Session Type</InputLabel>
+            <Select
+              label="Session Type"
+              value={session.sessionType || ''}
+              onChange={(e) =>
+                setSession({ ...session, sessionType: e.target.value })
+              }
+            >
+              {/* Replace with session types if needed */}
+              <MenuItem value={1}>Group</MenuItem>
+              <MenuItem value={2}>Individual</MenuItem>
+            </Select>
+          </FormControl>
         </Box>
 
         <Box sx={{ mb: 3 }}>
@@ -140,21 +130,19 @@ export default function FormFields({
             fetchData={(query) =>
               strongestRoles.includes('Teacher')
                 ? fetchTeacherByUserId(userId).then((teacher) => [
-                    {
-                      ...teacher,
-                      fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
-                    }
-                  ])
+                  {
+                    ...teacher,
+                    fullName: `${teacher.user.firstName} ${teacher.user.lastName}`,
+                  },
+                ])
                 : fetchTeachers(1, 5, query).then((data) =>
-                    data.data.map((teacher) => ({
-                      ...teacher,
-                      fullName: `${teacher.firstName} ${teacher.lastName}`
-                    }))
-                  )
+                  data.data.map((teacher) => ({
+                    ...teacher,
+                    fullName: `${teacher.firstName} ${teacher.lastName}`,
+                  }))
+                )
             }
-            onSelect={(teacher) => {
-              setSession({ ...session, teacherId: teacher?.id });
-            }}
+            onSelect={(teacher) => setSession({ ...session, teacherId: teacher?.id })}
             displayProperty="fullName"
             placeholder="Search Teacher"
             initialValue={selectedTeacher}
@@ -169,21 +157,22 @@ export default function FormFields({
               fetchStudents(1, 5, query).then((data) =>
                 data.data.map((student) => ({
                   ...student,
-                  fullName: `${student.firstName} ${student.lastName}`
+                  fullName: `${student.firstName} ${student.lastName}`,
                 }))
               )
             }
-            onSelect={(selectedItems) => {
+            onSelect={(selectedItems) =>
               setSession({
                 ...session,
-                studentIds: selectedItems.map((item) => item.id)
-              });
-            }}
+                studentIds: selectedItems.map((item) => item.id),
+              })
+            }
             displayProperty="fullName"
             placeholder="Enter student name"
             initialValue={selectedStudents}
           />
         </Box>
+
         <Box sx={{ mb: 3 }}>
           <SingleSelectWithAutocomplete
             width="100%"
@@ -191,13 +180,12 @@ export default function FormFields({
             fetchData={(query) =>
               fetchLocations(1, 5, query).then((data) => data.data)
             }
-            onSelect={(location) => {
-              setSession({ ...session, locationId: location?.id });
-            }}
+            onSelect={(location) =>
+              setSession({ ...session, locationId: location?.id })
+            }
             displayProperty="name"
             placeholder="Search Location"
             initialValue={selectedLocation}
-            disabled={!strongestRoles.includes('Teacher')}
           />
         </Box>
 
@@ -226,18 +214,16 @@ export default function FormFields({
           <FormControlLabel
             control={
               <Checkbox
-                checked={session.isHolidayCourse}
+                checked={session.isHolidayCourse || false}
                 onChange={(e) =>
                   setSession({
                     ...session,
-                    isHolidayCourse: e.target.checked
+                    isHolidayCourse: e.target.checked,
                   })
                 }
               />
             }
             label="Holiday Course"
-            labelPlacement="start"
-            sx={{ ml: 0 }}
           />
         </Box>
         <Box>

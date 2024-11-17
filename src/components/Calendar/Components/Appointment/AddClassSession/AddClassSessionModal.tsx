@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import FormFields from '../FormComponents/FormFields';
 import { useAuth } from 'src/hooks/useAuth';
-import { useSession } from '../../SessionContext';
+import { useSession } from '../../../contexts/SessionContext';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import { addClassSession } from 'src/services/classSessionService';
 
@@ -78,6 +78,7 @@ const AddClassSessionModal: React.FC<AddClassSessionModalProps> = ({
           userId={userId}
           roomId={roomId}
           editSession={null}
+          passedLocations={passedLocations}
         />
       </DialogContent>
       <DialogActions>
