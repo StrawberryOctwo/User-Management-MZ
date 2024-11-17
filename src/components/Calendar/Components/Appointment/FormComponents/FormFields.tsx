@@ -46,6 +46,7 @@ export default function FormFields({
 
   useEffect(() => {
     if (editSession) {
+      // Logic for Edit Modal
       const { classSession, teacher, location, students } = editSession;
 
       console.log('editSession', editSession);
@@ -63,7 +64,7 @@ export default function FormFields({
         note: editSession.note || prevSession.note,
         isHolidayCourse: classSession?.isHolidayCourse || false,
         recurrenceOption: editSession.classSession.recurrencePattern,
-        dayDetails: editSession.classSession.days
+        dayDetails: editSession.classSession.days,
       }));
 
       setSelectedTopic({
@@ -82,18 +83,15 @@ export default function FormFields({
       );
 
       setSelectedLocation(location);
-      console.log(selectedLocation)
     } else {
       setSession((prevSession) => ({
         ...prevSession,
-        locationId: null,
-        room: '',
+        locationId: passedLocations?.[0]?.id || null,
+        room: String(roomId || ''),
       }));
-      setSelectedLocation(null);
+      setSelectedLocation(passedLocations?.[0] || null);
     }
-  }, [editSession, setSession]);
-
-
+  }, [editSession, passedLocations, roomId, setSession]);
 
   useEffect(() => {
     const loadSessionTypes = async () => {
@@ -162,17 +160,17 @@ export default function FormFields({
             fetchData={(query) =>
               strongestRoles.includes('Teacher')
                 ? fetchTeacherByUserId(userId).then((teacher) => [
-                    {
-                      ...teacher,
-                      fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
-                    }
-                  ])
+                  {
+                    ...teacher,
+                    fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
+                  }
+                ])
                 : fetchTeachers(1, 5, query).then((data) =>
-                    data.data.map((teacher: any) => ({
-                      ...teacher,
-                      fullName: `${teacher.firstName} ${teacher.lastName}`
-                    }))
-                  )
+                  data.data.map((teacher: any) => ({
+                    ...teacher,
+                    fullName: `${teacher.firstName} ${teacher.lastName}`
+                  }))
+                )
             }
             onSelect={(teacher) =>
               setSession({ ...session, teacherId: teacher?.id })
@@ -221,6 +219,7 @@ export default function FormFields({
             displayProperty="name"
             placeholder="Search Location"
             initialValue={selectedLocation}
+            disabled={!strongestRoles.includes('Teacher')}
           />
         </Box>
 
