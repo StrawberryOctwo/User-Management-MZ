@@ -17,12 +17,27 @@ import { useAuth } from 'src/hooks/useAuth';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import { fetchStudents } from 'src/services/studentService';
+import { fetchSessionTypes } from 'src/services/contractPackagesService';
 
 const EditSessionInstanceTab = ({ session, setSession, editSession }) => {
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [selectedStudents, setSelectedStudents] = useState([]);
   const { userId, userRoles } = useAuth();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
+  const [sessionTypes, setSessionTypes] = useState([]);
+
+  useEffect(() => {
+    const loadSessionTypes = async () => {
+      try {
+        const response = await fetchSessionTypes(1, 5, '');
+        setSessionTypes(response.data);
+      } catch (error) {
+        console.error('Error fetching session types:', error);
+      }
+    };
+
+    loadSessionTypes();
+  }, []);
 
   useEffect(() => {
     if (editSession) {
@@ -34,6 +49,7 @@ const EditSessionInstanceTab = ({ session, setSession, editSession }) => {
         startTime: editSession.startTime || '',
         duration: editSession.duration || '',
         isActive: editSession.isActive || false,
+        sessionType: editSession.sessionType?.id || null,
         teacherId: teacher?.id || null,
         studentIds: students?.map((s) => s.id) || [],
         room: editSession.room || '',
@@ -43,9 +59,9 @@ const EditSessionInstanceTab = ({ session, setSession, editSession }) => {
       setSelectedTeacher(
         teacher
           ? {
-            id: teacher.id,
-            fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
-          }
+              id: teacher.id,
+              fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
+            }
           : null
       );
 
@@ -127,17 +143,17 @@ const EditSessionInstanceTab = ({ session, setSession, editSession }) => {
               fetchData={(query) =>
                 strongestRoles.includes('Teacher')
                   ? fetchTeacherByUserId(userId).then((teacher) => [
-                    {
-                      ...teacher,
-                      fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
-                    }
-                  ])
+                      {
+                        ...teacher,
+                        fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
+                      }
+                    ])
                   : fetchTeachers(1, 5, query).then((data) =>
-                    data.data.map((teacher) => ({
-                      ...teacher,
-                      fullName: `${teacher.firstName} ${teacher.lastName}`
-                    }))
-                  )
+                      data.data.map((teacher) => ({
+                        ...teacher,
+                        fullName: `${teacher.firstName} ${teacher.lastName}`
+                      }))
+                    )
               }
               onSelect={(teacher) => {
                 setSession({ ...session, teacherId: teacher?.id });
@@ -186,6 +202,30 @@ const EditSessionInstanceTab = ({ session, setSession, editSession }) => {
                   {`R${index + 1}`}
                 </MenuItem>
               ))}
+            </Select>
+          </FormControl>
+        </Grid>
+        <Grid item xs={6}>
+          <FormControl fullWidth>
+            <InputLabel>Session Type</InputLabel>
+            <Select
+              label="Session Type"
+              value={session.sessionType || ''}
+              onChange={(e) =>
+                setSession({ ...session, sessionType: e.target.value })
+              }
+            >
+              {sessionTypes.length > 0 ? (
+                sessionTypes.map((type) => (
+                  <MenuItem key={type.id} value={type.id}>
+                    {type.name}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled value="">
+                  No options available
+                </MenuItem>
+              )}
             </Select>
           </FormControl>
         </Grid>

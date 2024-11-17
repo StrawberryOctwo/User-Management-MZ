@@ -48,10 +48,12 @@ export default function FormFields({
     if (editSession) {
       const { classSession, teacher, location, students } = editSession;
 
+      console.log('editSession', editSession);
+
       setSession((prevSession) => ({
         ...prevSession,
         topicId: classSession?.topic?.id || null,
-        sessionType: classSession?.sessionType?.id || null,
+        sessionType: editSession?.sessionType?.id || null,
         teacherId: teacher?.id || null,
         locationId: location?.id || null,
         studentIds: students?.map((s) => s.id) || [],
@@ -60,8 +62,8 @@ export default function FormFields({
         endDate: editSession.date || prevSession.endDate,
         note: editSession.note || prevSession.note,
         isHolidayCourse: classSession?.isHolidayCourse || false,
-        recurrenceOption: prevSession.recurrenceOption,
-        dayDetails: prevSession.dayDetails
+        recurrenceOption: editSession.classSession.recurrencePattern,
+        dayDetails: editSession.classSession.days
       }));
 
       setSelectedTopic({
@@ -149,7 +151,7 @@ export default function FormFields({
             </Select>
           </FormControl>
         </Box>
-        
+
         <Box sx={{ mb: 3 }}>
           <SingleSelectWithAutocomplete
             width="100%"
@@ -157,17 +159,17 @@ export default function FormFields({
             fetchData={(query) =>
               strongestRoles.includes('Teacher')
                 ? fetchTeacherByUserId(userId).then((teacher) => [
-                  {
-                    ...teacher,
-                    fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
-                  }
-                ])
+                    {
+                      ...teacher,
+                      fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
+                    }
+                  ])
                 : fetchTeachers(1, 5, query).then((data) =>
-                  data.data.map((teacher: any) => ({
-                    ...teacher,
-                    fullName: `${teacher.firstName} ${teacher.lastName}`
-                  }))
-                )
+                    data.data.map((teacher: any) => ({
+                      ...teacher,
+                      fullName: `${teacher.firstName} ${teacher.lastName}`
+                    }))
+                  )
             }
             onSelect={(teacher) =>
               setSession({ ...session, teacherId: teacher?.id })
