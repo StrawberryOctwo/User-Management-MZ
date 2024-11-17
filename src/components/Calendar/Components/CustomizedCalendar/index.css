@@ -1,8 +1,8 @@
 .fc {
   background-color: #ffffff;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  padding: 20px;
+  border-radius: 16px; /* Slightly increased border radius for a softer look */
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12); /* Enhanced shadow for a more modern feel */
+  padding: 24px;
   margin: 0 auto;
   width: 100%;
   max-width: 90vw;
@@ -10,49 +10,53 @@
   overflow: hidden;
 }
 
-
 .fc-toolbar {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 10px;
+  padding-bottom: 16px; /* Slightly increased spacing for breathing room */
 }
 
 .fc-toolbar-title {
-  font-size: 1.5rem;
-  font-weight: 600;
+  font-size: 1.8rem; /* Slightly larger font for better readability */
+  font-weight: 700;
   color: #333333;
-  font-size: 1.6rem;
-  font-weight: 600;
-  margin: 0 8px;
+  margin: 0 10px;
 }
 
 .fc-toolbar .fc-button-group .fc-button,
 .fc-toolbar .fc-button {
-  background-color: #f0f0f0;
-  color: #333333;
+  background-color: #f9f9f9; /* Lightened button background for a cleaner aesthetic */
+  color: #444444;
   border: none;
-  border-radius: 6px;
-  padding: 6px 12px;
-  margin: 0 4px;
-  font-size: 0.9rem;
+  border-radius: 8px; /* Rounded buttons for modern appearance */
+  padding: 8px 16px;
+  margin: 0 6px;
+  font-size: 1rem;
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 .fc-button:hover {
-  background-color: #dcdcdc;
+  background-color: #eaeaea; /* Softer hover effect */
 }
 
 .fc-button.fc-button-primary {
-  background-color: #5569ff;
+  background-color: #4f6cff; /* Vibrant primary color */
   color: #ffffff;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 10px 20px;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+.fc-button.fc-button-primary:hover {
+  background-color: #3b57d1;
+  transform: scale(1.05); /* Slight zoom-in on hover for better feedback */
 }
 
 .fc-view-harness,
 .fc-daygrid-day,
 .fc-timeline-slot {
-  border-color: #e0e0e0;
+  border-color: #e5e5e5; /* Softened border color */
 }
 
 .fc-today-button::first-letter {
@@ -60,77 +64,72 @@
 }
 
 .fc-today-button:hover {
-  background-color: #7586ff !important;
+  background-color: #5f74ff !important;
 }
 
 .fc .fc-button:disabled {
-  opacity: 0.65;
-  background-color: #2c3e50 !important;
+  opacity: 0.5;
+  background-color: #d6d6d6 !important;
 }
 
 .fc-col-header-cell-cushion {
-  font-weight: 500;
+  font-weight: 600;
   color: #333333;
+  font-size: 1rem;
 }
 
-.fc .fc-timeline-slot-cushion {
-  padding: 15px 20px;
-  white-space: nowrap;
-}
-
+.fc .fc-timeline-slot-cushion,
 .fc .fc-datagrid-cell-cushion {
-  overflow: hidden;
-  padding: 15px 20px;
+  padding: 16px 24px; /* Increased padding for better spacing */
   white-space: nowrap;
+  overflow: hidden;
   text-align: center;
+  font-size: 0.95rem; /* Standardized text size */
 }
 
 .fc-scroller {
   overflow-y: auto;
   overflow-x: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #b0b0b0 #f0f0f0; /* Modern scrollbar color */
 }
 
 .fc-scroller::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 10px;
+  height: 10px;
 }
 
 .fc-scroller::-webkit-scrollbar-track {
-  background: #f0f0f0;
-  border-radius: 4px;
+  background: #f9f9f9;
+  border-radius: 6px;
 }
 
 .fc-scroller::-webkit-scrollbar-thumb {
-  background-color: #b3b3b3;
-  border-radius: 4px;
-  border: 2px solid #f0f0f0;
+  background-color: #b0b0b0;
+  border-radius: 6px;
+  border: 2px solid #f9f9f9;
 }
 
 .fc-scroller::-webkit-scrollbar-thumb:hover {
-  background-color: #888888;
-}
-
-.fc-scroller::-webkit-scrollbar-corner {
-  background: #f0f0f0;
+  background-color: #8e8e8e;
 }
 
 .fc-resource-area {
-  width: 150px;
+  width: 160px; /* Slightly wider for better readability */
+  background-color: #f9f9f9;
 }
 
 .fc-col-header-cell {
-  width: 150px;
+  width: 160px;
   text-align: center;
-  font-weight: 600;
+  font-weight: 700;
   color: #333333;
+  padding: 12px; /* Better spacing */
+  background-color: #f7f8fa; /* Subtle background for column headers */
 }
 
 .fc-now-indicator {
   border-top: 2px solid #4f46e5;
-}
-
-.fc-timeline-now-indicator-arrow {
-  display: none;
 }
 
 .fc-timeline-now-indicator-line {
@@ -144,9 +143,10 @@
 
 .fc-resource-area .fc-cell-text {
   font-size: 1.1rem;
-  font-weight: 500;
-  padding: 0 10px;
+  font-weight: 600;
+  padding: 0 12px;
   box-sizing: border-box;
+  color: #333333;
 }
 
 .fc-scrollgrid,
@@ -155,110 +155,60 @@
   border-spacing: 0;
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: inset 0 0 0 1px #e0e0e0;
+  box-shadow: inset 0 0 0 1px #e5e5e5;
 }
 
 .fc-scrollgrid td,
 .fc-scrollgrid th {
-  border: 1px solid #e0e0e0;
+  border: 1px solid #e5e5e5;
   padding: 0;
   box-sizing: border-box;
   overflow: hidden;
 }
 
 .fc-event {
-  padding: 5px;
-  margin: 0;
+  padding: 6px 10px; /* Slightly adjusted padding for better alignment */
+  margin: 2px 0;
   box-sizing: border-box;
-}
-
-.fc-scrollgrid-liquid .fc-col-header-cell {
-  background-color: #f7f8fa;
-  font-weight: 600;
+  background-color: #edf4ff; /* Subtle event background color */
   color: #333333;
-  padding: 10px;
-  border-bottom: 1px solid #e0e0e0;
-  padding: 5px 10px;
-  box-sizing: border-box;
+  border-radius: 6px;
+  font-size: 0.9rem;
+  transition: background-color 0.3s ease;
 }
 
-.fc-scrollgrid-liquid .fc-resource-area {
-  background-color: #f7f8fa;
-  border-right: 1px solid #e0e0e0;
-  font-weight: 500;
-  padding-left: 10px;
-}
-
-.fc-daygrid-day,
-.fc-timeline-slot,
-.fc-resource-area {
-  border-color: #e0e0e0;
-}
-
-.fc-now-indicator {
-  border-top: 2px solid #4f46e5;
-}
-
-.fc-timeline-now-indicator-line {
-  border-top: 2px solid #4f46e5;
-  opacity: 0.9;
-}
-
-.fc-timeline-now-indicator-container {
-  position: relative;
-}
-
-.fc-timeline-slot-lane {
-  padding: 0;
-  box-sizing: border-box;
+.fc-event:hover {
+  background-color: #dce8ff;
 }
 
 .fc-header-toolbar .fc-toolbar-chunk {
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 8px;
+  gap: 12px; /* Added spacing for better alignment */
 }
 
 .fc .fc-next-button,
 .fc .fc-prev-button {
   background: transparent;
   border: none;
-  color: #3b82f6;
+  color: #4f6cff;
   font-size: 1.2rem;
   padding: 6px 12px;
   cursor: pointer;
-  transition: color 0.2s, transform 0.2s, background-color 0.2s;
-}
-
-.fc .fc-next-button:focus,
-.fc .fc-prev-button:focus {
-  outline: none !important;
-  box-shadow: none !important;
-  border: none !important;
-  color: #3b82f6 !important;
-}
-
-.fc .fc-next-button:active,
-.fc .fc-prev-button:active {
-  background-color: #e1e1e1 !important;
-  color: #2563eb;
-  outline: none !important;
-  box-shadow: none !important;
-  transform: scale(1.05);
+  transition: color 0.3s ease, transform 0.2s ease, background-color 0.2s ease;
 }
 
 .fc .fc-next-button:hover,
 .fc .fc-prev-button:hover {
-  color: #2563eb;
+  color: #3b57d1;
   transform: scale(1.1);
-  background-color: #eee;
-  transition: color 0.2s, transform 0.2s, background-color 0.2s;
+  background-color: #f1f1f1;
 }
 
 .fc-resource.selected,
 .fc-timegrid-slot.selected {
   outline: none;
-  box-shadow: none;
-  border: none;
+  box-shadow: inset 0 0 0 2px #4f46e5;
+  border-radius: 6px;
 }

@@ -63,6 +63,10 @@ const FranchiseAdminsEdit = Loader(
   lazy(() => import('src/content/applications/FranchiseAdmins/Edit'))
 );
 
+const Interest = Loader(
+  lazy(() => import('src/content/applications/Interest'))
+);
+
 
 
 const Location = Loader(
@@ -300,6 +304,10 @@ const routes: RouteObject[] = [
             element: <Navigate to="calendar" replace />
           },
           {
+            path: 'interests',
+            element: <Interest />
+          },
+          {
             path: 'calendar',
             element: <Calendar />
           },
@@ -342,6 +350,7 @@ const routes: RouteObject[] = [
             path: 'billings',
             element: <Billings />
           },
+
           {
             path: 'billings/create',
             element: <CreateBill />

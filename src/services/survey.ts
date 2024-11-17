@@ -12,17 +12,23 @@ export const createSurvey = async (title: string, questions: { text: string, typ
 };
 
 // Fetch all surveys with pagination
-export const fetchAllSurveys = async (page: number = 1, limit: number = 10,search='') => {
+export const fetchAllSurveys = async (
+    page: number = 1,
+    limit: number = 10,
+    search: string = '',
+    options: { signal?: AbortSignal } = {}
+  ) => {
     try {
-        const response = await api.get('/surveys', {
-            params: { page, limit,search },
-        });
-        return response.data;
+      const response = await api.get('/surveys', {
+        params: { page, limit, search },
+        signal: options.signal, // Pass the signal for request cancellation
+      });
+      return response.data;
     } catch (error) {
-        console.error('Error fetching surveys:', error);
-        throw error;
+      console.error('Error fetching surveys:', error);
+      throw error;
     }
-};
+  };
 export const getSurveyAnswers = async (surveyId, page = 1, limit = 10,sort = '',search='') => {
     try {
       const response = await api.get(`surveys/${surveyId}/answers`, {

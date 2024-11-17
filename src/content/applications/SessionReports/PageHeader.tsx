@@ -22,7 +22,7 @@ function PageHeader() {
           Session Reports
         </Typography>
         <Typography variant="subtitle2">
-          {user.name}, these are your children's session reports
+          {user.name}, these are your students session reports
         </Typography>
       </Grid>
     </Grid>
