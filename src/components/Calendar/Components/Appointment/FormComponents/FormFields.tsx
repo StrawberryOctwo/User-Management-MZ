@@ -21,6 +21,7 @@ import {
 import { fetchStudents } from 'src/services/studentService';
 import { fetchLocations } from 'src/services/locationService';
 import { useSession } from '../../SessionContext';
+import { fetchSessionTypes } from 'src/services/contractPackagesService';
 
 export default function FormFields({
   strongestRoles,
@@ -41,6 +42,7 @@ export default function FormFields({
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState(null);
+  const [sessionTypes, setSessionTypes] = useState([]);
 
   useEffect(() => {
     if (editSession) {
@@ -93,6 +95,19 @@ export default function FormFields({
     }
   }, [editSession, passedLocations, roomId, setSession]);
 
+  useEffect(() => {
+    const loadSessionTypes = async () => {
+      try {
+        const response = await fetchSessionTypes(1, 5, '');
+        setSessionTypes(response.data);
+      } catch (error) {
+        console.error('Error fetching session types:', error);
+      }
+    };
+
+    loadSessionTypes();
+  }, []);
+
   return (
     <Grid container spacing={10} p={1}>
       <Grid item xs={12} md={6}>
@@ -120,12 +135,21 @@ export default function FormFields({
                 setSession({ ...session, sessionType: e.target.value })
               }
             >
-              <MenuItem value={1}>Group</MenuItem>
-              <MenuItem value={2}>Individual</MenuItem>
+              {sessionTypes.length > 0 ? (
+                sessionTypes.map((type) => (
+                  <MenuItem key={type.id} value={type.id}>
+                    {type.name}
+                  </MenuItem>
+                ))
+              ) : (
+                <MenuItem disabled value="">
+                  No options available
+                </MenuItem>
+              )}
             </Select>
           </FormControl>
         </Box>
-
+        
         <Box sx={{ mb: 3 }}>
           <SingleSelectWithAutocomplete
             width="100%"
@@ -133,17 +157,17 @@ export default function FormFields({
             fetchData={(query) =>
               strongestRoles.includes('Teacher')
                 ? fetchTeacherByUserId(userId).then((teacher) => [
-                    {
-                      ...teacher,
-                      fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
-                    }
-                  ])
+                  {
+                    ...teacher,
+                    fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
+                  }
+                ])
                 : fetchTeachers(1, 5, query).then((data) =>
-                    data.data.map((teacher: any) => ({
-                      ...teacher,
-                      fullName: `${teacher.firstName} ${teacher.lastName}`
-                    }))
-                  )
+                  data.data.map((teacher: any) => ({
+                    ...teacher,
+                    fullName: `${teacher.firstName} ${teacher.lastName}`
+                  }))
+                )
             }
             onSelect={(teacher) =>
               setSession({ ...session, teacherId: teacher?.id })
