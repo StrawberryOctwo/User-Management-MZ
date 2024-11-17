@@ -19,14 +19,17 @@ function HeaderButtons() {
       <HeaderNotifications />
       <HeaderLocalization />
       <SurveyNotifications />
+      <ProtectedBox allowedRoles={['SuperAdmin','FranchiseAdmin','LocationAdmin','Teacher','Student']}>
       <HeaderToDoList/>
+      </ProtectedBox>
       <ProtectedBox allowedRoles={['SuperAdmin']}>
       <ViewSurveysTable />
       </ProtectedBox>
       <ProtectedBox allowedRoles={['SuperAdmin']}>
       <SurveyBuilder />
-      </ProtectedBox>
+     
       <ToDoHeader />
+      </ProtectedBox>
       <ProtectedBox allowedRoles={['Teacher']}>
         <HeaderAvailability />
       </ProtectedBox>

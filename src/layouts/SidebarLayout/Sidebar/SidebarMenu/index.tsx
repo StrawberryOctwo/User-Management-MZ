@@ -196,6 +196,9 @@ function SidebarMenu() {
                   </Button>
                 </ListItem>
               </ProtectedListItem>
+              <ProtectedListItem
+                allowedRoles={['SuperAdmin']}
+              >
               <ListItem component="div">
                   <Button
                     disableRipple
@@ -207,6 +210,7 @@ function SidebarMenu() {
                     Interests
                   </Button>
                 </ListItem>
+                </ProtectedListItem>
             </List>
             
           </SubMenuWrapper>
@@ -318,7 +322,7 @@ function SidebarMenu() {
               </ProtectedListItem>
 
               <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin']}
+                allowedRoles={['SuperAdmin', 'LocationAdmin']}
               >
                 <ListItem component="div">
                   <Button
