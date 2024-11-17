@@ -34,7 +34,7 @@ interface ClassSessionDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   appointmentId: string;
-  onEdit: () => void;
+  onEdit: (classSession: any) => void;
   onDelete: () => void;
   onDeactivate: (appointmentId: any, newStatus: any) => void;
   canEdit: boolean;
@@ -193,6 +193,12 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     onDeactivateComplete(); // Refresh sessions in parent component
   };
 
+  const handleEdit = () => {
+    if (classSession) {
+      onEdit(classSession);
+    }
+  };
+
   return (
     <Dialog
       open={isOpen}
@@ -213,7 +219,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
           {canEdit && (
             <>
               <IconButton
-                onClick={onEdit}
+                onClick={handleEdit}
                 color="primary"
                 sx={{
                   backgroundColor: '#f0f0f0',

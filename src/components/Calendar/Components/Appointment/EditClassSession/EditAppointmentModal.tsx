@@ -10,7 +10,6 @@ import {
 } from '@mui/material';
 import FormFields from '../FormComponents/FormFields';
 import { useAuth } from 'src/hooks/useAuth';
-import { useSession } from '../../SessionContext';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import {
   fetchClassSessionById,
@@ -18,6 +17,7 @@ import {
   updateSessionInstance
 } from 'src/services/classSessionService';
 import EditSessionInstanceTab from './EditSessionInstanceTab';
+import { useSession } from '../../SessionContext';
 
 interface EditClassSessionModalProps {
   isOpen: boolean;
@@ -26,6 +26,7 @@ interface EditClassSessionModalProps {
   passedLocations?: any[];
   startTime?: Date;
   appointmentId?: string;
+  sessionDetails?: any;
 }
 
 const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
@@ -34,7 +35,8 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
   roomId,
   passedLocations = [],
   startTime,
-  appointmentId
+  appointmentId,
+  sessionDetails
 }) => {
   const [editSession, setEditSession] = useState({});
   const [editInstance, setEditInstance] = useState({});
@@ -107,6 +109,7 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
             userId={userId}
             roomId={roomId}
             editSession={editSession}
+            passedLocations={passedLocations}
           />
         )}
       </DialogContent>

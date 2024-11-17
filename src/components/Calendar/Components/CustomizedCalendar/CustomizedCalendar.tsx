@@ -67,6 +67,7 @@ export default function CustomizedCalendar({
   const [isEventTypeModalOpen, setIsEventTypeModalOpen] = useState(false);
   const [isToDoModalOpen, setIsToDoModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState('');
+  const [selectedSessionDetails, setSelectedSessionDetails] = useState<any>(null);
   const [selectedRange, setSelectedRange] = useState<{
     start: Date;
     end: Date;
@@ -145,13 +146,14 @@ export default function CustomizedCalendar({
     }
   };
 
-  const handleEditClassSession = () => {
+  const handleEditClassSession = (classSession: any) => {
     if (strongestRoles[0] == 'Teacher' || strongestRoles[0] == 'Student') {
       return;
     }
     if (selectedAppointmentId) {
       setSelectedAppointment(selectedAppointmentId);
       setDetailsModalOpen(false);
+      setSelectedSessionDetails(classSession);
       setModalOpen(true);
     } else {
       console.error('No appointment ID selected for editing.');
@@ -377,6 +379,7 @@ export default function CustomizedCalendar({
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         appointmentId={selectedAppointment}
+        sessionDetails={selectedSessionDetails}
       />
 
       <AddClassSessionModal
