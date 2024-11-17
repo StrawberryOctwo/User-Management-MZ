@@ -1,14 +1,26 @@
 import React, { useState } from 'react';
-import { Box, Typography, Grid, Paper, Divider, Link } from '@mui/material';
+import {
+  Box,
+  Typography,
+  Grid,
+  Card,
+  CardContent,
+  CardHeader,
+  Divider,
+  Link,
+  Paper,
+  useTheme,
+  useMediaQuery,
+} from '@mui/material';
 import {
   DataGrid,
   GridColDef,
-  GridToolbarColumnsButton,
   GridToolbarContainer,
+  GridToolbarColumnsButton,
   GridToolbarDensitySelector,
   GridToolbarExport,
   GridToolbarFilterButton,
-  GridToolbarQuickFilter
+  GridToolbarQuickFilter,
 } from '@mui/x-data-grid';
 
 interface DetailFieldConfig {
@@ -18,10 +30,10 @@ interface DetailFieldConfig {
   section?: string;
   component?: React.ReactNode | ((data: any) => React.ReactNode);
   isArray?: boolean;
-  isTable?: boolean; // Flag to decide between table or list (default true)
-  isTextArray?: boolean; // New flag to display array as simple text
-  linkUrl?: (id: number) => string; // URL generator function for clickable items
-  columns?: { field: string; headerName: string }[];
+  isTable?: boolean;
+  isTextArray?: boolean;
+  linkUrl?: (id: number) => string;
+  columns?: { field: string; headerName: string; width?: number }[];
 }
 
 interface ReusableDetailsProps {
@@ -33,9 +45,14 @@ interface ReusableDetailsProps {
 const ReusableDetails: React.FC<ReusableDetailsProps> = ({
   fields,
   data,
-  entityName
+  entityName,
 }) => {
-  const [pageSize, setPageSize] = useState(5); // State to manage page size
+  const theme = useTheme();
+  const isSmDown = useMediaQuery(theme.breakpoints.down('sm'));
+
+  const [pageSizes, setPageSizes] = useState<Record<string, number>>({});
+
+  // Group fields by their section
   const groupedFields = fields.reduce((acc, field) => {
     const sectionName = field.section || 'General';
     if (!acc[sectionName]) acc[sectionName] = [];
@@ -44,45 +61,146 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({
   }, {} as Record<string, DetailFieldConfig[]>);
 
   return (
-    <Paper elevation={3} sx={{ p: 3 }}>
+    <Paper
+      elevation={3}
+      sx={{
+        p: { xs: 2, sm: 3 },
+        backgroundColor: theme.palette.background.default,
+        borderRadius: 3,
+        overflow: 'hidden',
+        maxWidth: '1000px',
+        margin: '30px auto',
+      }}
+    >
       <Typography
-        variant="h4"
+        variant={isSmDown ? 'h4' : 'h3'}
         gutterBottom
-        sx={{ mb: 4, mt: 2, textAlign: 'center' }}
+        sx={{
+          mb: 3,
+          mt: 1.5,
+          textAlign: 'center',
+          fontWeight: '800',
+          color: theme.palette.primary.dark,
+        }}
       >
         {entityName} Details
       </Typography>
-      {Object.entries(groupedFields).map(([section, fields], index, arr) => (
-        <Box key={section} sx={{ mb: 4 }}>
-          <Typography variant="subtitle1" gutterBottom sx={{ mb: 2, ml: 1 }}>
-            <strong>{section}</strong>
-          </Typography>
-          <Grid container spacing={2}>
-            {fields.map((field) => (
-              <Grid item xs={12} key={field.name}>
-                {field.isArray ? (
-                  field.isTextArray ? (
-                    <Typography variant="body2" sx={{ ml: 1 }}>
-                      {field.label}:{' '}
-                      {(data[field.name] as Array<any>)
-                        .map((item) =>
-                          typeof item === 'string' ? item : item.name
-                        )
-                        .join(', ')}
+
+      {/* Iterate through each section */}
+      {Object.entries(groupedFields).map(([section, fields], index, arr) => {
+        // Separate table fields from non-table fields
+        const nonTableFields = fields.filter((field) => !field.isArray);
+        const tableFields = fields.filter((field) => field.isArray);
+
+        return (
+          <Card
+            key={`${section}-${index}`} // Ensure unique key
+            sx={{
+              mb: 3,
+              boxShadow: theme.shadows[3],
+              borderRadius: 2,
+              background: theme.palette.background.paper,
+              width: '100%',
+              transition: 'transform 0.2s',
+              '&:hover': {
+                transform: 'translateY(-3px)',
+              },
+            }}
+          >
+            <CardHeader
+              title={section}
+              titleTypographyProps={{
+                variant: 'h6',
+                fontWeight: '700',
+                color: theme.palette.text.primary,
+              }}
+              sx={{
+                borderBottom: `1px solid ${theme.palette.divider}`,
+                backgroundColor: theme.palette.action.hover,
+                padding: { xs: 1.5, sm: 2.5 },
+              }}
+            />
+            <CardContent>
+              {/* Render non-table fields in Grid */}
+              {nonTableFields.length > 0 && (
+                <Grid container spacing={2}>
+                  {nonTableFields.map((field) => (
+                    <Grid
+                      item
+                      xs={12}
+                      sm={6}
+                      md={4}
+                      key={field.name}
+                    >
+                      <Box
+                        sx={{
+                          p: 1.5,
+                          border: `1px solid ${theme.palette.divider}`,
+                          borderRadius: 2,
+                          backgroundColor: theme.palette.background.paper,
+                          height: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                        }}
+                      >
+                        {typeof field.component === 'function' ? (
+                          field.component(data)
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">
+                            <strong>{field.label}:</strong> {data[field.name]}
+                          </Typography>
+                        )}
+                      </Box>
+                    </Grid>
+                  ))}
+                </Grid>
+              )}
+
+              {/* Render table fields separately */}
+              {tableFields.map((field) => {
+                if (!field.columns) {
+                  console.warn(
+                    `Field "${field.name}" is marked as a table but does not have "columns" defined.`
+                  );
+                  return (
+                    <Box key={field.name} sx={{ mt: 3 }}>
+                      <Typography variant="h6" gutterBottom>
+                        {field.label}
+                      </Typography>
+                      <Typography variant="body2" color="error">
+                        Columns not defined for this table.
+                      </Typography>
+                    </Box>
+                  );
+                }
+
+                const rowsWithIds = (data[field.name] || []).map(
+                  (row: any, index: number) => ({
+                    id: `${field.name}-${index}`, // Ensure unique IDs across tables
+                    ...row,
+                  })
+                );
+
+                return (
+                  <Box key={field.name} sx={{ mt: 3 }}>
+                    <Typography variant="h6" gutterBottom>
+                      {field.label}
                     </Typography>
-                  ) : field.isTable !== false ? (
                     <DataGrid
                       autoHeight
-                      rows={data[field.name] || []}
+                      rows={rowsWithIds}
                       columns={field.columns as GridColDef[]}
-                      pageSize={pageSize}
+                      pageSize={pageSizes[field.name] || 5}
                       onPageSizeChange={(newPageSize) =>
-                        setPageSize(newPageSize)
+                        setPageSizes((prev) => ({
+                          ...prev,
+                          [field.name]: newPageSize,
+                        }))
                       }
                       rowsPerPageOptions={[5, 10, 25]}
                       pagination
                       components={{
-                        Toolbar: CustomToolbar
+                        Toolbar: CustomToolbar,
                       }}
                       componentsProps={{
                         noRowsOverlay: {
@@ -90,72 +208,75 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({
                             <Typography variant="body2" sx={{ mt: 1 }}>
                               No results found.
                             </Typography>
-                          )
-                        }
+                          ),
+                        },
                       }}
                       disableSelectionOnClick
                       sx={{
-                        ml: 1,
-                        '& .MuiDataGrid-main': { borderTop: '1px solid #ddd' },
+                        width: '100%',
+                        '& .MuiDataGrid-root': {
+                          backgroundColor: theme.palette.background.paper,
+                        },
+                        '& .MuiDataGrid-main': {
+                          borderTop: `1px solid ${theme.palette.divider}`,
+                        },
                         '& .MuiDataGrid-columnHeaderTitle': {
-                          fontWeight: 'bold'
+                          fontWeight: '700',
+                          color: theme.palette.text.primary,
                         },
                         '& .MuiDataGrid-columnHeader': {
-                          borderRight: '1px solid #ddd'
+                          borderRight: `1px solid ${theme.palette.divider}`,
                         },
                         '& .MuiDataGrid-cell': {
-                          borderRight: '1px solid #ddd'
+                          borderRight: `1px solid ${theme.palette.divider}`,
                         },
                         '& .MuiDataGrid-cell:focus': { outline: 'none' },
-                        '& .MuiDataGrid-cell:focus-within': { outline: 'none' }
+                        '& .MuiDataGrid-cell:focus-within': {
+                          outline: 'none',
+                        },
+                        '& .MuiDataGrid-footerContainer': {
+                          borderTop: `1px solid ${theme.palette.divider}`,
+                        },
+                        '& .MuiDataGrid-toolbarContainer': {
+                          backgroundColor: theme.palette.background.paper,
+                        },
                       }}
                     />
-                  ) : (
-                    <Box
-                      sx={{ display: 'flex', gap: 2, flexWrap: 'wrap', ml: 1 }}
-                    >
-                      {(data[field.name] as Array<any>).map((item) => (
-                        <Link
-                          key={item.id}
-                          href={field.linkUrl ? field.linkUrl(item.id) : '#'}
-                          underline="hover"
-                          target="_blank" // Open in new window
-                          rel="noopener noreferrer" // Prevents security risks
-                        >
-                          {item.name}
-                        </Link>
-                      ))}
-                    </Box>
-                  )
-                ) : typeof field.component === 'function' ? (
-                  field.component(data)
-                ) : (
-                  field.component || (
-                    <Typography variant="body2" sx={{ ml: 1 }}>
-                      {field.label}: {data[field.name]}
-                    </Typography>
-                  )
-                )}
-              </Grid>
-            ))}
-          </Grid>
-          {index < arr.length - 1 && (
-            <Divider sx={{ mt: 5, mb: 2, borderBottomWidth: '2px' }} />
-          )}
-        </Box>
-      ))}
+                  </Box>
+                );
+              })}
+            </CardContent>
+            {index < arr.length - 1 && (
+              <Divider sx={{ mt: 2, mb: 2, borderBottomWidth: '1px' }} />
+            )}
+          </Card>
+        );
+      })}
     </Paper>
   );
 };
 
 function CustomToolbar() {
+  const theme = useTheme();
   return (
-    <GridToolbarContainer sx={{ ml: 1, my: 1 }}>
+    <GridToolbarContainer
+      sx={{
+        ml: 1,
+        my: 1,
+        display: 'flex',
+        flexWrap: 'wrap',
+        gap: 1,
+        backgroundColor: theme.palette.background.paper,
+        borderBottom: `1px solid ${theme.palette.divider}`,
+        padding: 1,
+        borderRadius: 1,
+      }}
+    >
       <GridToolbarFilterButton />
       <GridToolbarColumnsButton />
       <GridToolbarDensitySelector />
       <GridToolbarExport />
-      <Box sx={{ flex: 1 }}></Box>
+      <Box sx={{ flexGrow: 1 }} />
       <GridToolbarQuickFilter />
     </GridToolbarContainer>
   );

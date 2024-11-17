@@ -14,7 +14,7 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { NavLink as RouterLink } from 'react-router-dom';
 import { SidebarContext } from 'src/contexts/SidebarContext';
 import EditCalendarIcon from '@mui/icons-material/CalendarMonth';
-import { AttachMoney, BusinessOutlined, FileUploadSharp, LocationSearching, LocationSearchingTwoTone, MoneyRounded, Person, PersonAddAlt1Sharp, Topic } from '@mui/icons-material';
+import { AttachMoney, BusinessOutlined, FileUploadSharp, Interests, LocationSearching, LocationSearchingTwoTone, MoneyRounded, Person, PersonAddAlt1Sharp, Topic } from '@mui/icons-material';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import withRole from 'src/hooks/withRole';
@@ -196,7 +196,19 @@ function SidebarMenu() {
                   </Button>
                 </ListItem>
               </ProtectedListItem>
+              <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/dashboard/interests"
+                    startIcon={<Interests />}
+                  >
+                    Interests
+                  </Button>
+                </ListItem>
             </List>
+            
           </SubMenuWrapper>
         </List>
         <List

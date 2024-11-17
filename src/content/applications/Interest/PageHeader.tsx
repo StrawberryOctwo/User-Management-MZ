@@ -19,10 +19,10 @@ function PageHeader() {
     <Grid container justifyContent="space-between" alignItems="center">
       <Grid item>
         <Typography variant="h3" component="h3" gutterBottom>
-          Invoices
+          Interests Bookings
         </Typography>
         <Typography variant="subtitle2">
-          {user.name}, these are your invoices
+          {user.name}, these are your interests bookings
         </Typography>
       </Grid>
     </Grid>
