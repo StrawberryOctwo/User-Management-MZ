@@ -35,9 +35,16 @@ const AddClassSessionModal: React.FC<AddClassSessionModalProps> = ({
   const [confirmOpen, setConfirmOpen] = useState(false);
 
   const validateSession = (session: Session) => {
+    const now = new Date();
+
     if (!session.room) return false;
-    if (!session.startDate || !(session.startDate instanceof Date))
+    if (
+      !session.startDate ||
+      !(session.startDate instanceof Date) ||
+      session.startDate < now
+    )
       return false;
+
     if (!session.endDate || !(session.endDate instanceof Date)) return false;
     if (!session.sessionType) return false;
     if (typeof session.isHolidayCourse !== 'boolean') return false;
@@ -115,6 +122,7 @@ const AddClassSessionModal: React.FC<AddClassSessionModalProps> = ({
             userId={userId}
             roomId={roomId}
             passedLocations={passedLocations}
+            isPartial={true}
           />
         </DialogContent>
         <DialogActions>
@@ -138,7 +146,7 @@ const AddClassSessionModal: React.FC<AddClassSessionModalProps> = ({
         onConfirm={handleConfirmSave}
         title="Confirm Save"
         content="Please review all details carefully before saving. Are you sure you want to save?"
-        confirmButtonText='Save'
+        confirmButtonText="Save"
       />
     </>
   );

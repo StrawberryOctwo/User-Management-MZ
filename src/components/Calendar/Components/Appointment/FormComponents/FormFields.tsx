@@ -247,7 +247,11 @@ export default function FormFields({
       {/* Right Column */}
       <Grid item xs={12} md={6}>
         <Box sx={{ mb: 1 }}>
-          <DateFields session={session} setSession={setSession} />
+          <DateFields
+            session={session}
+            setSession={setSession}
+            isPartial={isPartial}
+          />
         </Box>
         <Box sx={{ mb: 1 }}>
           <FormControlLabel

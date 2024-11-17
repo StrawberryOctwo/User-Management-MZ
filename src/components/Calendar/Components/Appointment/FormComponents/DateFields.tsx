@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Box, TextField } from '@mui/material';
 import moment from 'moment';
 
-export default function DateFields({ session, setSession }) {
+export default function DateFields({ session, setSession, isPartial }) {
   const [fieldErrors, setFieldErrors] = useState({
     startDate: '',
     endDate: ''
@@ -12,11 +12,45 @@ export default function DateFields({ session, setSession }) {
     validateDates(session.startDate, session.endDate);
   }, [session.startDate, session.endDate]);
 
-  const validateDates = (startDate: Date, endDate: Date) => {
+  const validateDates = (startDate: Date | null, endDate: Date | null) => {
     let errors = { startDate: '', endDate: '' };
 
-    if (endDate < startDate) {
-      errors.endDate = 'End date cannot be before start date';
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+
+    let normalizedStartDate = null;
+    let normalizedEndDate = null;
+
+    if (startDate instanceof Date && !isNaN(startDate.getTime())) {
+      normalizedStartDate = new Date(
+        startDate.getFullYear(),
+        startDate.getMonth(),
+        startDate.getDate()
+      );
+    }
+
+    if (endDate instanceof Date && !isNaN(endDate.getTime())) {
+      normalizedEndDate = new Date(
+        endDate.getFullYear(),
+        endDate.getMonth(),
+        endDate.getDate()
+      );
+    }
+
+    if (normalizedStartDate || normalizedEndDate) {
+      if (isPartial) {
+        if (normalizedStartDate && normalizedStartDate < today) {
+          errors.startDate = 'Start date cannot be before the current date';
+        }
+      }
+
+      if (
+        normalizedEndDate &&
+        normalizedStartDate &&
+        normalizedEndDate < normalizedStartDate
+      ) {
+        errors.endDate = 'End date cannot be before start date';
+      }
     }
 
     setFieldErrors(errors);
