@@ -55,6 +55,7 @@ export default function CustomizedCalendar({
   const TIME_SLOTS = 60 / STEP;
 
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
+  const [selectedClassSessionId, setSelectedClassSession] = useState<any>(null);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isDetailsModalOpen, setDetailsModalOpen] = useState(false);
   const [selectedAppointmentId, setSelectedAppointmentId] = useState<
@@ -147,6 +148,7 @@ export default function CustomizedCalendar({
     const appointmentId = event.id;
     if (appointmentId) {
       setSelectedAppointmentId(appointmentId);
+      setSelectedClassSession(event.extendedProps.sessionId);
       setDetailsModalOpen(true);
     } else {
       console.error('Event ID is undefined or not available.');
@@ -231,6 +233,7 @@ export default function CustomizedCalendar({
 
       return {
         id: session.data.appointment.id,
+        sessionId: session.data.appointment.sessionId,
         resourceId: session.resourceId,
         title: session.data.appointment.topic,
         start: `${session.data.appointment.date}T${session.data.appointment.startTime}`,
@@ -386,6 +389,7 @@ export default function CustomizedCalendar({
         isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         appointmentId={selectedAppointment}
+        classSessionId={selectedClassSessionId}
         sessionDetails={selectedSessionDetails}
       />
 

@@ -25,6 +25,7 @@ interface EditClassSessionModalProps {
   passedLocations?: any[];
   startTime?: Date;
   appointmentId?: string;
+  classSessionId?: string;
   sessionDetails?: any;
 }
 
@@ -32,6 +33,7 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
   isOpen,
   onClose,
   appointmentId,
+  classSessionId,
   sessionDetails
 }) => {
   const [editInstance, setEditInstance] = useState({});
@@ -62,7 +64,7 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
     } else if (tabIndex === 1) {
       updateClassSession(appointmentId, newSessionObject);
     } else if (tabIndex === 2) {
-      updateClassSessionFromTo(appointmentId, newSessionObject);
+      updateClassSessionFromTo(classSessionId, newSessionObject);
     }
 
     onClose();
@@ -107,7 +109,7 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
             editSession={sessionDetails}
           />
         )}
-                {tabIndex === 2 && (
+        {tabIndex === 2 && (
           <FormFields
             strongestRoles={strongestRoles}
             userId={userId}
