@@ -1,7 +1,7 @@
 .fc {
   background-color: #ffffff;
-  border-radius: 16px; /* Slightly increased border radius for a softer look */
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12); /* Enhanced shadow for a more modern feel */
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
   padding: 24px;
   margin: 0 auto;
   width: 100%;
@@ -14,11 +14,11 @@
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding-bottom: 16px; /* Slightly increased spacing for breathing room */
+  padding-bottom: 16px;
 }
 
 .fc-toolbar-title {
-  font-size: 1.8rem; /* Slightly larger font for better readability */
+  font-size: 1.8rem;
   font-weight: 700;
   color: #333333;
   margin: 0 10px;
@@ -26,10 +26,10 @@
 
 .fc-toolbar .fc-button-group .fc-button,
 .fc-toolbar .fc-button {
-  background-color: #f9f9f9; /* Lightened button background for a cleaner aesthetic */
+  background-color: #f9f9f9;
   color: #444444;
   border: none;
-  border-radius: 8px; /* Rounded buttons for modern appearance */
+  border-radius: 8px;
   padding: 8px 16px;
   margin: 0 6px;
   font-size: 1rem;
@@ -37,11 +37,11 @@
 }
 
 .fc-button:hover {
-  background-color: #eaeaea; /* Softer hover effect */
+  background-color: #eaeaea;
 }
 
 .fc-button.fc-button-primary {
-  background-color: #4f6cff; /* Vibrant primary color */
+  background-color: #4f6cff;
   color: #ffffff;
   border-radius: 12px;
   padding: 10px 20px;
@@ -50,13 +50,13 @@
 
 .fc-button.fc-button-primary:hover {
   background-color: #3b57d1;
-  transform: scale(1.05); /* Slight zoom-in on hover for better feedback */
+  transform: scale(1.05);
 }
 
 .fc-view-harness,
 .fc-daygrid-day,
 .fc-timeline-slot {
-  border-color: #e5e5e5; /* Softened border color */
+  border-color: #e5e5e5;
 }
 
 .fc-today-button::first-letter {
@@ -80,18 +80,18 @@
 
 .fc .fc-timeline-slot-cushion,
 .fc .fc-datagrid-cell-cushion {
-  padding: 16px 24px; /* Increased padding for better spacing */
+  padding: 16px 24px;
   white-space: nowrap;
   overflow: hidden;
   text-align: center;
-  font-size: 0.95rem; /* Standardized text size */
+  font-size: 0.95rem;
 }
 
 .fc-scroller {
   overflow-y: auto;
   overflow-x: auto;
   scrollbar-width: thin;
-  scrollbar-color: #b0b0b0 #f0f0f0; /* Modern scrollbar color */
+  scrollbar-color: #b0b0b0 #f0f0f0;
 }
 
 .fc-scroller::-webkit-scrollbar {
@@ -115,7 +115,7 @@
 }
 
 .fc-resource-area {
-  width: 160px; /* Slightly wider for better readability */
+  width: 160px;
   background-color: #f9f9f9;
 }
 
@@ -124,8 +124,8 @@
   text-align: center;
   font-weight: 700;
   color: #333333;
-  padding: 12px; /* Better spacing */
-  background-color: #f7f8fa; /* Subtle background for column headers */
+  padding: 12px;
+  background-color: #f7f8fa;
 }
 
 .fc-now-indicator {
@@ -167,10 +167,10 @@
 }
 
 .fc-event {
-  padding: 6px 10px; /* Slightly adjusted padding for better alignment */
+  padding: 6px 10px;
   margin: 2px 0;
   box-sizing: border-box;
-  background-color: #edf4ff; /* Subtle event background color */
+  background-color: #edf4ff;
   color: #333333;
   border-radius: 6px;
   font-size: 0.9rem;
@@ -185,7 +185,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  gap: 12px; /* Added spacing for better alignment */
+  gap: 12px;
 }
 
 .fc .fc-next-button,
@@ -199,11 +199,29 @@
   transition: color 0.3s ease, transform 0.2s ease, background-color 0.2s ease;
 }
 
+.fc .fc-next-button:focus,
+.fc .fc-prev-button:focus {
+  outline: none !important;
+  box-shadow: none !important;
+  border: none !important;
+  color: #3b82f6 !important;
+}
+
+.fc .fc-next-button:active,
+.fc .fc-prev-button:active {
+  background-color: #e1e1e1 !important;
+  color: #2563eb;
+  outline: none !important;
+  box-shadow: none !important;
+  transform: scale(1.05);
+}
+
 .fc .fc-next-button:hover,
 .fc .fc-prev-button:hover {
   color: #3b57d1;
   transform: scale(1.1);
   background-color: #f1f1f1;
+  transition: color 0.2s, transform 0.2s, background-color 0.2s;
 }
 
 .fc-resource.selected,
