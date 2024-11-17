@@ -43,8 +43,6 @@ export default function FormFields({
   const [selectedLocation, setSelectedLocation] = useState(null);
 
   useEffect(() => {
-    console.log('editSession:', editSession);
-
     if (editSession) {
       const { classSession, teacher, location, students } = editSession;
 
@@ -64,7 +62,6 @@ export default function FormFields({
         dayDetails: prevSession.dayDetails
       }));
 
-      // Prepopulate input states
       setSelectedTopic({
         id: classSession?.topic?.id,
         name: classSession?.topic?.name
@@ -84,7 +81,6 @@ export default function FormFields({
         name: location?.name
       });
     } else {
-      // Handle "Add" mode
       setSession((prevSession) => ({
         ...prevSession,
         locationId: passedLocations?.[0]?.id || null,
@@ -99,7 +95,6 @@ export default function FormFields({
 
   return (
     <Grid container spacing={10} p={1}>
-      {/* Left Column */}
       <Grid item xs={12} md={6}>
         <Box sx={{ mb: 3 }}>
           <SingleSelectWithAutocomplete

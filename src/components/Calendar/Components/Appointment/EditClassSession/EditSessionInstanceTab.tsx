@@ -6,9 +6,6 @@ import {
   InputLabel,
   Select,
   MenuItem,
-  FormControlLabel,
-  Checkbox,
-  Button,
   Grid
 } from '@mui/material';
 import {
@@ -21,19 +18,45 @@ import { getStrongestRoles } from 'src/hooks/roleUtils';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import { fetchStudents } from 'src/services/studentService';
 
-const EditSessionInstanceTab = ({ session, setSession }) => {
-  const [teachers, setTeachers] = useState([]);
+const EditSessionInstanceTab = ({ session, setSession, editSession }) => {
+  const [selectedTeacher, setSelectedTeacher] = useState(null);
+  const [selectedStudents, setSelectedStudents] = useState([]);
   const { userId, userRoles } = useAuth();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
 
   useEffect(() => {
-    const fetchData = async () => {
-      const response = await fetchTeachers(1, 100); // Fetch teachers (adjust the parameters as needed)
-      setTeachers(response.data);
-    };
+    if (editSession) {
+      const { teacher, students } = editSession;
 
-    fetchData();
-  }, []);
+      setSession((prevSession) => ({
+        ...prevSession,
+        date: editSession.date || '',
+        startTime: editSession.startTime || '',
+        duration: editSession.duration || '',
+        isActive: editSession.isActive || false,
+        teacherId: teacher?.id || null,
+        studentIds: students?.map((s) => s.id) || [],
+        room: editSession.room || '',
+        note: editSession.note || ''
+      }));
+
+      setSelectedTeacher(
+        teacher
+          ? {
+            id: teacher.id,
+            fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
+          }
+          : null
+      );
+
+      setSelectedStudents(
+        students?.map((student) => ({
+          id: student.id,
+          fullName: `${student.user.firstName} ${student.user.lastName}`
+        })) || []
+      );
+    }
+  }, [editSession, setSession]);
 
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2, p: 2 }}>
@@ -104,24 +127,24 @@ const EditSessionInstanceTab = ({ session, setSession }) => {
               fetchData={(query) =>
                 strongestRoles.includes('Teacher')
                   ? fetchTeacherByUserId(userId).then((teacher) => [
-                      {
-                        ...teacher,
-                        fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
-                      }
-                    ])
+                    {
+                      ...teacher,
+                      fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
+                    }
+                  ])
                   : fetchTeachers(1, 5, query).then((data) =>
-                      data.data.map((teacher) => ({
-                        ...teacher,
-                        fullName: `${teacher.firstName} ${teacher.lastName}`
-                      }))
-                    )
+                    data.data.map((teacher) => ({
+                      ...teacher,
+                      fullName: `${teacher.firstName} ${teacher.lastName}`
+                    }))
+                  )
               }
               onSelect={(teacher) => {
                 setSession({ ...session, teacherId: teacher?.id });
               }}
               displayProperty="fullName"
               placeholder="Search Teacher"
-              initialValue={teachers.find((t) => t.id === session.teacherId)}
+              initialValue={selectedTeacher}
             />
           </FormControl>
         </Grid>
@@ -146,11 +169,10 @@ const EditSessionInstanceTab = ({ session, setSession }) => {
               }}
               displayProperty="fullName"
               placeholder="Enter student name"
-              initialValue={session.students}
+              initialValue={selectedStudents}
             />
           </FormControl>
         </Grid>
-
         <Grid item xs={6}>
           <FormControl fullWidth>
             <InputLabel>Room</InputLabel>

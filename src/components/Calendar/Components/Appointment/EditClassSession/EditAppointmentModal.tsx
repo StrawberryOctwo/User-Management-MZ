@@ -93,6 +93,7 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
           <EditSessionInstanceTab
             session={editInstance}
             setSession={setEditInstance}
+            editSession={sessionDetails}
           />
         )}
         {tabIndex === 1 && (
