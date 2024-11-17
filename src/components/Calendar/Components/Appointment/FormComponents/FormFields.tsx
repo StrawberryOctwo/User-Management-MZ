@@ -28,13 +28,15 @@ export default function FormFields({
   userId,
   roomId,
   editSession,
-  passedLocations = null
+  passedLocations = null,
+  isPartial
 }: {
   strongestRoles: string[];
   userId: number | number;
   roomId?: string | number;
   editSession?: any;
   passedLocations?: any[] | null;
+  isPartial?: boolean;
 }) {
   const { session, setSession, setDayDetail, resetDayDetails } = useSession();
 
@@ -49,8 +51,6 @@ export default function FormFields({
       // Logic for Edit Modal
       const { classSession, teacher, location, students } = editSession;
 
-      console.log('editSession', editSession);
-
       setSession((prevSession) => ({
         ...prevSession,
         topicId: classSession?.topic?.id || null,
@@ -59,26 +59,28 @@ export default function FormFields({
         locationId: location?.id || null,
         studentIds: students?.map((s) => s.id) || [],
         room: editSession.room || '',
-        startDate: editSession.date || prevSession.startDate,
-        endDate: editSession.date || prevSession.endDate,
+        startDate: isPartial
+          ? new Date()
+          : editSession.classSession.startDate || prevSession.startDate,
+        endDate: editSession.classSession.endDate || prevSession.endDate,
         note: editSession.note || prevSession.note,
         isHolidayCourse: classSession?.isHolidayCourse || false,
         recurrenceOption: editSession.classSession.recurrencePattern,
-        dayDetails: editSession.classSession.days,
+        dayDetails: editSession.classSession.days
       }));
 
       setSelectedTopic({
         id: classSession?.topic?.id,
-        name: classSession?.topic?.name,
+        name: classSession?.topic?.name
       });
       setSelectedTeacher({
         id: teacher?.id,
-        fullName: `${teacher?.user?.firstName} ${teacher?.user?.lastName}`,
+        fullName: `${teacher?.user?.firstName} ${teacher?.user?.lastName}`
       });
       setSelectedStudents(
         students?.map((student) => ({
           id: student.id,
-          fullName: `${student.user?.firstName} ${student.user?.lastName}`,
+          fullName: `${student.user?.firstName} ${student.user?.lastName}`
         })) || []
       );
 
@@ -87,7 +89,7 @@ export default function FormFields({
       setSession((prevSession) => ({
         ...prevSession,
         locationId: passedLocations?.[0]?.id || null,
-        room: String(roomId || ''),
+        room: String(roomId || '')
       }));
       setSelectedLocation(passedLocations?.[0] || null);
     }
@@ -105,10 +107,6 @@ export default function FormFields({
 
     loadSessionTypes();
   }, []);
-
-  useEffect(() => {
-    console.log(passedLocations)
-  }, [passedLocations]);
 
   return (
     <Grid container spacing={10} p={1}>
@@ -152,7 +150,6 @@ export default function FormFields({
           </FormControl>
         </Box>
 
-
         <Box sx={{ mb: 3 }}>
           <SingleSelectWithAutocomplete
             width="100%"
@@ -160,17 +157,17 @@ export default function FormFields({
             fetchData={(query) =>
               strongestRoles.includes('Teacher')
                 ? fetchTeacherByUserId(userId).then((teacher) => [
-                  {
-                    ...teacher,
-                    fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
-                  }
-                ])
+                    {
+                      ...teacher,
+                      fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
+                    }
+                  ])
                 : fetchTeachers(1, 5, query).then((data) =>
-                  data.data.map((teacher: any) => ({
-                    ...teacher,
-                    fullName: `${teacher.firstName} ${teacher.lastName}`
-                  }))
-                )
+                    data.data.map((teacher: any) => ({
+                      ...teacher,
+                      fullName: `${teacher.firstName} ${teacher.lastName}`
+                    }))
+                  )
             }
             onSelect={(teacher) =>
               setSession({ ...session, teacherId: teacher?.id })
@@ -213,7 +210,7 @@ export default function FormFields({
               fetchLocations(1, 5, query).then((data) => data.data)
             }
             onSelect={(location) => {
-              setSession({ ...session, locationId: location?.id })
+              setSession({ ...session, locationId: location?.id });
               setSelectedLocation(location);
             }}
             displayProperty="name"
@@ -235,7 +232,7 @@ export default function FormFields({
                 length:
                   selectedLocation?.numberOfRooms ||
                   passedLocations?.[0]?.numberOfRooms ||
-                  7,
+                  7
               },
               (_, index) => (
                 <MenuItem key={index} value={`R${index + 1}`}>

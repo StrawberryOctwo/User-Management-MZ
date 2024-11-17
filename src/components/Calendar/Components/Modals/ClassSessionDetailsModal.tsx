@@ -73,6 +73,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deactivateDialogOpen, setDeactivateDialogOpen] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
+  const [isSessionEnded, setIsSessionEnded] = useState<boolean>(false);
 
   // Fetch class session details
   const loadClassSession = async () => {
@@ -181,7 +182,6 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
   };
 
   const handleToggleActivation = async () => {
-    console.log('Toggling activation status...');
     const newStatus = !classSession.isActive;
     await onDeactivate(appointmentId, newStatus);
     setDeactivateDialogOpen(false);
@@ -193,6 +193,25 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       onEdit(classSession);
     }
   };
+
+  useEffect(() => {
+    if (classSession) {
+      const endTime = moment(classSession.startTime, 'HH:mm:ss')
+        .add(classSession.duration, 'minutes')
+        .format('HH:mm:ss');
+      const endDateTime = moment(
+        `${classSession.date} ${endTime}`,
+        'YYYY-MM-DD HH:mm:ss'
+      );
+      const currentDateTime = moment();
+
+      if (currentDateTime.isAfter(endDateTime)) {
+        setIsSessionEnded(true);
+      } else {
+        setIsSessionEnded(false);
+      }
+    }
+  }, [classSession]);
 
   return (
     <Dialog
@@ -211,42 +230,55 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       >
         <Typography variant="h6">Class Session Details</Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
-          {canEdit && (
-            <>
-              <IconButton
-                onClick={handleEdit}
-                color="primary"
-                sx={{
-                  backgroundColor: '#f0f0f0',
-                  borderRadius: '50%',
-                  '&:hover': { backgroundColor: '#e0e0e0' }
-                }}
-              >
-                <EditIcon />
-              </IconButton>
-            </>
+          {canEdit && !isSessionEnded && (
+            <IconButton
+              onClick={handleEdit}
+              color="primary"
+              sx={{
+                backgroundColor: '#f0f0f0',
+                borderRadius: '50%',
+                '&:hover': { backgroundColor: '#e0e0e0' }
+              }}
+            >
+              <EditIcon />
+            </IconButton>
           )}
           <RoleBasedComponent
             allowedRoles={[
               'SuperAdmin',
               'FranchiseAdmin',
               'LocationAdmin',
-              'Teacher',
+              'Teacher'
             ]}
           >
-            {classSession?.isActive || (!classSession?.isActive && canReactivate) ? (
+            {classSession?.isActive && !isSessionEnded ? (
               <IconButton
                 onClick={() => setDeactivateDialogOpen(true)}
-                color={classSession?.isActive ? 'warning' : 'success'}
+                color="warning"
                 sx={{
                   backgroundColor: '#f0f0f0',
                   borderRadius: '50%',
-                  '&:hover': { backgroundColor: '#e0e0e0' },
+                  '&:hover': { backgroundColor: '#e0e0e0' }
                 }}
               >
-                {classSession?.isActive ? <VisibilityOffIcon /> : <VisibilityIcon />}
+                <VisibilityOffIcon />
               </IconButton>
-            ) : null}
+            ) : (
+              !classSession?.isActive &&
+              canReactivate && (
+                <IconButton
+                  onClick={() => setDeactivateDialogOpen(true)}
+                  color="success"
+                  sx={{
+                    backgroundColor: '#f0f0f0',
+                    borderRadius: '50%',
+                    '&:hover': { backgroundColor: '#e0e0e0' }
+                  }}
+                >
+                  <VisibilityIcon />
+                </IconButton>
+              )
+            )}
           </RoleBasedComponent>
         </Box>
       </DialogTitle>
@@ -483,8 +515,9 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       </ReusableDialog>
       <ReusableDialog
         open={deactivateDialogOpen}
-        title={`Confirm ${classSession?.isActive ? 'Deactivation' : 'Reactivation'
-          }`}
+        title={`Confirm ${
+          classSession?.isActive ? 'Deactivation' : 'Reactivation'
+        }`}
         onClose={() => setDeactivateDialogOpen(false)}
         actions={
           <>

@@ -69,7 +69,8 @@ export default function CustomizedCalendar({
   const [isEventTypeModalOpen, setIsEventTypeModalOpen] = useState(false);
   const [isToDoModalOpen, setIsToDoModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState('');
-  const [selectedSessionDetails, setSelectedSessionDetails] = useState<any>(null);
+  const [selectedSessionDetails, setSelectedSessionDetails] =
+    useState<any>(null);
   const [selectedRange, setSelectedRange] = useState<{
     start: Date;
     end: Date;
@@ -120,7 +121,6 @@ export default function CustomizedCalendar({
     const currentDate = new Date();
 
     if (currentDate > eventEndDate) {
-      console.warn('This event has already ended.');
       setCanAddReport(false);
     } else if (currentDate < eventEndDate) {
       setCanAddReport(true);
@@ -131,9 +131,7 @@ export default function CustomizedCalendar({
       return;
     }
 
-    if (
-      strongestRoles[0] === 'Teacher'
-    ) {
+    if (strongestRoles[0] === 'Teacher') {
       setCanReactivate(false);
     }
 
@@ -185,8 +183,7 @@ export default function CustomizedCalendar({
     appointmentId: string,
     isActive: boolean
   ) => {
-    if (strongestRoles[0] === 'Student')
-      return;
+    if (strongestRoles[0] === 'Student') return;
 
     try {
       await toggleClassSessionActivation(appointmentId, isActive);
@@ -253,7 +250,6 @@ export default function CustomizedCalendar({
 
     setEvents(mappedEvents);
   }, [classSessionEvents]);
-
 
   const handleOpenAddModal = (start: Date, end: Date, roomId: string) => {
     if (strongestRoles[0] == 'Student' || strongestRoles[0] == 'Parent') {

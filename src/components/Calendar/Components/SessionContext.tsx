@@ -5,7 +5,7 @@ interface DayDetail {
   duration: number;
 }
 
-interface Session {
+export interface Session {
   room: string;
   startDate: Date;
   endDate: Date;

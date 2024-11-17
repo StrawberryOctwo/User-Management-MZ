@@ -107,6 +107,7 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
             strongestRoles={strongestRoles}
             userId={userId}
             editSession={sessionDetails}
+            isPartial={false}
           />
         )}
         {tabIndex === 2 && (
@@ -114,6 +115,7 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
             strongestRoles={strongestRoles}
             userId={userId}
             editSession={sessionDetails}
+            isPartial={true}
           />
         )}
       </DialogContent>
