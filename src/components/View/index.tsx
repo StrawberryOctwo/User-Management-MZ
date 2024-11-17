@@ -102,9 +102,6 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({
               background: theme.palette.background.paper,
               width: '100%',
               transition: 'transform 0.2s',
-              '&:hover': {
-                transform: 'translateY(-3px)',
-              },
             }}
           >
             <CardHeader
@@ -247,7 +244,7 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({
               })}
             </CardContent>
             {index < arr.length - 1 && (
-              <Divider sx={{ mt: 2, mb: 2, borderBottomWidth: '1px' }} />
+              <Box sx={{ mt: 3, mb: 2, borderBottomWidth: '1px' }} />
             )}
           </Card>
         );
