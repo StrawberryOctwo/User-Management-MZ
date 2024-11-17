@@ -12,6 +12,7 @@ import { useAuth } from 'src/hooks/useAuth';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import {
   updateClassSession,
+  updateClassSessionFromTo,
   updateSessionInstance
 } from 'src/services/classSessionService';
 import EditSessionInstanceTab from './EditSessionInstanceTab';
@@ -60,6 +61,8 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
       updateSessionInstance(appointmentId, editInstance);
     } else if (tabIndex === 1) {
       updateClassSession(appointmentId, newSessionObject);
+    } else if (tabIndex === 2) {
+      updateClassSessionFromTo(appointmentId, newSessionObject);
     }
 
     onClose();
@@ -83,6 +86,7 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
       >
         <Tab label="Edit Current Session" />
         <Tab label="Edit Class (All Sessions)" />
+        <Tab label="Edit Class (Partial)" />
       </Tabs>
       <DialogContent
         sx={{
@@ -97,6 +101,13 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
           />
         )}
         {tabIndex === 1 && (
+          <FormFields
+            strongestRoles={strongestRoles}
+            userId={userId}
+            editSession={sessionDetails}
+          />
+        )}
+                {tabIndex === 2 && (
           <FormFields
             strongestRoles={strongestRoles}
             userId={userId}
