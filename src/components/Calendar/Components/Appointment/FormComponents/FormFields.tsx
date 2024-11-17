@@ -27,7 +27,7 @@ export default function FormFields({
   userId,
   roomId,
   editSession,
-  passedLocations = null,
+  passedLocations = null
 }: {
   strongestRoles: string[];
   userId: number | number;
@@ -35,12 +35,7 @@ export default function FormFields({
   editSession?: any;
   passedLocations?: any[] | null;
 }) {
-  const {
-    session,
-    setSession,
-    setDayDetail,
-    resetDayDetails,
-  } = useSession();
+  const { session, setSession, setDayDetail, resetDayDetails } = useSession();
 
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
@@ -64,36 +59,36 @@ export default function FormFields({
         note: editSession.note || prevSession.note,
         isHolidayCourse: classSession?.isHolidayCourse || false,
         recurrenceOption: prevSession.recurrenceOption,
-        dayDetails: prevSession.dayDetails,
+        dayDetails: prevSession.dayDetails
       }));
 
       setSelectedTopic({
         id: classSession?.topic?.id,
-        name: classSession?.topic?.name,
+        name: classSession?.topic?.name
       });
       setSelectedTeacher({
         id: teacher?.id,
-        fullName: `${teacher?.user?.firstName} ${teacher?.user?.lastName}`,
+        fullName: `${teacher?.user?.firstName} ${teacher?.user?.lastName}`
       });
       setSelectedStudents(
         students?.map((student) => ({
           id: student.id,
-          fullName: `${student.user?.firstName} ${student.user?.lastName}`,
+          fullName: `${student.user?.firstName} ${student.user?.lastName}`
         })) || []
       );
       setSelectedLocation({
         id: location?.id,
-        name: location?.name,
+        name: location?.name
       });
     } else {
       setSession((prevSession) => ({
         ...prevSession,
         locationId: passedLocations?.[0]?.id || null,
-        room: roomId?.toString() || '',
+        room: roomId?.toString() || ''
       }));
       setSelectedLocation({
         id: passedLocations?.[0]?.id,
-        name: passedLocations?.[0]?.name,
+        name: passedLocations?.[0]?.name
       });
     }
   }, [editSession, passedLocations, roomId, setSession]);
@@ -138,17 +133,17 @@ export default function FormFields({
             fetchData={(query) =>
               strongestRoles.includes('Teacher')
                 ? fetchTeacherByUserId(userId).then((teacher) => [
-                  {
-                    ...teacher,
-                    fullName: `${teacher.user.firstName} ${teacher.user.lastName}`,
-                  },
-                ])
+                    {
+                      ...teacher,
+                      fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
+                    }
+                  ])
                 : fetchTeachers(1, 5, query).then((data) =>
-                  data.data.map((teacher) => ({
-                    ...teacher,
-                    fullName: `${teacher.firstName} ${teacher.lastName}`,
-                  }))
-                )
+                    data.data.map((teacher: any) => ({
+                      ...teacher,
+                      fullName: `${teacher.firstName} ${teacher.lastName}`
+                    }))
+                  )
             }
             onSelect={(teacher) =>
               setSession({ ...session, teacherId: teacher?.id })
@@ -167,14 +162,14 @@ export default function FormFields({
               fetchStudents(1, 5, query).then((data) =>
                 data.data.map((student) => ({
                   ...student,
-                  fullName: `${student.firstName} ${student.lastName}`,
+                  fullName: `${student.firstName} ${student.lastName}`
                 }))
               )
             }
             onSelect={(selectedItems) =>
               setSession({
                 ...session,
-                studentIds: selectedItems.map((item) => item.id),
+                studentIds: selectedItems.map((item) => item.id)
               })
             }
             displayProperty="fullName"
@@ -231,7 +226,7 @@ export default function FormFields({
                 onChange={(e) =>
                   setSession({
                     ...session,
-                    isHolidayCourse: e.target.checked,
+                    isHolidayCourse: e.target.checked
                   })
                 }
               />
@@ -245,7 +240,7 @@ export default function FormFields({
             handleRecurrenceChange={(e) =>
               setSession({
                 ...session,
-                recurrenceOption: e.target.value as string,
+                recurrenceOption: e.target.value as string
               })
             }
             dayDetails={session.dayDetails}
