@@ -61,39 +61,37 @@ export default function FormFields({
         note: editSession.note || prevSession.note,
         isHolidayCourse: classSession?.isHolidayCourse || false,
         recurrenceOption: prevSession.recurrenceOption,
-        dayDetails: prevSession.dayDetails
+        dayDetails: prevSession.dayDetails,
       }));
 
       setSelectedTopic({
         id: classSession?.topic?.id,
-        name: classSession?.topic?.name
+        name: classSession?.topic?.name,
       });
       setSelectedTeacher({
         id: teacher?.id,
-        fullName: `${teacher?.user?.firstName} ${teacher?.user?.lastName}`
+        fullName: `${teacher?.user?.firstName} ${teacher?.user?.lastName}`,
       });
       setSelectedStudents(
         students?.map((student) => ({
           id: student.id,
-          fullName: `${student.user?.firstName} ${student.user?.lastName}`
+          fullName: `${student.user?.firstName} ${student.user?.lastName}`,
         })) || []
       );
-      setSelectedLocation({
-        id: location?.id,
-        name: location?.name
-      });
+
+      setSelectedLocation(location);
+      console.log(selectedLocation)
     } else {
       setSession((prevSession) => ({
         ...prevSession,
-        locationId: passedLocations?.[0]?.id || null,
-        room: roomId?.toString() || ''
+        locationId: null,
+        room: '',
       }));
-      setSelectedLocation({
-        id: passedLocations?.[0]?.id,
-        name: passedLocations?.[0]?.name
-      });
+      setSelectedLocation(null);
     }
-  }, [editSession, passedLocations, roomId, setSession]);
+  }, [editSession, setSession]);
+
+
 
   useEffect(() => {
     const loadSessionTypes = async () => {
@@ -107,6 +105,10 @@ export default function FormFields({
 
     loadSessionTypes();
   }, []);
+
+  useEffect(() => {
+    console.log(passedLocations)
+  }, [passedLocations]);
 
   return (
     <Grid container spacing={10} p={1}>
@@ -149,7 +151,7 @@ export default function FormFields({
             </Select>
           </FormControl>
         </Box>
-        
+
         <Box sx={{ mb: 3 }}>
           <SingleSelectWithAutocomplete
             width="100%"
@@ -209,9 +211,10 @@ export default function FormFields({
             fetchData={(query) =>
               fetchLocations(1, 5, query).then((data) => data.data)
             }
-            onSelect={(location) =>
+            onSelect={(location) => {
               setSession({ ...session, locationId: location?.id })
-            }
+              setSelectedLocation(location);
+            }}
             displayProperty="name"
             placeholder="Search Location"
             initialValue={selectedLocation}
@@ -226,7 +229,12 @@ export default function FormFields({
             onChange={(e) => setSession({ ...session, room: e.target.value })}
           >
             {Array.from(
-              { length: passedLocations?.[0]?.numberOfRooms || 7 },
+              {
+                length:
+                  selectedLocation?.numberOfRooms ||
+                  passedLocations?.[0]?.numberOfRooms ||
+                  7,
+              },
               (_, index) => (
                 <MenuItem key={index} value={`R${index + 1}`}>
                   {`R${index + 1}`}
