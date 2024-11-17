@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import {
   Dialog,
-  DialogTitle,
   DialogContent,
   DialogActions,
   Button,
@@ -12,7 +11,6 @@ import FormFields from '../FormComponents/FormFields';
 import { useAuth } from 'src/hooks/useAuth';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import {
-  fetchClassSessionById,
   updateClassSession,
   updateSessionInstance
 } from 'src/services/classSessionService';
@@ -32,13 +30,9 @@ interface EditClassSessionModalProps {
 const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
   isOpen,
   onClose,
-  roomId,
-  passedLocations = [],
-  startTime,
   appointmentId,
   sessionDetails
 }) => {
-  const [editSession, setEditSession] = useState({});
   const [editInstance, setEditInstance] = useState({});
   const { userId, userRoles } = useAuth();
   const { session, clearSession } = useSession();
@@ -51,14 +45,12 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
   };
 
   const onSave = () => {
-    // Map dayDetails to sessions
     const updatedSessions = Object.keys(session.dayDetails).map((day) => ({
       day,
       startTime: session.dayDetails[day].startTime,
       duration: session.dayDetails[day].duration
     }));
 
-    // Create a new object with the session and sessions array
     const newSessionObject = {
       ...session,
       sessions: updatedSessions
@@ -107,9 +99,7 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
           <FormFields
             strongestRoles={strongestRoles}
             userId={userId}
-            roomId={roomId}
-            editSession={editSession}
-            passedLocations={passedLocations}
+            editSession={sessionDetails}
           />
         )}
       </DialogContent>

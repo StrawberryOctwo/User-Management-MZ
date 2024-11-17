@@ -14,7 +14,6 @@ import RecurrenceOptions from './RecurrenceOptions';
 import DateFields from './DateFields';
 import { fetchTopics } from 'src/services/topicService';
 import { useEffect, useState } from 'react';
-import { fetchSessionTypes } from 'src/services/contractPackagesService';
 import {
   fetchTeacherByUserId,
   fetchTeachers
@@ -28,14 +27,19 @@ export default function FormFields({
   userId,
   roomId,
   editSession,
-  passedLocations
+  passedLocations = null,
+}: {
+  strongestRoles: string[];
+  userId: number | number;
+  roomId?: string | number;
+  editSession?: any;
+  passedLocations?: any[] | null;
 }) {
   const {
     session,
     setSession,
-    setSessionField,
     setDayDetail,
-    resetDayDetails
+    resetDayDetails,
   } = useSession();
 
   const [selectedTopic, setSelectedTopic] = useState(null);
@@ -43,14 +47,14 @@ export default function FormFields({
   const [selectedStudents, setSelectedStudents] = useState([]);
   const [selectedLocation, setSelectedLocation] = useState(null);
 
-
   useEffect(() => {
     console.log('editSession:', editSession);
+
     if (editSession) {
       const { classSession, teacher, location, students } = editSession;
 
       setSession((prevSession) => ({
-        ...prevSession, // Preserve existing properties
+        ...prevSession,
         topicId: classSession?.topic?.id || null,
         sessionType: classSession?.sessionType?.id || null,
         teacherId: teacher?.id || null,
@@ -61,8 +65,8 @@ export default function FormFields({
         endDate: editSession.date || prevSession.endDate,
         note: editSession.note || prevSession.note,
         isHolidayCourse: classSession?.isHolidayCourse || false,
-        recurrenceOption: prevSession.recurrenceOption, // Preserve existing
-        dayDetails: prevSession.dayDetails, // Preserve existing
+        recurrenceOption: prevSession.recurrenceOption,
+        dayDetails: prevSession.dayDetails,
       }));
 
       // Prepopulate input states
@@ -84,9 +88,19 @@ export default function FormFields({
         id: location?.id,
         name: location?.name,
       });
+    } else {
+      // Handle "Add" mode
+      setSession((prevSession) => ({
+        ...prevSession,
+        locationId: passedLocations?.[0]?.id || null,
+        room: roomId?.toString() || '',
+      }));
+      setSelectedLocation({
+        id: passedLocations?.[0]?.id,
+        name: passedLocations?.[0]?.name,
+      });
     }
-  }, [editSession, setSession]);
-
+  }, [editSession, passedLocations, roomId, setSession]);
 
   return (
     <Grid container spacing={10} p={1}>
@@ -116,7 +130,6 @@ export default function FormFields({
                 setSession({ ...session, sessionType: e.target.value })
               }
             >
-              {/* Replace with session types if needed */}
               <MenuItem value={1}>Group</MenuItem>
               <MenuItem value={2}>Individual</MenuItem>
             </Select>
@@ -142,7 +155,9 @@ export default function FormFields({
                   }))
                 )
             }
-            onSelect={(teacher) => setSession({ ...session, teacherId: teacher?.id })}
+            onSelect={(teacher) =>
+              setSession({ ...session, teacherId: teacher?.id })
+            }
             displayProperty="fullName"
             placeholder="Search Teacher"
             initialValue={selectedTeacher}
@@ -196,11 +211,14 @@ export default function FormFields({
             value={session.room || ''}
             onChange={(e) => setSession({ ...session, room: e.target.value })}
           >
-            {Array.from({ length: 7 }, (_, index) => (
-              <MenuItem key={index} value={`R${index + 1}`}>
-                {`R${index + 1}`}
-              </MenuItem>
-            ))}
+            {Array.from(
+              { length: passedLocations?.[0]?.numberOfRooms || 7 },
+              (_, index) => (
+                <MenuItem key={index} value={`R${index + 1}`}>
+                  {`R${index + 1}`}
+                </MenuItem>
+              )
+            )}
           </Select>
         </FormControl>
       </Grid>
@@ -229,12 +247,10 @@ export default function FormFields({
         <Box>
           <RecurrenceOptions
             recurrenceOption={session.recurrenceOption}
-            handleRecurrenceChange={(
-              e: React.ChangeEvent<{ value: unknown }>
-            ) =>
+            handleRecurrenceChange={(e) =>
               setSession({
                 ...session,
-                recurrenceOption: e.target.value as string
+                recurrenceOption: e.target.value as string,
               })
             }
             dayDetails={session.dayDetails}

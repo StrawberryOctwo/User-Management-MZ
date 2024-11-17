@@ -77,7 +77,6 @@ const AddClassSessionModal: React.FC<AddClassSessionModalProps> = ({
           strongestRoles={strongestRoles}
           userId={userId}
           roomId={roomId}
-          editSession={null}
           passedLocations={passedLocations}
         />
       </DialogContent>
