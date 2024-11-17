@@ -25,21 +25,26 @@ const FilterToolbar: React.FC<FilterToolbarProps> = ({
   userRole,
 }) => {
   const [franchiseId, setFranchiseId] = useState<number | null>(null);
-  const [isLocationEnabled, setIsLocationEnabled] = useState(!!selectedFranchise);
+  const [isLocationEnabled, setIsLocationEnabled] = useState(
+    !!selectedFranchise || userRole === 'LocationAdmin'
+  );
   const { userRoles } = useAuth();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
   const hasFranchiseAccess = strongestRoles.includes('SuperAdmin') || strongestRoles.includes('FranchiseAdmin');
+  const isLocationAdmin = strongestRoles.includes('LocationAdmin');
   const locationRef = useRef<any>(null); // Ref for MultiSelectWithCheckboxes
 
   useEffect(() => {
     if (selectedFranchise) {
       setFranchiseId(selectedFranchise.id);
     }
-  }, [selectedFranchise]);
+    // Update `isLocationEnabled` whenever `selectedFranchise` changes
+    setIsLocationEnabled(!!selectedFranchise || isLocationAdmin);
+  }, [selectedFranchise, isLocationAdmin]);
 
   const handleFranchiseChange = (franchise: any) => {
     setFranchiseId(franchise?.id || null);
-    setIsLocationEnabled(!!franchise?.id);
+    setIsLocationEnabled(!!franchise?.id || isLocationAdmin);
 
     onLocationsChange([]);
     if (locationRef.current) {
@@ -48,7 +53,6 @@ const FilterToolbar: React.FC<FilterToolbarProps> = ({
 
     onFranchiseChange(franchise);
   };
-
 
   const handleLocationsChange = (locations: any[]) => {
     onLocationsChange(locations); // Passes selected locations array to the parent
@@ -65,7 +69,9 @@ const FilterToolbar: React.FC<FilterToolbarProps> = ({
           <Grid item xs={12} sm={12} md={3} sx={{ ml: 2 }}>
             <SingleSelectWithAutocomplete
               label="Select Franchise"
-              fetchData={(query) => fetchFranchises(1, 5, query).then((data) => data.data)}
+              fetchData={(query) =>
+                fetchFranchises(1, 5, query).then((data) => data.data)
+              }
               onSelect={handleFranchiseChange}
               displayProperty="name"
               placeholder="Search Franchise"
@@ -89,7 +95,7 @@ const FilterToolbar: React.FC<FilterToolbarProps> = ({
             placeholder="Type to search locations"
             initialValue={selectedLocations}
             width="100%"
-            disabled={!franchiseId}
+            disabled={!isLocationEnabled}
           />
         </Grid>
       </Grid>

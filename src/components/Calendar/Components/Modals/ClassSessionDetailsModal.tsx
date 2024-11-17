@@ -39,7 +39,8 @@ interface ClassSessionDetailsModalProps {
   onDeactivate: (appointmentId: any, newStatus: any) => void;
   canEdit: boolean;
   canAddReport: boolean;
-  onDeactivateComplete: () => void; // New prop
+  canReactivate: boolean;
+  onDeactivateComplete: () => void;
 }
 
 const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
@@ -51,6 +52,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
   onDeactivate,
   onDeactivateComplete,
   canEdit,
+  canReactivate,
   canAddReport
 }) => {
   const [classSession, setClassSession] = useState<any>(null);
@@ -174,21 +176,14 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     await refreshClassSessionData();
   };
 
-  const handleDelete = async () => {
-    setDeleteDialogOpen(true);
-  };
-
-  const handleDeactivate = async () => {
-    setDeactivateDialogOpen(true);
-  };
-
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setTabIndex(newValue);
   };
 
   const handleToggleActivation = async () => {
+    console.log('Toggling activation status...');
     const newStatus = !classSession.isActive;
-    await onDeactivate(appointmentId, newStatus); // Toggle activation status
+    await onDeactivate(appointmentId, newStatus);
     setDeactivateDialogOpen(false);
     onDeactivateComplete(); // Refresh sessions in parent component
   };
@@ -229,32 +224,30 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
               >
                 <EditIcon />
               </IconButton>
-              <RoleBasedComponent
-                allowedRoles={[
-                  'SuperAdmin',
-                  'FranchiseAdmin',
-                  'LocationAdmin',
-                  'Teacher'
-                ]}
-              >
-                <IconButton
-                  onClick={() => setDeactivateDialogOpen(true)}
-                  color={classSession?.isActive ? 'warning' : 'success'}
-                  sx={{
-                    backgroundColor: '#f0f0f0',
-                    borderRadius: '50%',
-                    '&:hover': { backgroundColor: '#e0e0e0' }
-                  }}
-                >
-                  {classSession?.isActive ? (
-                    <VisibilityOffIcon />
-                  ) : (
-                    <VisibilityIcon />
-                  )}
-                </IconButton>
-              </RoleBasedComponent>
             </>
           )}
+          <RoleBasedComponent
+            allowedRoles={[
+              'SuperAdmin',
+              'FranchiseAdmin',
+              'LocationAdmin',
+              'Teacher',
+            ]}
+          >
+            {classSession?.isActive || (!classSession?.isActive && canReactivate) ? (
+              <IconButton
+                onClick={() => setDeactivateDialogOpen(true)}
+                color={classSession?.isActive ? 'warning' : 'success'}
+                sx={{
+                  backgroundColor: '#f0f0f0',
+                  borderRadius: '50%',
+                  '&:hover': { backgroundColor: '#e0e0e0' },
+                }}
+              >
+                {classSession?.isActive ? <VisibilityOffIcon /> : <VisibilityIcon />}
+              </IconButton>
+            ) : null}
+          </RoleBasedComponent>
         </Box>
       </DialogTitle>
       <DialogContent sx={{ minHeight: '370px' }} className="djfhjdf">
@@ -490,9 +483,8 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       </ReusableDialog>
       <ReusableDialog
         open={deactivateDialogOpen}
-        title={`Confirm ${
-          classSession?.isActive ? 'Deactivation' : 'Reactivation'
-        }`}
+        title={`Confirm ${classSession?.isActive ? 'Deactivation' : 'Reactivation'
+          }`}
         onClose={() => setDeactivateDialogOpen(false)}
         actions={
           <>

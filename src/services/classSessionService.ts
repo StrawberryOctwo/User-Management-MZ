@@ -56,7 +56,7 @@ export const fetchParentClassSessions = async (
 
 export const addClassSession = async (classData: any) => {
   try {
-    
+
     const response = await api.post('/class-session', classData);
     return response.data;
   } catch (error) {
@@ -141,12 +141,12 @@ export const deleteClassSession = async (classSessionId: number[]) => {
 };
 
 export async function toggleClassSessionActivation(
-  ids: number[],
+  ids: string,
   isActive: boolean
 ) {
   try {
     const response = await api.post('/class-sessions/toggle-activation', {
-      ids: ids,
+      id: ids,
       isActive: isActive
     });
     return response.data;

@@ -62,6 +62,7 @@ export default function CustomizedCalendar({
   >(null);
   const [canEditSession, setCanEditSession] = useState<boolean | null>(true);
   const [canAddReport, setCanAddReport] = useState<boolean | null>(false);
+  const [canReactivate, setCanReactivate] = useState<boolean | null>(true);
   const [events, setEvents] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEventTypeModalOpen, setIsEventTypeModalOpen] = useState(false);
@@ -130,6 +131,12 @@ export default function CustomizedCalendar({
     }
 
     if (
+      strongestRoles[0] === 'Teacher'
+    ) {
+      setCanReactivate(false);
+    }
+
+    if (
       strongestRoles[0] === 'Teacher' ||
       strongestRoles[0] === 'Parent' ||
       strongestRoles[0] === 'Student'
@@ -176,11 +183,11 @@ export default function CustomizedCalendar({
     appointmentId: string,
     isActive: boolean
   ) => {
-    if (strongestRoles[0] === 'Teacher' || strongestRoles[0] === 'Student')
+    if (strongestRoles[0] === 'Student')
       return;
 
     try {
-      await toggleClassSessionActivation([Number(appointmentId)], isActive);
+      await toggleClassSessionActivation(appointmentId, isActive);
       handleDeactivateComplete();
     } catch (error) {
       console.error('Error toggling class session activation:', error);
@@ -406,6 +413,7 @@ export default function CustomizedCalendar({
         onDeactivateComplete={handleDeactivateComplete}
         canEdit={canEditSession}
         canAddReport={canAddReport}
+        canReactivate={canReactivate}
       />
     </Box>
   );
