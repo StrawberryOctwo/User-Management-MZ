@@ -296,7 +296,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                   </Typography>
                   <Typography variant="subtitle1">
                     <strong>Session Type:</strong>{' '}
-                    {classSession?.classSession?.sessionType?.name}
+                    {classSession?.sessionType?.name}
                   </Typography>
                   <Typography variant="subtitle1">
                     <strong>Start Time:</strong>{' '}
