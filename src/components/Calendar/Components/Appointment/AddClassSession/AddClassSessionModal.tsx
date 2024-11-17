@@ -8,9 +8,9 @@ import {
 } from '@mui/material';
 import FormFields from '../FormComponents/FormFields';
 import { useAuth } from 'src/hooks/useAuth';
-import { useSession } from '../../../contexts/SessionContext';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import { addClassSession } from 'src/services/classSessionService';
+import { useSession } from '../../SessionContext';
 
 interface AddClassSessionModalProps {
   isOpen: boolean;

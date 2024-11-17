@@ -10,7 +10,6 @@ import {
 } from '@mui/material';
 import FormFields from '../FormComponents/FormFields';
 import { useAuth } from 'src/hooks/useAuth';
-import { useSession } from '../../../contexts/SessionContext';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import {
   fetchClassSessionById,
@@ -18,6 +17,7 @@ import {
   updateSessionInstance
 } from 'src/services/classSessionService';
 import EditSessionInstanceTab from './EditSessionInstanceTab';
+import { useSession } from '../../SessionContext';
 
 interface EditClassSessionModalProps {
   isOpen: boolean;

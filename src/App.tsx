@@ -9,7 +9,7 @@ import { SnackbarProvider } from './contexts/SnackbarContext'; // Import Snackba
 import { I18nextProvider } from 'react-i18next';
 import i18n from './i18n';
 import { AxiosInterceptorSetup } from './services/useAxiosSetup';
-import { SessionProvider } from './components/Calendar/contexts/SessionContext';
+import { SessionProvider } from './components/Calendar/Components/SessionContext';
 
 function App() {
   const content = useRoutes(router);

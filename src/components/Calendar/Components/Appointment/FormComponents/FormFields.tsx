@@ -12,7 +12,6 @@ import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWith
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
 import RecurrenceOptions from './RecurrenceOptions';
 import DateFields from './DateFields';
-import { useSession } from '../../../contexts/SessionContext';
 import { fetchTopics } from 'src/services/topicService';
 import { useEffect, useState } from 'react';
 import { fetchSessionTypes } from 'src/services/contractPackagesService';
@@ -22,6 +21,7 @@ import {
 } from 'src/services/teacherService';
 import { fetchStudents } from 'src/services/studentService';
 import { fetchLocations } from 'src/services/locationService';
+import { useSession } from '../../SessionContext';
 
 export default function FormFields({
   strongestRoles,
