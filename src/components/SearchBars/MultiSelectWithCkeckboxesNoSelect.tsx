@@ -5,11 +5,13 @@ interface MultiSelectWithCheckboxesNoSelectProps {
     label: string;
     fetchData: (query: string) => Promise<any[]>;
     onSelect: (selectedItems: any[]) => void;
-    displayProperty: string;
+    displayProperty?: string; // Optional
+    getOptionLabel?: (option: any) => string; // Optional for custom labels
     placeholder?: string;
     initialValue?: any[];
     width?: string | number;
     hideSelected?: boolean;
+    idField?: string;
 }
 
 const MultiSelectWithCheckboxesNoSelect = forwardRef(({
@@ -17,10 +19,12 @@ const MultiSelectWithCheckboxesNoSelect = forwardRef(({
     fetchData,
     onSelect,
     displayProperty,
+    getOptionLabel,
     placeholder = 'Select...',
     initialValue = [],
     width = '95%',
     hideSelected = false,
+    idField = 'id',
 }: MultiSelectWithCheckboxesNoSelectProps, ref) => {
     const [query, setQuery] = useState('');
     const [options, setOptions] = useState<any[]>([]);
@@ -43,14 +47,14 @@ const MultiSelectWithCheckboxesNoSelect = forwardRef(({
                 const uniqueOptions = [
                     ...prevOptions,
                     ...initialValue.filter(
-                        (item) => !prevOptions.some((option) => option.id === item.id)
+                        (item) => !prevOptions.some((option) => option[idField] === item[idField])
                     ),
                 ];
                 return uniqueOptions;
             });
             setSelectedItems(initialValue);
         }
-    }, [initialValue]);
+    }, [initialValue, idField]);
 
     useEffect(() => {
         let active = true;
@@ -65,7 +69,7 @@ const MultiSelectWithCheckboxesNoSelect = forwardRef(({
                             const uniqueOptions = [
                                 ...prevOptions,
                                 ...data.filter(
-                                    (item) => !prevOptions.some((option) => option.id === item.id)
+                                    (item) => !prevOptions.some((option) => option[idField] === item[idField])
                                 ),
                             ];
                             return uniqueOptions;
@@ -88,22 +92,29 @@ const MultiSelectWithCheckboxesNoSelect = forwardRef(({
         return () => {
             active = false;
         };
-    }, [focused, query, fetchData, selectedItems]);
+    }, [focused, query, fetchData, selectedItems, idField]);
 
     const handleFocus = () => setFocused(true);
     const handleBlur = () => setFocused(false);
 
     const handleChange = (event: any, value: any[]) => {
         const lastSelectedItem = value[value.length - 1];
-        if (!selectedItems.some((item) => item.id === lastSelectedItem.id)) {
+        if (!selectedItems.some((item) => item[idField] === lastSelectedItem[idField])) {
             const newSelectedItems = [...selectedItems, lastSelectedItem];
             setSelectedItems(newSelectedItems);
             onSelect(newSelectedItems);
         }
     };
 
-    const getNestedProperty = (option: any, path: string) =>
-        path.split('.').reduce((acc, part) => acc && acc[part], option);
+    // Use either getOptionLabel function or displayProperty
+    const labelGenerator = getOptionLabel
+        ? getOptionLabel
+        : (option: any) => {
+            if (displayProperty) {
+                return displayProperty.split('.').reduce((acc, part) => acc && acc[part], option) || '';
+            }
+            return '';
+        };
 
     return (
         <Autocomplete
@@ -112,7 +123,7 @@ const MultiSelectWithCheckboxesNoSelect = forwardRef(({
             options={options}
             disableCloseOnSelect
             filterSelectedOptions
-            getOptionLabel={(option) => getNestedProperty(option, displayProperty) || ''}
+            getOptionLabel={labelGenerator}
             onChange={handleChange}
             onInputChange={(event, newInputValue) => {
                 setQuery(newInputValue); // Update query for search
@@ -120,20 +131,20 @@ const MultiSelectWithCheckboxesNoSelect = forwardRef(({
             onFocus={handleFocus}
             onBlur={handleBlur}
             loading={loading}
-            isOptionEqualToValue={(option, value) => option.id === value.id}
+            isOptionEqualToValue={(option, value) => option[idField] === value[idField]}
             renderTags={(value: readonly any[], getTagProps) =>
                 !hideSelected ? value.map((option, index) => (
                     <Chip
                         variant="outlined"
-                        label={getNestedProperty(option, displayProperty)}
+                        label={labelGenerator(option)}
                         {...getTagProps({ index })}
-                        key={option.id}
+                        key={option[idField]}
                     />
                 )) : null
             }
             renderOption={(props, option) => (
-                <li {...props} key={option.id}>
-                    {getNestedProperty(option, displayProperty)}
+                <li {...props} key={option[idField]}>
+                    {labelGenerator(option)}
                 </li>
             )}
             renderInput={(params) => (

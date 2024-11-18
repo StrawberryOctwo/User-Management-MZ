@@ -109,7 +109,10 @@ const ToDoHeader: React.FC = () => {
         response.assignees.forEach(user => {
           user.roles.forEach(role => {
             if (organizedUsers[role]) {
-              organizedUsers[role].push(user);
+              organizedUsers[role].push({
+                ...user,
+                id: user.id || user.userId,
+              });
             }
           });
         });
@@ -146,14 +149,20 @@ const ToDoHeader: React.FC = () => {
       [role]: [...prev[role], ...selectedItems.filter((item) => !prev[role].some((prevItem) => prevItem.id === item.id))]
     }));
   };
+
   const reloadTable = () => {
     loadToDos(page);
   };
+
   const handleRemoveUser = (role, userToRemove) => {
-    setSelectedUsers((prev) => ({
-      ...prev,
-      [role]: prev[role].filter((user) => user.id !== userToRemove.id),
-    }));
+    setSelectedUsers((prev) => {
+      const updatedUsers = prev[role].filter((user) => user.id !== userToRemove.id);
+
+      return {
+        ...prev,
+        [role]: updatedUsers,
+      };
+    });
   };
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {

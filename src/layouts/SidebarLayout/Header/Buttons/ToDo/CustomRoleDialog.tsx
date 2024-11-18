@@ -1,4 +1,3 @@
-// CustomRoleDialog.tsx
 import React from 'react';
 import {
     Box,
@@ -16,7 +15,7 @@ import MultiSelectWithCheckboxesNoSelect from 'src/components/SearchBars/MultiSe
 interface CustomRoleDialogProps {
     open: boolean;
     onClose: () => void;
-    selectedUsers: any;
+    selectedUsers: { [role: string]: any[] }; // Added type for selectedUsers
     handleRoleInputChange: (role: string, selectedItems: any[]) => void;
     handleRemoveUser: (role: string, user: any) => void;
     assignToDoToUsers: (todoId: number | null, userIds: number[]) => Promise<void>;
@@ -54,6 +53,12 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                         Student: ['FranchiseAdmin', 'LocationAdmin', 'Teacher'],
                     };
 
+                    // Determine the idField based on the role
+                    const idField = (role === 'Teacher' || role === 'Student') ? 'userId' : 'id';
+
+                    // Define a label generator function to concatenate firstName and lastName
+                    const labelGenerator = (option: any) => `${option.firstName} ${option.lastName}`;
+
                     return (
                         <RoleBasedComponent key={role} allowedRoles={allowedRolesMap[role]}>
                             <Box sx={{ minWidth: 180, mb: 2 }}>
@@ -61,10 +66,12 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                                     label={labelMap[role]}
                                     fetchData={fetchDataFunctions[role]}
                                     onSelect={(selectedItems) => handleRoleInputChange(role, selectedItems)}
-                                    displayProperty="firstName"
+                                    // displayProperty="firstName" // Remove this prop
+                                    getOptionLabel={labelGenerator} // Use the label generator
                                     placeholder={`Type to search ${role.toLowerCase()}`}
                                     hideSelected
                                     initialValue={selectedUsers[role]}
+                                    idField={idField} // Pass the appropriate idField
                                 />
                             </Box>
                         </RoleBasedComponent>
@@ -78,32 +85,36 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                             <Box key={role} mt={1}>
                                 <Typography variant="subtitle1">{role}:</Typography>
                                 <Box pl={2}>
-                                    {selectedUsers[role].map((user) => (
-                                        <Box
-                                            key={user.id}
-                                            display="flex"
-                                            alignItems="center"
-                                            sx={{
-                                                position: 'relative',
-                                                '&:hover .remove-btn': { visibility: 'visible' },
-                                            }}
-                                        >
-                                            <Typography variant="body2" sx={{ mr: 1 }}>
-                                                - {user.firstName} {user.lastName}
-                                            </Typography>
-                                            <IconButton
-                                                className="remove-btn"
-                                                size="small"
-                                                color="secondary"
-                                                onClick={() => handleRemoveUser(role, user)}
+                                    {selectedUsers[role].map((user) => {
+                                        // Determine the unique key based on idField
+                                        const key = (role === 'Teacher' || role === 'Student') ? user.userId : user.id;
+                                        return (
+                                            <Box
+                                                key={key}
+                                                display="flex"
+                                                alignItems="center"
                                                 sx={{
-                                                    visibility: 'hidden',
+                                                    position: 'relative',
+                                                    '&:hover .remove-btn': { visibility: 'visible' },
                                                 }}
                                             >
-                                                &times;
-                                            </IconButton>
-                                        </Box>
-                                    ))}
+                                                <Typography variant="body2" sx={{ mr: 1 }}>
+                                                    - {user.firstName} {user.lastName}
+                                                </Typography>
+                                                <IconButton
+                                                    className="remove-btn"
+                                                    size="small"
+                                                    color="secondary"
+                                                    onClick={() => handleRemoveUser(role, user)}
+                                                    sx={{
+                                                        visibility: 'hidden',
+                                                    }}
+                                                >
+                                                    &times;
+                                                </IconButton>
+                                            </Box>
+                                        );
+                                    })}
                                 </Box>
                             </Box>
                         )
@@ -117,14 +128,15 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                 <Button
                     onClick={async () => {
                         const allSelectedUserIds = Object.entries(selectedUsers).flatMap(([role, users]) =>
-                            (users as any[]).map((user) =>
-                                role === 'Teacher' || role === 'Student' ? user.userId : user.id
-                            )
+                            (users as any[]).map((user) => {
+                                return (role === 'Teacher' || role === 'Student') ? user.userId : user.id;
+                            })
                         );
                         try {
                             await assignToDoToUsers(selectedCustomTodoId, allSelectedUserIds);
                             console.log('ToDo successfully assigned to users');
                             onSave();
+                            onClose();
                         } catch (error) {
                             console.error('Error assigning ToDo to users:', error);
                         }
