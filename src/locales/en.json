@@ -129,5 +129,8 @@
   "payment_status": "Payment Status",
 
 
-  "download": "Download"
+  "download": "Download",
+  "active": "Active",
+  "inactive": "Inactive",
+  "interested": "Interested"
 }

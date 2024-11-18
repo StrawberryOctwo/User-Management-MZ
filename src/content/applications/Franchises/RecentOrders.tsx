@@ -43,7 +43,7 @@ export default function ViewFranchisePage() {
   const columns = [
     { field: 'name', headerName: 'Franchise Name' },
     { field: 'ownerName', headerName: 'Owner Name' },
-    { field: 'status', headerName: 'Status', render: (value: any) => (value === '1' ? '1' : '0') },
+    { field: 'status', headerName: 'Status' },
     { field: 'totalEmployees', headerName: 'Total Employees' },
     { field: 'createdAt', headerName: 'Created At', render: (value: any) => new Date(value).toLocaleDateString() },
   ];

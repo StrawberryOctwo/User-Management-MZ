@@ -24,7 +24,7 @@ const CreateFranchise = () => {
                 bic: data.bic,
                 status: data.status,
                 totalEmployees: data.totalEmployees,
-                percentage:data.percentage
+                percentage: data.percentage
             };
             const response = await addFranchise(payload);
             return response
@@ -36,13 +36,20 @@ const CreateFranchise = () => {
             setLoading(false);
         }
     };
+
+    const statusOptions = [
+        { label: t('active'), value: 'active' },
+        { label: t('inactive'), value: 'inactive' },
+        { label: t('interested'), value: 'interested' },
+    ];
+
     const franchiseFields: FieldConfig[] = [
         { name: 'name', label: t('franchise_name'), type: 'text', required: true, section: 'Franchise Information' },
         { name: 'ownerName', label: t('owner_name'), type: 'text', required: true, section: 'Franchise Information' },
         { name: 'cardHolderName', label: t('card_holder_name'), type: 'text', required: true, section: 'Franchise Information' },
         { name: 'iban', label: t('iban'), type: 'text', required: true, section: 'Franchise Information' },
         { name: 'bic', label: t('bic'), type: 'text', required: true, section: 'Franchise Information' },
-        { name: 'status', label: t('status'), type: 'text', required: true, section: 'Franchise Information' },
+        { name: 'status', label: t('status'), type: 'select', required: true, section: 'Franchise Information', options: statusOptions },
         { name: 'totalEmployees', label: t('total_employees'), type: 'number', required: true, section: 'Franchise Information' },
         { name: 'percentage', label: t('percentage'), type: 'number', required: true, section: 'Franchise Information' },
 

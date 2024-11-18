@@ -76,8 +76,8 @@ const CreateTeacher = () => {
                     contractStartDate: data.contractStartDate,
                     contractEndDate: data.contractEndDate,
                     hourlyRate: data.hourlyRate,
-                    rateMultiplier : data.rateMultiplier,
-                    sessionRateMultiplier : data.sessionRateMultiplier,
+                    rateMultiplier: data.rateMultiplier,
+                    sessionRateMultiplier: data.sessionRateMultiplier,
                     bank: data.bank,
                     iban: data.iban,
                     bic: data.bic,
@@ -108,6 +108,12 @@ const CreateTeacher = () => {
             setLoading(false);
         }
     };
+
+    const statusOptions = [
+        { label: t('active'), value: 'active' },
+        { label: t('inactive'), value: 'inactive' },
+        { label: t('interested'), value: 'interested' },
+    ];
 
     const userFields: FieldConfig[] = [
         { name: 'firstName', label: t('first_name'), type: 'text', required: true, section: 'User Information' },
