@@ -15,6 +15,31 @@ import FeedbackIcon from '@mui/icons-material/Feedback';
 import { getSurveysForSelf } from 'src/services/survey';
 import SurveySubmitDialog from './SurveySubmitDialog';
 
+import { styled, alpha } from '@mui/material/styles';
+
+// Styled Badge to match the previous color
+const CustomBadge = styled(Badge)(({ theme }) => ({
+  '& .MuiBadge-badge': {
+    backgroundColor: alpha(theme.palette.error.main, 0.1), // Match background color
+    color: theme.palette.error.main, // Match text color
+    minWidth: '16px',
+    height: '16px',
+    borderRadius: '50%',
+    padding: 0,
+    boxShadow: `0 0 0 1px ${alpha(theme.palette.error.main, 0.3)}`,
+    '&::after': {
+      position: 'absolute',
+      top: 0,
+      left: 0,
+      width: '100%',
+      height: '100%',
+      borderRadius: '50%',
+      boxShadow: `0 0 0 1px ${alpha(theme.palette.error.main, 0.3)}`,
+      content: '""',
+    },
+  },
+}));
+
 function SurveyNotifications() {
   const ref = useRef(null);
   const [isOpen, setOpen] = useState(false);
@@ -23,7 +48,6 @@ function SurveyNotifications() {
   const [page, setPage] = useState(1);
   const limit = 5;
 
-  // Fetch surveys when component mounts
   useEffect(() => {
     fetchSurveys(1);
   }, []);
@@ -31,7 +55,9 @@ function SurveyNotifications() {
   const fetchSurveys = async (pageNumber) => {
     try {
       const data = await getSurveysForSelf(pageNumber, limit);
-      setSurveys((prevSurveys) => (pageNumber === 1 ? data.data : [...prevSurveys, ...data.data]));
+      setSurveys((prevSurveys) =>
+        pageNumber === 1 ? data.data : [...prevSurveys, ...data.data]
+      );
       setPage(pageNumber);
     } catch (error) {
       console.error('Failed to fetch surveys:', error);
@@ -48,51 +74,49 @@ function SurveyNotifications() {
   };
 
   const handleSurveySubmit = async () => {
-    await fetchSurveys(page); // Refresh survey list
-    setSelectedSurvey(null); // Close dialog after submission
+    await fetchSurveys(page);
+    setSelectedSurvey(null);
   };
 
   const pendingCount = surveys.filter((survey) => survey.status === 'pending').length;
-
-  const getStatusColor = (status) => {
-    switch (status) {
-      case 'pending':
-        return 'error.main';
-      case 'completed':
-        return 'success.main';
-      case 'skipped':
-        return 'text.secondary';
-      default:
-        return 'text.secondary';
-    }
-  };
 
   return (
     <>
       <Tooltip arrow title="Surveys">
         <IconButton color="primary" ref={ref} onClick={handleOpen}>
-          <Badge badgeContent={pendingCount} color="error">
+          <CustomBadge badgeContent={pendingCount}>
             <FeedbackIcon />
-          </Badge>
+          </CustomBadge>
         </IconButton>
       </Tooltip>
       <Dialog open={isOpen} onClose={handleClose} maxWidth="sm" fullWidth>
         <Box sx={{ p: 2 }} display="flex" alignItems="center" justifyContent="space-between">
-          <Typography variant="h5" fontWeight="bold">Your Surveys</Typography>
+          <Typography variant="h5" fontWeight="bold">
+            Your Surveys
+          </Typography>
         </Box>
         <Divider />
         <List sx={{ p: 0 }}>
           {surveys.map((survey) => (
             <ListItem
               key={survey.id}
-              sx={{ p: 2, display: 'flex', alignItems: 'center', cursor: survey.status === 'pending' ? 'pointer' : 'default' }}
+              sx={{
+                p: 2,
+                display: 'flex',
+                alignItems: 'center',
+                cursor: survey.status === 'pending' ? 'pointer' : 'default',
+              }}
               onClick={() => handleSurveyClick(survey)}
             >
               <Box flex="1">
                 <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
                   {survey.survey.title}
                 </Typography>
-                <Typography variant="body2" color={getStatusColor(survey.status)} sx={{ mt: 0.5 }}>
+                <Typography
+                  variant="body2"
+                  color={survey.status === 'pending' ? 'error.main' : 'text.secondary'}
+                  sx={{ mt: 0.5 }}
+                >
                   {survey.status.charAt(0).toUpperCase() + survey.status.slice(1)}
                 </Typography>
                 <Typography variant="body2" color="textSecondary" sx={{ mt: 0.5 }}>
@@ -111,7 +135,6 @@ function SurveyNotifications() {
         )}
       </Dialog>
 
-      {/* Dialog for submitting survey */}
       {selectedSurvey && (
         <SurveySubmitDialog
           surveyId={selectedSurvey.survey.id}
@@ -124,3 +147,4 @@ function SurveyNotifications() {
 }
 
 export default SurveyNotifications;
+
