@@ -9,6 +9,7 @@ interface UserInfo {
   dob: string;
   email: string;
   address: string;
+  city: string;
   postalCode: string;
 }
 
@@ -25,6 +26,7 @@ function UserDetails({ user, isEditing, setUser }: UserDetailsProps) {
     dob: '',
     email: '',
     address: '',
+    city: '',
     postalCode: ''
   });
 
@@ -35,6 +37,7 @@ function UserDetails({ user, isEditing, setUser }: UserDetailsProps) {
       dob: moment(user.dob).format('YYYY-MM-DD'),
       email: user.email,
       address: user.address,
+      city: user.city,
       postalCode: user.postalCode
     });
   }, [user]);
