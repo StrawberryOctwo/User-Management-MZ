@@ -59,7 +59,7 @@ function Logo() {
       title="Verwaltungssoftware" // Tooltip text in German
       arrow
     >
-      <LogoWrapper to="/overview">
+      <LogoWrapper to="/">
         <Badge
           sx={{
             '.MuiBadge-badge': {
@@ -75,7 +75,7 @@ function Logo() {
           <LogoSignWrapper>
             {/* Replace with your image */}
             <LogoSign src="/logo.svg" alt="Logo" />
-            </LogoSignWrapper>
+          </LogoSignWrapper>
         </Badge>
       </LogoWrapper>
     </TooltipWrapper>
