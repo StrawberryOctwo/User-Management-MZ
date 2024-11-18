@@ -18,14 +18,13 @@ const CreateTeacher = () => {
     const [selectedTopics, setSelectedTopics] = useState<any[]>([]);
     const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
-    const [employeeNumber, setEmployeeNumber] = useState(''); // Only tracking employeeNumber
+    const [employeeNumber, setEmployeeNumber] = useState('');
     const { showMessage } = useSnackbar();
 
-    // Function to generate the employee number based on form data
     const handleGenerateEmployeeNumber = (formData: { firstName: string; lastName: string; dob: string }) => {
         if (formData.firstName && formData.lastName && formData.dob) {
             const generatedEmployeeNumber = generateEmployeeNumber(formData.firstName, formData.lastName, formData.dob);
-            setEmployeeNumber(generatedEmployeeNumber); // Update the employeeNumber state
+            setEmployeeNumber(generatedEmployeeNumber);
         } else {
             alert('Please fill in First Name, Last Name, and Date of Birth before generating the employee number.');
         }
@@ -65,6 +64,7 @@ const CreateTeacher = () => {
                     dob: data.dob,
                     email: data.email,
                     password: data.password,
+                    city: data.city,
                     address: data.address,
                     postalCode: data.postalCode,
                     phoneNumber: data.phoneNumber,
@@ -125,6 +125,7 @@ const CreateTeacher = () => {
         { name: 'dob', label: t('dob'), type: 'date', required: true, section: 'User Information' },
         { name: 'email', label: t('email'), type: 'email', required: true, section: 'User Information' },
         { name: 'password', label: t('password'), type: 'password', required: true, section: 'User Information' },
+        { name: 'city', label: t('city'), type: 'text', required: true, section: 'User Information' },
         { name: 'address', label: t('address'), type: 'text', required: true, section: 'User Information' },
         { name: 'postalCode', label: t('postal_code'), type: 'text', required: true, section: 'User Information' },
         { name: 'phoneNumber', label: t('phone_number'), type: 'text', required: true, section: 'User Information' },
@@ -162,7 +163,7 @@ const CreateTeacher = () => {
                                 dob: document.querySelector<HTMLInputElement>('[name="dob"]')?.value || '',
                             })
                         }
-                        sx={{ height: '50px' }} // Matching the height of TextField for better alignment
+                        sx={{ height: '50px' }}
                     >
                         Generate
                     </Button>
@@ -220,7 +221,7 @@ const CreateTeacher = () => {
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <ReusableForm
-                fields={[...userFields, ...teacherFields]} // Merge both field arrays
+                fields={[...userFields, ...teacherFields]}
                 onSubmit={handleTeacherSubmit}
                 entityName="Teacher"
                 entintyFunction='Add'

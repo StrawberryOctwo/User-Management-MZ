@@ -11,18 +11,17 @@ import { useSnackbar } from 'src/contexts/SnackbarContext';
 
 
 const EditLocationAdmin = () => {
-    const { id } = useParams<{ id: string }>(); // Get the LocationAdmin ID from the URL
+    const { id } = useParams<{ id: string }>();
     const [locationAdminData, setLocationAdminData] = useState<Record<string, any> | null>(null);
     const [selectedLocations, setSelectedLocations] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
-    const locationRef = useRef<any>(null); // Reference to access the location component
+    const locationRef = useRef<any>(null);
     const { showMessage } = useSnackbar();
 
-    // Fetch the LocationAdmin data by ID on component mount
     const fetchLocationAdmin = async () => {
         setLoading(true);
         try {
-            const fetchedData = await fetchLocationAdminById(Number(id)); // Fetch LocationAdmin by ID
+            const fetchedData = await fetchLocationAdminById(Number(id));
 
             // Pre-fill form fields with fetched data
             const flattenedData = {
@@ -30,6 +29,7 @@ const EditLocationAdmin = () => {
                 lastName: fetchedData.lastName,
                 dob: formatDateForInput(fetchedData.dob),
                 email: fetchedData.email,
+                city: fetchedData.city,
                 address: fetchedData.address,
                 postalCode: fetchedData.postalCode,
                 phoneNumber: fetchedData.phoneNumber,
@@ -37,7 +37,7 @@ const EditLocationAdmin = () => {
             };
 
             setLocationAdminData(flattenedData);
-            setSelectedLocations(fetchedData.locations); // Set selected locations
+            setSelectedLocations(fetchedData.locations);
         } catch (error) {
             console.error('Error fetching Location Admin:', error);
         } finally {
@@ -67,17 +67,17 @@ const EditLocationAdmin = () => {
                 firstName: data.firstName,
                 lastName: data.lastName,
                 email: data.email,
-                password: data.password || undefined, // Only include password if updated
+                password: data.password || undefined,
                 dob: data.dob,
+                city: data.city,
                 address: data.address,
                 postalCode: data.postalCode,
                 phoneNumber: data.phoneNumber,
-                locationIds: locationIds, // Include selected location IDs
+                locationIds: locationIds,
             };
 
-            const response = await updateLocationAdmin(Number(id), payload); // Call the service method to update
+            const response = await updateLocationAdmin(Number(id), payload);
 
-            // Refetch the updated data after a successful update
             await fetchLocationAdmin();
 
             return response;
@@ -91,15 +91,15 @@ const EditLocationAdmin = () => {
 
     const formatDateForInput = (date: string) => {
         const d = new Date(date);
-        return d.toISOString().split('T')[0]; // Returns YYYY-MM-DD format
+        return d.toISOString().split('T')[0];
     };
 
-    // User Data fields
     const userFields: FieldConfig[] = [
         { name: 'firstName', label: t('first_name'), type: 'text', required: true, section: 'User Information' },
         { name: 'lastName', label: t('last_name'), type: 'text', required: true, section: 'User Information' },
         { name: 'dob', label: t('dob'), type: 'date', required: true, section: 'User Information' },
         { name: 'email', label: t('email'), type: 'email', required: true, section: 'User Information' },
+        { name: 'city', label: t('city'), type: 'text', required: true, section: 'User Information' },
         { name: 'address', label: t('address'), type: 'text', required: true, section: 'User Information' },
         { name: 'postalCode', label: t('postal_code'), type: 'text', required: true, section: 'User Information' },
         { name: 'phoneNumber', label: t('phone_number'), type: 'text', required: true, section: 'User Information' },
@@ -107,7 +107,6 @@ const EditLocationAdmin = () => {
         { name: 'confirmPassword', label: t('confirm_password'), type: 'password', required: false, section: 'Change Password' },
     ];
 
-    // Other Data fields (Locations and any additional info)
     const otherFields = [
         {
             name: 'locations',
@@ -121,8 +120,8 @@ const EditLocationAdmin = () => {
                     onSelect={handleLocationSelect}
                     displayProperty="name"
                     placeholder="Type to search locations"
-                    ref={locationRef} // Use ref to access the component's reset function
-                    initialValue={selectedLocations} // Pre-fill selected locations
+                    ref={locationRef}
+                    initialValue={selectedLocations}
                 />
             ),
         },
@@ -132,10 +131,10 @@ const EditLocationAdmin = () => {
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {!loading && locationAdminData && (
                 <ReusableForm
-                    fields={[...userFields, ...otherFields]} // Merge both field arrays
+                    fields={[...userFields, ...otherFields]}
                     onSubmit={handleSubmit}
-                    initialData={locationAdminData} // Pre-fill form with location admin data
-                    entityName="Location Admin" // Update with the actual entity name
+                    initialData={locationAdminData}
+                    entityName="Location Admin"
                     entintyFunction="Edit"
                 />
             )}

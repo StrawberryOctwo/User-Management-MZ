@@ -80,6 +80,7 @@ const EditStudent = () => {
           lastName: fetchedData.user.lastName,
           dob: formatDateForInput(fetchedData.user.dob),
           email: fetchedData.user.email,
+          city: fetchedData.user.city,
           address: fetchedData.user.address,
           postalCode: fetchedData.user.postalCode,
           phoneNumber: fetchedData.user.phoneNumber,
@@ -180,6 +181,7 @@ const EditStudent = () => {
         lastName: data.lastName,
         dob: data.dob,
         email: data.email,
+        city: data.city,
         address: data.address,
         postalCode: data.postalCode,
         phoneNumber: data.phoneNumber,
@@ -331,6 +333,13 @@ const EditStudent = () => {
       name: 'email',
       label: t('email'),
       type: 'email',
+      required: true,
+      section: 'User Information'
+    },
+    {
+      name: 'city',
+      label: t('city'),
+      type: 'text',
       required: true,
       section: 'User Information'
     },

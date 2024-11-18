@@ -17,45 +17,43 @@ const EditTeacher = () => {
     const [teacherData, setTeacherData] = useState<Record<string, any> | null>(null);
     const [selectedLocations, setSelectedLocations] = useState<any[]>([]);
     const [selectedTopics, setSelectedTopics] = useState<any[]>([]);
-    const [uploadedFiles, setUploadedFiles] = useState<any[]>([]); // For storing uploaded files
+    const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const { showMessage } = useSnackbar();
 
-    // Fetch teacher data and documents by ID on component mount
     const fetchTeacher = async () => {
         setLoading(true);
         try {
             const fetchedData = await fetchTeacherById(Number(id));
-            const teacherDocuments = await fetchTeacherDocumentsById(Number(id)); // Fetch teacher documents
+            const teacherDocuments = await fetchTeacherDocumentsById(Number(id));
 
-            // Flatten the user fields for the form
             const flattenedData = {
                 ...fetchedData,
                 firstName: fetchedData.user.firstName,
                 lastName: fetchedData.user.lastName,
-                dob: formatDateForInput(fetchedData.user.dob), // Format date for input
+                dob: formatDateForInput(fetchedData.user.dob),
                 email: fetchedData.user.email,
+                city: fetchedData.user.city,
                 address: fetchedData.user.address,
                 postalCode: fetchedData.user.postalCode,
                 phoneNumber: fetchedData.user.phoneNumber,
-                contractStartDate: formatDateForInput(fetchedData.contractStartDate), // Format date for input
-                contractEndDate: formatDateForInput(fetchedData.contractEndDate), // Format date for input
+                contractStartDate: formatDateForInput(fetchedData.contractStartDate),
+                contractEndDate: formatDateForInput(fetchedData.contractEndDate),
             };
 
             setTeacherData(flattenedData);
-            setSelectedLocations(fetchedData.locations); // Set selected locations
-            setSelectedTopics(fetchedData.topics); // Set selected topics
+            setSelectedLocations(fetchedData.locations);
+            setSelectedTopics(fetchedData.topics);
 
-            // Map the documents retrieved from the API to the format needed for the UploadSection
             const formattedDocuments = teacherDocuments.documents.map((doc: { id: any, name: any; type: any; path: any; }) => ({
                 id: doc.id,
                 fileName: doc.name,
                 fileType: doc.type,
-                file: null, // No actual file data, just the metadata
-                path: doc.path // You can use this to display a link to the file
+                file: null,
+                path: doc.path
             }));
 
-            setUploadedFiles(formattedDocuments); // Set initial documents in state
+            setUploadedFiles(formattedDocuments);
 
         } catch (error) {
             console.error('Error fetching teacher:', error);
@@ -81,7 +79,7 @@ const EditTeacher = () => {
 
     const formatDateForInput = (date: string) => {
         const d = new Date(date);
-        return d.toISOString().split('T')[0]; // Returns YYYY-MM-DD format
+        return d.toISOString().split('T')[0];
     };
 
     const handleTeacherSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
@@ -103,7 +101,6 @@ const EditTeacher = () => {
             const locationIds = selectedLocations.map(location => location.id);
             const topicIds = selectedTopics.map(topic => topic.id);
 
-            // Separate user and teacher data
             const userData = {
                 firstName: data.firstName,
                 lastName: data.lastName,
@@ -112,7 +109,8 @@ const EditTeacher = () => {
                 address: data.address,
                 postalCode: data.postalCode,
                 phoneNumber: data.phoneNumber,
-                password: data.password
+                password: data.password,
+                city: data.city,
             };
 
             const teacherData = {
@@ -128,14 +126,11 @@ const EditTeacher = () => {
                 iban: data.iban,
                 bic: data.bic,
             };
-            // Update teacher and user data together
             const response = await updateTeacher(Number(id), userData, teacherData);
 
-            // Assign the teacher to multiple locations and multiple topics
             await assignTeacherToLocations(Number(id), locationIds);
             await assignTeacherToTopics(Number(id), topicIds);
 
-            // Upload documents for the teacher
             const userId = response.userId;
             for (const file of uploadedFiles) {
                 const documentPayload = {
@@ -144,11 +139,10 @@ const EditTeacher = () => {
                     userId: String(userId),
                 };
                 if (file.file) {
-                    await addDocument(documentPayload, file.file); // Upload file only if it's new
+                    await addDocument(documentPayload, file.file);
                 }
             }
 
-            // Refetch teacher data after successful update
             await fetchTeacher();
 
             return response;
@@ -170,6 +164,7 @@ const EditTeacher = () => {
         { name: 'lastName', label: t('last_name'), type: 'text', required: true, section: 'User Information' },
         { name: 'dob', label: t('dob'), type: 'date', required: true, section: 'User Information' },
         { name: 'email', label: t('email'), type: 'email', required: true, section: 'User Information' },
+        { name: 'city', label: t('city'), type: 'text', required: true, section: 'User Information' },
         { name: 'address', label: t('address'), type: 'text', required: true, section: 'User Information' },
         { name: 'postalCode', label: t('postal_code'), type: 'text', required: true, section: 'User Information' },
         { name: 'phoneNumber', label: t('phone_number'), type: 'text', required: true, section: 'User Information' },
@@ -201,7 +196,7 @@ const EditTeacher = () => {
                     onSelect={handleLocationSelect}
                     displayProperty="name"
                     placeholder="Type to search locations"
-                    initialValue={selectedLocations} // Pre-fill selected locations
+                    initialValue={selectedLocations}
                 />
             ),
         },
@@ -217,7 +212,7 @@ const EditTeacher = () => {
                     onSelect={handleTopicSelect}
                     displayProperty="name"
                     placeholder="Type to search topics"
-                    initialValue={selectedTopics} // Pre-fill selected topics
+                    initialValue={selectedTopics}
                 />
             ),
         },
@@ -226,7 +221,7 @@ const EditTeacher = () => {
             label: 'Uploaded Documents',
             type: 'custom',
             section: 'Documents',
-            component: <UploadSection onUploadChange={handleFilesChange} initialDocuments={uploadedFiles} />, // Pass initial documents
+            component: <UploadSection onUploadChange={handleFilesChange} initialDocuments={uploadedFiles} />,
             xs: 12,
             sm: 12,
         }
@@ -236,10 +231,10 @@ const EditTeacher = () => {
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {!loading && teacherData && (
                 <ReusableForm
-                    key={teacherData.id} // Add key to force re-render when teacherData changes
+                    key={teacherData.id}
                     fields={[...userFields, ...teacherFields]}
                     onSubmit={handleTeacherSubmit}
-                    initialData={teacherData} // Pre-fill form with teacher data
+                    initialData={teacherData}
                     entityName="Teacher"
                     entintyFunction='Edit'
                 />

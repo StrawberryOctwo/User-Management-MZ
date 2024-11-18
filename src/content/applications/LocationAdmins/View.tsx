@@ -42,6 +42,7 @@ const ViewLocationAdmin: React.FC = () => {
         { name: 'lastName', label: t('last_name'), section: t('admin_details') },
         { name: 'dob', label: t('dob'), section: t('admin_details') },
         { name: 'email', label: t('email'), section: t('admin_details') },
+        { name: 'city', label: t('city'), section: t('admin_details') },
         { name: 'address', label: t('address'), section: t('admin_details') },
         { name: 'postalCode', label: t('postal_code'), section: t('admin_details') },
         { name: 'phoneNumber', label: t('phone_number'), section: t('admin_details') },

@@ -4,15 +4,14 @@ import { Box, Button, Typography } from '@mui/material';
 import { t } from 'i18next';
 import { format } from 'date-fns';
 import { fetchFranchiseAdminById } from 'src/services/franchiseAdminService';
-import ReusableDetails from 'src/components/View'; // Adjust path to the correct component
+import ReusableDetails from 'src/components/View';
 
 const ViewFranchiseAdmin: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [franchiseAdmin, setFranchiseAdmin] = useState<Record<string, any> | null>(null);
     const [loading, setLoading] = useState(true);
-    const [errorMessage, setErrorMessage] = useState<string | null>(null); // Error state
+    const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    // Function to load the franchise admin by ID
     const loadFranchiseAdmin = async () => {
         setLoading(true);
         try {
@@ -28,16 +27,16 @@ const ViewFranchiseAdmin: React.FC = () => {
 
     useEffect(() => {
         if (id) {
-            loadFranchiseAdmin(); // Fetch franchise admin data on component mount
+            loadFranchiseAdmin();
         }
     }, [id, t]);
 
-    // Define fields for the ReusableDetails component
     const Fields = [
         { name: 'firstName', label: t('first_name'), section: t('admin_details') },
         { name: 'lastName', label: t('last_name'), section: t('admin_details') },
         { name: 'dob', label: t('dob'), section: t('admin_details') },
         { name: 'email', label: t('email'), section: t('admin_details') },
+        { name: 'city', label: t('city'), section: t('admin_details') },
         { name: 'address', label: t('address'), section: t('admin_details') },
         { name: 'postalCode', label: t('postal_code'), section: t('admin_details') },
         { name: 'phoneNumber', label: t('phone_number'), section: t('admin_details') },

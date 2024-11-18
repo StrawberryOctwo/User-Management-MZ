@@ -10,7 +10,6 @@ const CreateParent = () => {
   const handleSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
     setLoading(true);
     try {
-      // Structure payload to include both user and parent data
       const payload = {
         user: {
           firstName: data.firstName,
@@ -19,6 +18,7 @@ const CreateParent = () => {
           password: data.password,
           phoneNumber: data.phoneNumber,
           dob: data.dob,
+          city: data.city,
           address: data.address,
           postalCode: data.postalCode,
         },
@@ -29,7 +29,7 @@ const CreateParent = () => {
         },
       };
 
-      const response = await addParent(payload); // Pass the structured payload
+      const response = await addParent(payload);
       return response;
     } catch (error: any) {
       console.error("Error adding parent:", error);
@@ -45,6 +45,7 @@ const CreateParent = () => {
     { name: 'email', label: t('email'), type: 'email', required: true, section: 'Parent Information' },
     { name: 'password', label: t('password'), type: 'password', required: true, section: 'Parent Information' },
     { name: 'dob', label: t('dob'), type: 'date', required: true, section: 'Parent Information' },
+    { name: 'city', label: t('city'), type: 'text', required: true, section: 'Parent Information' },
     { name: 'address', label: t('address'), type: 'text', required: true, section: 'Parent Information' },
     { name: 'postalCode', label: t('postal_code'), type: 'text', required: true, section: 'Parent Information' },
     { name: 'phoneNumber', label: t('phone_number'), type: 'text', required: true, section: 'Parent Information' },

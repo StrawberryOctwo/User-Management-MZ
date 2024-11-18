@@ -65,6 +65,7 @@ const ViewTeacherPage: React.FC = () => {
         { name: 'user.lastName', label: t('last_name'), section: t('user_details') },
         { name: 'user.dob', label: t('dob'), section: t('user_details') },
         { name: 'user.email', label: t('email'), section: t('user_details') },
+        { name: 'user.city', label: t('city'), section: t('user_details') },
         { name: 'user.address', label: t('address'), section: t('user_details') },
         { name: 'user.postalCode', label: t('postal_code'), section: t('user_details') },
         { name: 'user.phoneNumber', label: t('phone_Number'), section: t('user_details') },
@@ -126,8 +127,8 @@ const ViewTeacherPage: React.FC = () => {
                 },
             ],
         },
-       ,
-    
+        ,
+
         {
             name: 'documents',
             label: t('documents'),
@@ -158,6 +159,7 @@ const ViewTeacherPage: React.FC = () => {
         'user.lastName': teacher?.user?.lastName,
         'user.dob': formattedDob,
         'user.email': teacher?.user?.email,
+        'user.city': teacher?.user?.city,
         'user.address': teacher?.user?.address,
         'user.postalCode': teacher?.user?.postalCode,
         'user.phoneNumber': teacher?.user?.phoneNumber,
@@ -185,7 +187,7 @@ const ViewTeacherPage: React.FC = () => {
                     />
                 )
             )}
-                       <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
+            <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
                 <DialogTitle>{t('update_payment_status')}</DialogTitle>
                 <DialogContent>
                     <Select
@@ -202,7 +204,7 @@ const ViewTeacherPage: React.FC = () => {
                     <Button onClick={handleCloseDialog} color="secondary">
                         {t('cancel')}
                     </Button>
-                    <Button  color="primary">
+                    <Button color="primary">
                         {t('submit')}
                     </Button>
                 </DialogActions>

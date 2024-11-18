@@ -8,9 +8,9 @@ import { fetchFranchises } from 'src/services/franchiseService';
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
 
 export default function CreateFranchiseAdmin() {
-    const [selectedFranchises, setSelectedFranchises] = useState<any[]>([]); // State to hold selected franchises
-    const dropdownRef = useRef<any>(null); // Ref to access the reset method in MultiSelectWithCheckboxes
-    const [loading, setLoading] = useState(false); // Unified loading state for both fetching and deleting
+    const [selectedFranchises, setSelectedFranchises] = useState<any[]>([]);
+    const dropdownRef = useRef<any>(null);
+    const [loading, setLoading] = useState(false);
 
     const handleFranchiseSelect = (selectedItems: any[]) => {
         setSelectedFranchises(selectedItems);
@@ -32,20 +32,23 @@ export default function CreateFranchiseAdmin() {
                 email: data.email,
                 password: data.password,
                 dob: data.dob,
+                city: data.city,
                 address: data.address,
                 postalCode: data.postalCode,
                 phoneNumber: data.phoneNumber,
-                franchiseIds: franchiseIds, // Include selected franchise IDs
+                franchiseIds: franchiseIds,
             };
 
-            const response = await addFranchiseAdmin(payload); // Call your API service with the structured payload
+            const response = await addFranchiseAdmin(payload);
 
-            // Reset the form fields and selected franchises
             setSelectedFranchises([]);
             if (dropdownRef.current) {
-                dropdownRef.current.reset(); // Reset the MultiSelectWithCheckboxes
+                dropdownRef.current.reset();
             }
 
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
             return response;
         }
         catch (error: any) {
@@ -62,6 +65,7 @@ export default function CreateFranchiseAdmin() {
         { name: 'email', label: t('email'), type: 'email', required: true, section: 'User Information' },
         { name: 'password', label: t('password'), type: 'password', required: true, section: 'User Information' },
         { name: 'dob', label: t('dob'), type: 'date', required: true, section: 'User Information' },
+        { name: 'city', label: t('city'), type: 'text', required: true, section: 'User Information' },
         { name: 'address', label: t('address'), type: 'text', required: true, section: 'User Information' },
         { name: 'postalCode', label: t('postal_code'), type: 'text', required: true, section: 'User Information' },
         { name: 'phoneNumber', label: t('phone_Number'), type: 'text', required: true, section: 'User Information' },
@@ -75,7 +79,7 @@ export default function CreateFranchiseAdmin() {
             section: 'Franchise Admin Assignment',
             component: (
                 <MultiSelectWithCheckboxes
-                    ref={dropdownRef} // Attach the ref to the MultiSelectWithCheckboxes
+                    ref={dropdownRef}
                     label={t('Search_and_assign_franchises')}
                     fetchData={(query) => fetchFranchises(1, 5, query).then((data) => data.data)}
                     onSelect={handleFranchiseSelect}
@@ -89,7 +93,7 @@ export default function CreateFranchiseAdmin() {
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <ReusableForm
-                fields={[...adminFields, ...otherFields]} // Merge both field arrays
+                fields={[...adminFields, ...otherFields]}
                 onSubmit={handleAdminSubmit}
                 entityName="Franchise Admin"
                 entintyFunction="Add"

@@ -12,7 +12,6 @@ const ViewParent: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-    // Function to load the parent by ID
     const loadParent = async () => {
         setLoading(true);
         setErrorMessage(null);
@@ -20,13 +19,13 @@ const ViewParent: React.FC = () => {
         try {
             const parentData = await fetchParentById(Number(id));
 
-            // Flatten user data into the parent object and student user data
             const flattenedData = {
                 ...parentData,
                 firstName: parentData.user?.firstName,
                 lastName: parentData.user?.lastName,
                 dob: parentData.user?.dob ? format(new Date(parentData.user.dob), 'PP') : '',
                 email: parentData.user?.email,
+                city: parentData.user?.city,
                 address: parentData.user?.address,
                 postalCode: parentData.user?.postalCode,
                 phoneNumber: parentData.user?.phoneNumber,
@@ -54,12 +53,12 @@ const ViewParent: React.FC = () => {
 
     const formattedDob = parent ? format(new Date(parent.dob), 'PP') : '';
 
-    // Define fields for the ReusableDetails component
     const Fields = [
         { name: 'firstName', label: t('first_name'), section: t('parent_details') },
         { name: 'lastName', label: t('last_name'), section: t('parent_details') },
         { name: 'dob', label: t('dob'), section: t('parent_details') },
         { name: 'email', label: t('email'), section: t('parent_details') },
+        { name: 'city', label: t('city'), section: t('parent_details') },
         { name: 'address', label: t('address'), section: t('parent_details') },
         { name: 'postalCode', label: t('postal_code'), section: t('parent_details') },
         { name: 'phoneNumber', label: t('phone_number'), section: t('parent_details') },
@@ -95,7 +94,6 @@ const ViewParent: React.FC = () => {
         },
     ];
 
-    // Transform data for ReusableDetails
     const transformedData = {
         ...parent,
         dob: formattedDob,

@@ -15,12 +15,11 @@ const CreateLocationAdmin = () => {
         setSelectedLocations(selectedItems);
     };
 
-    const locationRef = useRef<any>(null); // Reference to access the location component
+    const locationRef = useRef<any>(null);
 
     const handleSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
         setLoading(true);
         try {
-            // Safely access selectedItems if available
             const locationIds = locationRef.current?.selectedItems?.map((location: { id: any }) => location.id) || [];
 
             const payload = {
@@ -30,19 +29,22 @@ const CreateLocationAdmin = () => {
                 password: data.password,
                 dob: data.dob,
                 address: data.address,
+                city: data.city,
                 postalCode: data.postalCode,
                 phoneNumber: data.phoneNumber,
-                locationIds: locationIds, // Include selected location IDs
+                locationIds: locationIds,
             };
 
-            // Step 1: Create the entity (replace with the correct service call)
             const response = await addLocationAdmin(payload);
 
-            // Reset form fields and locations after successful submission
             setSelectedLocations([]);
             if (locationRef.current) {
                 locationRef.current.reset();
             }
+
+            setTimeout(() => {
+                window.location.reload();
+            }, 1500);
 
             return response;
         } catch (error: any) {
@@ -54,19 +56,18 @@ const CreateLocationAdmin = () => {
     };
 
 
-    // User Data fields
     const userFields: FieldConfig[] = [
         { name: 'firstName', label: t('first_name'), type: 'text', required: true, section: 'User Information' },
         { name: 'lastName', label: t('last_name'), type: 'text', required: true, section: 'User Information' },
         { name: 'dob', label: t('dob'), type: 'date', required: true, section: 'User Information' },
         { name: 'email', label: t('email'), type: 'email', required: true, section: 'User Information' },
         { name: 'password', label: t('password'), type: 'password', required: true, section: 'User Information' },
+        { name: 'city', label: t('city'), type: 'text', required: true, section: 'User Information' },
         { name: 'address', label: t('address'), type: 'text', required: true, section: 'User Information' },
         { name: 'postalCode', label: t('postal_code'), type: 'text', required: true, section: 'User Information' },
         { name: 'phoneNumber', label: t('phone_number'), type: 'text', required: true, section: 'User Information' },
     ];
 
-    // Other Data fields (Locations and any additional info)
     const otherFields = [
         {
             name: 'locations',
@@ -80,7 +81,7 @@ const CreateLocationAdmin = () => {
                     onSelect={handleLocationSelect}
                     displayProperty="name"
                     placeholder="Type to search locations"
-                    ref={locationRef} // Use ref to access the component's reset function
+                    ref={locationRef}
                 />
             ),
         },
@@ -89,9 +90,9 @@ const CreateLocationAdmin = () => {
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             <ReusableForm
-                fields={[...userFields, ...otherFields]} // Merge both field arrays
+                fields={[...userFields, ...otherFields]}
                 onSubmit={handleSubmit}
-                entityName="Location Admin" // Update with the actual entity name
+                entityName="Location Admin"
                 entintyFunction='Add'
             />
         </Box>

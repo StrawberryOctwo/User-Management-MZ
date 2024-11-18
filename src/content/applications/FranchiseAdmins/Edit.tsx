@@ -11,17 +11,17 @@ import { fetchFranchises } from 'src/services/franchiseService';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
 
 export default function EditFranchiseAdmin() {
-    const { id } = useParams<{ id: string }>(); // Get the franchise admin ID from the URL
-    const [adminData, setAdminData] = useState<Record<string, any> | null>(null); // State to store the initial admin data
-    const [selectedFranchises, setSelectedFranchises] = useState<any[]>([]); // Store selected franchises
-    const dropdownRef = useRef<any>(null); // Ref to access the reset method in MultiSelectWithCheckboxes
-    const [loading, setLoading] = useState(false); // Unified loading state
+    const { id } = useParams<{ id: string }>();
+    const [adminData, setAdminData] = useState<Record<string, any> | null>(null);
+    const [selectedFranchises, setSelectedFranchises] = useState<any[]>([]);
+    const dropdownRef = useRef<any>(null);
+    const [loading, setLoading] = useState(false);
     const { showMessage } = useSnackbar();
-    const franchiseRef = useRef<any>(null); // Ref for accessing selected franchises
+    const franchiseRef = useRef<any>(null);
 
     const formatDateForInput = (date: string) => {
         const d = new Date(date);
-        return d.toISOString().split('T')[0]; // Returns YYYY-MM-DD format
+        return d.toISOString().split('T')[0];
     };
 
     const fetchAdminData = async () => {
@@ -41,6 +41,7 @@ export default function EditFranchiseAdmin() {
                 lastName: userData.lastName || '',
                 dob: formatDateForInput(userData.dob) || '',
                 email: userData.email || '',
+                city: userData.city || '',
                 address: userData.address || '',
                 postalCode: userData.postalCode || '',
                 phoneNumber: userData.phoneNumber || '',
@@ -86,20 +87,20 @@ export default function EditFranchiseAdmin() {
                 lastName: data.lastName,
                 email: data.email,
                 dob: formatDateForInput(data.dob),
+                city: data.city,
                 address: data.address,
                 postalCode: data.postalCode,
                 phoneNumber: data.phoneNumber,
-                franchiseIds, // Include selected franchise IDs
+                franchiseIds,
                 password: data.password
             };
 
-            const response = await updateFranchiseAdmin(Number(id), payload); // Call the API service with the structured payload
+            const response = await updateFranchiseAdmin(Number(id), payload);
 
-            // If update is successful, fetch the updated data again
-            await fetchAdminData(); // Refetch the franchise admin data
+            await fetchAdminData();
 
             if (dropdownRef.current) {
-                dropdownRef.current.reset(); // Reset the MultiSelectWithCheckboxes
+                dropdownRef.current.reset();
             }
 
             return response;
@@ -117,6 +118,7 @@ export default function EditFranchiseAdmin() {
         { name: 'lastName', label: t('last_name'), type: 'text', required: true, section: 'User Information' },
         { name: 'email', label: t('email'), type: 'email', required: true, section: 'User Information' },
         { name: 'dob', label: t('dob'), type: 'date', required: true, section: 'User Information' },
+        { name: 'city', label: t('city'), type: 'text', required: true, section: 'User Information' },
         { name: 'address', label: t('address'), type: 'text', required: true, section: 'User Information' },
         { name: 'postalCode', label: t('postal_code'), type: 'text', required: true, section: 'User Information' },
         { name: 'phoneNumber', label: t('phone_number'), type: 'text', required: true, section: 'User Information' },
@@ -132,13 +134,13 @@ export default function EditFranchiseAdmin() {
             section: 'Franchise Admin Assignment',
             component: (
                 <MultiSelectWithCheckboxes
-                    ref={franchiseRef} // Attach the ref to the MultiSelectWithCheckboxes
+                    ref={franchiseRef}
                     label={t('Search_and_assign_franchises')}
                     fetchData={(query) => fetchFranchises(1, 5, query).then((data) => data.data)}
                     onSelect={handleFranchiseSelect}
                     displayProperty="name"
                     placeholder="Type to search franchises"
-                    initialValue={selectedFranchises} // Pre-fill selected franchises
+                    initialValue={selectedFranchises}
                 />
             ),
         },
@@ -148,9 +150,9 @@ export default function EditFranchiseAdmin() {
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {!loading && adminData && (
                 <ReusableForm
-                    fields={[...adminFields, ...otherFields]} // Merge both field arrays
+                    fields={[...adminFields, ...otherFields]}
                     onSubmit={handleAdminSubmit}
-                    initialData={adminData} // Pre-fill form with admin data
+                    initialData={adminData}
                     entityName="Franchise Admin"
                     entintyFunction="Edit"
                 />

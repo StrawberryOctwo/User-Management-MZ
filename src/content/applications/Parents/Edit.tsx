@@ -7,24 +7,23 @@ import { fetchParentById, updateParent } from 'src/services/parentService';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
 
 const EditParent = () => {
-    const { id } = useParams<{ id: string }>(); // Get the Parent ID from the URL
+    const { id } = useParams<{ id: string }>();
     const [parentData, setParentData] = useState<Record<string, any> | null>(null);
     const [loading, setLoading] = useState(true);
     const { showMessage } = useSnackbar();
 
-    // Fetch the Parent data by ID on component mount
     const fetchParent = async () => {
         setLoading(true);
         try {
             const fetchedData = await fetchParentById(Number(id));
 
-            // Pre-fill form fields with fetched data
             const flattenedData = {
                 firstName: fetchedData.user.firstName,
                 lastName: fetchedData.user.lastName,
                 email: fetchedData.user.email,
-                password: '', // Empty for security; users can enter a new password
+                password: '',
                 dob: formatDateForInput(fetchedData.user.dob),
+                city: fetchedData.user.city,
                 address: fetchedData.user.address,
                 postalCode: fetchedData.user.postalCode,
                 phoneNumber: fetchedData.user.phoneNumber,
@@ -58,8 +57,9 @@ const EditParent = () => {
                     firstName: data.firstName,
                     lastName: data.lastName,
                     email: data.email,
-                    password: data.password || undefined, // Only include password if updated
+                    password: data.password || undefined,
                     dob: data.dob,
+                    city: data.city,
                     address: data.address,
                     postalCode: data.postalCode,
                     phoneNumber: data.phoneNumber,
@@ -72,7 +72,7 @@ const EditParent = () => {
             };
 
             const response = await updateParent(Number(id), payload);
-            await fetchParent(); // Refetch updated data
+            await fetchParent();
 
             return response;
         } catch (error: any) {
@@ -85,15 +85,15 @@ const EditParent = () => {
 
     const formatDateForInput = (date: string) => {
         const d = new Date(date);
-        return d.toISOString().split('T')[0]; // Returns YYYY-MM-DD format
+        return d.toISOString().split('T')[0];
     };
 
-    // User Data fields
     const userFields: FieldConfig[] = [
         { name: 'firstName', label: t('first_name'), type: 'text', required: true, section: 'User Information' },
         { name: 'lastName', label: t('last_name'), type: 'text', required: true, section: 'User Information' },
         { name: 'dob', label: t('dob'), type: 'date', required: true, section: 'User Information' },
         { name: 'email', label: t('email'), type: 'email', required: true, section: 'User Information' },
+        { name: 'city', label: t('city'), type: 'text', required: true, section: 'User Information' },
         { name: 'address', label: t('address'), type: 'text', required: true, section: 'User Information' },
         { name: 'postalCode', label: t('postal_code'), type: 'text', required: true, section: 'User Information' },
         { name: 'phoneNumber', label: t('phone_number'), type: 'text', required: true, section: 'User Information' },
@@ -101,7 +101,6 @@ const EditParent = () => {
         { name: 'confirmPassword', label: t('confirm_password'), type: 'password', required: false, section: 'Change Password' },
     ];
 
-    // Banking Information fields
     const bankingFields: FieldConfig[] = [
         { name: 'accountHolder', label: t('account_holder'), type: 'text', required: true, section: 'Banking Information' },
         { name: 'iban', label: t('iban'), type: 'text', required: true, section: 'Banking Information' },

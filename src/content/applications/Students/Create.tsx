@@ -122,6 +122,7 @@ export default function CreateStudent() {
           dob: data['dob'],
           email: data['email'],
           password: data['password'],
+          city: data['city'],
           address: data['address'],
           postalCode: data['postalCode'],
           phoneNumber: data['phoneNumber']
@@ -273,6 +274,13 @@ export default function CreateStudent() {
       name: 'password',
       label: t('password'),
       type: 'password',
+      required: true,
+      section: 'User Information'
+    },
+    {
+      name: 'city',
+      label: t('city'),
+      type: 'text',
       required: true,
       section: 'User Information'
     },
