@@ -40,11 +40,12 @@ const EditFranchise = () => {
                 bic: data.bic,
                 status: data.status,
                 totalEmployees: data.totalEmployees,
-                percentage:data.percentage
+                percentage: data.percentage
 
             };
-            const response = await updateFranchise(Number(id), payload); // Update franchise
-            return response; // Don't fetch again to prevent re-rendering
+            const response = await updateFranchise(Number(id), payload);
+            fetchFranchise();
+            return response;
         } catch (error: any) {
             console.error('Error updating Franchise:', error);
             throw error;
@@ -53,14 +54,19 @@ const EditFranchise = () => {
         }
     };
 
-    // Define the fields for the form
+    const statusOptions = [
+        { label: t('active'), value: 'active' },
+        { label: t('inactive'), value: 'inactive' },
+        { label: t('interested'), value: 'interested' },
+    ];
+
     const franchiseFields: FieldConfig[] = [
         { name: 'name', label: t('franchise_name'), type: 'text', required: true, section: 'Franchise Information' },
         { name: 'ownerName', label: t('owner_name'), type: 'text', required: true, section: 'Franchise Information' },
         { name: 'cardHolderName', label: t('card_holder_name'), type: 'text', required: true, section: 'Franchise Information' },
         { name: 'iban', label: t('iban'), type: 'text', required: true, section: 'Franchise Information' },
         { name: 'bic', label: t('bic'), type: 'text', required: true, section: 'Franchise Information' },
-        { name: 'status', label: t('status'), type: 'text', required: true, section: 'Franchise Information' }, // Optionally make this a dropdown
+        { name: 'status', label: t('status'), type: 'select', required: true, section: 'Franchise Information', options: statusOptions },
         { name: 'totalEmployees', label: t('total_employees'), type: 'number', required: true, section: 'Franchise Information' },
         { name: 'percentage', label: t('percentage'), type: 'number', required: true, section: 'Franchise Information' },
 

@@ -88,9 +88,9 @@ const EditStudent = () => {
             : '',
           parent: fetchedData.parent
             ? {
-                id: fetchedData.parent.id,
-                accountHolder: fetchedData.parent.user.firstName
-              }
+              id: fetchedData.parent.id,
+              accountHolder: fetchedData.parent.user.firstName
+            }
             : null // Set parent to null if not present
         };
 
@@ -274,7 +274,7 @@ const EditStudent = () => {
       />
     )
   };
-  
+
   const parentSelectionField = {
     name: 'parent',
     label: 'Select Parent',
@@ -298,6 +298,12 @@ const EditStudent = () => {
       />
     )
   };
+
+  const statusOptions = [
+    { label: t('active'), value: 'active' },
+    { label: t('inactive'), value: 'inactive' },
+    { label: t('interested'), value: 'interested' },
+  ];
 
   const userFields: FieldConfig[] = [
     {
@@ -369,9 +375,10 @@ const EditStudent = () => {
     {
       name: 'status',
       label: t('status'),
-      type: 'text',
+      type: 'select',
       required: true,
-      section: 'Student Information'
+      section: 'Student Information',
+      options: statusOptions
     },
     {
       name: 'gradeLevel',
@@ -394,8 +401,8 @@ const EditStudent = () => {
           initialValue={
             studentData?.gradeLevel
               ? gradeOptions.find(
-                  (grade) => grade.id === studentData.gradeLevel
-                )
+                (grade) => grade.id === studentData.gradeLevel
+              )
               : null
           }
         />

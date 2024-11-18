@@ -234,6 +234,12 @@ export default function CreateStudent() {
     )
   };
 
+  const statusOptions = [
+    { label: t('active'), value: 'active' },
+    { label: t('inactive'), value: 'inactive' },
+    { label: t('interested'), value: 'interested' },
+  ];
+
   const userFields: FieldConfig[] = [
     {
       name: 'firstName',
@@ -297,9 +303,10 @@ export default function CreateStudent() {
     {
       name: 'status',
       label: t('status'),
-      type: 'text',
+      type: 'select',
       required: true,
-      section: 'Student Information'
+      section: 'Student Information',
+      options: statusOptions
     },
     {
       name: 'gradeLevel',

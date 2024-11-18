@@ -134,19 +134,22 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
                   sm={field.sm || 6}
                   sx={{ display: 'flex', justifyContent: 'center' }}
                 >
-                  {field.name === 'status' ? (
+                  {field.type === 'select' && field.options ? (
                     <FormControl fullWidth sx={{ width: '95%' }}>
                       <InputLabel>{field.label}</InputLabel>
                       <Select
                         name={field.name}
-                        label={field.name}
+                        label={field.label}
                         value={formData[field.name] ?? ''}
-                        onChange={handleChange} // Now correctly typed
+                        onChange={handleChange}
                         required={field.required}
                         disabled={field.disabled}
                       >
-                        <MenuItem value={1}>Active</MenuItem>
-                        <MenuItem value={0}>Inactive</MenuItem>
+                        {field.options.map((option) => (
+                          <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
                       </Select>
                     </FormControl>
                   ) : field.component ? (
@@ -173,23 +176,23 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
                       InputProps={
                         field.type === 'password'
                           ? {
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  <IconButton
-                                    onClick={() =>
-                                      togglePasswordVisibility(field.name)
-                                    }
-                                    edge="end"
-                                  >
-                                    {passwordVisibility[field.name] ? (
-                                      <VisibilityOff />
-                                    ) : (
-                                      <Visibility />
-                                    )}
-                                  </IconButton>
-                                </InputAdornment>
-                              )
-                            }
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <IconButton
+                                  onClick={() =>
+                                    togglePasswordVisibility(field.name)
+                                  }
+                                  edge="end"
+                                >
+                                  {passwordVisibility[field.name] ? (
+                                    <VisibilityOff />
+                                  ) : (
+                                    <Visibility />
+                                  )}
+                                </IconButton>
+                              </InputAdornment>
+                            )
+                          }
                           : undefined
                       }
                     />
