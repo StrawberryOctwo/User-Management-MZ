@@ -1,5 +1,6 @@
 import { Grid, Typography, Box, CardContent, TextField } from '@mui/material';
-import { useState } from 'react';
+import moment from 'moment';
+import { useEffect, useState } from 'react';
 import Text from 'src/components/Text';
 
 interface UserInfo {
@@ -12,21 +13,36 @@ interface UserInfo {
 }
 
 interface UserDetailsProps {
+  user: any;
   isEditing: boolean;
+  setUser: (user: any) => void;
 }
 
-function UserDetails({ isEditing }: UserDetailsProps) {
+function UserDetails({ user, isEditing, setUser }: UserDetailsProps) {
   const [userInfo, setUserInfo] = useState<UserInfo>({
-    firstName: "John",
-    lastName: "Doe",
-    dob: "1990-05-15",
-    email: "john.doe@example.com",
-    address: "123 Elm Street",
-    postalCode: "90210"
+    firstName: '',
+    lastName: '',
+    dob: '',
+    email: '',
+    address: '',
+    postalCode: ''
   });
 
+  useEffect(() => {
+    setUserInfo({
+      firstName: user.firstName,
+      lastName: user.lastName,
+      dob: moment(user.dob).format('YYYY-MM-DD'),
+      email: user.email,
+      address: user.address,
+      postalCode: user.postalCode
+    });
+  }, [user]);
+
   const handleInputChange = (field: keyof UserInfo, value: string) => {
-    setUserInfo({ ...userInfo, [field]: value });
+    const updatedInfo = { ...userInfo, [field]: value };
+    setUserInfo(updatedInfo);
+    setUser((prev: any) => ({ ...prev, [field]: value }));
   };
 
   return (
@@ -36,22 +52,36 @@ function UserDetails({ isEditing }: UserDetailsProps) {
           {Object.keys(userInfo).map((key) => (
             <Grid container key={key} alignItems="center" sx={{ mb: 2 }}>
               <Grid item xs={12} sm={4} md={3} textAlign={{ sm: 'right' }}>
-                <Box pr={3}>
-                  {key.charAt(0).toUpperCase() + key.slice(1)}:
-                </Box>
+                <Box pr={3}>{key.charAt(0).toUpperCase() + key.slice(1)}:</Box>
               </Grid>
               <Grid item xs={12} sm={8} md={9}>
                 {isEditing ? (
-                  <TextField
-                    variant="outlined"
-                    fullWidth
-                    value={userInfo[key as keyof UserInfo]}
-                    onChange={(e) =>
-                      handleInputChange(key as keyof UserInfo, e.target.value)
-                    }
-                  />
+                  key === 'dob' ? (
+                    <TextField
+                      variant="outlined"
+                      fullWidth
+                      type="date"
+                      value={userInfo.dob}
+                      onChange={(e) =>
+                        handleInputChange(key as keyof UserInfo, e.target.value)
+                      }
+                    />
+                  ) : (
+                    <TextField
+                      variant="outlined"
+                      fullWidth
+                      value={userInfo[key as keyof UserInfo]}
+                      onChange={(e) =>
+                        handleInputChange(key as keyof UserInfo, e.target.value)
+                      }
+                    />
+                  )
                 ) : (
-                  <Text color="black">{userInfo[key as keyof UserInfo]}</Text>
+                  <Text color="black">
+                    {key === 'dob'
+                      ? moment(userInfo.dob).format('MMMM Do, YYYY')
+                      : userInfo[key as keyof UserInfo]}
+                  </Text>
                 )}
               </Grid>
             </Grid>

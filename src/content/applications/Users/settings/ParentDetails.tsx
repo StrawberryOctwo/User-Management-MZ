@@ -1,5 +1,5 @@
 import { Grid, Typography, Box, CardContent, TextField } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Text from 'src/components/Text';
 
 interface ParentInfo {
@@ -10,24 +10,39 @@ interface ParentInfo {
 
 interface ParentDetailsProps {
   isEditing: boolean;
+  user: any;
+  setUser: (user: any) => void;
 }
 
-function ParentDetails({ isEditing }: ParentDetailsProps) {
+function ParentDetails({ user, isEditing, setUser }: ParentDetailsProps) {
   const [parentInfo, setParentInfo] = useState<ParentInfo>({
-    accountHolder: "John Doe",
-    iban: "DE89 3704 0044 0532 0130 00",
-    bic: "COBADEFFXXX"
+    accountHolder: '',
+    iban: '',
+    bic: ''
   });
 
+  useEffect(() => {
+    setParentInfo({
+      accountHolder: user.parentDetails.accountHolder,
+      iban: user.parentDetails.iban,
+      bic: user.parentDetails.bic
+    });
+  }, [user]);
+
   const handleInputChange = (field: keyof ParentInfo, value: string) => {
-    setParentInfo({ ...parentInfo, [field]: value });
+    const updatedInfo = { ...parentInfo, [field]: value };
+    setParentInfo(updatedInfo);
+    setUser((prev: any) => ({
+      ...prev,
+      parentDetails: { ...prev.parentDetails, [field]: value }
+    }));
   };
 
   return (
     <CardContent sx={{ p: 4 }}>
       <Typography variant="subtitle2">
         <Grid container spacing={0}>
-          {["accountHolder", "iban", "bic"].map((field) => (
+          {['accountHolder', 'iban', 'bic'].map((field) => (
             <Grid container key={field} alignItems="center" sx={{ mb: 2 }}>
               <Grid item xs={12} sm={4} md={3} textAlign={{ sm: 'right' }}>
                 <Box pr={3}>
@@ -41,11 +56,16 @@ function ParentDetails({ isEditing }: ParentDetailsProps) {
                     fullWidth
                     value={parentInfo[field as keyof ParentInfo]}
                     onChange={(e) =>
-                      handleInputChange(field as keyof ParentInfo, e.target.value)
+                      handleInputChange(
+                        field as keyof ParentInfo,
+                        e.target.value
+                      )
                     }
                   />
                 ) : (
-                  <Text color="black">{parentInfo[field as keyof ParentInfo]}</Text>
+                  <Text color="black">
+                    {parentInfo[field as keyof ParentInfo]}
+                  </Text>
                 )}
               </Grid>
             </Grid>

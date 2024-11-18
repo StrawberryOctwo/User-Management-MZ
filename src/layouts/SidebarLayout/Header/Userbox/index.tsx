@@ -66,7 +66,7 @@ function HeaderUserbox() {
   const getInitials = (name: string): string => {
     const initials = name
       .split(' ')
-      .map(n => n[0])
+      .map((n) => n[0])
       .join('');
     return initials.toUpperCase();
   };
@@ -87,9 +87,9 @@ function HeaderUserbox() {
     navigate('/logout'); // Redirect to /logout route
   };
   const handleProfile = (): void => {
+    handleClose();
     navigate('/management/profile/settings'); // Redirect to /logout route
   };
-
 
   return (
     <>

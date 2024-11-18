@@ -1,5 +1,6 @@
 import { Grid, Typography, Box, CardContent, TextField } from '@mui/material';
-import { useState } from 'react';
+import moment from 'moment';
+import { useEffect, useState } from 'react';
 import Text from 'src/components/Text';
 
 interface TeacherInfo {
@@ -16,30 +17,51 @@ interface TeacherInfo {
 
 interface TeacherDetailsProps {
   isEditing: boolean;
+  user: any;
+  setUser: (user: any) => void;
 }
 
-function TeacherDetails({ isEditing }: TeacherDetailsProps) {
+function TeacherDetails({ user, isEditing, setUser }: TeacherDetailsProps) {
   const [teacherInfo, setTeacherInfo] = useState<TeacherInfo>({
-    idNumber: "123456789",
-    taxNumber: "987654321",
-    bank: "Sample Bank",
-    iban: "DE89 3704 0044 0532 0130 00",
-    bic: "COBADEFFXXX",
-    contractStartDate: "2020-01-01",
-    contractEndDate: "2023-12-31",
-    hourlyRate: 50,
-    employeeNumber: "T-2023-1001"
+    idNumber: '',
+    taxNumber: '',
+    bank: '',
+    iban: '',
+    bic: '',
+    contractStartDate: '',
+    contractEndDate: '',
+    hourlyRate: 0,
+    employeeNumber: ''
   });
 
+  useEffect(() => {
+    setTeacherInfo({
+      idNumber: user.teacherDetails.idNumber,
+      taxNumber: user.teacherDetails.taxNumber,
+      bank: user.teacherDetails.bank,
+      iban: user.teacherDetails.iban,
+      bic: user.teacherDetails.bic,
+      contractStartDate: user.teacherDetails.contractStartDate,
+      contractEndDate: user.teacherDetails.contractEndDate,
+      hourlyRate: user.teacherDetails.hourlyRate,
+      employeeNumber: user.teacherDetails.employeeNumber
+    });
+  }, [user]);
+
   const handleInputChange = (field: keyof TeacherInfo, value: string) => {
-    setTeacherInfo({ ...teacherInfo, [field]: value });
+    const updatedInfo = { ...teacherInfo, [field]: value };
+    setTeacherInfo(updatedInfo);
+    setUser((prev: any) => ({
+      ...prev,
+      teacherDetails: { ...prev.teacherDetails, [field]: value }
+    }));
   };
 
   return (
     <CardContent sx={{ p: 4 }}>
       <Typography variant="subtitle2">
         <Grid container spacing={0}>
-          {["idNumber", "taxNumber", "bank", "iban", "bic"].map((field) => (
+          {['idNumber', 'taxNumber', 'bank', 'iban', 'bic'].map((field) => (
             <Grid container key={field} alignItems="center" sx={{ mb: 2 }}>
               <Grid item xs={12} sm={4} md={3} textAlign={{ sm: 'right' }}>
                 <Box pr={3}>
@@ -53,11 +75,16 @@ function TeacherDetails({ isEditing }: TeacherDetailsProps) {
                     fullWidth
                     value={teacherInfo[field as keyof TeacherInfo]}
                     onChange={(e) =>
-                      handleInputChange(field as keyof TeacherInfo, e.target.value)
+                      handleInputChange(
+                        field as keyof TeacherInfo,
+                        e.target.value
+                      )
                     }
                   />
                 ) : (
-                  <Text color="black">{teacherInfo[field as keyof TeacherInfo]}</Text>
+                  <Text color="black">
+                    {teacherInfo[field as keyof TeacherInfo]}
+                  </Text>
                 )}
               </Grid>
             </Grid>
@@ -70,7 +97,8 @@ function TeacherDetails({ isEditing }: TeacherDetailsProps) {
             </Grid>
             <Grid item xs={12} sm={8} md={9}>
               <Text color="black">
-                {teacherInfo.contractStartDate} - {teacherInfo.contractEndDate}
+                {moment(teacherInfo.contractStartDate).format('MMMM Do, YYYY')}{' '}
+                - {moment(teacherInfo.contractEndDate).format('MMMM Do, YYYY')}
               </Text>
             </Grid>
           </Grid>

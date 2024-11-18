@@ -1,27 +1,77 @@
 import { Grid, Typography, Card, Box, Divider, Button } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import DoneTwoToneIcon from '@mui/icons-material/DoneTwoTone';
+import CancelTwoToneIcon from '@mui/icons-material/CancelTwoTone';
 import ParentDetails from './ParentDetails';
 import TeacherDetails from './TeacherDetails';
-import StudentDetails from './StudentDetails';
 import UserDetails from './UserDetails';
-
-type UserRole = 'Parent' | 'Teacher' | 'Student';
-
-const userRole: UserRole = 'Parent';
+import { fetchUserProfile, updateUserProfile } from 'src/services/userService';
 
 function EditProfileTab() {
-  const [isEditingUser, setIsEditingUser] = useState(false);
-  const [isEditingRole, setIsEditingRole] = useState(false);
+  const [isEditingUser, setIsEditingUser] = useState(false); // State for User Details
+  const [isEditingParent, setIsEditingParent] = useState(false); // State for Parent Details
+  const [isEditingTeacher, setIsEditingTeacher] = useState(false); // State for Teacher Details
+  const [user, setUser] = useState<any>({});
+  const [userRole, setUserRole] = useState<string>('');
 
-  const handleUserEditToggle = () => {
+  const handleUserEditToggle = async () => {
+    if (isEditingUser) {
+      await handleSaveUser();
+    }
     setIsEditingUser(!isEditingUser);
   };
 
-  const handleRoleEditToggle = () => {
-    setIsEditingRole(!isEditingRole);
+  const handleParentEditToggle = async () => {
+    if (isEditingParent) {
+      await handleSaveUser();
+    }
+    setIsEditingParent(!isEditingParent);
   };
+
+  const handleTeacherEditToggle = async () => {
+    if (isEditingTeacher) {
+      await handleSaveUser();
+    }
+    setIsEditingTeacher(!isEditingTeacher);
+  };
+
+  const handleSaveUser = async () => {
+    try {
+      await updateUserProfile(user);
+      console.log('User profile updated successfully!');
+    } catch (error) {
+      console.error('Failed to update user profile:', error);
+    }
+  };
+
+  const handleSaveParentDetails = async () => {
+    try {
+      // Save parent-specific details (e.g., accountHolder, IBAN)
+      console.log('Parent details updated successfully!');
+    } catch (error) {
+      console.error('Failed to update parent details:', error);
+    }
+  };
+
+  const handleSaveTeacherDetails = async () => {
+    try {
+      // Save teacher-specific details (e.g., hourlyRate, contract dates)
+      console.log('Teacher details updated successfully!');
+    } catch (error) {
+      console.error('Failed to update teacher details:', error);
+    }
+  };
+
+  useEffect(() => {
+    const fetchUser = async () => {
+      const user = await fetchUserProfile();
+      setUser(user.data);
+      setUserRole(user.data.role);
+    };
+
+    fetchUser();
+  }, []);
 
   return (
     <Grid container spacing={3}>
@@ -42,16 +92,34 @@ function EditProfileTab() {
                 Manage information related to your personal details
               </Typography>
             </Box>
-            <Button
-              variant="text"
-              startIcon={isEditingUser ? <DoneTwoToneIcon /> : <EditTwoToneIcon />}
-              onClick={handleUserEditToggle}
-            >
-              {isEditingUser ? "Save" : "Edit"}
-            </Button>
+            <Box display="flex" gap={1}>
+              {isEditingUser && (
+                <Button
+                  variant="text"
+                  color="error"
+                  startIcon={<CancelTwoToneIcon />}
+                  onClick={() => setIsEditingUser(false)}
+                >
+                  Cancel
+                </Button>
+              )}
+              <Button
+                variant="text"
+                startIcon={
+                  isEditingUser ? <DoneTwoToneIcon /> : <EditTwoToneIcon />
+                }
+                onClick={handleUserEditToggle}
+              >
+                {isEditingUser ? 'Save' : 'Edit'}
+              </Button>
+            </Box>
           </Box>
           <Divider />
-          <UserDetails isEditing={isEditingUser} />
+          <UserDetails
+            user={user}
+            isEditing={isEditingUser}
+            setUser={setUser}
+          />
         </Card>
       </Grid>
 
@@ -66,16 +134,34 @@ function EditProfileTab() {
               justifyContent="space-between"
             >
               <Typography variant="h4">Parent Account Details</Typography>
-              <Button
-                variant="text"
-                startIcon={isEditingRole ? <DoneTwoToneIcon /> : <EditTwoToneIcon />}
-                onClick={handleRoleEditToggle}
-              >
-                {isEditingRole ? "Save" : "Edit"}
-              </Button>
+              <Box display="flex" gap={1}>
+                {isEditingParent && (
+                  <Button
+                    variant="text"
+                    color="error"
+                    startIcon={<CancelTwoToneIcon />}
+                    onClick={() => setIsEditingParent(false)}
+                  >
+                    Cancel
+                  </Button>
+                )}
+                <Button
+                  variant="text"
+                  startIcon={
+                    isEditingParent ? <DoneTwoToneIcon /> : <EditTwoToneIcon />
+                  }
+                  onClick={handleParentEditToggle}
+                >
+                  {isEditingParent ? 'Save' : 'Edit'}
+                </Button>
+              </Box>
             </Box>
             <Divider />
-            <ParentDetails isEditing={isEditingRole} />
+            <ParentDetails
+              user={user}
+              isEditing={isEditingParent}
+              setUser={setUser}
+            />
           </Card>
         </Grid>
       )}
@@ -89,29 +175,37 @@ function EditProfileTab() {
               alignItems="center"
               justifyContent="space-between"
             >
-              <Typography variant="h4">Teacher Professional Information</Typography>
-              <Button
-                variant="text"
-                startIcon={isEditingRole ? <DoneTwoToneIcon /> : <EditTwoToneIcon />}
-                onClick={handleRoleEditToggle}
-              >
-                {isEditingRole ? "Save" : "Edit"}
-              </Button>
+              <Typography variant="h4">
+                Teacher Professional Information
+              </Typography>
+              <Box display="flex" gap={1}>
+                {isEditingTeacher && (
+                  <Button
+                    variant="text"
+                    color="error"
+                    startIcon={<CancelTwoToneIcon />}
+                    onClick={() => setIsEditingTeacher(false)}
+                  >
+                    Cancel
+                  </Button>
+                )}
+                <Button
+                  variant="text"
+                  startIcon={
+                    isEditingTeacher ? <DoneTwoToneIcon /> : <EditTwoToneIcon />
+                  }
+                  onClick={handleTeacherEditToggle}
+                >
+                  {isEditingTeacher ? 'Save' : 'Edit'}
+                </Button>
+              </Box>
             </Box>
             <Divider />
-            <TeacherDetails isEditing={isEditingRole} />
-          </Card>
-        </Grid>
-      )}
-
-      {userRole === 'Student' && (
-        <Grid item xs={12}>
-          <Card>
-            <Box p={3}>
-              <Typography variant="h4">Student Details</Typography>
-            </Box>
-            <Divider />
-            <StudentDetails />
+            <TeacherDetails
+              user={user}
+              isEditing={isEditingTeacher}
+              setUser={setUser}
+            />
           </Card>
         </Grid>
       )}
