@@ -52,17 +52,15 @@ function HeaderLocalization() {
 
   return (
     <>
-      <Tooltip arrow title="Change Language">
-        <Button
-          color="primary"
-          ref={ref}
-          onClick={handleOpen}
-          fullWidth
-          startIcon={<TranslateIcon />}
-        >
-          {availableLanguages.find((lang) => lang.code === language)?.label}
-        </Button>
-      </Tooltip>
+      <Button
+        color="primary"
+        ref={ref}
+        onClick={handleOpen}
+        fullWidth
+        startIcon={<TranslateIcon />}
+      >
+        {availableLanguages.find((lang) => lang.code === language)?.label}
+      </Button>
 
       <Menu
         anchorEl={ref.current}
