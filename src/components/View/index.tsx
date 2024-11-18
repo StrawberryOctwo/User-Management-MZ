@@ -11,6 +11,9 @@ import {
   Paper,
   useTheme,
   useMediaQuery,
+  List,
+  ListItem,
+  ListItemText,
 } from '@mui/material';
 import {
   DataGrid,
@@ -88,9 +91,10 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({
 
       {/* Iterate through each section */}
       {Object.entries(groupedFields).map(([section, fields], index, arr) => {
-        // Separate table fields from non-table fields
-        const nonTableFields = fields.filter((field) => !field.isArray);
-        const tableFields = fields.filter((field) => field.isArray);
+        // Separate fields into categories
+        const nonTableFields = fields.filter((field) => !field.isArray && !field.isTextArray);
+        const tableFields = fields.filter((field) => field.isArray && !field.isTextArray);
+        const textArrayFields = fields.filter((field) => field.isArray && field.isTextArray);
 
         return (
           <Card
@@ -142,9 +146,70 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({
                       >
                         {typeof field.component === 'function' ? (
                           field.component(data)
+                        ) : field.isTextArray ? (
+                          // This condition is now redundant as textArrayFields are handled separately
+                          // But keeping it for safety
+                          data[field.name] && data[field.name].length > 0 ? (
+                            <Typography variant="body2" color="text.secondary">
+                              <strong>{field.label}:</strong> {data[field.name].join(', ')}
+                            </Typography>
+                          ) : (
+                            <Typography variant="body2" color="text.secondary">
+                              <strong>{field.label}:</strong> N/A
+                            </Typography>
+                          )
                         ) : (
                           <Typography variant="body2" color="text.secondary">
-                            <strong>{field.label}:</strong> {data[field.name]}
+                            <strong>{field.label}:</strong> {data[field.name] || 'N/A'}
+                          </Typography>
+                        )}
+                      </Box>
+                    </Grid>
+                  ))}
+                </Grid>
+              )}
+
+              {/* Render text array fields */}
+              {textArrayFields.length > 0 && (
+                <Grid container spacing={2} sx={{ mt: 2 }}>
+                  {textArrayFields.map((field) => (
+                    <Grid
+                      item
+                      xs={12}
+                      sm={6}
+                      md={4}
+                      key={field.name}
+                    >
+                      <Box
+                        sx={{
+                          p: 1.5,
+                          border: `1px solid ${theme.palette.divider}`,
+                          borderRadius: 2,
+                          backgroundColor: theme.palette.background.paper,
+                          height: '100%',
+                          display: 'flex',
+                          flexDirection: 'column',
+                        }}
+                      >
+                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
+                          <strong>{field.label}:</strong>
+                        </Typography>
+                        {data[field.name] && data[field.name].length > 0 ? (
+                          // Display as comma-separated
+                          <Typography variant="body2" color="text.secondary">
+                            {data[field.name].join(', ')}
+                          </Typography>
+                          // Alternatively, display as list:
+                          // <List dense>
+                          //   {data[field.name].map((item: string, idx: number) => (
+                          //     <ListItem key={idx} sx={{ pl: 0 }}>
+                          //       <ListItemText primary={item} />
+                          //     </ListItem>
+                          //   ))}
+                          // </List>
+                        ) : (
+                          <Typography variant="body2" color="text.secondary">
+                            N/A
                           </Typography>
                         )}
                       </Box>

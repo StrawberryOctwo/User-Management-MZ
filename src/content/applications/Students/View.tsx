@@ -45,25 +45,34 @@ const ViewStudentPage: React.FC = () => {
   const loadStudentData = async () => {
     setLoading(true);
     setErrorMessage(null);
-
+  
     try {
       const studentData = await fetchStudentById(Number(id));
       console.log('studentData:', studentData);
+  
+      // Transform availableDates: Binary to Array of Day Names
       studentData.availableDates = decodeAvailableDates(
         studentData.availableDates
       ).map(capitalizeFirstLetter);
+  
+      // Transform locations: Array of Objects to Array of Names
+      if (studentData.locations && Array.isArray(studentData.locations)) {
+        studentData.locations = studentData.locations.map((location: any) => location.name);
+      }
+  
+      // Format Dates
       studentData.contractEndDate = formatDate(studentData.contractEndDate);
       studentData.createdAt = formatDate(studentData.createdAt);
       studentData.user.dob = formatDate(studentData.user.dob);
-
+  
       setStudent(studentData);
-
+  
       const studentDocuments = await fetchStudentDocumentsById(Number(id));
       setDocuments(studentDocuments.documents);
-
+  
       const reports = await getSessionReportsForStudent(id);
       setSessionReports(reports);
-
+  
       const userPayments = await getPaymentsForUser(studentData.user?.id);
       setPayments(userPayments.data);
     } catch (error: any) {
@@ -73,6 +82,7 @@ const ViewStudentPage: React.FC = () => {
       setLoading(false);
     }
   };
+  
 
   const handleUpdateStatus = async (paymentId: number, newStatus: string) => {
     setPayments((prevPayments) =>
