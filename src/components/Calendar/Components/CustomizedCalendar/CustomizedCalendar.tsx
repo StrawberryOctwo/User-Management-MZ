@@ -361,6 +361,12 @@ export default function CustomizedCalendar({
           minute: '2-digit',
           hour12: false
         }}
+        titleFormat={{
+          year: 'numeric',
+          month: 'long',
+          day: 'numeric',
+          weekday: 'long' // Add the day of the week here
+        }}
         datesSet={(info) => {
           onDateChange(moment(info.start).format('YYYY-MM-DD'));
         }}
@@ -374,6 +380,7 @@ export default function CustomizedCalendar({
           }
         }}
       />
+
 
       <EventTypeSelectionModal
         isOpen={isEventTypeModalOpen}
