@@ -12,7 +12,7 @@ import {
   AccordionSummary,
   Accordion,
 } from '@mui/material';
-import AssignmentIcon from '@mui/icons-material/Assignment';
+import SpatialAudioOffIcon from '@mui/icons-material/SpatialAudioOff';
 import { fetchToDosByAssignedBy, createToDo, toggleToDoCompletion, assignToDoToRole, assignToDoToUsers, fetchAssignedUsersForTodo } from 'src/services/todoService';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import RoleBasedComponent from 'src/components/ProtectedComponent';
@@ -172,7 +172,7 @@ const ToDoHeader: React.FC = () => {
     <Box sx={{ position: 'relative' }}>
       <Tooltip arrow title="Manage ToDos">
         <IconButton color="primary" onClick={handleOpenDialog}>
-          <AssignmentIcon />
+          <SpatialAudioOffIcon />
         </IconButton>
       </Tooltip>
 

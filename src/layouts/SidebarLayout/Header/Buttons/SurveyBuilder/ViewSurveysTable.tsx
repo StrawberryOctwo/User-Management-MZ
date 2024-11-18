@@ -13,14 +13,18 @@ import {
   DialogContent,
   TableFooter,
   TablePagination,
+  Tooltip,
+  alpha,
+  Badge,
+  styled,
+  DialogTitle,
 } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
-import ListIcon from '@mui/icons-material/List';
-import SurveyBuilderDialog from './SurveyBuilderDialog';
-import SubmissionsTable from './SubmissionsTable';
+import RateReviewIcon from '@mui/icons-material/RateReview';import SubmissionsTable from './SubmissionsTable';
 import { fetchSurveyById, fetchAllSurveys } from 'src/services/survey';
 import moment from 'moment';
+import SurveyBuilderDialog from './SurveyBuilderDialog';
 
 function ViewSurveysTable() {
   const [surveys, setSurveys] = useState([]);
@@ -86,14 +90,42 @@ function ViewSurveysTable() {
     setRowsPerPage(parseInt(event.target.value, 5));
     setPage(1);
   };
-
+  const CustomBadge = styled(Badge)(({ theme }) => ({
+    '& .MuiBadge-badge': {
+      backgroundColor: alpha(theme.palette.error.main, 0.1), // Match background color
+      color: theme.palette.error.main, // Match text color
+      minWidth: '16px',
+      height: '16px',
+      borderRadius: '50%',
+      padding: 0,
+      boxShadow: `0 0 0 1px ${alpha(theme.palette.error.main, 0.3)}`,
+      '&::after': {
+        position: 'absolute',
+        top: 0,
+        left: 0,
+        width: '100%',
+        height: '100%',
+        borderRadius: '50%',
+        boxShadow: `0 0 0 1px ${alpha(theme.palette.error.main, 0.3)}`,
+        content: '""',
+      },
+    },
+  }));
+  
   return (
     <div>
+
+
+      <Tooltip arrow title="Survey Submissions">
       <IconButton color="primary" onClick={() => setOpenSurveyListDialog(true)}>
-        <ListIcon />
-      </IconButton>
+      <CustomBadge>
+        <RateReviewIcon />
+          </CustomBadge>
+        </IconButton>
+      </Tooltip>
 
       <Dialog open={openSurveyListDialog} onClose={handleCloseSurveyListDialog} maxWidth="md" fullWidth>
+      <DialogTitle>Survey Submissions</DialogTitle>
         <DialogContent>
           <TableContainer component={Paper}>
             <Table>

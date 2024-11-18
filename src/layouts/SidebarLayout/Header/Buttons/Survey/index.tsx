@@ -11,7 +11,7 @@ import {
   Badge,
   Button,
 } from '@mui/material';
-import FeedbackIcon from '@mui/icons-material/Feedback';
+import PollIcon from '@mui/icons-material/Poll';
 import { getSurveysForSelf } from 'src/services/survey';
 import SurveySubmitDialog from './SurveySubmitDialog';
 
@@ -85,7 +85,7 @@ function SurveyNotifications() {
       <Tooltip arrow title="Surveys">
         <IconButton color="primary" ref={ref} onClick={handleOpen}>
           <CustomBadge badgeContent={pendingCount}>
-            <FeedbackIcon />
+            <PollIcon />
           </CustomBadge>
         </IconButton>
       </Tooltip>

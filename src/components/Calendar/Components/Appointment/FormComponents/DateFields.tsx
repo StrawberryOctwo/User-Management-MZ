@@ -38,11 +38,7 @@ export default function DateFields({ session, setSession, isPartial }) {
     }
 
     if (normalizedStartDate || normalizedEndDate) {
-      if (isPartial) {
-        if (normalizedStartDate && normalizedStartDate < today) {
-          errors.startDate = 'Start date cannot be before the current date';
-        }
-      }
+
 
       if (
         normalizedEndDate &&

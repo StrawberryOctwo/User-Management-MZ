@@ -1,8 +1,7 @@
 import { useRef, useState } from 'react';
 import { Tooltip, IconButton } from '@mui/material';
-import BuildIcon from '@mui/icons-material/Build';
 import SurveyBuilderDialog from './SurveyBuilderDialog';
-
+import ConstructionIcon from '@mui/icons-material/Construction';
 function SurveyBuilder() {
   const [isOpen, setOpen] = useState<boolean>(false);
   const ref = useRef(null);
@@ -12,9 +11,9 @@ function SurveyBuilder() {
 
   return (
     <>
-      <Tooltip arrow title="Open Survey Builder">
+      <Tooltip arrow title="Survey Builder">
         <IconButton color="primary" ref={ref} onClick={handleOpen}>
-          <BuildIcon />
+          <ConstructionIcon />
         </IconButton>
       </Tooltip>
 
