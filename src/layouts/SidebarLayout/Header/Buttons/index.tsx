@@ -3,7 +3,6 @@ import HeaderSearch from './Search';
 import HeaderNotifications from './Notifications';
 import HeaderLocalization from './Localization';
 import HeaderAvailability from './Availability';
-import withRole from 'src/hooks/withRole';
 import StudentExamsHeader from './StudentExam';
 import ToDoHeader from './ToDo';
 import AbsenceNotifications from './Absences';
@@ -11,24 +10,26 @@ import SurveyBuilder from './SurveyBuilder/SurveyBuilder';
 import SurveyNotifications from './Survey';
 import ViewSurveysTable from './SurveyBuilder/ViewSurveysTable';
 import HeaderToDoList from './AssignedToDos/ToDoListPopUp';
+import withRole from 'src/hooks/withRole';
 
 function HeaderButtons() {
   return (
-    <Box sx={{ mr: 1, display: 'flex', alignItems: 'center', gap: 1 }}>
-      <HeaderSearch />
+    <Box sx={{ mr: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
+      {/* <HeaderSearch /> */}
       <HeaderNotifications />
-      <HeaderLocalization />
+      {/* <HeaderLocalization /> */}
       <SurveyNotifications />
-      <ProtectedBox allowedRoles={['SuperAdmin','FranchiseAdmin','LocationAdmin','Teacher','Student']}>
-      <HeaderToDoList/>
+      <ProtectedBox allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher', 'Student']}>
+        <HeaderToDoList />
       </ProtectedBox>
       <ProtectedBox allowedRoles={['SuperAdmin']}>
-      <ViewSurveysTable />
+        <ViewSurveysTable />
       </ProtectedBox>
       <ProtectedBox allowedRoles={['SuperAdmin']}>
-      <SurveyBuilder />
-     
-      <ToDoHeader />
+        <SurveyBuilder />
+      </ProtectedBox>
+      <ProtectedBox allowedRoles={['SuperAdmin']}>
+        <ToDoHeader />
       </ProtectedBox>
       <ProtectedBox allowedRoles={['Teacher']}>
         <HeaderAvailability />

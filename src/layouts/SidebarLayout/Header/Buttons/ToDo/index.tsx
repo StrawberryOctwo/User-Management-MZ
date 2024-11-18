@@ -169,7 +169,7 @@ const ToDoHeader: React.FC = () => {
   };
 
   return (
-    <Box sx={{ position: 'relative', padding: 2 }}>
+    <Box sx={{ position: 'relative' }}>
       <Tooltip arrow title="Manage ToDos">
         <IconButton color="primary" onClick={handleOpenDialog}>
           <AssignmentIcon />
