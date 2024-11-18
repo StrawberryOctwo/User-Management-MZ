@@ -1,20 +1,16 @@
 import React, { useState } from 'react';
-import { FieldConfig } from 'src/components/Table/tableRowCreate'; // Import FieldConfig type from the correct path
+import { FieldConfig } from 'src/components/Table/tableRowCreate';
 import { Box } from '@mui/material';
 import { t } from 'i18next';
 import { addFranchise } from 'src/services/franchiseService';
 import ReusableForm from 'src/components/Table/tableRowCreate';
 
-// Separate configurations for franchise fields
-
-
 const CreateFranchise = () => {
-    const [loading, setLoading] = useState(false); // Unified loading state for both fetching and deleting
+    const [loading, setLoading] = useState(false);
 
     const handleFranchiseSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
         setLoading(true);
 
-        // Structure the data as required by the API
         try {
             const payload = {
                 name: data.name,
@@ -24,7 +20,10 @@ const CreateFranchise = () => {
                 bic: data.bic,
                 status: data.status,
                 totalEmployees: data.totalEmployees,
-                percentage: data.percentage
+                percentage: data.percentage,
+                city: data.city,
+                address: data.address,
+                postalCode: data.postalCode,
             };
             const response = await addFranchise(payload);
             return response
@@ -52,13 +51,16 @@ const CreateFranchise = () => {
         { name: 'status', label: t('status'), type: 'select', required: true, section: 'Franchise Information', options: statusOptions },
         { name: 'totalEmployees', label: t('total_employees'), type: 'number', required: true, section: 'Franchise Information' },
         { name: 'percentage', label: t('percentage'), type: 'number', required: true, section: 'Franchise Information' },
+        { name: 'city', label: t('city'), type: 'text', required: true, section: 'Franchise Information' },
+        { name: 'address', label: t('address'), type: 'text', required: true, section: 'Franchise Information' },
+        { name: 'postalCode', label: t('postalCode'), type: 'text', required: true, section: 'Franchise Information' },
 
     ];
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
 
             <ReusableForm
-                fields={franchiseFields} // Use franchise fields array
+                fields={franchiseFields}
                 onSubmit={handleFranchiseSubmit}
                 entityName="Franchise"
                 entintyFunction="Add"

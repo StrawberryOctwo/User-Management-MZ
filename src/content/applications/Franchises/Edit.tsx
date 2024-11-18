@@ -7,17 +7,16 @@ import { fetchFranchiseById, updateFranchise } from 'src/services/franchiseServi
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
 
 const EditFranchise = () => {
-    const { id } = useParams<{ id: string }>(); // Get franchise ID from URL
+    const { id } = useParams<{ id: string }>();
     const [franchiseData, setFranchiseData] = useState<Record<string, any> | null>(null);
     const [loading, setLoading] = useState(true);
     const [submitLoading, setSubmitLoading] = useState(false);
 
-    // Fetch franchise data by ID on component mount
     const fetchFranchise = async () => {
         setLoading(true);
         try {
-            const fetchedFranchise = await fetchFranchiseById(Number(id)); // Fetch franchise by ID
-            setFranchiseData(fetchedFranchise); // Set franchise data to state
+            const fetchedFranchise = await fetchFranchiseById(Number(id));
+            setFranchiseData(fetchedFranchise);
         } catch (error) {
             console.error('Error fetching franchise:', error);
         } finally {
@@ -40,8 +39,10 @@ const EditFranchise = () => {
                 bic: data.bic,
                 status: data.status,
                 totalEmployees: data.totalEmployees,
-                percentage: data.percentage
-
+                percentage: data.percentage,
+                city: data.city,
+                address: data.address,
+                postalCode: data.postalCode,
             };
             const response = await updateFranchise(Number(id), payload);
             fetchFranchise();
@@ -50,7 +51,7 @@ const EditFranchise = () => {
             console.error('Error updating Franchise:', error);
             throw error;
         } finally {
-            setSubmitLoading(false); // Reset submit loading state
+            setSubmitLoading(false);
         }
     };
 
@@ -69,17 +70,19 @@ const EditFranchise = () => {
         { name: 'status', label: t('status'), type: 'select', required: true, section: 'Franchise Information', options: statusOptions },
         { name: 'totalEmployees', label: t('total_employees'), type: 'number', required: true, section: 'Franchise Information' },
         { name: 'percentage', label: t('percentage'), type: 'number', required: true, section: 'Franchise Information' },
-
+        { name: 'city', label: t('city'), type: 'text', required: true, section: 'Franchise Information' },
+        { name: 'address', label: t('address'), type: 'text', required: true, section: 'Franchise Information' },
+        { name: 'postalCode', label: t('postalCode'), type: 'text', required: true, section: 'Franchise Information' },
     ];
 
     return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
             {!loading && franchiseData && (
                 <ReusableForm
-                    key={franchiseData.id} // Add key to force re-render when franchiseData changes
-                    fields={franchiseFields} // Use franchise fields array
-                    onSubmit={handleFranchiseSubmit} // Submit handler for editing
-                    initialData={franchiseData} // Pre-fill form with franchise data
+                    key={franchiseData.id}
+                    fields={franchiseFields}
+                    onSubmit={handleFranchiseSubmit}
+                    initialData={franchiseData}
                     entityName="Franchise"
                     entintyFunction="Edit"
                 />
