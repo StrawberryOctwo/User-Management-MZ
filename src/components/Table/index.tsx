@@ -57,6 +57,7 @@ interface ReusableTableProps {
 }
 
 const getStatusLabel = (status: string): JSX.Element => {
+    console.log(status)
     const map = {
         active: { text: 'Active', color: 'success' },
         inactive: { text: 'Inactive', color: 'error' },

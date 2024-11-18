@@ -116,14 +116,15 @@ const EditTeacher = () => {
             };
 
             const teacherData = {
+                status: data.status,
                 employeeNumber: data.employeeNumber,
                 idNumber: data.idNumber,
                 taxNumber: data.taxNumber,
                 contractStartDate: data.contractStartDate,
                 contractEndDate: data.contractEndDate,
                 hourlyRate: data.hourlyRate,
-                rateMultiplier : data.rateMultiplier,
-                sessionRateMultiplier : data.sessionRateMultiplier,                bank: data.bank,
+                rateMultiplier: data.rateMultiplier,
+                sessionRateMultiplier: data.sessionRateMultiplier, bank: data.bank,
                 iban: data.iban,
                 bic: data.bic,
             };
@@ -158,8 +159,12 @@ const EditTeacher = () => {
             setLoading(false);
         }
     };
+    const statusOptions = [
+        { label: t('active'), value: 'active' },
+        { label: t('inactive'), value: 'inactive' },
+        { label: t('interested'), value: 'interested' },
+    ];
 
-    // Define fields for the form
     const userFields: FieldConfig[] = [
         { name: 'firstName', label: t('first_name'), type: 'text', required: true, section: 'User Information' },
         { name: 'lastName', label: t('last_name'), type: 'text', required: true, section: 'User Information' },
@@ -173,6 +178,7 @@ const EditTeacher = () => {
     ];
 
     const teacherFields = [
+        { name: 'status', label: t('status'), type: 'select', required: true, section: 'Teacher Information', options: statusOptions },
         { name: 'hourlyRate', label: t('hourly_rate'), type: 'number', required: true, section: 'Teacher Information' },
         { name: 'rateMultiplier', label: 'rateMultiplier', type: 'number', required: true, section: 'Teacher Information' },
         { name: 'sessionRateMultiplier', label: 'sessionRateMultiplier', type: 'number', required: true, section: 'Teacher Information' },

@@ -39,7 +39,6 @@ const CreateParent = () => {
     }
   };
 
-  // Parent Data fields
   const parentFields: FieldConfig[] = [
     { name: 'firstName', label: t('first_name'), type: 'text', required: true, section: 'Parent Information' },
     { name: 'lastName', label: t('last_name'), type: 'text', required: true, section: 'Parent Information' },

@@ -60,9 +60,9 @@ const CreateTeacher = () => {
 
             const payload = {
                 user: {
-                    firstName: data.firstName,  // Using the value entered in the form fields
-                    lastName: data.lastName,    // Using the value entered in the form fields
-                    dob: data.dob,              // Using the value entered in the form fields
+                    firstName: data.firstName,
+                    lastName: data.lastName,
+                    dob: data.dob,
                     email: data.email,
                     password: data.password,
                     address: data.address,
@@ -70,7 +70,8 @@ const CreateTeacher = () => {
                     phoneNumber: data.phoneNumber,
                 },
                 teacher: {
-                    employeeNumber: employeeNumber, // Use the generated employee number
+                    status: data.status,
+                    employeeNumber: employeeNumber,
                     idNumber: data.idNumber,
                     taxNumber: data.taxNumber,
                     contractStartDate: data.contractStartDate,
@@ -100,6 +101,9 @@ const CreateTeacher = () => {
 
             setSelectedLocations([]);
             setSelectedTopics([]);
+            setTimeout(() => {
+                window.location.reload();
+            }, 2000);
             return response;
         } catch (error: any) {
             console.error("Error adding teacher:", error);
@@ -127,6 +131,7 @@ const CreateTeacher = () => {
     ];
 
     const teacherFields = [
+        { name: 'status', label: t('status'), type: 'select', required: true, section: 'Teacher Information', options: statusOptions },
         { name: 'hourlyRate', label: 'Hourly Rate', type: 'number', required: true, section: 'Teacher Information' },
         { name: 'rateMultiplier', label: 'rateMultiplier', type: 'number', required: true, section: 'Teacher Information' },
         { name: 'sessionRateMultiplier', label: 'sessionRateMultiplier', type: 'number', required: true, section: 'Teacher Information' },
