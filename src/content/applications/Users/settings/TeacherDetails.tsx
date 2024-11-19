@@ -107,7 +107,7 @@ function TeacherDetails({ user, isEditing, setUser }: TeacherDetailsProps) {
               <Box pr={3}>Hourly Rate:</Box>
             </Grid>
             <Grid item xs={12} sm={8} md={9}>
-              <Text color="black">${teacherInfo.hourlyRate}/hr</Text>
+              <Text color="black">€{teacherInfo.hourlyRate}/hr</Text>
             </Grid>
           </Grid>
         </Grid>
