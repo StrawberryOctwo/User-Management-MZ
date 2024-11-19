@@ -14,8 +14,14 @@ import {
   AccordionSummary,
   Accordion,
   Button,
+  Chip, // Import Chip for labels
 } from '@mui/material';
 import SpatialAudioOffIcon from '@mui/icons-material/SpatialAudioOff';
+import AddIcon from '@mui/icons-material/Add'; // Icon for Create
+import VisibilityIcon from '@mui/icons-material/Visibility'; // Icon for View
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import CloseIcon from '@mui/icons-material/Close'; // Ensure CloseIcon is imported
+import RoleBasedComponent from 'src/components/ProtectedComponent';
 import {
   fetchToDosByAssignedBy,
   createToDo,
@@ -24,8 +30,6 @@ import {
   assignToDoToUsers,
   fetchAssignedUsersForTodo,
 } from 'src/services/todoService';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import RoleBasedComponent from 'src/components/ProtectedComponent';
 import { fetchFranchiseAdmins } from 'src/services/franchiseAdminService';
 import { fetchLocationAdmins } from 'src/services/locationAdminService';
 import { fetchStudents } from 'src/services/studentService';
@@ -53,6 +57,8 @@ const ToDoHeader: React.FC = () => {
     Teacher: [],
     Student: [],
   });
+
+  const [expanded, setExpanded] = useState<string | false>('add'); // 'add' or 'view'
 
   const limit = 5;
 
@@ -207,9 +213,21 @@ const ToDoHeader: React.FC = () => {
         <DialogContent dividers>
 
           <RoleBasedComponent allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher']}>
-            <Accordion>
-              <AccordionSummary expandIcon={<ExpandMoreIcon />} aria-controls="panel1-content" id="panel1-header">
-                <Typography variant="body1" fontWeight="bold">Add New ToDo</Typography>
+            <Accordion
+              expanded={expanded === 'add'}
+              onChange={() => setExpanded(expanded === 'add' ? false : 'add')}
+            >
+              <AccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="add-content"
+                id="add-header"
+              >
+                <Box display="flex" alignItems="center" gap={1}>
+                  <AddIcon color="primary" /> {/* Icon indicating Create */}
+                  <Typography variant="body1" fontWeight="bold">
+                    Add New ToDo
+                  </Typography>
+                </Box>
               </AccordionSummary>
               <AccordionDetails>
                 <AddToDoForm onAdd={() => loadToDos(page)} />
@@ -218,15 +236,21 @@ const ToDoHeader: React.FC = () => {
             <Divider sx={{ my: 2 }} />
           </RoleBasedComponent>
 
-          <Accordion defaultExpanded>
+          <Accordion
+            expanded={expanded === 'view'}
+            onChange={() => setExpanded(expanded === 'view' ? false : 'view')}
+          >
             <AccordionSummary
               expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1-content"
-              id="panel1-header"
+              aria-controls="view-content"
+              id="view-header"
             >
-              <Typography variant="body1" fontWeight="bold">
-                View ToDos
-              </Typography>
+              <Box display="flex" alignItems="center" gap={1}>
+                <VisibilityIcon color="secondary" /> {/* Icon indicating View */}
+                <Typography variant="body1" fontWeight="bold">
+                  View ToDos
+                </Typography>
+              </Box>
             </AccordionSummary>
             <AccordionDetails>
               <ToDoTable
@@ -254,6 +278,28 @@ const ToDoHeader: React.FC = () => {
               </Box>
             </AccordionDetails>
           </Accordion>
+
+          {/* Active Section Indicators */}
+          <Box display="flex" gap={2} alignItems="center" mb={2}>
+            <Typography variant="subtitle1">Current Section:</Typography>
+            <Chip
+              icon={<AddIcon />}
+              label="Create"
+              color="primary"
+              variant={expanded === 'add' ? 'filled' : 'outlined'}
+              onClick={() => setExpanded(expanded === 'add' ? false : 'add')}
+              sx={{ cursor: 'pointer' }}
+            />
+            <Chip
+              icon={<VisibilityIcon />}
+              label="View"
+              color="secondary"
+              variant={expanded === 'view' ? 'filled' : 'outlined'}
+              onClick={() => setExpanded(expanded === 'view' ? false : 'view')}
+              sx={{ cursor: 'pointer' }}
+            />
+          </Box>
+
         </DialogContent>
       </Dialog>
     </Box>
