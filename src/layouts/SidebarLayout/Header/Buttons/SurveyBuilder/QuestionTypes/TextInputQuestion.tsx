@@ -1,22 +1,38 @@
-// TextInputQuestion.tsx
-import { Box, Typography, TextField } from '@mui/material';
+// src/components/QuestionTypes/TextInputQuestion.tsx
 
-function TextInputQuestion({ question, onChange }) {
+import { TextField, Box } from '@mui/material';
+import React from 'react';
+
+interface Question {
+  id: string;
+  type: string;
+  text: string;
+  options: string[];
+}
+
+interface TextInputQuestionProps {
+  question: Question;
+  onChange: (updatedQuestion: Question) => void;
+}
+
+const TextInputQuestion: React.FC<TextInputQuestionProps> = ({ question, onChange }) => {
+  const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const updatedText = e.target.value;
+    console.log('TextInputQuestion - Updating text to:', updatedText); // Debugging
+    onChange({ ...question, text: updatedText });
+  };
+
   return (
-    <Box p={2}>
-      <Typography variant="body1">Question:</Typography>
+    <Box>
       <TextField
         fullWidth
-        placeholder="Enter your question here"
+        label="Question Text"
+        variant="outlined"
         value={question.text}
-        onChange={(e) => onChange({ ...question, text: e.target.value })}
-        sx={{ mb: 2 }}
+        onChange={handleTextChange}
       />
-      <Typography variant="body2" color="textSecondary">
-        Answer: User will enter a free-text response
-      </Typography>
     </Box>
   );
-}
+};
 
 export default TextInputQuestion;

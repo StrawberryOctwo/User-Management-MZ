@@ -1,4 +1,5 @@
-// DropArea.tsx
+// src/components/DropArea.tsx
+
 import { Box, Typography, Modal, Paper, Button, IconButton, List, ListItem, MenuItem } from '@mui/material';
 import { Droppable, Draggable } from 'react-beautiful-dnd';
 import DeleteIcon from '@mui/icons-material/Delete';
@@ -7,18 +8,88 @@ import { useState } from 'react';
 import TextInputQuestion from './QuestionTypes/TextInputQuestion';
 import CheckboxQuestion from './QuestionTypes/CheckboxQuestion';
 import DropdownQuestion from './QuestionTypes/DropdownQuestion';
+import { styled, alpha, useTheme } from '@mui/material/styles';
 
-function DropArea({ questions, onEdit, onDelete }) {
+interface Question {
+  id: string;
+  type: string;
+  text: string;
+  options: string[];
+}
+
+interface DropAreaProps {
+  questions: Question[];
+  onEdit: (question: Question) => void;
+  onDelete: (id: string) => void;
+}
+
+const StyledDroppableBox = styled(Box)(({ theme, isDraggingOver }: { theme: any; isDraggingOver: boolean }) => ({
+  padding: theme.spacing(2),
+  backgroundColor: isDraggingOver ? alpha(theme.palette.primary.main, 0.1) : theme.palette.background.default,
+  borderRadius: theme.shape.borderRadius,
+  border: isDraggingOver ? `2px dashed ${theme.palette.primary.main}` : `1px solid ${theme.palette.divider}`,
+  minHeight: '300px',
+  width: '100%',
+  textAlign: 'center',
+  transition: 'background-color 0.2s ease, border 0.2s ease',
+  overflowY: 'auto',
+  maxHeight: '60vh', // Adjusted maxHeight for better usability
+  // Custom scrollbar styling
+  '&::-webkit-scrollbar': {
+    width: '8px',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor: '#888',
+    borderRadius: '4px',
+  },
+  '&::-webkit-scrollbar-thumb:hover': {
+    backgroundColor: '#555',
+  },
+}));
+
+const StyledDraggablePaper = styled(Paper)(({ theme }) => ({
+  width: '100%',
+  padding: theme.spacing(3),
+  marginBottom: theme.spacing(2),
+  border: `1px solid ${theme.palette.divider}`,
+  display: 'flex',
+  flexDirection: 'column',
+  position: 'relative',
+  textAlign: 'left', // Changed to left for better readability
+  wordWrap: 'break-word',
+  backgroundColor: theme.palette.background.paper,
+  boxShadow: theme.shadows[1],
+  transition: 'background-color 0.2s ease, box-shadow 0.2s ease',
+  '&:hover': {
+    backgroundColor: alpha(theme.palette.primary.light, 0.05),
+    boxShadow: theme.shadows[3],
+  },
+}));
+
+const ActionButtons = styled(Box)(({ theme }) => ({
+  display: 'flex',
+  justifyContent: 'flex-end',
+  marginTop: theme.spacing(2),
+}));
+
+const EditButton = styled(Button)(({ theme }) => ({
+  marginRight: theme.spacing(1),
+}));
+
+function DropArea({ questions, onEdit, onDelete }: DropAreaProps) {
+  const theme = useTheme();
   const [isModalOpen, setModalOpen] = useState(false);
-  const [currentQuestion, setCurrentQuestion] = useState(null);
-    console.log(questions)
-  const handleEditClick = (question) => {
+  const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
+
+  const handleEditClick = (question: Question) => {
+    console.log('DropArea - Editing Question:', question);
     setCurrentQuestion(question);
     setModalOpen(true);
   };
 
   const handleSaveQuestion = () => {
     if (currentQuestion) {
+      console.log('DropArea - Saving Question:', currentQuestion);
       onEdit(currentQuestion);
       setModalOpen(false);
     }
@@ -32,37 +103,7 @@ function DropArea({ questions, onEdit, onDelete }) {
   return (
     <Droppable droppableId="dropArea">
       {(provided, snapshot) => (
-        <Box
-          ref={provided.innerRef}
-          {...provided.droppableProps}
-          p={2}
-          bgcolor="background.default"
-          borderRadius={1}
-          border={snapshot.isDraggingOver ? '2px dashed' : '1px solid'}
-          borderColor={snapshot.isDraggingOver ? 'primary.main' : 'divider'}
-          minHeight="300px"
-          width="100%"
-          textAlign="center"
-          sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            alignItems: 'center',
-            gap: 2,
-            overflowY: 'auto',
-            maxHeight: '100vh',
-            scrollbarWidth: 'thin',
-            '&::-webkit-scrollbar': {
-              width: '8px',
-            },
-            '&::-webkit-scrollbar-thumb': {
-              backgroundColor: '#888',
-              borderRadius: '4px',
-            },
-            '&::-webkit-scrollbar-thumb:hover': {
-              backgroundColor: '#555',
-            },
-          }}
-        >
+        <StyledDroppableBox ref={provided.innerRef} {...provided.droppableProps} isDraggingOver={snapshot.isDraggingOver}>
           {questions.length === 0 && (
             <Typography variant="body1" color="textSecondary">
               Drag and drop a question here to start building your survey.
@@ -70,43 +111,34 @@ function DropArea({ questions, onEdit, onDelete }) {
           )}
 
           {questions.map((question, index) => (
-            <Draggable key={question.id} draggableId={String(question.id)} index={index}>
-              {(provided) => (
-                <Paper
+            <Draggable key={question.id} draggableId={question.id} index={index}>
+              {(provided, snapshot) => (
+                <StyledDraggablePaper
                   ref={provided.innerRef}
                   {...provided.draggableProps}
                   {...provided.dragHandleProps}
                   sx={{
-                    width: '80%', // Stretch more horizontally
-                    maxWidth: '600px',
-                    p: 3,
-                    mb: 2,
-                    border: '1px solid',
-                    borderColor: 'divider',
-                    display: 'flex',
-                    flexDirection: 'column',
-                    position: 'relative',
-                    textAlign: 'center',
-                    wordWrap: 'break-word', // Wrap long text to prevent overflow
+                    backgroundColor: snapshot.isDragging ? alpha(theme.palette.primary.main, 0.05) : 'inherit',
+                    boxShadow: snapshot.isDragging ? theme.shadows[4] : 'inherit',
                   }}
                 >
-                  <Typography variant="h6" sx={{ mb: 1 }}>
+                  <Typography variant="h6" gutterBottom>
                     {question.text || `${question.type} Question`}
                   </Typography>
-                  
+
                   {/* Render based on question type */}
-                  {question.type === 'TextInput' && (
+                  {question.type === 'Text Input' && (
                     <Typography variant='body1' color="textSecondary">
                       {'Answer Goes Here'}
                     </Typography>
                   )}
                   {question.type === 'Dropdown' && (
-                    <Box width="100%">
-                      <Typography variant="body2" color="textSecondary">
+                    <Box>
+                      <Typography variant="body2" color="textSecondary" gutterBottom>
                         Answer (Select One):
                       </Typography>
                       <List>
-                        {question.options?.map((option, idx) => (
+                        {question.options.map((option, idx) => (
                           <MenuItem key={idx} value={option}>
                             {option || 'Dropdown Option'}
                           </MenuItem>
@@ -115,13 +147,13 @@ function DropArea({ questions, onEdit, onDelete }) {
                     </Box>
                   )}
                   {question.type === 'Checkbox' && (
-                    <Box width="100%">
-                      <Typography variant="body2" color="textSecondary">
+                    <Box>
+                      <Typography variant="body2" color="textSecondary" gutterBottom>
                         Answer (Select Multiple):
                       </Typography>
                       <List>
-                        {question.options?.map((option, idx) => (
-                          <ListItem key={idx}>
+                        {question.options.map((option, idx) => (
+                          <ListItem key={idx} disableGutters>
                             <input type="checkbox" /> {option || 'Checkbox Option'}
                           </ListItem>
                         ))}
@@ -129,40 +161,54 @@ function DropArea({ questions, onEdit, onDelete }) {
                     </Box>
                   )}
 
-                  {/* Action buttons aligned to the right */}
-                  <Box display="flex" justifyContent="flex-end" mt={2}>
-                    <Button
+                  {/* Action buttons */}
+                  <ActionButtons>
+                    <EditButton
                       size="small"
                       variant="outlined"
                       onClick={() => handleEditClick(question)}
-                      sx={{ mr: 1 }}
                     >
                       Edit
-                    </Button>
-                    <IconButton onClick={() => onDelete(question.id)}>
+                    </EditButton>
+                    <IconButton
+                      onClick={() => onDelete(question.id)}
+                      aria-label={`delete ${question.text || question.type}`}
+                      size="small"
+                      color="error"
+                    >
                       <DeleteIcon />
                     </IconButton>
-                  </Box>
-                </Paper>
+                  </ActionButtons>
+                </StyledDraggablePaper>
               )}
             </Draggable>
           ))}
           {provided.placeholder}
 
           {/* Modal for editing question */}
-          <Modal open={isModalOpen} onClose={handleModalClose}>
-            <Box p={3} bgcolor="background.paper" borderRadius={2} m="auto" maxWidth={400} position="relative">
+          <Modal open={isModalOpen} onClose={handleModalClose} aria-labelledby="edit-question-modal" aria-describedby="edit-question-form">
+            <Box
+              p={3}
+              bgcolor="background.paper"
+              borderRadius={2}
+              maxWidth={400}
+              width="90%"
+              mx="auto"
+              my="10vh"
+              position="relative"
+              boxShadow={24}
+            >
               <IconButton
                 aria-label="close"
                 onClick={handleModalClose}
-                sx={{ position: 'absolute', right: 8, top: 8 }}
+                sx={{ position: 'absolute', right: 8, top: 8, color: 'grey.500' }}
               >
                 <CloseIcon />
               </IconButton>
               <Typography variant="h6" mb={2}>Customize Question</Typography>
               {currentQuestion && (
                 <>
-                  {currentQuestion.type === 'TextInput' && (
+                  {currentQuestion.type === 'Text Input' && (
                     <TextInputQuestion
                       question={currentQuestion}
                       onChange={(updatedQuestion) => setCurrentQuestion(updatedQuestion)}
@@ -180,14 +226,19 @@ function DropArea({ questions, onEdit, onDelete }) {
                       onChange={(updatedQuestion) => setCurrentQuestion(updatedQuestion)}
                     />
                   )}
-                  <Button variant="contained" onClick={handleSaveQuestion} sx={{ mt: 2 }}>
+                  <Button
+                    variant="contained"
+                    onClick={handleSaveQuestion}
+                    sx={{ mt: 2 }}
+                    fullWidth
+                  >
                     Save
                   </Button>
                 </>
               )}
             </Box>
           </Modal>
-        </Box>
+        </StyledDroppableBox>
       )}
     </Droppable>
   );
