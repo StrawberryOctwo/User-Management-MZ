@@ -45,24 +45,6 @@ function EditProfileTab() {
     }
   };
 
-  const handleSaveParentDetails = async () => {
-    try {
-      // Save parent-specific details (e.g., accountHolder, IBAN)
-      console.log('Parent details updated successfully!');
-    } catch (error) {
-      console.error('Failed to update parent details:', error);
-    }
-  };
-
-  const handleSaveTeacherDetails = async () => {
-    try {
-      // Save teacher-specific details (e.g., hourlyRate, contract dates)
-      console.log('Teacher details updated successfully!');
-    } catch (error) {
-      console.error('Failed to update teacher details:', error);
-    }
-  };
-
   useEffect(() => {
     const fetchUser = async () => {
       const user = await fetchUserProfile();

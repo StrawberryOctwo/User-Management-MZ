@@ -1,3 +1,5 @@
+// src/components/ToDoHeader.tsx
+
 import React, { useEffect, useState } from 'react';
 import {
   Box,
@@ -11,9 +13,17 @@ import {
   AccordionDetails,
   AccordionSummary,
   Accordion,
+  Button,
 } from '@mui/material';
 import SpatialAudioOffIcon from '@mui/icons-material/SpatialAudioOff';
-import { fetchToDosByAssignedBy, createToDo, toggleToDoCompletion, assignToDoToRole, assignToDoToUsers, fetchAssignedUsersForTodo } from 'src/services/todoService';
+import {
+  fetchToDosByAssignedBy,
+  createToDo,
+  toggleToDoCompletion,
+  assignToDoToRole,
+  assignToDoToUsers,
+  fetchAssignedUsersForTodo,
+} from 'src/services/todoService';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import RoleBasedComponent from 'src/components/ProtectedComponent';
 import { fetchFranchiseAdmins } from 'src/services/franchiseAdminService';
@@ -36,6 +46,7 @@ const ToDoHeader: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [customRoleDialogOpen, setCustomRoleDialogOpen] = useState(false);
   const [selectedCustomTodoId, setSelectedCustomTodoId] = useState<number | null>(null);
+  const [customRoleDialogOrigin, setCustomRoleDialogOrigin] = useState<string | null>(null);
   const [selectedUsers, setSelectedUsers] = useState({
     FranchiseAdmin: [],
     LocationAdmin: [],
@@ -127,11 +138,11 @@ const ToDoHeader: React.FC = () => {
     }
   };
 
-
   const handleAssignRole = async (todoId: number, role: string) => {
     if (role === 'Custom') {
       setSelectedCustomTodoId(todoId);
-      reloadTable()
+      setCustomRoleDialogOrigin('AssignRole');
+      reloadTable();
       handleOpenCustomRoleDialog(todoId);
     } else {
       await assignToDoToRole(todoId, role);
@@ -177,6 +188,12 @@ const ToDoHeader: React.FC = () => {
     Student: (query) => fetchStudents(1, 5, query).then((data) => data.data),
   };
 
+  // Handler to view assignees
+  const handleViewAssignees = (todoId: number) => {
+    setCustomRoleDialogOrigin('ViewAssignees');
+    handleOpenCustomRoleDialog(todoId);
+  };
+
   return (
     <Box sx={{ position: 'relative' }}>
       <Tooltip arrow title="Manage ToDos">
@@ -216,6 +233,7 @@ const ToDoHeader: React.FC = () => {
                 todos={todos}
                 onToggleCompletion={handleToggleCompletion}
                 onAssignRole={handleAssignRole}
+                onViewAssignees={handleViewAssignees} // Pass the new prop
                 page={page}
                 totalPages={totalPages}
                 onPageChange={handlePageChange}
@@ -225,13 +243,13 @@ const ToDoHeader: React.FC = () => {
                 <CustomRoleDialog
                   open={customRoleDialogOpen}
                   onClose={handleCloseCustomRoleDialog}
-                  selectedUsers={selectedUsers}
                   handleRoleInputChange={handleRoleInputChange}
                   handleRemoveUser={handleRemoveUser}
                   assignToDoToUsers={assignToDoToUsers}
                   selectedCustomTodoId={selectedCustomTodoId}
                   fetchDataFunctions={fetchDataFunctions}
                   onSave={reloadTable}
+                  originName={customRoleDialogOrigin}
                 />
               </Box>
             </AccordionDetails>
