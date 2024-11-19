@@ -1,4 +1,6 @@
 // src/components/CustomRoleDialog.tsx
+import AddIcon from '@mui/icons-material/Add';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -28,14 +30,16 @@ import {
     CircularProgress,
     Snackbar,
     Alert,
-    Chip, // Imported Chip
+    Chip,
+    Divider,
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import CloseIcon from '@mui/icons-material/Close'; // Imported CloseIcon
+import CloseIcon from '@mui/icons-material/Close';
 import RoleBasedComponent from 'src/components/ProtectedComponent';
 import MultiSelectWithCheckboxesNoSelect from 'src/components/SearchBars/MultiSelectWithCkeckboxesNoSelect';
 import { useAuth } from 'src/hooks/useAuth';
 import { fetchAssignedUsersForTodo } from 'src/services/todoService';
+import { styled, alpha, useTheme } from '@mui/material/styles';
 
 interface User {
     id?: number;
@@ -86,6 +90,32 @@ const rolesConfig = [
     },
 ];
 
+// Styled Components for enhanced visuals
+const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+}));
+
+const StyledAccordionSummary = styled(AccordionSummary)(({ theme }) => ({
+    backgroundColor: alpha(theme.palette.secondary.light, 0.1),
+    borderRadius: '4px',
+}));
+
+const ActiveChip = styled(Chip)(({ theme }) => ({
+    cursor: 'pointer',
+    '&.MuiChip-filled': {
+        backgroundColor: theme.palette.primary.main,
+        color: theme.palette.primary.contrastText,
+    },
+    '&.MuiChip-outlined': {
+        borderColor: theme.palette.primary.main,
+        color: theme.palette.primary.main,
+    },
+}));
+
 const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
     open,
     onClose,
@@ -97,6 +127,7 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
     onSave,
     originName
 }) => {
+    const theme = useTheme();
     const [filter, setFilter] = useState('');
     const [selectedRole, setSelectedRole] = useState('All');
     const [page, setPage] = useState(0); // Zero-based index
@@ -195,18 +226,43 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-            <DialogTitle>{originName === 'AssignRole' ? 'Assign Custom Roles' : 'View Assigned Users'}</DialogTitle>
+            {/* Styled Dialog Title */}
+            <StyledDialogTitle>
+                <Typography variant="h6">
+                    {originName === 'AssignRole' ? 'Assign Custom Roles' : 'View Assigned Users'}
+                </Typography>
+                <IconButton onClick={onClose} aria-label="close dialog">
+                    <CloseIcon />
+                </IconButton>
+            </StyledDialogTitle>
+            <Divider />
+
+            {/* Dialog Content */}
             <DialogContent dividers>
                 {originName === 'AssignRole' && (
-                    <Box>
-                        <Accordion>
-                            <AccordionSummary
+                    <Box mb={3}>
+                        <Accordion
+                            expanded={expanded === 'add'}
+                            onChange={handleAccordionChange('add')}
+                            sx={{
+                                boxShadow: theme.shadows[1],
+                                borderRadius: '8px',
+                                mb: 2,
+                                '&:before': { display: 'none' },
+                            }}
+                        >
+                            <StyledAccordionSummary
                                 expandIcon={<ExpandMoreIcon />}
                                 aria-controls="add-content"
                                 id="add-header"
                             >
-                                <Typography variant="h6">Add Users</Typography>
-                            </AccordionSummary>
+                                <Box display="flex" alignItems="center" gap={1}>
+                                    <AddIcon color="primary" />
+                                    <Typography variant="subtitle1" fontWeight="bold" color="primary">
+                                        Add Users
+                                    </Typography>
+                                </Box>
+                            </StyledAccordionSummary>
                             <AccordionDetails>
                                 {rolesConfig.map(({ role, label, allowedRoles, idField }) => (
                                     <RoleBasedComponent key={role} allowedRoles={allowedRoles}>
@@ -220,7 +276,7 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                                                 getOptionLabel={(option) =>
                                                     `${option.firstName} ${option.lastName}`
                                                 }
-                                                placeholder={`Type to search ${role.toLowerCase()}`}
+                                                placeholder={`Search ${label}`}
                                                 hideSelected
                                                 initialValue={[]}
                                                 idField={idField}
@@ -231,19 +287,32 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                                 ))}
                             </AccordionDetails>
                         </Accordion>
-                        <Box sx={{ my: 1, borderBottom: '1px solid #ccc' }} />
+                        <Divider sx={{ my: 2 }} />
                     </Box>
                 )}
 
                 {/* Assigned Users Accordion */}
-                <Accordion defaultExpanded>
-                    <AccordionSummary
+                <Accordion
+                    expanded={expanded === 'table'}
+                    onChange={handleAccordionChange('table')}
+                    sx={{
+                        boxShadow: theme.shadows[1],
+                        borderRadius: '8px',
+                        '&:before': { display: 'none' },
+                    }}
+                >
+                    <StyledAccordionSummary
                         expandIcon={<ExpandMoreIcon />}
                         aria-controls="table-content"
                         id="table-header"
                     >
-                        <Typography variant="h6">Assigned Users</Typography>
-                    </AccordionSummary>
+                        <Box display="flex" alignItems="center" gap={1}>
+                            <VisibilityIcon color="secondary" />
+                            <Typography variant="subtitle1" fontWeight="bold" color="secondary">
+                                Assigned Users
+                            </Typography>
+                        </Box>
+                    </StyledAccordionSummary>
                     <AccordionDetails>
                         {/* Search and Filter Controls */}
                         <Box display="flex" gap={2} alignItems="center" mb={2} mt={2}>
@@ -339,8 +408,9 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                                                                 size="small"
                                                                 color="secondary"
                                                                 onClick={() => handleRemoveUser(user.roles[0], user)}
+                                                                aria-label={`remove ${user.firstName} ${user.lastName}`}
                                                             >
-                                                                <CloseIcon /> {/* Use CloseIcon instead of &times; */}
+                                                                <CloseIcon />
                                                             </IconButton>
                                                         </TableCell>
                                                     </TableRow>
@@ -379,34 +449,30 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                             onRowsPerPageChange={handleChangeRowsPerPage}
                             rowsPerPageOptions={[5, 10, 25, 50]}
                             labelRowsPerPage="Rows per page:"
+                            sx={{ mt: 2 }}
                         />
                     </AccordionDetails>
                 </Accordion>
-
-                {/* Loading Indicator */}
-                {loading && (
-                    <Box display="flex" justifyContent="center" alignItems="center" mt={2}>
-                        <CircularProgress />
-                    </Box>
-                )}
 
                 {/* Snackbar for Notifications */}
                 <Snackbar
                     open={snackbar.open}
                     autoHideDuration={6000}
                     onClose={handleCloseSnackbar}
+                    anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
                 >
                     <Alert
                         onClose={handleCloseSnackbar}
                         severity={snackbar.severity}
                         sx={{ width: '100%' }}
+                        variant="filled"
                     >
                         {snackbar.message}
                     </Alert>
                 </Snackbar>
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose} color="secondary">
+                <Button onClick={onClose} color="secondary" variant="outlined">
                     Cancel
                 </Button>
                 <Button

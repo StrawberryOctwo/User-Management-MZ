@@ -14,13 +14,14 @@ import {
   AccordionSummary,
   Accordion,
   Button,
-  Chip, // Import Chip for labels
+  Chip,
+  useTheme,
 } from '@mui/material';
 import SpatialAudioOffIcon from '@mui/icons-material/SpatialAudioOff';
-import AddIcon from '@mui/icons-material/Add'; // Icon for Create
-import VisibilityIcon from '@mui/icons-material/Visibility'; // Icon for View
+import AddIcon from '@mui/icons-material/Add';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import CloseIcon from '@mui/icons-material/Close'; // Ensure CloseIcon is imported
+import CloseIcon from '@mui/icons-material/Close';
 import RoleBasedComponent from 'src/components/ProtectedComponent';
 import {
   fetchToDosByAssignedBy,
@@ -37,16 +38,40 @@ import { fetchTeachers } from 'src/services/teacherService';
 import CustomRoleDialog from './CustomRoleDialog';
 import AddToDoForm from './AddToDoForm';
 import ToDoTable from './ToDoTable';
+import { styled, alpha } from '@mui/material/styles';
+
+// Styled Components for enhanced visuals
+const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.primary.contrastText,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+}));
+
+const StyledAccordionSummary = styled(AccordionSummary)(({ theme }) => ({
+  backgroundColor: alpha(theme.palette.primary.light, 0.1),
+  borderRadius: '4px',
+}));
+
+const ActiveChip = styled(Chip)(({ theme }) => ({
+  cursor: 'pointer',
+  '&.MuiChip-filled': {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+  },
+  '&.MuiChip-outlined': {
+    borderColor: theme.palette.primary.main,
+    color: theme.palette.primary.main,
+  },
+}));
 
 const ToDoHeader: React.FC = () => {
+  const theme = useTheme();
   const [todos, setTodos] = useState<any[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newTitle, setNewTitle] = useState('');
-  const [newDescription, setNewDescription] = useState('');
-  const [newPriority, setNewPriority] = useState('Medium');
-  const [newDueDate, setNewDueDate] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [customRoleDialogOpen, setCustomRoleDialogOpen] = useState(false);
   const [selectedCustomTodoId, setSelectedCustomTodoId] = useState<number | null>(null);
@@ -80,10 +105,6 @@ const ToDoHeader: React.FC = () => {
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
-    setNewTitle('');
-    setNewDescription('');
-    setNewPriority('Medium');
-    setNewDueDate('');
     setErrorMessage(null);
     setTodos([]);
   };
@@ -171,7 +192,7 @@ const ToDoHeader: React.FC = () => {
     loadToDos(page);
   };
 
-  const handleRemoveUser = (role, userToRemove) => {
+  const handleRemoveUser = (role: string, userToRemove: any) => {
     setSelectedUsers((prev) => {
       const updatedUsers = prev[role].filter((user) => user.id !== userToRemove.id);
 
@@ -188,10 +209,10 @@ const ToDoHeader: React.FC = () => {
   };
 
   const fetchDataFunctions = {
-    FranchiseAdmin: (query) => fetchFranchiseAdmins(1, 5, query).then((data) => data.data),
-    LocationAdmin: (query) => fetchLocationAdmins(1, 5, query).then((data) => data.data),
-    Teacher: (query) => fetchTeachers(1, 5, query).then((data) => data.data),
-    Student: (query) => fetchStudents(1, 5, query).then((data) => data.data),
+    FranchiseAdmin: (query: string) => fetchFranchiseAdmins(1, 5, query).then((data) => data.data),
+    LocationAdmin: (query: string) => fetchLocationAdmins(1, 5, query).then((data) => data.data),
+    Teacher: (query: string) => fetchTeachers(1, 5, query).then((data) => data.data),
+    Student: (query: string) => fetchStudents(1, 5, query).then((data) => data.data),
   };
 
   // Handler to view assignees
@@ -203,105 +224,146 @@ const ToDoHeader: React.FC = () => {
   return (
     <Box sx={{ position: 'relative' }}>
       <Tooltip arrow title="Manage ToDos">
-        <IconButton color="primary" onClick={handleOpenDialog}>
-          <SpatialAudioOffIcon />
+        <IconButton
+          color="primary"
+          onClick={handleOpenDialog}
+          sx={{
+            backgroundColor: alpha(theme.palette.primary.main, 0.1),
+            '&:hover': {
+              backgroundColor: alpha(theme.palette.primary.main, 0.2),
+            },
+          }}
+        >
+          <SpatialAudioOffIcon color="primary" />
         </IconButton>
       </Tooltip>
 
       <Dialog open={isDialogOpen} onClose={handleCloseDialog} fullWidth maxWidth="md">
-        <DialogTitle>Manage My Created ToDos</DialogTitle>
-        <DialogContent dividers>
+        {/* Styled Dialog Title */}
+        <StyledDialogTitle>
+          <Typography variant="h6">Manage My Created ToDos</Typography>
+          <IconButton onClick={handleCloseDialog} aria-label="close dialog">
+            <CloseIcon />
+          </IconButton>
+        </StyledDialogTitle>
+        <Divider />
 
+        {/* Dialog Content */}
+        <DialogContent dividers>
           <RoleBasedComponent allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher']}>
+            {/* Add ToDo Accordion */}
             <Accordion
               expanded={expanded === 'add'}
               onChange={() => setExpanded(expanded === 'add' ? false : 'add')}
+              sx={{
+                boxShadow: theme.shadows[1],
+                borderRadius: '8px',
+                mb: 2,
+                '&:before': { display: 'none' },
+              }}
             >
-              <AccordionSummary
+              <StyledAccordionSummary
                 expandIcon={<ExpandMoreIcon />}
                 aria-controls="add-content"
                 id="add-header"
               >
                 <Box display="flex" alignItems="center" gap={1}>
-                  <AddIcon color="primary" /> {/* Icon indicating Create */}
-                  <Typography variant="body1" fontWeight="bold">
+                  <AddIcon color="primary" />
+                  <Typography variant="subtitle1" fontWeight="bold" color="primary">
                     Add New ToDo
                   </Typography>
                 </Box>
-              </AccordionSummary>
+              </StyledAccordionSummary>
               <AccordionDetails>
                 <AddToDoForm onAdd={() => loadToDos(page)} />
               </AccordionDetails>
             </Accordion>
+
             <Divider sx={{ my: 2 }} />
+
+            {/* View ToDos Accordion */}
+            <Accordion
+              expanded={expanded === 'view'}
+              onChange={() => setExpanded(expanded === 'view' ? false : 'view')}
+              sx={{
+                boxShadow: theme.shadows[1],
+                borderRadius: '8px',
+                '&:before': { display: 'none' },
+              }}
+            >
+              <StyledAccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="view-content"
+                id="view-header"
+              >
+                <Box display="flex" alignItems="center" gap={1}>
+                  <VisibilityIcon color="secondary" />
+                  <Typography variant="subtitle1" fontWeight="bold" color="secondary">
+                    View ToDos
+                  </Typography>
+                </Box>
+              </StyledAccordionSummary>
+              <AccordionDetails>
+                <ToDoTable
+                  todos={todos}
+                  onToggleCompletion={handleToggleCompletion}
+                  onAssignRole={handleAssignRole}
+                  onViewAssignees={handleViewAssignees}
+                  page={page}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                  reloadTable={reloadTable}
+                />
+                <Box sx={{ position: 'relative', padding: 2 }}>
+                  <CustomRoleDialog
+                    open={customRoleDialogOpen}
+                    onClose={handleCloseCustomRoleDialog}
+                    handleRoleInputChange={handleRoleInputChange}
+                    handleRemoveUser={handleRemoveUser}
+                    assignToDoToUsers={assignToDoToUsers}
+                    selectedCustomTodoId={selectedCustomTodoId}
+                    fetchDataFunctions={fetchDataFunctions}
+                    onSave={reloadTable}
+                    originName={customRoleDialogOrigin}
+                  />
+                </Box>
+              </AccordionDetails>
+            </Accordion>
           </RoleBasedComponent>
 
-          <Accordion
-            expanded={expanded === 'view'}
-            onChange={() => setExpanded(expanded === 'view' ? false : 'view')}
-          >
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="view-content"
-              id="view-header"
-            >
-              <Box display="flex" alignItems="center" gap={1}>
-                <VisibilityIcon color="secondary" /> {/* Icon indicating View */}
-                <Typography variant="body1" fontWeight="bold">
-                  View ToDos
-                </Typography>
-              </Box>
-            </AccordionSummary>
-            <AccordionDetails>
-              <ToDoTable
-                todos={todos}
-                onToggleCompletion={handleToggleCompletion}
-                onAssignRole={handleAssignRole}
-                onViewAssignees={handleViewAssignees} // Pass the new prop
-                page={page}
-                totalPages={totalPages}
-                onPageChange={handlePageChange}
-                reloadTable={reloadTable}
-              />
-              <Box sx={{ position: 'relative', padding: 2 }}>
-                <CustomRoleDialog
-                  open={customRoleDialogOpen}
-                  onClose={handleCloseCustomRoleDialog}
-                  handleRoleInputChange={handleRoleInputChange}
-                  handleRemoveUser={handleRemoveUser}
-                  assignToDoToUsers={assignToDoToUsers}
-                  selectedCustomTodoId={selectedCustomTodoId}
-                  fetchDataFunctions={fetchDataFunctions}
-                  onSave={reloadTable}
-                  originName={customRoleDialogOrigin}
-                />
-              </Box>
-            </AccordionDetails>
-          </Accordion>
-
           {/* Active Section Indicators */}
-          <Box display="flex" gap={2} alignItems="center" mb={2}>
-            <Typography variant="subtitle1">Current Section:</Typography>
-            <Chip
+          <Box display="flex" gap={2} alignItems="center" mt={4}>
+            <Typography variant="subtitle1" color="textSecondary">
+              Current Section:
+            </Typography>
+            <ActiveChip
               icon={<AddIcon />}
               label="Create"
-              color="primary"
               variant={expanded === 'add' ? 'filled' : 'outlined'}
+              color="primary"
               onClick={() => setExpanded(expanded === 'add' ? false : 'add')}
-              sx={{ cursor: 'pointer' }}
             />
-            <Chip
+            <ActiveChip
               icon={<VisibilityIcon />}
               label="View"
-              color="secondary"
               variant={expanded === 'view' ? 'filled' : 'outlined'}
+              color="secondary"
               onClick={() => setExpanded(expanded === 'view' ? false : 'view')}
-              sx={{ cursor: 'pointer' }}
             />
           </Box>
 
+          {/* Display Error Message */}
+          {errorMessage && (
+            <Box mt={2}>
+              <Typography variant="body2" color="error">
+                {errorMessage}
+              </Typography>
+            </Box>
+          )}
         </DialogContent>
       </Dialog>
+
+
     </Box>
   );
 };
