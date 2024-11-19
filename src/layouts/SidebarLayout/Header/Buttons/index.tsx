@@ -11,12 +11,15 @@ import SurveyNotifications from './Survey';
 import ViewSurveysTable from './SurveyBuilder/ViewSurveysTable';
 import HeaderToDoList from './AssignedToDos/ToDoListPopUp';
 import withRole from 'src/hooks/withRole';
+import RemoteAlert from 'src/components/RemoteAlert';
 
 function HeaderButtons() {
   return (
     <Box sx={{ mr: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
       {/* <HeaderSearch /> */}
+      <RemoteAlert />
       <HeaderNotifications />
+
       {/* <HeaderLocalization /> */}
       <SurveyNotifications />
       <ProtectedBox allowedRoles={[ 'FranchiseAdmin', 'LocationAdmin', 'Teacher', 'Student']}>
