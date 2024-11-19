@@ -28,8 +28,10 @@ import {
     CircularProgress,
     Snackbar,
     Alert,
+    Chip, // Imported Chip
 } from '@mui/material';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import CloseIcon from '@mui/icons-material/Close'; // Imported CloseIcon
 import RoleBasedComponent from 'src/components/ProtectedComponent';
 import MultiSelectWithCheckboxesNoSelect from 'src/components/SearchBars/MultiSelectWithCkeckboxesNoSelect';
 import { useAuth } from 'src/hooks/useAuth';
@@ -193,7 +195,7 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
-            <DialogTitle>{originName === 'AssignRole' ? 'Assign Custom Roles' : 'View assigned users'}</DialogTitle>
+            <DialogTitle>{originName === 'AssignRole' ? 'Assign Custom Roles' : 'View Assigned Users'}</DialogTitle>
             <DialogContent dividers>
                 {originName === 'AssignRole' && (
                     <Box>
@@ -232,7 +234,6 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                         <Box sx={{ my: 1, borderBottom: '1px solid #ccc' }} />
                     </Box>
                 )}
-
 
                 {/* Assigned Users Accordion */}
                 <Accordion defaultExpanded>
@@ -276,6 +277,33 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                             </FormControl>
                         </Box>
 
+                        {/* Active Filters Display */}
+                        {(filter || (selectedRole && selectedRole !== 'All')) && (
+                            <Box display="flex" gap={1} alignItems="center" mb={2}>
+                                <Typography variant="subtitle1">Active Filters:</Typography>
+                                {filter && (
+                                    <Chip
+                                        label={`Search: "${filter}"`}
+                                        onDelete={() => {
+                                            setFilter('');
+                                        }}
+                                        color="primary"
+                                        variant="outlined"
+                                    />
+                                )}
+                                {selectedRole && selectedRole !== 'All' && (
+                                    <Chip
+                                        label={`Role: ${selectedRole}`}
+                                        onDelete={() => {
+                                            setSelectedRole('All');
+                                        }}
+                                        color="primary"
+                                        variant="outlined"
+                                    />
+                                )}
+                            </Box>
+                        )}
+
                         {/* Users Table */}
                         <TableContainer>
                             <Table size="small">
@@ -300,8 +328,6 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                                                 index === array.length - 1 ||
                                                 user.roles[0] !== array[index + 1]?.roles[0];
 
-                                            console.log(isLastInRole);
-
                                             return (
                                                 <React.Fragment key={user.userId || user.id}>
                                                     <TableRow>
@@ -314,7 +340,7 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                                                                 color="secondary"
                                                                 onClick={() => handleRemoveUser(user.roles[0], user)}
                                                             >
-                                                                &times;
+                                                                <CloseIcon /> {/* Use CloseIcon instead of &times; */}
                                                             </IconButton>
                                                         </TableCell>
                                                     </TableRow>
