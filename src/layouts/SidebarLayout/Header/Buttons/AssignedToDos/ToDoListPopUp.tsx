@@ -1,3 +1,5 @@
+// src/components/HeaderToDoList.tsx
+
 import React, { useState, useEffect } from 'react';
 import {
   Box,
@@ -8,7 +10,7 @@ import {
   Typography,
   Button,
   Tooltip,
-  Chip,
+  Chip, // Already imported
   TextField,
   MenuItem,
   CircularProgress,
@@ -24,6 +26,7 @@ import {
   Search as SearchIcon,
   ExpandMore as ExpandMoreIcon,
   ExpandLess as ExpandLessIcon,
+  Close as CloseIcon, // Import CloseIcon for Chips
 } from '@mui/icons-material';
 import { fetchToDosForSelf, toggleToDoCompletion } from 'src/services/todoService';
 
@@ -64,6 +67,7 @@ const HeaderToDoList: React.FC = () => {
       }
   `
   );
+
   const fetchTodos = async (currentPage = 1) => {
     setLoading(true);
     try {
@@ -74,10 +78,10 @@ const HeaderToDoList: React.FC = () => {
         search: searchQuery,
         priority: priorityFilter !== 'All' ? priorityFilter : undefined,
       });
-      const { data, pageCount,pendingCount } = response;
+      const { data, pageCount, pendingCount } = response;
       setToDos(data || []);
       setTotalPages(pageCount);
-      setpendingCountTodos(pendingCount)
+      setpendingCountTodos(pendingCount);
     } catch (error) {
       console.error('Error fetching tasks:', error);
     } finally {
@@ -201,10 +205,10 @@ const HeaderToDoList: React.FC = () => {
             badgeContent={pendingToDoCount}
             anchorOrigin={{
               vertical: 'top',
-              horizontal: 'right'
+              horizontal: 'right',
             }}
           >
-          <AssignmentIcon />
+            <AssignmentIcon />
           </ToDoBadge>
         </IconButton>
       </Tooltip>
@@ -227,7 +231,10 @@ const HeaderToDoList: React.FC = () => {
             size="small"
             fullWidth
             value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
+            onChange={(e) => {
+              setSearchQuery(e.target.value);
+              setPage(1); // Reset to first page when filter changes
+            }}
             InputProps={{
               startAdornment: <SearchIcon fontSize="small" sx={{ mr: 1 }} />,
             }}
@@ -237,7 +244,10 @@ const HeaderToDoList: React.FC = () => {
             label="Priority"
             size="small"
             value={priorityFilter}
-            onChange={(e) => setPriorityFilter(e.target.value)}
+            onChange={(e) => {
+              setPriorityFilter(e.target.value);
+              setPage(1); // Reset to first page when filter changes
+            }}
             sx={{ minWidth: 120 }}
           >
             <MenuItem value="All">All</MenuItem>
@@ -246,6 +256,51 @@ const HeaderToDoList: React.FC = () => {
             <MenuItem value="Low">Low</MenuItem>
           </TextField>
         </Box>
+
+        {/* Active Filters Display */}
+        {(searchQuery || (priorityFilter && priorityFilter !== 'All')) && (
+          <Box display="flex" gap={1} alignItems="center" mb={2}>
+            <Typography variant="subtitle1">Active Filters:</Typography>
+            {searchQuery && (
+              <Chip
+                label={`Search: "${searchQuery}"`}
+                onDelete={() => {
+                  setSearchQuery('');
+                  setPage(1); // Reset to first page when filter changes
+                }}
+                color="primary"
+                variant="outlined"
+                icon={<CloseIcon />}
+              />
+            )}
+            {priorityFilter && priorityFilter !== 'All' && (
+              <Chip
+                label={`Priority: ${priorityFilter}`}
+                onDelete={() => {
+                  setPriorityFilter('All');
+                  setPage(1); // Reset to first page when filter changes
+                }}
+                color="secondary"
+                variant="outlined"
+                icon={<CloseIcon />}
+              />
+            )}
+            {/* Optional: Clear All Filters Button */}
+            <Button
+              variant="text"
+              color="error"
+              size="small"
+              onClick={() => {
+                setSearchQuery('');
+                setPriorityFilter('All');
+                setPage(1); // Reset to first page when filters are cleared
+              }}
+            >
+              Clear All
+            </Button>
+          </Box>
+        )}
+
         {loading ? (
           <Box display="flex" justifyContent="center" py={4}>
             <CircularProgress />
