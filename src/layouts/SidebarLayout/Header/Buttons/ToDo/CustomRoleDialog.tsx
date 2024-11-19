@@ -1,4 +1,6 @@
-import React from 'react';
+// src/components/CustomRoleDialog.tsx
+
+import React, { useState, useEffect } from 'react';
 import {
     Box,
     Button,
@@ -6,120 +8,376 @@ import {
     DialogActions,
     DialogContent,
     DialogTitle,
-    Typography,
     IconButton,
+    Table,
+    TableBody,
+    TableCell,
+    TableHead,
+    TableRow,
+    TableContainer,
+    TextField,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    Select,
+    TablePagination,
+    Typography,
+    Accordion,
+    AccordionSummary,
+    AccordionDetails,
+    CircularProgress,
+    Snackbar,
+    Alert,
 } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import RoleBasedComponent from 'src/components/ProtectedComponent';
 import MultiSelectWithCheckboxesNoSelect from 'src/components/SearchBars/MultiSelectWithCkeckboxesNoSelect';
+import { useAuth } from 'src/hooks/useAuth';
+import { fetchAssignedUsersForTodo } from 'src/services/todoService';
+
+interface User {
+    id?: number;
+    userId?: number;
+    firstName: string;
+    lastName: string;
+    email: string;
+    roles: string[];
+    completed: boolean;
+}
 
 interface CustomRoleDialogProps {
     open: boolean;
     onClose: () => void;
-    selectedUsers: { [role: string]: any[] }; // Added type for selectedUsers
     handleRoleInputChange: (role: string, selectedItems: any[]) => void;
-    handleRemoveUser: (role: string, user: any) => void;
+    handleRemoveUser: (role: string, user: User) => void;
     assignToDoToUsers: (todoId: number | null, userIds: number[]) => Promise<void>;
     selectedCustomTodoId: number | null;
     fetchDataFunctions: { [role: string]: (query: string) => Promise<any[]> };
     onSave: () => void;
+    originName: string;
 }
+
+const rolesConfig = [
+    {
+        role: 'FranchiseAdmin',
+        label: 'Franchise Admins',
+        allowedRoles: ['SuperAdmin'],
+        idField: 'id',
+    },
+    {
+        role: 'LocationAdmin',
+        label: 'Location Admins',
+        allowedRoles: ['FranchiseAdmin'],
+        idField: 'id',
+    },
+    {
+        role: 'Teacher',
+        label: 'Teachers',
+        allowedRoles: ['FranchiseAdmin', 'LocationAdmin'],
+        idField: 'userId',
+    },
+    {
+        role: 'Student',
+        label: 'Students',
+        allowedRoles: ['FranchiseAdmin', 'LocationAdmin', 'Teacher'],
+        idField: 'userId',
+    },
+];
 
 const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
     open,
     onClose,
-    selectedUsers,
     handleRoleInputChange,
     handleRemoveUser,
     assignToDoToUsers,
     selectedCustomTodoId,
     fetchDataFunctions,
     onSave,
+    originName
 }) => {
+    const [filter, setFilter] = useState('');
+    const [selectedRole, setSelectedRole] = useState('All');
+    const [page, setPage] = useState(0); // Zero-based index
+    const [rowsPerPage, setRowsPerPage] = useState(10);
+    const [expanded, setExpanded] = useState<string | false>('add'); // 'add' or 'table'
+    const [assignees, setAssignees] = useState<User[]>([]);
+    const [total, setTotal] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [snackbar, setSnackbar] = useState<{
+        open: boolean;
+        message: string;
+        severity: 'success' | 'error';
+    }>({ open: false, message: '', severity: 'success' });
+
+    // Accessing userRoles from useAuth hook
+    const { userRoles } = useAuth(); // e.g., userRoles = ['SuperAdmin']
+
+    // Helper function to check if a role is allowed based on userRoles
+    const isRoleAllowed = (
+        roleAllowedRoles: string[],
+        userRoles: string[]
+    ): boolean => {
+        return roleAllowedRoles.some((allowedRole) =>
+            userRoles.includes(allowedRole)
+        );
+    };
+
+    // Filter rolesConfig to determine which roles the current user can see in the filter selector
+    const allowedRolesForFilter = rolesConfig.filter(({ allowedRoles }) =>
+        isRoleAllowed(allowedRoles, userRoles)
+    );
+
+    // Fetch assignees from the API
+    const fetchAssignees = async () => {
+        if (!selectedCustomTodoId) return;
+
+        setLoading(true);
+        try {
+            const data = await fetchAssignedUsersForTodo(selectedCustomTodoId, {
+                search: filter,
+                role: selectedRole !== 'All' ? selectedRole : '',
+                page: page + 1, // API is one-based
+                limit: rowsPerPage,
+            });
+            setAssignees(data.assignees);
+            setTotal(data.total);
+        } catch (error) {
+            setSnackbar({
+                open: true,
+                message: 'Failed to fetch assigned users.',
+                severity: 'error',
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Fetch assignees when component mounts or when dependencies change
+    useEffect(() => {
+        if (open && selectedCustomTodoId) {
+            fetchAssignees();
+        }
+    }, [open, selectedCustomTodoId, filter, selectedRole, page, rowsPerPage]);
+
+    // Handlers for pagination
+    const handleChangePage = (
+        event: React.MouseEvent<HTMLButtonElement> | null,
+        newPage: number
+    ) => {
+        setPage(newPage);
+    };
+
+    const handleChangeRowsPerPage = (
+        event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ) => {
+        setRowsPerPage(parseInt(event.target.value, 10));
+        setPage(0); // Reset to first page
+    };
+
+    // Handlers for accordion expansion
+    const handleAccordionChange = (panel: string) => (
+        event: React.SyntheticEvent,
+        isExpanded: boolean
+    ) => {
+        setExpanded(isExpanded ? panel : false);
+    };
+
+    // Handler to close Snackbar
+    const handleCloseSnackbar = (
+        event?: React.SyntheticEvent | Event,
+        reason?: string
+    ) => {
+        if (reason === 'clickaway') return;
+        setSnackbar({ ...snackbar, open: false });
+    };
+
     return (
-        <Dialog open={open} onClose={onClose} fullWidth>
-            <DialogTitle>Assign Custom Roles</DialogTitle>
+        <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
+            <DialogTitle>{originName === 'AssignRole' ? 'Assign Custom Roles' : 'View assigned users'}</DialogTitle>
             <DialogContent dividers>
-                {['FranchiseAdmin', 'LocationAdmin', 'Teacher', 'Student'].map((role) => {
-                    const labelMap: { [key: string]: string } = {
-                        FranchiseAdmin: 'Franchise Admins',
-                        LocationAdmin: 'Location Admins',
-                        Teacher: 'Teachers',
-                        Student: 'Students',
-                    };
-                    const allowedRolesMap: { [key: string]: string[] } = {
-                        FranchiseAdmin: ['SuperAdmin'],
-                        LocationAdmin: ['FranchiseAdmin'],
-                        Teacher: ['FranchiseAdmin', 'LocationAdmin'],
-                        Student: ['FranchiseAdmin', 'LocationAdmin', 'Teacher'],
-                    };
+                {originName === 'AssignRole' && (
+                    <Box>
+                        <Accordion>
+                            <AccordionSummary
+                                expandIcon={<ExpandMoreIcon />}
+                                aria-controls="add-content"
+                                id="add-header"
+                            >
+                                <Typography variant="h6">Add Users</Typography>
+                            </AccordionSummary>
+                            <AccordionDetails>
+                                {rolesConfig.map(({ role, label, allowedRoles, idField }) => (
+                                    <RoleBasedComponent key={role} allowedRoles={allowedRoles}>
+                                        <Box sx={{ minWidth: 180, mb: 2 }}>
+                                            <MultiSelectWithCheckboxesNoSelect
+                                                label={label}
+                                                fetchData={fetchDataFunctions[role]}
+                                                onSelect={(selectedItems) =>
+                                                    handleRoleInputChange(role, selectedItems)
+                                                }
+                                                getOptionLabel={(option) =>
+                                                    `${option.firstName} ${option.lastName}`
+                                                }
+                                                placeholder={`Type to search ${role.toLowerCase()}`}
+                                                hideSelected
+                                                initialValue={[]}
+                                                idField={idField}
+                                                width="100%"
+                                            />
+                                        </Box>
+                                    </RoleBasedComponent>
+                                ))}
+                            </AccordionDetails>
+                        </Accordion>
+                        <Box sx={{ my: 1, borderBottom: '1px solid #ccc' }} />
+                    </Box>
+                )}
 
-                    // Determine the idField based on the role
-                    const idField = (role === 'Teacher' || role === 'Student') ? 'userId' : 'id';
 
-                    // Define a label generator function to concatenate firstName and lastName
-                    const labelGenerator = (option: any) => `${option.firstName} ${option.lastName}`;
+                {/* Assigned Users Accordion */}
+                <Accordion defaultExpanded>
+                    <AccordionSummary
+                        expandIcon={<ExpandMoreIcon />}
+                        aria-controls="table-content"
+                        id="table-header"
+                    >
+                        <Typography variant="h6">Assigned Users</Typography>
+                    </AccordionSummary>
+                    <AccordionDetails>
+                        {/* Search and Filter Controls */}
+                        <Box display="flex" gap={2} alignItems="center" mb={2} mt={2}>
+                            <TextField
+                                label="Search by Name"
+                                variant="outlined"
+                                value={filter}
+                                onChange={(e) => {
+                                    setFilter(e.target.value);
+                                    setPage(0); // Reset to first page when filter changes
+                                }}
+                                sx={{ width: '70%' }}
+                            />
+                            <FormControl sx={{ width: '30%' }}>
+                                <InputLabel>Filter by Role</InputLabel>
+                                <Select
+                                    value={selectedRole}
+                                    onChange={(e) => {
+                                        setSelectedRole(e.target.value);
+                                        setPage(0); // Reset to first page when role filter changes
+                                    }}
+                                    label="Filter by Role"
+                                >
+                                    <MenuItem value="All">All</MenuItem>
+                                    {allowedRolesForFilter.map(({ role }) => (
+                                        <MenuItem key={role} value={role}>
+                                            {role}
+                                        </MenuItem>
+                                    ))}
+                                </Select>
+                            </FormControl>
+                        </Box>
 
-                    return (
-                        <RoleBasedComponent key={role} allowedRoles={allowedRolesMap[role]}>
-                            <Box sx={{ minWidth: 180, mb: 2 }}>
-                                <MultiSelectWithCheckboxesNoSelect
-                                    label={labelMap[role]}
-                                    fetchData={fetchDataFunctions[role]}
-                                    onSelect={(selectedItems) => handleRoleInputChange(role, selectedItems)}
-                                    // displayProperty="firstName" // Remove this prop
-                                    getOptionLabel={labelGenerator} // Use the label generator
-                                    placeholder={`Type to search ${role.toLowerCase()}`}
-                                    hideSelected
-                                    initialValue={selectedUsers[role]}
-                                    idField={idField} // Pass the appropriate idField
-                                />
-                            </Box>
-                        </RoleBasedComponent>
-                    );
-                })}
+                        {/* Users Table */}
+                        <TableContainer>
+                            <Table size="small">
+                                <TableHead>
+                                    <TableRow>
+                                        <TableCell>Role</TableCell>
+                                        <TableCell>Name</TableCell>
+                                        <TableCell>Email</TableCell>
+                                        <TableCell>Action</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {loading ? (
+                                        <TableRow>
+                                            <TableCell colSpan={4} align="center">
+                                                <CircularProgress size={24} />
+                                            </TableCell>
+                                        </TableRow>
+                                    ) : assignees.length > 0 ? (
+                                        assignees.map((user, index, array) => {
+                                            const isLastInRole =
+                                                index === array.length - 1 ||
+                                                user.roles[0] !== array[index + 1]?.roles[0];
 
-                <Box mt={3}>
-                    <Typography variant="h6">Selected Users:</Typography>
-                    {Object.keys(selectedUsers).map((role) =>
-                        selectedUsers[role].length > 0 && (
-                            <Box key={role} mt={1}>
-                                <Typography variant="subtitle1">{role}:</Typography>
-                                <Box pl={2}>
-                                    {selectedUsers[role].map((user) => {
-                                        // Determine the unique key based on idField
-                                        const key = (role === 'Teacher' || role === 'Student') ? user.userId : user.id;
-                                        return (
-                                            <Box
-                                                key={key}
-                                                display="flex"
-                                                alignItems="center"
-                                                sx={{
-                                                    position: 'relative',
-                                                    '&:hover .remove-btn': { visibility: 'visible' },
-                                                }}
-                                            >
-                                                <Typography variant="body2" sx={{ mr: 1 }}>
-                                                    - {user.firstName} {user.lastName}
-                                                </Typography>
-                                                <IconButton
-                                                    className="remove-btn"
-                                                    size="small"
-                                                    color="secondary"
-                                                    onClick={() => handleRemoveUser(role, user)}
-                                                    sx={{
-                                                        visibility: 'hidden',
-                                                    }}
-                                                >
-                                                    &times;
-                                                </IconButton>
-                                            </Box>
-                                        );
-                                    })}
-                                </Box>
-                            </Box>
-                        )
-                    )}
-                </Box>
+                                            console.log(isLastInRole);
+
+                                            return (
+                                                <React.Fragment key={user.userId || user.id}>
+                                                    <TableRow>
+                                                        <TableCell>{user.roles.join(', ')}</TableCell>
+                                                        <TableCell>{`${user.firstName} ${user.lastName}`}</TableCell>
+                                                        <TableCell>{user.email}</TableCell>
+                                                        <TableCell>
+                                                            <IconButton
+                                                                size="small"
+                                                                color="secondary"
+                                                                onClick={() => handleRemoveUser(user.roles[0], user)}
+                                                            >
+                                                                &times;
+                                                            </IconButton>
+                                                        </TableCell>
+                                                    </TableRow>
+                                                    {isLastInRole && (
+                                                        <TableRow>
+                                                            <TableCell
+                                                                colSpan={4}
+                                                                sx={{
+                                                                    borderBottom: '3px solid #ccc',
+                                                                    padding: 0,
+                                                                }}
+                                                            />
+                                                        </TableRow>
+                                                    )}
+                                                </React.Fragment>
+                                            );
+                                        })
+                                    ) : (
+                                        <TableRow>
+                                            <TableCell colSpan={4} align="center">
+                                                No users found.
+                                            </TableCell>
+                                        </TableRow>
+                                    )}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+
+                        {/* Pagination Controls */}
+                        <TablePagination
+                            component="div"
+                            count={total}
+                            page={page}
+                            onPageChange={handleChangePage}
+                            rowsPerPage={rowsPerPage}
+                            onRowsPerPageChange={handleChangeRowsPerPage}
+                            rowsPerPageOptions={[5, 10, 25, 50]}
+                            labelRowsPerPage="Rows per page:"
+                        />
+                    </AccordionDetails>
+                </Accordion>
+
+                {/* Loading Indicator */}
+                {loading && (
+                    <Box display="flex" justifyContent="center" alignItems="center" mt={2}>
+                        <CircularProgress />
+                    </Box>
+                )}
+
+                {/* Snackbar for Notifications */}
+                <Snackbar
+                    open={snackbar.open}
+                    autoHideDuration={6000}
+                    onClose={handleCloseSnackbar}
+                >
+                    <Alert
+                        onClose={handleCloseSnackbar}
+                        severity={snackbar.severity}
+                        sx={{ width: '100%' }}
+                    >
+                        {snackbar.message}
+                    </Alert>
+                </Snackbar>
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose} color="secondary">
@@ -127,17 +385,28 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                 </Button>
                 <Button
                     onClick={async () => {
-                        const allSelectedUserIds = Object.entries(selectedUsers).flatMap(([role, users]) =>
-                            (users as any[]).map((user) => {
-                                return (role === 'Teacher' || role === 'Student') ? user.userId : user.id;
-                            })
+                        if (!selectedCustomTodoId) return;
+
+                        // Extract user IDs based on roles
+                        const allSelectedUserIds = assignees.map((user) =>
+                            user.userId ? user.userId : user.id
                         );
+
                         try {
                             await assignToDoToUsers(selectedCustomTodoId, allSelectedUserIds);
-                            console.log('ToDo successfully assigned to users');
+                            setSnackbar({
+                                open: true,
+                                message: 'ToDo successfully assigned to users',
+                                severity: 'success',
+                            });
                             onSave();
                             onClose();
                         } catch (error) {
+                            setSnackbar({
+                                open: true,
+                                message: 'Error assigning ToDo to users',
+                                severity: 'error',
+                            });
                             console.error('Error assigning ToDo to users:', error);
                         }
                     }}

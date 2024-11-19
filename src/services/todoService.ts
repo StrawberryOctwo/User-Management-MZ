@@ -135,12 +135,44 @@ export const assignToDoToUsers = async (todoId: number, userIds: number[]) => {
   }
 };
 
-export const fetchAssignedUsersForTodo = async (todoId: number) => {
+export const fetchAssignedUsersForTodo = async (
+  todoId: number,
+  params: FetchAssignedUsersParams = {}
+): Promise<FetchAssignedUsersResponse> => {
   try {
-    const response = await api.get(`/todos/${todoId}/assigned-users`);
+    const response = await api.get<FetchAssignedUsersResponse>(`/todos/${todoId}/assigned-users`, {
+      params,
+    });
     return response.data;
-  } catch (error) {
-    console.error('Failed to assign ToDo to users:', error);
-    throw error;
+  } catch (error: any) {
+    console.error('Failed to fetch assigned users:', error);
+    // You can customize error handling here based on your application's needs
+    throw error.response?.data || error.message || 'Unknown error';
   }
 };
+
+
+interface FetchAssignedUsersParams {
+  search?: string;
+  role?: string;
+  page?: number;
+  limit?: number;
+}
+
+interface AssignedUser {
+  id?: number;
+  userId?: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  roles: string[];
+  completed: boolean;
+}
+
+interface FetchAssignedUsersResponse {
+  message: string;
+  total: number;
+  page: number;
+  limit: number;
+  assignees: AssignedUser[];
+}

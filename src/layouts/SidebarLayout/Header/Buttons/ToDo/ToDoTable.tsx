@@ -1,8 +1,11 @@
+// src/components/ToDoTable.tsx
+
 import React, { useState } from 'react';
 import {
     Box,
     Chip,
     IconButton,
+    Tooltip,
     Table,
     TableBody,
     TableCell,
@@ -14,13 +17,15 @@ import {
     Menu,
     MenuItem,
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
+import AssignmentIcon from '@mui/icons-material/Assignment';
+import VisibilityIcon from '@mui/icons-material/Visibility';
 import RoleBasedComponent from 'src/components/ProtectedComponent';
 
 interface ToDoTableProps {
     todos: any[];
     onToggleCompletion: (todoId: number) => void;
     onAssignRole: (todoId: number, role: string) => void;
+    onViewAssignees: (todoId: number) => void;
     page: number;
     totalPages: number;
     onPageChange: (event: React.ChangeEvent<unknown>, value: number) => void;
@@ -31,6 +36,7 @@ const ToDoTable: React.FC<ToDoTableProps> = ({
     todos,
     onToggleCompletion,
     onAssignRole,
+    onViewAssignees,
     page,
     totalPages,
     onPageChange,
@@ -87,7 +93,7 @@ const ToDoTable: React.FC<ToDoTableProps> = ({
                             <TableCell>Priority</TableCell>
                             <TableCell>Due Date</TableCell>
                             <TableCell>Assigned Roles</TableCell>
-                            <TableCell>Assign Role</TableCell>
+                            <TableCell>Actions</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -106,9 +112,25 @@ const ToDoTable: React.FC<ToDoTableProps> = ({
                                     )}
                                 </TableCell>
                                 <TableCell>
-                                    <IconButton color="primary" onClick={(e) => handleOpenRoleMenu(e, todo.id)}>
-                                        <AddIcon />
-                                    </IconButton>
+                                    <Tooltip title="Assign Role">
+                                        <IconButton
+                                            color="primary"
+                                            onClick={(e) => handleOpenRoleMenu(e, todo.id)}
+                                            aria-label="assign role"
+                                        >
+                                            <AssignmentIcon />
+                                        </IconButton>
+                                    </Tooltip>
+
+                                    <Tooltip title="View Assignees">
+                                        <IconButton
+                                            color="secondary"
+                                            onClick={() => onViewAssignees(todo.id)}
+                                            aria-label="view assignees"
+                                        >
+                                            <VisibilityIcon />
+                                        </IconButton>
+                                    </Tooltip>
                                 </TableCell>
                             </TableRow>
                         ))}
@@ -126,7 +148,6 @@ const ToDoTable: React.FC<ToDoTableProps> = ({
                 <Pagination count={totalPages} page={page} onChange={onPageChange} color="primary" />
             </Box>
 
-            {/* Role Assignment Menu */}
             <Menu
                 anchorEl={anchorEl}
                 open={Boolean(anchorEl)}
