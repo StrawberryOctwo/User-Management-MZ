@@ -16,6 +16,7 @@ import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import DownloadTwoToneIcon from '@mui/icons-material/DownloadTwoTone';
+import { useNavigate } from 'react-router-dom';
 
 export default function ViewBookings() {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -25,6 +26,7 @@ export default function ViewBookings() {
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(5);
   const { userId } = useAuth();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (userId) {
@@ -78,7 +80,8 @@ export default function ViewBookings() {
 
   // Action Handlers (Implement as needed)
   const handleView = (id: any) => {
-    // Implement view logic, e.g., navigate to booking details
+    navigate(`view/${id}`);
+
     console.log('View booking with ID:', id);
   };
 
@@ -96,7 +99,7 @@ export default function ViewBookings() {
 
   return (
     <Box sx={{ padding: 4 }}>
-      {/* Header Section */}
+      {}
       <Paper elevation={3} sx={{ padding: 2, marginBottom: 4 }}>
         <Toolbar
           sx={{
@@ -120,7 +123,7 @@ export default function ViewBookings() {
         </Toolbar>
       </Paper>
 
-      {/* ReusableTable Component */}
+      {}
       <ReusableTable
         data={bookings}
         columns={columns}
@@ -140,3 +143,4 @@ export default function ViewBookings() {
     </Box>
   );
 }
+

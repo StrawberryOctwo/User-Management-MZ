@@ -66,6 +66,9 @@ const FranchiseAdminsEdit = Loader(
 const Interest = Loader(
   lazy(() => import('src/content/applications/Interest'))
 );
+const ViewInterest = Loader(
+  lazy(() => import('src/content/applications/Interest/View'))
+);
 
 
 
@@ -306,6 +309,10 @@ const routes: RouteObject[] = [
           {
             path: 'interests',
             element: <Interest />
+          },
+          {
+            path: 'interests/view/:id',
+            element: <ViewInterest />
           },
           {
             path: 'calendar',
@@ -570,4 +577,5 @@ const routes: RouteObject[] = [
 ];
 
 export default routes;
+
 
