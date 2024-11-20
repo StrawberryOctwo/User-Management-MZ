@@ -67,3 +67,12 @@ export const updateInterest = async (
     throw error;
   }
 };
+export const toggleAcceptedStatus = async (id: number) => {
+  try {
+    const response = await api.patch(`/interests/${id}/toggle-accepted`);
+    return response.data;
+  } catch (error) {
+    console.error('Error toggling accepted status:', error);
+    throw error;
+  }
+};
