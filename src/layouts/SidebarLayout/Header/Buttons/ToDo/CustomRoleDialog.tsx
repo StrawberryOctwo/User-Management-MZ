@@ -40,6 +40,7 @@ import MultiSelectWithCheckboxesNoSelect from 'src/components/SearchBars/MultiSe
 import { useAuth } from 'src/hooks/useAuth';
 import { fetchAssignedUsersForTodo } from 'src/services/todoService';
 import { styled, alpha, useTheme } from '@mui/material/styles';
+import UsersTable from './UsersTable';
 
 interface User {
     id?: number;
@@ -54,8 +55,6 @@ interface User {
 interface CustomRoleDialogProps {
     open: boolean;
     onClose: () => void;
-    handleRoleInputChange: (role: string, selectedItems: any[]) => void;
-    handleRemoveUser: (role: string, user: User) => void;
     assignToDoToUsers: (todoId: number | null, userIds: number[]) => Promise<void>;
     selectedCustomTodoId: number | null;
     fetchDataFunctions: { [role: string]: (query: string) => Promise<any[]> };
@@ -119,8 +118,6 @@ const ActiveChip = styled(Chip)(({ theme }) => ({
 const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
     open,
     onClose,
-    handleRoleInputChange,
-    handleRemoveUser,
     assignToDoToUsers,
     selectedCustomTodoId,
     fetchDataFunctions,
@@ -136,6 +133,8 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
     const [assignees, setAssignees] = useState<User[]>([]);
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(false);
+    const [newlySelectedUsers, setNewlySelectedUsers] = useState<User[]>([]);
+    const [initialAssignees, setInitialAssignees] = useState<User[]>([]);
     const [snackbar, setSnackbar] = useState<{
         open: boolean;
         message: string;
@@ -161,7 +160,7 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
     );
 
     // Fetch assignees from the API
-    const fetchAssignees = async () => {
+    const fetchInitialAssignees = async () => {
         if (!selectedCustomTodoId) return;
 
         setLoading(true);
@@ -169,11 +168,21 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
             const data = await fetchAssignedUsersForTodo(selectedCustomTodoId, {
                 search: filter,
                 role: selectedRole !== 'All' ? selectedRole : '',
-                page: page + 1, // API is one-based
+                page: page + 1,
                 limit: rowsPerPage,
             });
-            setAssignees(data.assignees);
-            setTotal(data.total);
+
+            const uniqueAssignees = data.assignees.reduce((acc: User[], current: User) => {
+                const currentId = current.userId || current.id;
+                const exists = acc.some(user => (user.userId || user.id) === currentId);
+                if (!exists) {
+                    acc.push(current);
+                }
+                return acc;
+            }, []);
+
+            setInitialAssignees(uniqueAssignees);
+            setTotal(uniqueAssignees.length);
         } catch (error) {
             setSnackbar({
                 open: true,
@@ -188,9 +197,15 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
     // Fetch assignees when component mounts or when dependencies change
     useEffect(() => {
         if (open && selectedCustomTodoId) {
-            fetchAssignees();
+            fetchInitialAssignees();
         }
     }, [open, selectedCustomTodoId, filter, selectedRole, page, rowsPerPage]);
+
+    useEffect(() => {
+        if (!open) {
+            setNewlySelectedUsers([]);
+        }
+    }, [open]);
 
     // Handlers for pagination
     const handleChangePage = (
@@ -224,6 +239,65 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
         setSnackbar({ ...snackbar, open: false });
     };
 
+
+    const handleRoleInputChange = (role: string, selectedItems: User[]) => {
+        const newUsers = selectedItems.map(user => ({
+            ...user,
+            roles: [role],
+            completed: false
+        }));
+
+        setNewlySelectedUsers(prev => {
+            // Create a map of existing users for quick lookup
+            const existingUsersMap = new Map(
+                prev.map(user => [(user.userId || user.id)?.toString(), user])
+            );
+
+            // Add new users while preserving existing ones
+            newUsers.forEach(newUser => {
+                const newUserId = (newUser.userId || newUser.id)?.toString();
+                if (newUserId && !existingUsersMap.has(newUserId)) {
+                    existingUsersMap.set(newUserId, newUser);
+                }
+            });
+
+            return Array.from(existingUsersMap.values());
+        });
+    };
+
+    // Modified handleRemoveUser to handle both tables
+    const handleRemoveUser = (role: string, userToRemove: User, isNewlySelected: boolean) => {
+        if (isNewlySelected) {
+            setNewlySelectedUsers(prev => prev.filter(user =>
+                !(user.userId === userToRemove.userId || user.id === userToRemove.id)
+            ));
+        } else {
+            setInitialAssignees(prev => prev.filter(user =>
+                !(user.userId === userToRemove.userId || user.id === userToRemove.id)
+            ));
+        }
+    };
+
+    const filterOutAssignedUsers = async (role: string, fetchFunction: (query: string) => Promise<any[]>, query: string) => {
+        try {
+            const fetchedUsers = await fetchFunction(query);
+            // Filter out users that are in either initialAssignees or newlySelectedUsers
+            return fetchedUsers.filter(fetchedUser => {
+                const fetchedUserId = fetchedUser.userId || fetchedUser.id;
+                const isInInitialAssignees = initialAssignees.some(assignedUser =>
+                    (assignedUser.userId || assignedUser.id) === fetchedUserId
+                );
+                const isInNewlySelected = newlySelectedUsers.some(selectedUser =>
+                    (selectedUser.userId || selectedUser.id) === fetchedUserId
+                );
+                return !isInInitialAssignees && !isInNewlySelected;
+            });
+        } catch (error) {
+            console.error('Error fetching users:', error);
+            return [];
+        }
+    };
+
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
             {/* Styled Dialog Title */}
@@ -240,81 +314,92 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
             {/* Dialog Content */}
             <DialogContent dividers>
                 {originName === 'AssignRole' && (
-                    <Box mb={3}>
+                    <>
+                        {/* Add Users Accordion */}
+                        <Box mb={3}>
+                            <Accordion
+                                sx={{
+                                    boxShadow: theme.shadows[1],
+                                    borderRadius: '8px',
+                                    mb: 2,
+                                    '&:before': { display: 'none' },
+                                }}
+                                defaultExpanded
+                            >
+                                <StyledAccordionSummary
+                                    expandIcon={<ExpandMoreIcon />}
+                                    aria-controls="add-content"
+                                    id="add-header"
+                                >
+                                    <Box display="flex" alignItems="center" gap={1}>
+                                        <AddIcon color="primary" />
+                                        <Typography variant="subtitle1" fontWeight="bold" color="primary">
+                                            Add Users
+                                        </Typography>
+                                    </Box>
+                                </StyledAccordionSummary>
+                                <AccordionDetails>
+                                    {rolesConfig.map(({ role, label, allowedRoles, idField }) => (
+                                        <RoleBasedComponent key={role} allowedRoles={allowedRoles}>
+                                            <Box sx={{ minWidth: 180, mb: 2 }}>
+                                                <MultiSelectWithCheckboxesNoSelect
+                                                    label={label}
+                                                    fetchData={(query) => filterOutAssignedUsers(role, fetchDataFunctions[role], query)}
+                                                    onSelect={(selectedItems) =>
+                                                        handleRoleInputChange(role, selectedItems)
+                                                    }
+                                                    getOptionLabel={(option) =>
+                                                        `${option.firstName} ${option.lastName}`
+                                                    }
+                                                    placeholder={`Search ${label}`}
+                                                    hideSelected
+                                                    initialValue={[]}
+                                                    idField={idField}
+                                                    width="100%"
+                                                />
+                                            </Box>
+                                        </RoleBasedComponent>
+                                    ))}
+                                </AccordionDetails>
+                            </Accordion>
+                        </Box>
+
+                        {/* Newly Selected Users Accordion */}
                         <Accordion
-                            expanded={expanded === 'add'}
-                            onChange={handleAccordionChange('add')}
                             sx={{
                                 boxShadow: theme.shadows[1],
                                 borderRadius: '8px',
-                                mb: 2,
                                 '&:before': { display: 'none' },
                             }}
+                            defaultExpanded
                         >
                             <StyledAccordionSummary
                                 expandIcon={<ExpandMoreIcon />}
-                                aria-controls="add-content"
-                                id="add-header"
+                                aria-controls="new-users-content"
+                                id="new-users-header"
                             >
                                 <Box display="flex" alignItems="center" gap={1}>
-                                    <AddIcon color="primary" />
+                                    <VisibilityIcon color="secondary" />
                                     <Typography variant="subtitle1" fontWeight="bold" color="primary">
-                                        Add Users
+                                        Newly Selected Users
                                     </Typography>
                                 </Box>
                             </StyledAccordionSummary>
                             <AccordionDetails>
-                                {rolesConfig.map(({ role, label, allowedRoles, idField }) => (
-                                    <RoleBasedComponent key={role} allowedRoles={allowedRoles}>
-                                        <Box sx={{ minWidth: 180, mb: 2 }}>
-                                            <MultiSelectWithCheckboxesNoSelect
-                                                label={label}
-                                                fetchData={fetchDataFunctions[role]}
-                                                onSelect={(selectedItems) =>
-                                                    handleRoleInputChange(role, selectedItems)
-                                                }
-                                                getOptionLabel={(option) =>
-                                                    `${option.firstName} ${option.lastName}`
-                                                }
-                                                placeholder={`Search ${label}`}
-                                                hideSelected
-                                                initialValue={[]}
-                                                idField={idField}
-                                                width="100%"
-                                            />
-                                        </Box>
-                                    </RoleBasedComponent>
-                                ))}
+                                <UsersTable
+                                    users={newlySelectedUsers}
+                                    loading={loading}
+                                    isNewlySelected={true}
+                                    onRemoveUser={handleRemoveUser}
+                                />
                             </AccordionDetails>
                         </Accordion>
-                        <Divider sx={{ my: 2 }} />
-                    </Box>
+                    </>
                 )}
 
-                {/* Assigned Users Accordion */}
-                <Accordion
-                    expanded={expanded === 'table'}
-                    onChange={handleAccordionChange('table')}
-                    sx={{
-                        boxShadow: theme.shadows[1],
-                        borderRadius: '8px',
-                        '&:before': { display: 'none' },
-                    }}
-                >
-                    <StyledAccordionSummary
-                        expandIcon={<ExpandMoreIcon />}
-                        aria-controls="table-content"
-                        id="table-header"
-                    >
-                        <Box display="flex" alignItems="center" gap={1}>
-                            <VisibilityIcon color="secondary" />
-                            <Typography variant="subtitle1" fontWeight="bold" color="secondary">
-                                Assigned Users
-                            </Typography>
-                        </Box>
-                    </StyledAccordionSummary>
-                    <AccordionDetails>
-                        {/* Search and Filter Controls */}
+
+                {originName === 'ViewAssignees' && (
+                    <Box>
                         <Box display="flex" gap={2} alignItems="center" mb={2} mt={2}>
                             <TextField
                                 label="Search by Name"
@@ -322,7 +407,7 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                                 value={filter}
                                 onChange={(e) => {
                                     setFilter(e.target.value);
-                                    setPage(0); // Reset to first page when filter changes
+                                    setPage(0);
                                 }}
                                 sx={{ width: '70%' }}
                             />
@@ -332,7 +417,7 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                                     value={selectedRole}
                                     onChange={(e) => {
                                         setSelectedRole(e.target.value);
-                                        setPage(0); // Reset to first page when role filter changes
+                                        setPage(0);
                                     }}
                                     label="Filter by Role"
                                 >
@@ -346,98 +431,12 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                             </FormControl>
                         </Box>
 
-                        {/* Active Filters Display */}
-                        {(filter || (selectedRole && selectedRole !== 'All')) && (
-                            <Box display="flex" gap={1} alignItems="center" mb={2}>
-                                <Typography variant="subtitle1">Active Filters:</Typography>
-                                {filter && (
-                                    <Chip
-                                        label={`Search: "${filter}"`}
-                                        onDelete={() => {
-                                            setFilter('');
-                                        }}
-                                        color="primary"
-                                        variant="outlined"
-                                    />
-                                )}
-                                {selectedRole && selectedRole !== 'All' && (
-                                    <Chip
-                                        label={`Role: ${selectedRole}`}
-                                        onDelete={() => {
-                                            setSelectedRole('All');
-                                        }}
-                                        color="primary"
-                                        variant="outlined"
-                                    />
-                                )}
-                            </Box>
-                        )}
-
-                        {/* Users Table */}
-                        <TableContainer>
-                            <Table size="small">
-                                <TableHead>
-                                    <TableRow>
-                                        <TableCell>Role</TableCell>
-                                        <TableCell>Name</TableCell>
-                                        <TableCell>Email</TableCell>
-                                        <TableCell>Action</TableCell>
-                                    </TableRow>
-                                </TableHead>
-                                <TableBody>
-                                    {loading ? (
-                                        <TableRow>
-                                            <TableCell colSpan={4} align="center">
-                                                <CircularProgress size={24} />
-                                            </TableCell>
-                                        </TableRow>
-                                    ) : assignees.length > 0 ? (
-                                        assignees.map((user, index, array) => {
-                                            const isLastInRole =
-                                                index === array.length - 1 ||
-                                                user.roles[0] !== array[index + 1]?.roles[0];
-
-                                            return (
-                                                <React.Fragment key={user.userId || user.id}>
-                                                    <TableRow>
-                                                        <TableCell>{user.roles.join(', ')}</TableCell>
-                                                        <TableCell>{`${user.firstName} ${user.lastName}`}</TableCell>
-                                                        <TableCell>{user.email}</TableCell>
-                                                        <TableCell>
-                                                            <IconButton
-                                                                size="small"
-                                                                color="secondary"
-                                                                onClick={() => handleRemoveUser(user.roles[0], user)}
-                                                                aria-label={`remove ${user.firstName} ${user.lastName}`}
-                                                            >
-                                                                <CloseIcon />
-                                                            </IconButton>
-                                                        </TableCell>
-                                                    </TableRow>
-                                                    {isLastInRole && (
-                                                        <TableRow>
-                                                            <TableCell
-                                                                colSpan={4}
-                                                                sx={{
-                                                                    borderBottom: '3px solid #ccc',
-                                                                    padding: 0,
-                                                                }}
-                                                            />
-                                                        </TableRow>
-                                                    )}
-                                                </React.Fragment>
-                                            );
-                                        })
-                                    ) : (
-                                        <TableRow>
-                                            <TableCell colSpan={4} align="center">
-                                                No users found.
-                                            </TableCell>
-                                        </TableRow>
-                                    )}
-                                </TableBody>
-                            </Table>
-                        </TableContainer>
+                        <UsersTable
+                            users={initialAssignees}
+                            loading={loading}
+                            isNewlySelected={false}
+                            onRemoveUser={handleRemoveUser}
+                        />
 
                         {/* Pagination Controls */}
                         <TablePagination
@@ -451,10 +450,9 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                             labelRowsPerPage="Rows per page:"
                             sx={{ mt: 2 }}
                         />
-                    </AccordionDetails>
-                </Accordion>
+                    </Box>
+                )}
 
-                {/* Snackbar for Notifications */}
                 <Snackbar
                     open={snackbar.open}
                     autoHideDuration={6000}
@@ -475,38 +473,39 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                 <Button onClick={onClose} color="secondary" variant="outlined">
                     Cancel
                 </Button>
-                <Button
-                    onClick={async () => {
-                        if (!selectedCustomTodoId) return;
+                {originName === 'AssignRole' && (
+                    <Button
+                        onClick={async () => {
+                            if (!selectedCustomTodoId) return;
 
-                        // Extract user IDs based on roles
-                        const allSelectedUserIds = assignees.map((user) =>
-                            user.userId ? user.userId : user.id
-                        );
+                            // Combine initial and newly selected users
+                            const allUsers = [...initialAssignees, ...newlySelectedUsers];
+                            const allSelectedUserIds = allUsers.map(user => user.userId || user.id);
 
-                        try {
-                            await assignToDoToUsers(selectedCustomTodoId, allSelectedUserIds);
-                            setSnackbar({
-                                open: true,
-                                message: 'ToDo successfully assigned to users',
-                                severity: 'success',
-                            });
-                            onSave();
-                            onClose();
-                        } catch (error) {
-                            setSnackbar({
-                                open: true,
-                                message: 'Error assigning ToDo to users',
-                                severity: 'error',
-                            });
-                            console.error('Error assigning ToDo to users:', error);
-                        }
-                    }}
-                    color="primary"
-                    variant="contained"
-                >
-                    Save
-                </Button>
+                            try {
+                                await assignToDoToUsers(selectedCustomTodoId, allSelectedUserIds);
+                                setSnackbar({
+                                    open: true,
+                                    message: 'ToDo successfully assigned to users',
+                                    severity: 'success'
+                                });
+                                onSave();
+                                onClose();
+                            } catch (error) {
+                                setSnackbar({
+                                    open: true,
+                                    message: 'Error assigning ToDo to users',
+                                    severity: 'error'
+                                });
+                                console.error('Error assigning ToDo to users:', error);
+                            }
+                        }}
+                        color="primary"
+                        variant="contained"
+                    >
+                        Save
+                    </Button>
+                )}
             </DialogActions>
         </Dialog>
     );

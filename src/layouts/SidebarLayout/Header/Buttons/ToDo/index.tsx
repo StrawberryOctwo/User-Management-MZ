@@ -181,26 +181,8 @@ const ToDoHeader: React.FC = () => {
     }
   };
 
-  const handleRoleInputChange = (role: string, selectedItems) => {
-    setSelectedUsers((prev) => ({
-      ...prev,
-      [role]: [...prev[role], ...selectedItems.filter((item) => !prev[role].some((prevItem) => prevItem.id === item.id))]
-    }));
-  };
-
   const reloadTable = () => {
     loadToDos(page);
-  };
-
-  const handleRemoveUser = (role: string, userToRemove: any) => {
-    setSelectedUsers((prev) => {
-      const updatedUsers = prev[role].filter((user) => user.id !== userToRemove.id);
-
-      return {
-        ...prev,
-        [role]: updatedUsers,
-      };
-    });
   };
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
@@ -318,8 +300,6 @@ const ToDoHeader: React.FC = () => {
                   <CustomRoleDialog
                     open={customRoleDialogOpen}
                     onClose={handleCloseCustomRoleDialog}
-                    handleRoleInputChange={handleRoleInputChange}
-                    handleRemoveUser={handleRemoveUser}
                     assignToDoToUsers={assignToDoToUsers}
                     selectedCustomTodoId={selectedCustomTodoId}
                     fetchDataFunctions={fetchDataFunctions}
