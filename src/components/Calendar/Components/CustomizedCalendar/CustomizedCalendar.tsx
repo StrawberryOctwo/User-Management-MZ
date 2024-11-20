@@ -83,6 +83,24 @@ export default function CustomizedCalendar({
   const { showMessage } = useSnackbar();
   const { userRoles } = useAuth();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
+  const [selectedDate, setSelectedDate] = useState(new Date(date));
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const calendarRef = useRef(null);
+
+  const resources = useMemo(() => {
+    const maxRooms = selectedLocations.reduce(
+      (max, location) => Math.max(max, location.numberOfRooms || 0),
+      0
+    );
+
+    const unsortedResources = Array.from({ length: maxRooms }, (_, index) => ({
+      id: `R${index + 1}`,
+      title: `Room ${index + 1}`,
+      sortOrder: index + 1
+    }));
+
+    return unsortedResources.sort((a, b) => a.sortOrder - b.sortOrder);
+  }, [selectedLocations]);
 
   /*   const onPrevClick = useCallback(() => {
       if (view === Views.DAY) {
@@ -305,35 +323,16 @@ export default function CustomizedCalendar({
     console.log('Saving To-Do:', todo);
   };
 
-  const resources = useMemo(() => {
-    const maxRooms = selectedLocations.reduce(
-      (max, location) => Math.max(max, location.numberOfRooms || 0),
-      0
-    );
-
-    const unsortedResources = Array.from({ length: maxRooms }, (_, index) => ({
-      id: `R${index + 1}`,
-      title: `Room ${index + 1}`,
-      sortOrder: index + 1
-    }));
-
-    return unsortedResources.sort((a, b) => a.sortOrder - b.sortOrder);
-  }, [selectedLocations]);
-
   const renderEventContent = (eventInfo: any) => {
     return <EventItem eventInfo={eventInfo} />;
   };
-  const [selectedDate, setSelectedDate] = useState(new Date(date));
-  const [showDatePicker, setShowDatePicker] = useState(false);
-  const calendarRef = useRef(null);
 
   const handleDateChange = (date) => {
     setSelectedDate(date);
     setShowDatePicker(false);
 
-    // Access FullCalendar API and update the date
     const calendarApi = calendarRef.current.getApi();
-    calendarApi.gotoDate(date); // Update FullCalendar to selected date
+    calendarApi.gotoDate(date);
   };
 
   return (
@@ -345,7 +344,7 @@ export default function CustomizedCalendar({
       gap={2}
       p={2}
     >
-     <FullCalendar
+      <FullCalendar
         ref={calendarRef}
         plugins={[resourceTimelinePlugin, interactionPlugin]}
         schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
@@ -353,7 +352,7 @@ export default function CustomizedCalendar({
         initialDate={selectedDate}
         headerToolbar={{
           left: 'today',
-          center: 'prev datePickerButton next', // Ensure 'prev' and 'next' are default buttons
+          center: 'prev datePickerButton next',
           right: 'eventButton',
         }}
         customButtons={{
@@ -386,10 +385,9 @@ export default function CustomizedCalendar({
           weekday: 'long',
         }}
         datesSet={(info) => {
-          // Update selectedDate when the calendar changes (prev/next button pressed)
           const currentDate = info.view.currentStart;
-          setSelectedDate(currentDate); // Sync the selected date with FullCalendar's current view
-          onDateChange(moment(currentDate).format('YYYY-MM-DD')); // Optionally update the external date state
+          setSelectedDate(currentDate);
+          onDateChange(moment(currentDate).format('YYYY-MM-DD'));
         }}
         eventClick={(info) => handleEventClick(info.event)}
         select={(info) => {
@@ -402,27 +400,23 @@ export default function CustomizedCalendar({
         }}
       />
 
-{showDatePicker && (
+      {showDatePicker && (
         <div
-        className='date-picker-div'
+          className='date-picker-div'
         >
           <DatePicker
             selected={selectedDate}
             onChange={handleDateChange}
             inline
-            
           />
-             <Button variant="contained" size="small"
-             sx={{ marginTop: '10px' }}
+          <Button variant="contained" size="small"
+            sx={{ marginTop: '10px' }}
             onClick={() => setShowDatePicker(false)}
-       
           >
             Close
           </Button>
         </div>
       )}
-
-
 
       <EventTypeSelectionModal
         isOpen={isEventTypeModalOpen}
