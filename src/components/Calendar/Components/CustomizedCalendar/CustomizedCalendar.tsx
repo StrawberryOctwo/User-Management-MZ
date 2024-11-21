@@ -1,14 +1,18 @@
-import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
-import { Box, Button } from '@mui/material';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+import {
+  Box,
+  Button,
+  ClickAwayListener,
+  Paper,
+  Popper,
+} from '@mui/material';
 import moment from 'moment';
 import { Views } from 'react-big-calendar';
-import 'react-datepicker/dist/react-datepicker.css';
 import './index.css';
 import EditAppointmentModal from '../Appointment/EditClassSession/EditAppointmentModal';
 import AddClassSessionModal from '../Appointment/AddClassSession/AddClassSessionModal';
 import ClassSessionDetailsModal from '../Modals/ClassSessionDetailsModal';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
-import DatePicker from 'react-datepicker';
 import { useAuth } from 'src/hooks/useAuth';
 import {
   deleteClassSession,
@@ -21,6 +25,11 @@ import interactionPlugin from '@fullcalendar/interaction';
 import EventTypeSelectionModal from '../Modals/EventTypeSelectionModal';
 import ToDoModal from '../Modals/ToDoModal';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
+import { Dayjs } from 'dayjs';
+import dayjs from 'dayjs';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { CalendarPicker } from '@mui/x-date-pickers/CalendarPicker';
+import { LocalizationProvider } from '@mui/x-date-pickers';
 
 export enum TimeSlotMinutes {
   Five = 5,
@@ -28,6 +37,7 @@ export enum TimeSlotMinutes {
   Fifteen = 15,
   Thirty = 30
 }
+
 type Keys = keyof typeof Views;
 
 type DemoProps = {
@@ -43,25 +53,11 @@ export default function CustomizedCalendar({
   loadClassSessions,
   selectedLocations
 }: DemoProps) {
-  const [date, setDate] = useState<Date>(moment().toDate());
-  const [view, setView] = useState<typeof Views[Keys]>(Views.DAY);
-  const [contextMenuInfo, setContextMenuInfo] = useState<{
-    xPosition: number;
-    yPosition: number;
-    selectedTime: string;
-    resourceId: number;
-  }>();
-
-  const STEP = 15;
-  const TIME_SLOTS = 60 / STEP;
-
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
   const [selectedClassSessionId, setSelectedClassSession] = useState<any>(null);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isDetailsModalOpen, setDetailsModalOpen] = useState(false);
-  const [selectedAppointmentId, setSelectedAppointmentId] = useState<
-    string | null
-  >(null);
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
   const [canEditSession, setCanEditSession] = useState<boolean | null>(true);
   const [canAddReport, setCanAddReport] = useState<boolean | null>(false);
   const [canReactivate, setCanReactivate] = useState<boolean | null>(true);
@@ -70,12 +66,8 @@ export default function CustomizedCalendar({
   const [isEventTypeModalOpen, setIsEventTypeModalOpen] = useState(false);
   const [isToDoModalOpen, setIsToDoModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState('');
-  const [selectedSessionDetails, setSelectedSessionDetails] =
-    useState<any>(null);
-  const [selectedRange, setSelectedRange] = useState<{
-    start: Date;
-    end: Date;
-  }>({
+  const [selectedSessionDetails, setSelectedSessionDetails] = useState<any>(null);
+  const [selectedRange, setSelectedRange] = useState<{ start: Date; end: Date }>({
     start: new Date(),
     end: new Date()
   });
@@ -83,9 +75,13 @@ export default function CustomizedCalendar({
   const { showMessage } = useSnackbar();
   const { userRoles } = useAuth();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
-  const [selectedDate, setSelectedDate] = useState(new Date(date));
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const calendarRef = useRef(null);
+  const calendarRef = useRef<any>(null);
+
+  const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const datePickerButtonRef = useRef<HTMLButtonElement>(null);
+  const isHandlingClick = useRef(false);
 
   const resources = useMemo(() => {
     const maxRooms = selectedLocations.reduce(
@@ -102,38 +98,45 @@ export default function CustomizedCalendar({
     return unsortedResources.sort((a, b) => a.sortOrder - b.sortOrder);
   }, [selectedLocations]);
 
-  /*   const onPrevClick = useCallback(() => {
-      if (view === Views.DAY) {
-        setDate(moment(date).subtract(1, 'd').toDate());
-      } else if (view === Views.WEEK) {
-        setDate(moment(date).subtract(1, 'w').toDate());
-      } else {
-        setDate(moment(date).subtract(1, 'M').toDate());
+
+  const handleDatePickerClick = (event: any) => {
+    if (isHandlingClick.current) return;
+    isHandlingClick.current = true;
+
+    const buttonElement = document.querySelector('.fc-datePickerButton-button');
+
+    if (buttonElement) {
+      setAnchorEl(buttonElement as HTMLElement);
+      setShowDatePicker(true);
+    }
+
+    // Reset the flag after a short delay
+    setTimeout(() => {
+      isHandlingClick.current = false;
+    }, 100);
+  };
+
+  const handleClickAway = (event: MouseEvent | TouchEvent) => {
+    if (!isHandlingClick.current) {
+      setShowDatePicker(false);
+      setAnchorEl(null);
+    }
+  };
+
+  const handleDateChange = (newValue: Dayjs | null) => {
+    if (newValue) {
+      const selected = newValue.toDate();
+      setSelectedDate(selected);
+      onDateChange(moment(selected).format('YYYY-MM-DD'));
+      setShowDatePicker(false);
+      setAnchorEl(null);
+
+      const calendarApi = calendarRef.current?.getApi();
+      if (calendarApi) {
+        calendarApi.gotoDate(selected);
       }
-    }, [view, date]);
-  
-    const onNextClick = useCallback(() => {
-      if (view === Views.DAY) {
-        setDate(moment(date).add(1, 'd').toDate());
-      } else if (view === Views.WEEK) {
-        setDate(moment(date).add(1, 'w').toDate());
-      } else {
-        setDate(moment(date).add(1, 'M').toDate());
-      }
-    }, [view, date]);
-  
-    const dateText = useMemo(() => {
-      if (view === Views.DAY) return moment(date).format('dddd, MMMM DD');
-      if (view === Views.WEEK) {
-        const from = moment(date)?.startOf('week');
-        const to = moment(date)?.endOf('week');
-        return `${from.format('MMMM DD')} to ${to.format('MMMM DD')}`;
-      }
-    }, [view, date]);
-  
-    const onTodayClick = useCallback(() => {
-      setDate(moment().toDate());
-    }, []); */
+    }
+  };
 
   const handleEventClick = (event: any) => {
     const eventEndDate = new Date(event.end);
@@ -173,7 +176,7 @@ export default function CustomizedCalendar({
   };
 
   const handleEditClassSession = (classSession: any) => {
-    if (strongestRoles[0] == 'Teacher' || strongestRoles[0] == 'Student') {
+    if (strongestRoles[0] === 'Teacher' || strongestRoles[0] === 'Student') {
       return;
     }
     if (selectedAppointmentId) {
@@ -187,7 +190,7 @@ export default function CustomizedCalendar({
   };
 
   const handleDeleteClassSession = () => {
-    if (strongestRoles[0] == 'Teacher' || strongestRoles[0] == 'Student') {
+    if (strongestRoles[0] === 'Teacher' || strongestRoles[0] === 'Student') {
       return;
     }
     if (selectedAppointmentId) {
@@ -218,7 +221,7 @@ export default function CustomizedCalendar({
     setDetailsModalOpen(false);
   };
 
-  const checkOverlap = (currentSession, allSessions) => {
+  const checkOverlap = (currentSession: any, allSessions: any[]) => {
     const currentTeacher = currentSession.data.appointment.teacher;
     const currentStart = new Date(currentSession.start);
     const currentEnd = new Date(currentSession.end);
@@ -271,10 +274,10 @@ export default function CustomizedCalendar({
   }, [classSessionEvents]);
 
   const handleOpenAddModal = (start: Date, end: Date, roomId: string) => {
-    if (strongestRoles[0] == 'Student' || strongestRoles[0] == 'Parent') {
+    if (strongestRoles[0] === 'Student' || strongestRoles[0] === 'Parent') {
       return;
     }
-    if (strongestRoles[0] != 'Teacher') {
+    if (strongestRoles[0] !== 'Teacher') {
       if (selectedLocations.length > 1) {
         showMessage(
           'Please select a single location to add a class session.',
@@ -319,20 +322,12 @@ export default function CustomizedCalendar({
     setIsToDoModalOpen(false);
   };
 
-  const handleSaveToDo = (todo) => {
+  const handleSaveToDo = (todo: any) => {
     console.log('Saving To-Do:', todo);
   };
 
   const renderEventContent = (eventInfo: any) => {
     return <EventItem eventInfo={eventInfo} />;
-  };
-
-  const handleDateChange = (date) => {
-    setSelectedDate(date);
-    setShowDatePicker(false);
-
-    const calendarApi = calendarRef.current.getApi();
-    calendarApi.gotoDate(date);
   };
 
   return (
@@ -344,6 +339,26 @@ export default function CustomizedCalendar({
       gap={2}
       p={2}
     >
+      <LocalizationProvider dateAdapter={AdapterDayjs}>
+        <ClickAwayListener onClickAway={handleClickAway} mouseEvent="onMouseDown">
+          <div>
+            <Popper
+              open={showDatePicker}
+              anchorEl={anchorEl}
+              placement="bottom-start"
+              style={{ zIndex: 1300 }}
+            >
+              <Paper elevation={3} style={{ padding: '16px' }}>
+                <CalendarPicker
+                  date={dayjs(selectedDate)}
+                  onChange={handleDateChange}
+                />
+              </Paper>
+            </Popper>
+          </div>
+        </ClickAwayListener>
+      </LocalizationProvider>
+
       <FullCalendar
         ref={calendarRef}
         plugins={[resourceTimelinePlugin, interactionPlugin]}
@@ -358,7 +373,7 @@ export default function CustomizedCalendar({
         customButtons={{
           datePickerButton: {
             text: moment(selectedDate).format('dddd, MMMM D, YYYY'),
-            click: () => setShowDatePicker(true),
+            click: handleDatePickerClick,
           },
           eventButton: {
             text: 'Add Event',
@@ -400,24 +415,7 @@ export default function CustomizedCalendar({
         }}
       />
 
-      {showDatePicker && (
-        <div
-          className='date-picker-div'
-        >
-          <DatePicker
-            selected={selectedDate}
-            onChange={handleDateChange}
-            inline
-          />
-          <Button variant="contained" size="small"
-            sx={{ marginTop: '10px' }}
-            onClick={() => setShowDatePicker(false)}
-          >
-            Close
-          </Button>
-        </div>
-      )}
-
+      {/* Other Modals */}
       <EventTypeSelectionModal
         isOpen={isEventTypeModalOpen}
         onClose={handleCloseEventTypeModal}
