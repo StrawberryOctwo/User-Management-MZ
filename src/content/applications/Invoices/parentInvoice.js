@@ -2,6 +2,7 @@ import html2pdf from 'html2pdf.js';
 
 const generateParentInvoicePDF = async (invoice, preview = false) => {
     const element = document.createElement('div');
+    console.log(invoice);
 
     // Formatting details
     const invoiceDate = new Date(invoice.createdAt).toLocaleDateString('de-DE');
@@ -9,9 +10,9 @@ const generateParentInvoicePDF = async (invoice, preview = false) => {
     const studentName = `${invoice.student.user.firstName} ${invoice.student.user.lastName}`;
     const totalAmount = Number(invoice.totalAmount).toFixed(2);
     const parentName = `${invoice.user.firstName} ${invoice.user.lastName}`;
-    const parentAddress = `${invoice.user.address}`
-    const parentPostalCode = `${invoice.user.postalCode}`
-    const parentIban =  `${invoice.student.parent.iban}`
+    const parentAddress = `${invoice.user.address}`;
+    const parentPostalCode = `${invoice.user.postalCode}`;
+    const parentIban = `${invoice.student.parent.iban}`; // Adjusted to match the invoice object
 
     // Helper function to calculate hours between start and end time
     const calculateSessionHours = (start, end) => {
@@ -21,20 +22,48 @@ const generateParentInvoicePDF = async (invoice, preview = false) => {
     };
 
     element.innerHTML = `
-      <div style="font-family: 'Arial', sans-serif; padding: 20px;">
-        <h1 style="text-align: center;">Rechnung</h1>
-        
-        <p><strong>${parentName}</strong></p>
-        <p>${parentAddress}</p>
+      <div style="font-family: 'Arial', sans-serif; padding: 20px; color: #333;">
+        <!-- Header Section -->
+        <header style="border-bottom: 2px solid #4CAF50; padding-bottom: 10px; margin-bottom: 20px;">
+          <h1 style="text-align: center; color: #4CAF50; margin: 0;">Rechnung</h1>
+          <p style="text-align: right; margin: 5px 0; font-size: 14px;">
+            <strong>Rechnung Nr.:</strong> ${invoice.invoiceId}
+          </p>
+        </header>
 
-        
-        <p style="text-align: right;">den ${invoiceDate}</p>
-        <p><strong>Rechnung Nr.:</strong> ${invoice.invoiceId}</p>
+        <!-- Parent and Franchise Information -->
+        <section style="display: flex; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap;">
+          <!-- Parent Information -->
+          <div style="flex: 1; min-width: 250px; margin-right: 20px;">
+            <h2 style="font-size: 18px; margin-bottom: 10px; color: #555;">Eltern Details</h2>
+            <p><strong>Name:</strong> ${parentName}</p>
+            <p><strong>Adresse:</strong> ${parentAddress}</p>
+            <p><strong>Postleitzahl:</strong> ${parentPostalCode}</p>
+          </div>
 
-        <p>Sehr geehrte Damen und Herren,</p>
-        <p>hiermit stellen wir Ihnen für ${studentName} in dem Monat ${monthYear} folgende Rechnung:</p>
-        <p><em>Umsatzsteuerfreie Leistung gemäß § 4 Nr. 21b UStG.</em></p>
+          <!-- Franchise Information -->
+          <div style="width: 300px; min-width: 250px;">
+            <h2 style="font-size: 18px; margin-bottom: 10px; color: #555;">Franchise Details</h2>
+            <p><strong>${invoice.student.locations[0].franchise.name}</strong></p>
+            <p>${invoice.student.locations[0].franchise.address || 'Adresse nicht verfügbar'}</p>
+            <p>${invoice.student.locations[0].franchise.postalCode || ''} ${invoice.student.locations[0].franchise.city || ''}</p>
+          </div>
+        </section>
 
+        <!-- Date Section -->
+        <div style="text-align: right; margin-bottom: 30px;">
+          <p style="font-size: 14px;">den ${invoiceDate}</p>
+        </div>
+
+        <!-- Invoice Information -->
+        <section style="margin-bottom: 20px;">
+          <h2 style="font-size: 16px; margin-bottom: 10px; color: #4CAF50;">Rechnung für ${studentName} (${monthYear})</h2>
+          <p>Sehr geehrte Damen und Herren,</p>
+          <p>hiermit stellen wir Ihnen für ${studentName} in dem Monat ${monthYear} folgende Rechnung:</p>
+          <p><em>Umsatzsteuerfreie Leistung gemäß § 4 Nr. 21b UStG.</em></p>
+        </section>
+
+        <!-- Invoice Table -->
         <table style="width: 100%; border-collapse: collapse; margin-top: 10px;">
           <thead>
             <tr style="background-color: #f2f2f2;">
@@ -48,20 +77,25 @@ const generateParentInvoicePDF = async (invoice, preview = false) => {
             ${invoice.payments
               .map(payment => `
                 <tr>
-                  <td style="border: 1px solid #ddd; padding: 8px;">${new Date(payment.session.sessionStartDate).toLocaleDateString('de-DE')}</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">${payment.session.sessionType}</td>
-                  <td style="border: 1px solid #ddd; padding: 8px;">${calculateSessionHours(payment.session.sessionStartDate, payment.session.sessionEndDate)} hrs</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">${new Date(payment.session.date).toLocaleDateString('de-DE')}</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">${payment.session.sessionType.name || 'Nicht definiert'}</td>
+                  <td style="border: 1px solid #ddd; padding: 8px;">${payment.session.duration/60} hrs</td>
                   <td style="border: 1px solid #ddd; padding: 8px;">€${Number(payment.amount).toFixed(2)}</td>
                 </tr>
               `).join('')}
-            <tr>
-              <td colspan="3" style="border: 1px solid #ddd; padding: 8px;">+ Monatsbericht</td>
-              <td style="border: 1px solid #ddd; padding: 8px;">€${invoice.extraAmount}</td>
-            </tr>
-            <tr>
-              <td colspan="3" style="border: 1px solid #ddd; padding: 8px;">+ Materialkosten</td>
-              <td style="border: 1px solid #ddd; padding: 8px;">€${invoice.extraAmount}</td>
-            </tr>
+            <!-- Include one-time and monthly fees only if they are greater than 0 -->
+            ${invoice.oneTimeFee > 0 ? `
+              <tr>
+                <td colspan="3" style="border: 1px solid #ddd; padding: 8px;">+ Materialkosten</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">€${Number(invoice.oneTimeFee).toFixed(2)}</td>
+              </tr>
+            ` : ''}
+            ${invoice.monthlyFee > 0 ? `
+              <tr>
+                <td colspan="3" style="border: 1px solid #ddd; padding: 8px;">+ Monatsgebühr</td>
+                <td style="border: 1px solid #ddd; padding: 8px;">€${Number(invoice.monthlyFee).toFixed(2)}</td>
+              </tr>
+            ` : ''}
             <tr style="font-weight: bold;">
               <td colspan="3" style="border: 1px solid #ddd; padding: 8px;">Gesamtsumme</td>
               <td style="border: 1px solid #ddd; padding: 8px;">€${totalAmount}</td>
@@ -69,25 +103,28 @@ const generateParentInvoicePDF = async (invoice, preview = false) => {
           </tbody>
         </table>
 
-        <p style="margin-top: 20px;">Der Betrag wird am ${invoiceDate} von Ihrem Konto abgehoben.</p>
-        <p>Unsere Gläubiger-ID lautet: ${parentIban}</p>
-        
-        <p style="margin-top: 20px;">
-          <strong>Hinweis:</strong> Bitte sorgen Sie für eine positive Kontodeckung, ansonsten entstehen uns hohe Gebühren, die wir Ihnen neu berechnen müssen. 
-          Wir sind gezwungen 10,00 € Bankgebühr und 5,00 € Bearbeitungsgebühren zusätzlich zu berechnen. 
-          Der fällige Betrag wird am 10. des Monats nochmal abgebucht.
-        </p>
+        <!-- Payment Information -->
+        <section style="margin-top: 30px;">
+          <p>Der Betrag wird am ${invoiceDate} von Ihrem Konto abgebucht.</p>
+          <p><strong>IBAN:</strong> ${parentIban}</p>
 
-        <p><em>„Für eine verbesserte Klausurvorbereitung möchten wir gerne mit den jeweiligen Fachlehrern in der Schule in Kontakt treten. 
-        Wenn das erwünscht ist, melden Sie sich doch bitte bei uns“</em></p>
+          <p style="margin-top: 20px;">
+            <strong>Hinweis:</strong> Bitte sorgen Sie für eine positive Kontodeckung, ansonsten entstehen uns hohe Gebühren, die wir Ihnen neu berechnen müssen. 
+            Wir sind gezwungen, 10,00 € Bankgebühr und 5,00 € Bearbeitungsgebühren zusätzlich zu berechnen. 
+            Der fällige Betrag wird am 10. des Monats nochmal abgebucht.
+          </p>
 
-        <p style="text-align: center; font-weight: bold;">Mit freundlichen Grüßen</p>
-        <p style="text-align: center;">- Empfehlen Sie uns an Ihre Freunde & Familie weiter -</p>
+          <p><em>„Für eine verbesserte Klausurvorbereitung möchten wir gerne mit den jeweiligen Fachlehrern in der Schule in Kontakt treten. 
+          Wenn das erwünscht ist, melden Sie sich doch bitte bei uns.“</em></p>
+        </section>
 
-        <footer style="font-size: 0.9em; color: #666; text-align: center; margin-top: 30px;">
-          Lernförderung OWL | Geschäftsführer: Bold Molor | Steuernummer: 349/5218/3982 <br>
-          Adresse: Bahnhofstraße 6, 33602 Bielefeld | Tel.: 0176 / 214 96 747 | E-mail: kontakt@lernfoerderung-owl.de
-        </footer>
+        <!-- Closing Section -->
+        <div style="text-align: center; font-weight: bold; margin-top: 20px;">
+          <p>Mit freundlichen Grüßen</p>
+          <p>- Empfehlen Sie uns an Ihre Freunde & Familie weiter -</p>
+        </div>
+
+ 
       </div>
     `;
 

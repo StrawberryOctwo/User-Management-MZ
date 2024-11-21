@@ -5,7 +5,7 @@ import { fetchInvoiceById, fetchUserInvoices } from 'src/services/invoiceService
 import { useAuth } from 'src/hooks/useAuth';
 import ViewInvoiceDetails from 'src/components/Invoices/ViewInvoiceDetails';
 import generateTeacherInvoicePDF from './teacherInvoice';
-import { fetchTeacherById, fetchTeacherByUserId } from 'src/services/teacherService';
+import { fetchTeacherById, fetchTeacherByUserId, fetchTeacherInvoiceInfoByUserId } from 'src/services/teacherService';
 import generateParentInvoicePDF from './parentInvoice';
 
 export default function ViewInvoices() {
@@ -58,7 +58,7 @@ export default function ViewInvoices() {
         if (isMounted.current) generateParentInvoicePDF(invoiceData,true);
       } else {
         // Fetch additional teacher data if not a parent
-        const teacherData = await fetchTeacherByUserId(userId);
+        const teacherData = await fetchTeacherInvoiceInfoByUserId(userId);
         if (isMounted.current) generateTeacherInvoicePDF(invoiceData, teacherData,true);
       }  } catch (error) {
       console.error('Error generating invoice PDF:', error);
