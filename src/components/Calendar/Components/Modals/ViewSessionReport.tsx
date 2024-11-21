@@ -318,6 +318,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
             <Button onClick={handleOpenConfirmDelete} color="error">
               Delete Report
             </Button>
+            
             <Button onClick={handleSave} color="primary" variant="contained">
               Save Report
             </Button>
