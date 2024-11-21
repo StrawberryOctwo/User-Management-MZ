@@ -1,11 +1,11 @@
 {
-  "name": "Verwaltung Nachhilfe",
+  "name": "verwaltung-nachhilfe",
   "version": "2.0.0",
   "title": "Verwaltung Nachhilfe",
   "description": "UI",
   "author": {
     "name": "Verwaltung Nachhilfe",
-    "url": "Verwaltung Nachhilfe"
+    "url": "http://example.com"
   },
   "private": false,
   "dependencies": {

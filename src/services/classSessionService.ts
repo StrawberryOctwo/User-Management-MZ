@@ -56,7 +56,6 @@ export const fetchParentClassSessions = async (
 
 export const addClassSession = async (classData: any) => {
   try {
-
     const response = await api.post('/class-session', classData);
     return response.data;
   } catch (error) {
@@ -87,7 +86,10 @@ export const updateClassSession = async (id: string, updatedData: any) => {
 
 export const submitTeacherReports = async (classSessionId: any) => {
   try {
-    const response = await api.patch(`/session-reports/class-session/teacher/submit`, classSessionId);
+    const response = await api.patch(
+      `/session-reports/class-session/teacher/submit`,
+      classSessionId
+    );
     return response.data;
   } catch (error) {
     console.error(`Error submitting reports:`, error);
@@ -95,7 +97,10 @@ export const submitTeacherReports = async (classSessionId: any) => {
   }
 };
 
-export const updateClassSessionFromTo = async (id: string, updatedData: any) => {
+export const updateClassSessionFromTo = async (
+  id: string,
+  updatedData: any
+) => {
   try {
     const response = await api.put(`/class-session/from-to/${id}`, updatedData);
     return response.data;
@@ -176,7 +181,6 @@ export async function toggleClassSessionActivation(
   }
 }
 
-
 export interface Holiday {
   id: number;
   name: string;
@@ -213,20 +217,20 @@ export const fetchClosingDays = async () => {
 export const mockHolidays: Holiday[] = [
   {
     id: 1,
-    name: "Thanksgiving",
-    start_date: "2024-11-28",  // Current test date
-    end_date: "2024-11-28",
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-01-01T00:00:00Z",
+    name: 'Thanksgiving',
+    start_date: '2024-11-28', // Current test date
+    end_date: '2024-11-28',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
     deletedAt: null
   },
   {
     id: 2,
-    name: "Christmas",
-    start_date: "2024-12-24",
-    end_date: "2024-12-26",
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-01-01T00:00:00Z",
+    name: 'Christmas',
+    start_date: '2024-12-24',
+    end_date: '2024-12-26',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
     deletedAt: null
   }
 ];
@@ -234,26 +238,23 @@ export const mockHolidays: Holiday[] = [
 export const mockClosingDays: Holiday[] = [
   {
     id: 3,
-    name: "Staff Training",
-    start_date: "2024-11-28",  // Current test date
-    end_date: "2024-11-28",
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-01-01T00:00:00Z",
+    name: 'Staff Training',
+    start_date: '2024-11-28', // Current test date
+    end_date: '2024-11-28',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
     deletedAt: null
   },
   {
     id: 4,
-    name: "Maintenance Day",
-    start_date: "2024-11-25",
-    end_date: "2024-11-25",
-    createdAt: "2024-01-01T00:00:00Z",
-    updatedAt: "2024-01-01T00:00:00Z",
+    name: 'Maintenance Day',
+    start_date: '2024-11-25',
+    end_date: '2024-11-25',
+    createdAt: '2024-01-01T00:00:00Z',
+    updatedAt: '2024-01-01T00:00:00Z',
     deletedAt: null
   }
 ];
-
-
-
 
 interface HolidayInput {
   name: string;
@@ -306,7 +307,10 @@ export const addClosingDay = async (closingDayData: HolidayInput) => {
 };
 
 // Update a closing day
-export const updateClosingDay = async (id: number, closingDayData: HolidayInput) => {
+export const updateClosingDay = async (
+  id: number,
+  closingDayData: HolidayInput
+) => {
   try {
     const response = await api.put(`/closing-day/${id}`, closingDayData);
     return response.data;

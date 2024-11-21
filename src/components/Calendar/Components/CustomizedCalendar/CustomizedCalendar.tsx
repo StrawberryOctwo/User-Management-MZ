@@ -1,11 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import {
-  Box,
-  Button,
-  ClickAwayListener,
-  Paper,
-  Popper,
-} from '@mui/material';
+import { Box, Button, ClickAwayListener, Paper, Popper } from '@mui/material';
 import moment from 'moment';
 import { Views } from 'react-big-calendar';
 import './index.css';
@@ -35,7 +29,10 @@ import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { CalendarPicker } from '@mui/x-date-pickers/CalendarPicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
-import { calendarEventHandlers, calendarHelpers } from '../../utils/calendarHelpers';
+import {
+  calendarEventHandlers,
+  calendarHelpers
+} from '../../utils/calendarHelpers';
 import SpecialDayModal from '../Modals/SpecialDayModal';
 
 export enum TimeSlotMinutes {
@@ -64,7 +61,9 @@ export default function CustomizedCalendar({
   const [selectedClassSessionId, setSelectedClassSession] = useState<any>(null);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isDetailsModalOpen, setDetailsModalOpen] = useState(false);
-  const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState<
+    string | null
+  >(null);
   const [canEditSession, setCanEditSession] = useState<boolean | null>(true);
   const [canAddReport, setCanAddReport] = useState<boolean | null>(false);
   const [canReactivate, setCanReactivate] = useState<boolean | null>(true);
@@ -73,8 +72,12 @@ export default function CustomizedCalendar({
   const [isEventTypeModalOpen, setIsEventTypeModalOpen] = useState(false);
   const [isToDoModalOpen, setIsToDoModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState('');
-  const [selectedSessionDetails, setSelectedSessionDetails] = useState<any>(null);
-  const [selectedRange, setSelectedRange] = useState<{ start: Date; end: Date }>({ start: new Date(), end: new Date() });
+  const [selectedSessionDetails, setSelectedSessionDetails] =
+    useState<any>(null);
+  const [selectedRange, setSelectedRange] = useState<{
+    start: Date;
+    end: Date;
+  }>({ start: new Date(), end: new Date() });
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -158,12 +161,22 @@ export default function CustomizedCalendar({
   const getDateStatus = (date: Date) => {
     const dateStr = moment(date).format('YYYY-MM-DD');
 
-    const holidayMatch = holidays.find(
-      holiday => moment(dateStr).isBetween(holiday.start_date, holiday.end_date, 'day', '[]')
+    const holidayMatch = holidays.find((holiday) =>
+      moment(dateStr).isBetween(
+        holiday.start_date,
+        holiday.end_date,
+        'day',
+        '[]'
+      )
     );
 
-    const closingDayMatch = closingDays.find(
-      closingDay => moment(dateStr).isBetween(closingDay.start_date, closingDay.end_date, 'day', '[]')
+    const closingDayMatch = closingDays.find((closingDay) =>
+      moment(dateStr).isBetween(
+        closingDay.start_date,
+        closingDay.end_date,
+        'day',
+        '[]'
+      )
     );
 
     return {
@@ -405,7 +418,10 @@ export default function CustomizedCalendar({
       p={2}
     >
       <LocalizationProvider dateAdapter={AdapterDayjs}>
-        <ClickAwayListener onClickAway={handleClickAway} mouseEvent="onMouseDown">
+        <ClickAwayListener
+          onClickAway={handleClickAway}
+          mouseEvent="onMouseDown"
+        >
           <div>
             <Popper
               open={showDatePicker}
@@ -452,22 +468,22 @@ export default function CustomizedCalendar({
           onDateChange(moment(currentDate).format('YYYY-MM-DD'));
         }}
         eventClick={(info) => handleEventClick(info.event)}
-        select={(info) => calendarEventHandlers.handleSelect(
-          info,
-          getDateStatus,
-          showMessage,
-          handleOpenAddModal
-        )}
+        select={(info) =>
+          calendarEventHandlers.handleSelect(
+            info,
+            getDateStatus,
+            showMessage,
+            handleOpenAddModal
+          )
+        }
         views={calendarHelpers.getViewSettings()}
-        slotLabelDidMount={(arg) => calendarEventHandlers.handleSlotLabel(
-          arg,
-          getDateStatus
-        )}
+        slotLabelDidMount={(arg) =>
+          calendarEventHandlers.handleSlotLabel(arg, getDateStatus)
+        }
         selectConstraint={calendarHelpers.getSelectConstraint()}
-        selectOverlap={(event) => calendarEventHandlers.handleSelectOverlap(
-          event,
-          getDateStatus
-        )}
+        selectOverlap={(event) =>
+          calendarEventHandlers.handleSelectOverlap(event, getDateStatus)
+        }
       />
 
       <EventTypeSelectionModal
@@ -535,5 +551,4 @@ export default function CustomizedCalendar({
       />
     </Box>
   );
-
 }
