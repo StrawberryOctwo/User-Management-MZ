@@ -151,7 +151,9 @@ function HeaderNotifications() {
           }}
         >
           <Typography variant="h5" fontWeight="bold">
-            {unreadCount} Unread Notifications
+            {unreadCount > 0
+              ? `${unreadCount} Unread Notifications`
+              : 'No Notifications'}
           </Typography>
         </Box>
         <List
@@ -261,34 +263,36 @@ function HeaderNotifications() {
             </ListItem>
           ))}
         </List>
-        <Box
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
-            p: 2
-          }}
-        >
-          <Button
-            variant="contained"
-            size="small"
-            disabled={currentPage === 0}
-            onClick={handlePreviousPage}
+        {notifications.length > 0 && (
+          <Box
+            sx={{
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              p: 2
+            }}
           >
-            Previous
-          </Button>
-          <Typography variant="body2">
-            Page {currentPage + 1} of {totalPages}
-          </Typography>
-          <Button
-            variant="contained"
-            size="small"
-            disabled={currentPage >= totalPages - 1}
-            onClick={handleNextPage}
-          >
-            Next
-          </Button>
-        </Box>
+            <Button
+              variant="contained"
+              size="small"
+              disabled={currentPage === 0}
+              onClick={handlePreviousPage}
+            >
+              Previous
+            </Button>
+            <Typography variant="body2">
+              Page {currentPage + 1} of {totalPages}
+            </Typography>
+            <Button
+              variant="contained"
+              size="small"
+              disabled={currentPage >= totalPages - 1}
+              onClick={handleNextPage}
+            >
+              Next
+            </Button>
+          </Box>
+        )}
       </Popover>
     </>
   );
