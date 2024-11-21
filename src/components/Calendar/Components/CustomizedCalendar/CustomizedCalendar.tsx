@@ -35,6 +35,8 @@ import dayjs from 'dayjs';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { CalendarPicker } from '@mui/x-date-pickers/CalendarPicker';
 import { LocalizationProvider } from '@mui/x-date-pickers';
+import { calendarEventHandlers, calendarHelpers } from '../../utils/calendarHelpers';
+import SpecialDayModal from '../Modals/SpecialDayModal';
 
 export enum TimeSlotMinutes {
   Five = 5,
@@ -72,25 +74,23 @@ export default function CustomizedCalendar({
   const [isToDoModalOpen, setIsToDoModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState('');
   const [selectedSessionDetails, setSelectedSessionDetails] = useState<any>(null);
-  const [selectedRange, setSelectedRange] = useState<{ start: Date; end: Date }>({
-    start: new Date(),
-    end: new Date()
-  });
-
-  const { showMessage } = useSnackbar();
-  const { userRoles } = useAuth();
-  const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
+  const [selectedRange, setSelectedRange] = useState<{ start: Date; end: Date }>({ start: new Date(), end: new Date() });
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const calendarRef = useRef<any>(null);
-
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [closingDays, setClosingDays] = useState<Holiday[]>([]);
+  const [isHolidayModalOpen, setIsHolidayModalOpen] = useState(false);
+  const [isClosingDayModalOpen, setIsClosingDayModalOpen] = useState(false);
+  const [selectedSpecialDay, setSelectedSpecialDay] = useState<any>(null);
 
+  const { showMessage } = useSnackbar();
+  const { userRoles } = useAuth();
+
+  const calendarRef = useRef<any>(null);
   const datePickerButtonRef = useRef<HTMLButtonElement>(null);
   const isHandlingClick = useRef(false);
-
+  const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
   const resources = useMemo(() => {
     const maxRooms = selectedLocations.reduce(
       (max, location) => Math.max(max, location.numberOfRooms || 0),
@@ -107,24 +107,53 @@ export default function CustomizedCalendar({
   }, [selectedLocations]);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        // For development, use mock data
-        setHolidays(mockHolidays);
-        setClosingDays(mockClosingDays);
-
-        // For production, uncomment these lines
-        // const holidaysData = await fetchHolidays();
-        // const closingDaysData = await fetchClosingDays();
-        // setHolidays(holidaysData);
-        // setClosingDays(closingDaysData);
-      } catch (error) {
-        console.error('Error fetching holidays and closing days:', error);
-      }
-    };
-
     fetchData();
   }, []);
+
+  useEffect(() => {
+    const mappedEvents = classSessionEvents.map((session) => {
+      const [firstName, lastName] = session.data.appointment.teacher.split(' ');
+      const formattedTeacher = `${firstName[0]}. ${lastName}`;
+      const hasOverlap = checkOverlap(session, classSessionEvents);
+
+      return {
+        id: session.data.appointment.id,
+        sessionId: session.data.appointment.sessionId,
+        resourceId: session.resourceId,
+        title: session.data.appointment.topic,
+        start: `${session.data.appointment.date}T${session.data.appointment.startTime}`,
+        end: `${session.data.appointment.date}T${session.data.appointment.endTime}`,
+        status: session.data.appointment.status,
+        extendedProps: {
+          topicName: session.data.appointment.topic || 'No Topic',
+          teacher: formattedTeacher,
+          location: session.data.appointment.location,
+          sessionType: session.data.appointment.sessionType,
+          students: session.data.appointment.students,
+          reportStatus: session.data.appointment.reportStatus,
+          hasOverlap
+        }
+      };
+    });
+
+    setEvents(mappedEvents);
+  }, [classSessionEvents]);
+
+  const fetchData = async () => {
+    try {
+      // For development, use mock data
+      setHolidays(mockHolidays);
+      setClosingDays(mockClosingDays);
+
+      // For production, uncomment these lines
+      // const holidaysData = await fetchHolidays();
+      // const closingDaysData = await fetchClosingDays();
+      // setHolidays(holidaysData);
+      // setClosingDays(closingDaysData);
+    } catch (error) {
+      console.error('Error fetching holidays and closing days:', error);
+    }
+  };
 
   const getDateStatus = (date: Date) => {
     const dateStr = moment(date).format('YYYY-MM-DD');
@@ -145,8 +174,14 @@ export default function CustomizedCalendar({
     };
   };
 
+  const handleSpecialDaySuccess = () => {
+    // Refresh your calendar data
+    loadClassSessions();
+    // Refresh holidays and closing days
+    fetchData();
+  };
 
-  const handleDatePickerClick = (event: any) => {
+  const handleDatePickerClick = (event: MouseEvent) => {
     if (isHandlingClick.current) return;
     isHandlingClick.current = true;
 
@@ -157,7 +192,6 @@ export default function CustomizedCalendar({
       setShowDatePicker(true);
     }
 
-    // Reset the flag after a short delay
     setTimeout(() => {
       isHandlingClick.current = false;
     }, 100);
@@ -291,35 +325,6 @@ export default function CustomizedCalendar({
     });
   };
 
-  useEffect(() => {
-    const mappedEvents = classSessionEvents.map((session) => {
-      const [firstName, lastName] = session.data.appointment.teacher.split(' ');
-      const formattedTeacher = `${firstName[0]}. ${lastName}`;
-      const hasOverlap = checkOverlap(session, classSessionEvents);
-
-      return {
-        id: session.data.appointment.id,
-        sessionId: session.data.appointment.sessionId,
-        resourceId: session.resourceId,
-        title: session.data.appointment.topic,
-        start: `${session.data.appointment.date}T${session.data.appointment.startTime}`,
-        end: `${session.data.appointment.date}T${session.data.appointment.endTime}`,
-        status: session.data.appointment.status,
-        extendedProps: {
-          topicName: session.data.appointment.topic || 'No Topic',
-          teacher: formattedTeacher,
-          location: session.data.appointment.location,
-          sessionType: session.data.appointment.sessionType,
-          students: session.data.appointment.students,
-          reportStatus: session.data.appointment.reportStatus,
-          hasOverlap
-        }
-      };
-    });
-
-    setEvents(mappedEvents);
-  }, [classSessionEvents]);
-
   const handleOpenAddModal = (start: Date, end: Date, roomId: string) => {
     if (strongestRoles[0] === 'Student' || strongestRoles[0] === 'Parent') {
       return;
@@ -351,17 +356,30 @@ export default function CustomizedCalendar({
   };
 
   const handleContinue = (eventType: string) => {
-    if (eventType === 'To-Do') {
-      setIsToDoModalOpen(true);
-    } else if (eventType === 'Class Session') {
-      if (selectedLocations.length > 1) {
-        showMessage(
-          'Please select a single location to add a class session.',
-          'error'
-        );
-        return;
-      }
-      setIsAddModalOpen(true);
+    switch (eventType) {
+      case 'To-Do':
+        setIsToDoModalOpen(true);
+        break;
+      case 'Class Session':
+        if (selectedLocations.length > 1) {
+          showMessage(
+            'Please select a single location to add a class session.',
+            'error'
+          );
+          return;
+        }
+        setIsAddModalOpen(true);
+        break;
+      case 'Holiday':
+        // You'll need to create these modals
+        setIsHolidayModalOpen(true);
+        break;
+      case 'Closing Day':
+        // You'll need to create these modals
+        setIsClosingDayModalOpen(true);
+        break;
+      default:
+        break;
     }
   };
 
@@ -412,21 +430,12 @@ export default function CustomizedCalendar({
         schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
         initialView="resourceTimelineDay"
         initialDate={selectedDate}
-        headerToolbar={{
-          left: 'today',
-          center: 'prev datePickerButton next',
-          right: 'eventButton',
-        }}
-        customButtons={{
-          datePickerButton: {
-            text: moment(selectedDate).format('dddd, MMMM D, YYYY'),
-            click: handleDatePickerClick,
-          },
-          eventButton: {
-            text: 'Add Event',
-            click: handleOpenEventTypeModal,
-          },
-        }}
+        headerToolbar={calendarHelpers.getHeaderToolbar()}
+        customButtons={calendarHelpers.getCustomButtons(
+          handleDatePickerClick,
+          handleOpenEventTypeModal,
+          selectedDate
+        )}
         resources={resources}
         resourceOrder="sortOrder"
         events={events}
@@ -435,64 +444,37 @@ export default function CustomizedCalendar({
         slotMaxTime="19:00:00"
         resourceAreaWidth="120px"
         selectable={true}
-        slotLabelFormat={{
-          hour: '2-digit',
-          minute: '2-digit',
-          hour12: false,
-        }}
-        titleFormat={{
-          year: 'numeric',
-          month: 'long',
-          day: 'numeric',
-          weekday: 'long',
-        }}
+        slotLabelFormat={calendarHelpers.getTimeFormats().slotLabelFormat}
+        titleFormat={calendarHelpers.getTimeFormats().titleFormat}
         datesSet={(info) => {
           const currentDate = info.view.currentStart;
           setSelectedDate(currentDate);
           onDateChange(moment(currentDate).format('YYYY-MM-DD'));
         }}
         eventClick={(info) => handleEventClick(info.event)}
-        select={(info) => {
-          const { isClosingDay } = getDateStatus(info.start);
-          if (isClosingDay) {
-            showMessage('Cannot add events on closing days', 'error');
-            return;
-          }
-          handleOpenAddModal(info.start, info.end, info.resource.id);
-        }}
-        views={{
-          resourceTimelineDay: {
-            slotMinWidth: 120,
-          },
-        }}
-        slotLabelDidMount={(arg) => {
-          const { isHoliday, isClosingDay } = getDateStatus(arg.date);
-
-          if (isClosingDay) {
-            arg.el.classList.add('closing-day');
-            arg.el.style.pointerEvents = 'none';
-          }
-          if (isHoliday) {
-            arg.el.classList.add('holiday');
-          }
-        }}
-        selectConstraint={{
-          startTime: '12:00:00',
-          endTime: '19:00:00',
-          daysOfWeek: [0, 1, 2, 3, 4, 5, 6]
-        }}
-        selectOverlap={(event) => {
-          if (!event.start) return true;
-          const { isClosingDay } = getDateStatus(new Date(event.start));
-          return !isClosingDay;
-        }}
+        select={(info) => calendarEventHandlers.handleSelect(
+          info,
+          getDateStatus,
+          showMessage,
+          handleOpenAddModal
+        )}
+        views={calendarHelpers.getViewSettings()}
+        slotLabelDidMount={(arg) => calendarEventHandlers.handleSlotLabel(
+          arg,
+          getDateStatus
+        )}
+        selectConstraint={calendarHelpers.getSelectConstraint()}
+        selectOverlap={(event) => calendarEventHandlers.handleSelectOverlap(
+          event,
+          getDateStatus
+        )}
       />
 
-      {/* Other Modals */}
       <EventTypeSelectionModal
         isOpen={isEventTypeModalOpen}
         onClose={handleCloseEventTypeModal}
         onContinue={handleContinue}
+        userRole={strongestRoles[0]} // Pass the user role
       />
 
       <EditAppointmentModal
@@ -528,6 +510,28 @@ export default function CustomizedCalendar({
         canEdit={canEditSession}
         canAddReport={canAddReport}
         canReactivate={canReactivate}
+      />
+
+      <SpecialDayModal
+        isOpen={isHolidayModalOpen}
+        onClose={() => {
+          setIsHolidayModalOpen(false);
+          setSelectedSpecialDay(null);
+        }}
+        type="Holiday"
+        initialData={selectedSpecialDay}
+        onSuccess={handleSpecialDaySuccess}
+      />
+
+      <SpecialDayModal
+        isOpen={isClosingDayModalOpen}
+        onClose={() => {
+          setIsClosingDayModalOpen(false);
+          setSelectedSpecialDay(null);
+        }}
+        type="Closing Day"
+        initialData={selectedSpecialDay}
+        onSuccess={handleSpecialDaySuccess}
       />
     </Box>
   );

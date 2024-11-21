@@ -251,3 +251,78 @@ export const mockClosingDays: Holiday[] = [
     deletedAt: null
   }
 ];
+
+
+
+
+interface HolidayInput {
+  name: string;
+  start_date: string;
+  end_date: string;
+}
+
+// Add a holiday
+export const addHoliday = async (holidayData: HolidayInput) => {
+  try {
+    const response = await api.post('/holiday', holidayData);
+    return response.data;
+  } catch (error) {
+    console.error('Error adding holiday:', error);
+    throw error;
+  }
+};
+
+// Update a holiday
+export const updateHoliday = async (id: number, holidayData: HolidayInput) => {
+  try {
+    const response = await api.put(`/holiday/${id}`, holidayData);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating holiday:', error);
+    throw error;
+  }
+};
+
+// Delete a holiday
+export const deleteHoliday = async (id: number) => {
+  try {
+    const response = await api.delete(`/holiday/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting holiday:', error);
+    throw error;
+  }
+};
+
+// Add a closing day (uses same endpoint as holiday but marks it as a closing day)
+export const addClosingDay = async (closingDayData: HolidayInput) => {
+  try {
+    const response = await api.post('/closing-day', closingDayData);
+    return response.data;
+  } catch (error) {
+    console.error('Error adding closing day:', error);
+    throw error;
+  }
+};
+
+// Update a closing day
+export const updateClosingDay = async (id: number, closingDayData: HolidayInput) => {
+  try {
+    const response = await api.put(`/closing-day/${id}`, closingDayData);
+    return response.data;
+  } catch (error) {
+    console.error('Error updating closing day:', error);
+    throw error;
+  }
+};
+
+// Delete a closing day
+export const deleteClosingDay = async (id: number) => {
+  try {
+    const response = await api.delete(`/closing-day/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error deleting closing day:', error);
+    throw error;
+  }
+};
