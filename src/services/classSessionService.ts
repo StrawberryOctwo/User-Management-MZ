@@ -175,3 +175,79 @@ export async function toggleClassSessionActivation(
     throw error;
   }
 }
+
+
+export interface Holiday {
+  id: number;
+  name: string;
+  start_date: string;
+  end_date: string;
+  createdAt: string;
+  updatedAt: string;
+  deletedAt: string | null;
+}
+
+// Fetch holidays
+export const fetchHolidays = async () => {
+  try {
+    const response = await api.get('/holidays');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching holidays:', error);
+    throw error;
+  }
+};
+
+// Fetch closing days
+export const fetchClosingDays = async () => {
+  try {
+    const response = await api.get('/closing-days');
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching closing days:', error);
+    throw error;
+  }
+};
+
+// Mock data for development
+export const mockHolidays: Holiday[] = [
+  {
+    id: 1,
+    name: "Thanksgiving",
+    start_date: "2024-11-28",  // Current test date
+    end_date: "2024-11-28",
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    deletedAt: null
+  },
+  {
+    id: 2,
+    name: "Christmas",
+    start_date: "2024-12-24",
+    end_date: "2024-12-26",
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    deletedAt: null
+  }
+];
+
+export const mockClosingDays: Holiday[] = [
+  {
+    id: 3,
+    name: "Staff Training",
+    start_date: "2024-11-28",  // Current test date
+    end_date: "2024-11-28",
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    deletedAt: null
+  },
+  {
+    id: 4,
+    name: "Maintenance Day",
+    start_date: "2024-11-25",
+    end_date: "2024-11-25",
+    createdAt: "2024-01-01T00:00:00Z",
+    updatedAt: "2024-01-01T00:00:00Z",
+    deletedAt: null
+  }
+];

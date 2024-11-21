@@ -16,7 +16,12 @@ import { getStrongestRoles } from 'src/hooks/roleUtils';
 import { useAuth } from 'src/hooks/useAuth';
 import {
   deleteClassSession,
-  toggleClassSessionActivation
+  toggleClassSessionActivation,
+  fetchHolidays,
+  fetchClosingDays,
+  mockHolidays,
+  mockClosingDays,
+  Holiday
 } from 'src/services/classSessionService';
 import FullCalendar from '@fullcalendar/react';
 import resourceTimelinePlugin from '@fullcalendar/resource-timeline';
@@ -80,6 +85,9 @@ export default function CustomizedCalendar({
   const calendarRef = useRef<any>(null);
 
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
+  const [holidays, setHolidays] = useState<Holiday[]>([]);
+  const [closingDays, setClosingDays] = useState<Holiday[]>([]);
+
   const datePickerButtonRef = useRef<HTMLButtonElement>(null);
   const isHandlingClick = useRef(false);
 
@@ -97,6 +105,45 @@ export default function CustomizedCalendar({
 
     return unsortedResources.sort((a, b) => a.sortOrder - b.sortOrder);
   }, [selectedLocations]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        // For development, use mock data
+        setHolidays(mockHolidays);
+        setClosingDays(mockClosingDays);
+
+        // For production, uncomment these lines
+        // const holidaysData = await fetchHolidays();
+        // const closingDaysData = await fetchClosingDays();
+        // setHolidays(holidaysData);
+        // setClosingDays(closingDaysData);
+      } catch (error) {
+        console.error('Error fetching holidays and closing days:', error);
+      }
+    };
+
+    fetchData();
+  }, []);
+
+  const getDateStatus = (date: Date) => {
+    const dateStr = moment(date).format('YYYY-MM-DD');
+
+    const holidayMatch = holidays.find(
+      holiday => moment(dateStr).isBetween(holiday.start_date, holiday.end_date, 'day', '[]')
+    );
+
+    const closingDayMatch = closingDays.find(
+      closingDay => moment(dateStr).isBetween(closingDay.start_date, closingDay.end_date, 'day', '[]')
+    );
+
+    return {
+      isHoliday: !!holidayMatch,
+      isClosingDay: !!closingDayMatch,
+      holidayName: holidayMatch?.name,
+      closingDayName: closingDayMatch?.name
+    };
+  };
 
 
   const handleDatePickerClick = (event: any) => {
@@ -406,12 +453,38 @@ export default function CustomizedCalendar({
         }}
         eventClick={(info) => handleEventClick(info.event)}
         select={(info) => {
+          const { isClosingDay } = getDateStatus(info.start);
+          if (isClosingDay) {
+            showMessage('Cannot add events on closing days', 'error');
+            return;
+          }
           handleOpenAddModal(info.start, info.end, info.resource.id);
         }}
         views={{
           resourceTimelineDay: {
             slotMinWidth: 120,
           },
+        }}
+        slotLabelDidMount={(arg) => {
+          const { isHoliday, isClosingDay } = getDateStatus(arg.date);
+
+          if (isClosingDay) {
+            arg.el.classList.add('closing-day');
+            arg.el.style.pointerEvents = 'none';
+          }
+          if (isHoliday) {
+            arg.el.classList.add('holiday');
+          }
+        }}
+        selectConstraint={{
+          startTime: '12:00:00',
+          endTime: '19:00:00',
+          daysOfWeek: [0, 1, 2, 3, 4, 5, 6]
+        }}
+        selectOverlap={(event) => {
+          if (!event.start) return true;
+          const { isClosingDay } = getDateStatus(new Date(event.start));
+          return !isClosingDay;
         }}
       />
 
@@ -458,4 +531,5 @@ export default function CustomizedCalendar({
       />
     </Box>
   );
+
 }
