@@ -17,11 +17,11 @@ import moment from 'moment';
 import {
   fetchClassSessionById,
   getClassSessionReportsStatus,
-  getStudentSessionReportStatus
+  getStudentSessionReportStatus,
+  submitTeacherReports // Added import
 } from 'src/services/classSessionService';
 import AddSessionReportForm from './AddSessionReportForm';
 import ViewSessionReportForm from './ViewSessionReport';
-import StudentDetailCard from './StudentDetailCArd';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import AbsenceTab from './AbsenceTab';
 import RoleBasedComponent from 'src/components/ProtectedComponent';
@@ -29,6 +29,7 @@ import EditIcon from '@mui/icons-material/Edit';
 import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { calculateEndTimeInMinutes } from 'src/utils/teacherUtils';
+import StudentDetailCard from './StudentDetailCArd';
 
 interface ClassSessionDetailsModalProps {
   isOpen: boolean;
@@ -74,6 +75,11 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
   const [deactivateDialogOpen, setDeactivateDialogOpen] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
   const [isSessionEnded, setIsSessionEnded] = useState<boolean>(false);
+  
+  // New state variables for submission
+  const [isSubmittingReports, setIsSubmittingReports] = useState<boolean>(false);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const [submissionSuccess, setSubmissionSuccess] = useState<string | null>(null);
 
   // Fetch class session details
   const loadClassSession = async () => {
@@ -83,9 +89,6 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     try {
       const response = await fetchClassSessionById(appointmentId);
       setClassSession(response);
-
-      const reportResponse = await getClassSessionReportsStatus(appointmentId);
-      setAllReportsCompleted(reportResponse.allReportsCompleted);
 
       const studentReportsStatus: {
         [studentId: string]: {
@@ -105,6 +108,12 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       }
 
       setReportStatus(studentReportsStatus);
+
+      // Check if all reports are completed
+      const allCompleted = response.students.every(
+        (student: any) => studentReportsStatus[student.id].reportCompleted
+      );
+      setAllReportsCompleted(allCompleted);
     } catch (error) {
       setErrorMessage('Failed to load class session details.');
       console.error('Error fetching class session details:', error);
@@ -118,11 +127,6 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       loadClassSession();
     }
   }, [isOpen, appointmentId]);
-
-  useEffect(() => {
-    if (allReportsCompleted) {
-    }
-  }, [allReportsCompleted]);
 
   const handleAddReport = (student: any) => {
     setSelectedStudent(student);
@@ -212,6 +216,27 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       }
     }
   }, [classSession]);
+
+  // New handler for submitting all reports
+  const handleSubmitAllReports = async () => {
+    if (!classSession) return;
+
+    setIsSubmittingReports(true);
+    setSubmissionError(null);
+    setSubmissionSuccess(null);
+
+    try {
+      await submitTeacherReports({ classSessionId: classSession.id });
+      setSubmissionSuccess('All session reports have been successfully submitted.');
+      // Refresh the class session data to update the `reportsSubmitted` status
+      await loadClassSession();
+    } catch (error) {
+      console.error('Error submitting reports:', error);
+      setSubmissionError('Failed to submit all session reports. Please try again.');
+    } finally {
+      setIsSubmittingReports(false);
+    }
+  };
 
   return (
     <Dialog
@@ -384,29 +409,32 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                   <Typography variant="body2">No students enrolled.</Typography>
                 )}
 
-                {allReportsCompleted && (
-                  <Box
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center"
-                    mt={3}
-                  >
-                    <Typography
-                      variant="h5"
-                      color="green"
-                      sx={{
-                        fontWeight: 'bold',
-                        textAlign: 'center',
-                        backgroundColor: '#e0f2f1',
-                        padding: '10px',
-                        borderRadius: '5px',
-                        border: '1px solid green'
-                      }}
-                    >
-                      Session Reports Submitted
-                    </Typography>
-                  </Box>
+                {/* Display success or error messages */}
+                {submissionSuccess && (
+                  <Typography variant="body2" color="success.main" sx={{ mt: 2 }}>
+                    {submissionSuccess}
+                  </Typography>
                 )}
+                {submissionError && (
+                  <Typography variant="body2" color="error" sx={{ mt: 2 }}>
+                    {submissionError}
+                  </Typography>
+                )}
+
+                {/* Submit All Reports Button */}
+                <Box display="flex" justifyContent="center" mt={3}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleSubmitAllReports}
+                    disabled={classSession.reportsSubmitted || isSubmittingReports}
+                    startIcon={isSubmittingReports && <CircularProgress size={20} />}
+                  >
+                    Submit All Reports
+                  </Button>
+                </Box>
+
+
 
                 {/* Add Session Report Form Dialog */}
                 <AddSessionReportForm

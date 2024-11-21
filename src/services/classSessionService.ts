@@ -85,6 +85,16 @@ export const updateClassSession = async (id: string, updatedData: any) => {
   }
 };
 
+export const submitTeacherReports = async (classSessionId: any) => {
+  try {
+    const response = await api.patch(`/session-reports/class-session/teacher/submit`, classSessionId);
+    return response.data;
+  } catch (error) {
+    console.error(`Error submitting reports:`, error);
+    throw error;
+  }
+};
+
 export const updateClassSessionFromTo = async (id: string, updatedData: any) => {
   try {
     const response = await api.put(`/class-session/from-to/${id}`, updatedData);
