@@ -1,25 +1,29 @@
-import { useEffect, useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import {
-  alpha,
-  Badge,
+  Avatar,
   Box,
   Button,
-  Fade,
+  Divider,
   IconButton,
   List,
   ListItem,
   Popover,
   Tooltip,
-  Typography
+  Typography,
+  Fade,
+  Modal,
+  alpha,
+  Badge,
+  styled
 } from '@mui/material';
 import NotificationsActiveTwoToneIcon from '@mui/icons-material/NotificationsActiveTwoTone';
-import { styled } from '@mui/material/styles';
-import { formatDistanceToNowStrict, set } from 'date-fns';
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
-import { useAuth } from 'src/hooks/useAuth';
-import { handleMarkAsRead } from 'src/services/notificationService';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
-import { fetchNotifications, INotification } from './utils';
+import { formatDistanceToNowStrict } from 'date-fns';
+import { handleMarkAsRead } from 'src/services/notificationService';
+import { useAuth } from 'src/hooks/useAuth';
+import { INotification, fetchNotifications } from './utils';
+import { GridCloseIcon } from '@mui/x-data-grid';
 
 const NotificationsBadge = styled(Badge)(
   ({ theme }) => `
@@ -50,6 +54,8 @@ function HeaderNotifications() {
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
+  const [selectedNotification, setSelectedNotification] =
+    useState<INotification | null>(null);
   const { userId } = useAuth();
   const limit = 3;
 
@@ -59,6 +65,22 @@ function HeaderNotifications() {
 
   const handleClose = (): void => {
     setOpen(false);
+  };
+
+  const handlePreviousPage = (): void => {
+    setCurrentPage((prev) => Math.max(prev - 1, 0));
+  };
+
+  const handleNextPage = (): void => {
+    setCurrentPage((prev) => Math.min(prev + 1, totalPages - 1));
+  };
+
+  const handleNotificationClick = (notification: INotification) => {
+    setSelectedNotification(notification);
+  };
+
+  const handleModalClose = () => {
+    setSelectedNotification(null);
   };
 
   useEffect(() => {
@@ -104,14 +126,6 @@ function HeaderNotifications() {
     };
   }, [userId]);
 
-  const handlePreviousPage = () => {
-    if (currentPage > 0) setCurrentPage((prev) => prev - 1);
-  };
-
-  const handleNextPage = () => {
-    if (currentPage < totalPages - 1) setCurrentPage((prev) => prev + 1);
-  };
-
   return (
     <>
       <Tooltip arrow title="Notifications">
@@ -151,7 +165,7 @@ function HeaderNotifications() {
           }}
         >
           <Typography variant="h5" fontWeight="bold">
-            {unreadCount > 0
+            {notifications.length > 0
               ? `${unreadCount} Unread Notifications`
               : 'No Notifications'}
           </Typography>
@@ -186,8 +200,10 @@ function HeaderNotifications() {
                 flexDirection: 'column',
                 alignItems: 'flex-start',
                 borderBottom: '1px solid',
-                borderColor: 'divider'
+                borderColor: 'divider',
+                cursor: 'pointer'
               }}
+              onClick={() => handleNotificationClick(notification)}
             >
               <Box flex="1" width="100%">
                 <Typography
@@ -204,7 +220,15 @@ function HeaderNotifications() {
                   component="span"
                   variant="body2"
                   color="text.secondary"
-                  sx={{ display: 'block', mb: 2 }}
+                  sx={{
+                    display: '-webkit-box',
+                    WebkitBoxOrient: 'vertical',
+                    WebkitLineClamp: 4, // Limit to 4 lines
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    mb: 2,
+                    width: '450px'
+                  }}
                 >
                   {notification.message}
                 </Typography>
@@ -233,13 +257,14 @@ function HeaderNotifications() {
                     size="small"
                     color="primary"
                     variant="outlined"
-                    onClick={() =>
+                    onClick={(e) => {
+                      e.stopPropagation(); // Prevent triggering the click event on the ListItem
                       handleMarkAsRead(
                         notification.id,
                         setNotifications,
                         setUnreadCount
-                      )
-                    }
+                      );
+                    }}
                     startIcon={<RemoveRedEyeOutlinedIcon />}
                   >
                     Mark as Read
@@ -294,6 +319,93 @@ function HeaderNotifications() {
           </Box>
         )}
       </Popover>
+      <Modal
+        open={!!selectedNotification}
+        onClose={handleModalClose}
+        aria-labelledby="notification-modal-title"
+        aria-describedby="notification-modal-description"
+      >
+        <Box
+          sx={{
+            position: 'absolute',
+            top: '50%',
+            left: '50%',
+            transform: 'translate(-50%, -50%)',
+            width: 800,
+            bgcolor: 'background.paper',
+            borderRadius: 1,
+            boxShadow: 24,
+            p: 4,
+            outline: 'none'
+          }}
+        >
+          <IconButton
+            aria-label="close"
+            onClick={handleModalClose}
+            sx={{
+              position: 'absolute',
+              right: 8,
+              top: 8,
+              color: (theme) => theme.palette.grey[500]
+            }}
+          >
+            <GridCloseIcon />
+          </IconButton>
+          <Typography id="notification-modal-title" variant="h6" component="h2">
+            {selectedNotification?.title}
+          </Typography>
+          <Divider sx={{ my: 2 }} />
+          <Typography
+            id="notification-modal-description"
+            sx={{
+              mt: 2,
+              lineHeight: 2.5, // Line spacing
+              whiteSpace: 'pre-wrap', // Preserve whitespace and wrap text
+              wordBreak: 'break-word', // Break long words
+              textAlign: 'justify', // Justify text
+              maxHeight: '400px', // Limit the height
+              overflowY: 'auto', // Enable vertical scrolling
+              paddingRight: '16px', // Add padding to the right for scrollbar
+              '&::-webkit-scrollbar': {
+                width: '6px' // Set scrollbar width
+              },
+              '&::-webkit-scrollbar-thumb': {
+                backgroundColor: 'rgba(0, 0, 0, 0.2)', // Thumb color
+                borderRadius: '3px' // Rounded corners for thumb
+              },
+              '&::-webkit-scrollbar-thumb:hover': {
+                backgroundColor: 'rgba(0, 0, 0, 0.3)' // Thumb color on hover
+              },
+              '&::-webkit-scrollbar-track': {
+                backgroundColor: 'rgba(0, 0, 0, 0.1)' // Track color
+              }
+            }}
+          >
+            {selectedNotification?.message}
+          </Typography>
+
+          <Typography
+            id="notification-modal-date"
+            sx={{
+              mt: 2,
+              fontSize: '0.875rem', // Smaller font size
+              color: 'text.secondary', // Secondary text color
+              fontStyle: 'italic', // Italic style
+              display: 'block', // Ensure it takes up the full width
+              textAlign: 'left' // Align to the right
+            }}
+          >
+            {selectedNotification &&
+              new Date(selectedNotification.createdAt).toLocaleString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+                year: 'numeric',
+                month: 'numeric',
+                day: 'numeric'
+              })}
+          </Typography>
+        </Box>
+      </Modal>
     </>
   );
 }
