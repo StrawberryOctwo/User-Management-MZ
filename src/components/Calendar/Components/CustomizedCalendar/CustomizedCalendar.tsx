@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useMemo, useEffect } from 'react';
-import { Box } from '@mui/material';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
+import { Box, Button } from '@mui/material';
 import moment from 'moment';
 import { Views } from 'react-big-calendar';
 import 'react-datepicker/dist/react-datepicker.css';
@@ -8,6 +8,7 @@ import EditAppointmentModal from '../Appointment/EditClassSession/EditAppointmen
 import AddClassSessionModal from '../Appointment/AddClassSession/AddClassSessionModal';
 import ClassSessionDetailsModal from '../Modals/ClassSessionDetailsModal';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
+import DatePicker from 'react-datepicker';
 import { useAuth } from 'src/hooks/useAuth';
 import {
   deleteClassSession,
@@ -322,6 +323,18 @@ export default function CustomizedCalendar({
   const renderEventContent = (eventInfo: any) => {
     return <EventItem eventInfo={eventInfo} />;
   };
+  const [selectedDate, setSelectedDate] = useState(new Date(date));
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const calendarRef = useRef(null);
+
+  const handleDateChange = (date) => {
+    setSelectedDate(date);
+    setShowDatePicker(false);
+
+    // Access FullCalendar API and update the date
+    const calendarApi = calendarRef.current.getApi();
+    calendarApi.gotoDate(date); // Update FullCalendar to selected date
+  };
 
   return (
     <Box
@@ -332,21 +345,26 @@ export default function CustomizedCalendar({
       gap={2}
       p={2}
     >
-      <FullCalendar
+     <FullCalendar
+        ref={calendarRef}
         plugins={[resourceTimelinePlugin, interactionPlugin]}
         schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
         initialView="resourceTimelineDay"
-        initialDate={date}
+        initialDate={selectedDate}
         headerToolbar={{
           left: 'today',
-          center: 'prev title next',
-          right: 'eventButton'
+          center: 'prev datePickerButton next', // Ensure 'prev' and 'next' are default buttons
+          right: 'eventButton',
         }}
         customButtons={{
+          datePickerButton: {
+            text: moment(selectedDate).format('dddd, MMMM D, YYYY'),
+            click: () => setShowDatePicker(true),
+          },
           eventButton: {
             text: 'Add Event',
-            click: handleOpenEventTypeModal
-          }
+            click: handleOpenEventTypeModal,
+          },
         }}
         resources={resources}
         resourceOrder="sortOrder"
@@ -359,16 +377,19 @@ export default function CustomizedCalendar({
         slotLabelFormat={{
           hour: '2-digit',
           minute: '2-digit',
-          hour12: false
+          hour12: false,
         }}
         titleFormat={{
           year: 'numeric',
           month: 'long',
           day: 'numeric',
-          weekday: 'long' // Add the day of the week here
+          weekday: 'long',
         }}
         datesSet={(info) => {
-          onDateChange(moment(info.start).format('YYYY-MM-DD'));
+          // Update selectedDate when the calendar changes (prev/next button pressed)
+          const currentDate = info.view.currentStart;
+          setSelectedDate(currentDate); // Sync the selected date with FullCalendar's current view
+          onDateChange(moment(currentDate).format('YYYY-MM-DD')); // Optionally update the external date state
         }}
         eventClick={(info) => handleEventClick(info.event)}
         select={(info) => {
@@ -376,10 +397,31 @@ export default function CustomizedCalendar({
         }}
         views={{
           resourceTimelineDay: {
-            slotMinWidth: 120
-          }
+            slotMinWidth: 120,
+          },
         }}
       />
+
+{showDatePicker && (
+        <div
+        className='date-picker-div'
+        >
+          <DatePicker
+            selected={selectedDate}
+            onChange={handleDateChange}
+            inline
+            
+          />
+             <Button variant="contained" size="small"
+             sx={{ marginTop: '10px' }}
+            onClick={() => setShowDatePicker(false)}
+       
+          >
+            Close
+          </Button>
+        </div>
+      )}
+
 
 
       <EventTypeSelectionModal
