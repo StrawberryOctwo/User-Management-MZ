@@ -8,7 +8,7 @@ import {
   MenuItem,
   Tooltip,
   Typography,
-  Button,
+  Button
 } from '@mui/material';
 import TranslateIcon from '@mui/icons-material/Translate';
 import { useRef, useState, useEffect } from 'react';
@@ -23,7 +23,7 @@ function HeaderLocalization() {
   const availableLanguages = [
     { code: 'en', label: 'English' },
     { code: 'de', label: 'German' },
-    { code: 'fr', label: 'French' },
+    { code: 'fr', label: 'French' }
   ];
 
   useEffect(() => {
@@ -68,11 +68,11 @@ function HeaderLocalization() {
         onClose={handleClose}
         anchorOrigin={{
           vertical: 'bottom',
-          horizontal: 'right',
+          horizontal: 'right'
         }}
         transformOrigin={{
           vertical: 'top',
-          horizontal: 'left',
+          horizontal: 'left'
         }}
       >
         <Box sx={{ p: 2, minWidth: 200 }}>
