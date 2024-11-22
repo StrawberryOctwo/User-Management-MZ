@@ -11,7 +11,10 @@ import CalendarLegend from './Components/CalendarLegend';
 import { useAuth } from 'src/hooks/useAuth';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import {
+  Holiday,
   fetchClassSessions,
+  fetchClosingDays,
+  fetchHolidays,
   fetchParentClassSessions,
   fetchUserClassSessions
 } from 'src/services/classSessionService';
@@ -21,6 +24,8 @@ const CalendarContent: React.FC = () => {
   const [classSessionEvents, setClassSessionEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [holidays, setHolidays] = useState<Holiday[]>([]);
+  const [closingDays, setClosingDays] = useState<Holiday[]>([]);
   const [startDate, setStartDate] = useState<string>(
     moment().startOf('month').format('YYYY-MM-DD')
   );
@@ -63,7 +68,9 @@ const CalendarContent: React.FC = () => {
       setSelectedFranchise(JSON.parse(savedFranchise));
     }
     if (savedLocations) {
-      setSelectedLocations(JSON.parse(savedLocations));
+      const parsedLocations = JSON.parse(savedLocations);
+      setSelectedLocations(parsedLocations);
+      fetchSpecialDays(parsedLocations);
     }
   }, []);
 
@@ -76,6 +83,7 @@ const CalendarContent: React.FC = () => {
         setSelectedLocations(storedLocations);
       }
       loadClassSessions(storedLocations);
+      fetchSpecialDays(storedLocations);
     };
 
     calendarsharedService.on('absenceUpdated', onAbsenceUpdated);
@@ -183,6 +191,24 @@ const CalendarContent: React.FC = () => {
     }
   };
 
+  const fetchSpecialDays = async (locations: any[]) => {
+    try {
+      if (locations.length === 0) return;
+
+      const locationIds = locations.map(loc => loc.id);
+
+      const [holidaysResponse, closingDaysResponse] = await Promise.all([
+        fetchHolidays(locationIds),
+        fetchClosingDays(locationIds)
+      ]);
+
+      setHolidays(holidaysResponse.holidays);
+      setClosingDays(closingDaysResponse.holidays);
+    } catch (error) {
+      console.error('Error fetching special days:', error);
+    }
+  };
+
   useEffect(() => {
     const onAbsenceUpdated = () => {
       loadClassSessions();
@@ -208,13 +234,15 @@ const CalendarContent: React.FC = () => {
   };
 
   const handleLocationsChange = (locations: any[]) => {
-    // Updated to multiple locations
     setSelectedLocations(locations);
     setClassSessionEvents([]);
     if (locations.length > 0) {
       localStorage.setItem('selectedLocations', JSON.stringify(locations));
+      fetchSpecialDays(locations);
     } else {
       localStorage.removeItem('selectedLocations');
+      setHolidays([]);
+      setClosingDays([]);
     }
   };
 
@@ -246,6 +274,8 @@ const CalendarContent: React.FC = () => {
           onDateChange={setDate}
           loadClassSessions={loadClassSessions}
           selectedLocations={selectedLocations}
+          holidays={holidays}
+          closingDays={closingDays}
         />
         {selectedLocations.length === 0 &&
           strongestRole !== 'Teacher' &&
