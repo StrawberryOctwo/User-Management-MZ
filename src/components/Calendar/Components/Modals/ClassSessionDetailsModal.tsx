@@ -448,7 +448,9 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                   }
                   classSessionId={appointmentId}
                   studentId={selectedStudent ? selectedStudent.id : ''}
-                  userId={selectedStudent ? selectedStudent.user.id : ''}
+                  user={selectedStudent}
+                  teacher={classSession.teacher}
+                  sessionDate={classSession.date}
                 />
 
                 {/* View Session Report Form Dialog */}

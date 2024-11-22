@@ -1,10 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, MenuItem, Box, FormControlLabel, Checkbox } from '@mui/material';
-import { useTranslation } from 'react-i18next'; // Import translation hook
-import { addSessionReport } from 'src/services/sessionReportService';
-import { fetchClassSessionById } from 'src/services/classSessionService';
-import {  getStudentPaymentDetails } from 'src/services/paymentService';
-import { sessionTypeFunc } from 'src/utils/sessionType'
+import React, { useState } from 'react';
+import { Dialog, DialogTitle, DialogContent, DialogActions, TextField, Button, Box, FormControl, FormControlLabel, Radio, RadioGroup, FormLabel, Stepper, Step, StepLabel, Typography } from '@mui/material';
+import { useTranslation } from 'react-i18next';
+
 interface AddSessionReportFormProps {
     isOpen: boolean;
     onClose: () => void;
@@ -12,184 +9,262 @@ interface AddSessionReportFormProps {
     studentName: string;
     classSessionId: string;
     studentId: string;
-    userId: string;
+    user: any;
+    teacher: any;
+    sessionDate: string;
 }
 
-const AddSessionReportForm: React.FC<AddSessionReportFormProps> = ({ isOpen, onClose, onSave, studentName, classSessionId, studentId, userId }) => {
-    const { t } = useTranslation();  // Use translation hook to access locale
-    const [groupSessionPrice, setGroupSessionPrice] = useState<number>(0);
-    const [individualSessionPrice, setIndividualSessionPrice] = useState<number>(0);
-    const [sessionType, setSessionType] = useState<string>('');  // Will be "group" or "1on1"
+const steps = ['Lesson Content', 'Progress & Learning', 'Attention', 'Homework & Notes'];
 
-    // New Fields
-    const [lessonTopic, setLessonTopic] = useState<string>('');
-    const [coveredMaterials, setCoveredMaterials] = useState<string>('');
-    const [progress, setProgress] = useState<string>('');
-    const [learningAssessment, setLearningAssessment] = useState<string>('');
-    const [activeParticipation, setActiveParticipation] = useState<boolean>(false);
-    const [concentration, setConcentration] = useState<boolean>(false);
-    const [worksIndependently, setWorksIndependently] = useState<boolean>(false);
-    const [cooperation, setCooperation] = useState<boolean>(false);
-    const [previousHomeworkCompleted, setPreviousHomeworkCompleted] = useState<boolean>(false);
-    const [nextHomework, setNextHomework] = useState<string>('');
-    const [tutorRemarks, setTutorRemarks] = useState<string>('');
+const StepContent = ({ step, formData, handleChange, user, teacher, sessionDate }) => {
+    switch (step) {
 
-    // Fetch the session details and payment details
-    useEffect(() => {
-        const fetchSessionAndPaymentDetails = async () => {
-            try {
-                // Fetch session details (including session type)
-                const sessionDetails = await fetchClassSessionById(classSessionId);
-                setSessionType(sessionDetails.sessionType);  // Set session type (e.g., "1on1", "group")
- 
-                // Fetch payment details for the student
-                const paymentDetails = await getStudentPaymentDetails(studentId);
-                setGroupSessionPrice(paymentDetails.groupSessionPrice);
-                setIndividualSessionPrice(paymentDetails.individualSessionPrice);
-            } catch (error) {
-                console.error('Error fetching session or payment details:', error);
-            }
-        };
+        case 0:
+            return (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <FormLabel component="legend">1. Lesson Content</FormLabel>
+                    <TextField
+                        label="Topic of the Lesson"
+                        value={formData.lessonTopic}
+                        onChange={handleChange('lessonTopic')}
+                        fullWidth
+                    />
+                    <TextField
+                        label="Covered Topics/Exercises"
+                        value={formData.coveredMaterials}
+                        onChange={handleChange('coveredMaterials')}
+                        fullWidth
+                    />
+                </Box>
+            );
 
-        if (isOpen) {
-            fetchSessionAndPaymentDetails();
-        }
+        case 1:
+            return (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <FormLabel component="legend">2. Progress in this Lesson</FormLabel>
+                    <FormControl component="fieldset">
+                        <RadioGroup value={formData.progress} onChange={handleChange('progress')}>
+                            <Box display="flex">
+                                <FormControlLabel value="very-good" control={<Radio />} label="Very Good" />
+                                <FormControlLabel value="good" control={<Radio />} label="Good" />
+                                <FormControlLabel value="needs-improvement" control={<Radio />} label="Needs Improvement" />
+                                <FormControlLabel value="difficult" control={<Radio />} label="Difficult" />
+                            </Box>
+                        </RadioGroup>
+                    </FormControl>
+                    <TextField
+                        label="Brief Explanation/Assessment of Learning Progress"
+                        value={formData.learningAssessment}
+                        onChange={handleChange('learningAssessment')}
+                        multiline
+                        rows={3}
+                        fullWidth
+                    />
+                </Box>
+            );
 
+        case 2:
+            return (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <FormLabel component="legend" sx={{ fontWeight: 'bold' }}>Attention</FormLabel>
+                    {[
+                        { field: 'activeParticipation', label: 'Regular and active participation in class', inputField: 'participationNotes' },
+                        { field: 'concentration', label: 'Remains focused', inputField: 'concentrationNotes' },
+                        { field: 'worksIndependently', label: 'Works independently', inputField: 'independentWorkNotes' },
+                        { field: 'cooperation', label: 'Cooperative', inputField: 'cooperationNotes' }
+                    ].map(({ field, label, inputField }) => (
+                        <Box key={field} sx={{ mb: 2 }}>
+                            <FormLabel>{label}</FormLabel>
+                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1 }}>
+                                <TextField
+                                    label="Notes"
+                                    value={formData[inputField]}
+                                    onChange={handleChange(inputField)}
+                                    size="small"
+                                    fullWidth
+                                />
+                                <RadioGroup value={formData[field]} onChange={handleChange(field)} row sx={{ minWidth: '150px' }}>
+                                    <FormControlLabel value="yes" control={<Radio size="small" />} label="Yes" />
+                                    <FormControlLabel value="no" control={<Radio size="small" />} label="No" />
+                                </RadioGroup>
+                            </Box>
+                        </Box>
+                    ))}
+                </Box>
+            );
 
-    }, [isOpen, classSessionId, studentId]);
+        case 3:
+            return (
+                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <Box>
+                        <FormLabel component="legend">3. Homework</FormLabel>
+                        <FormControl fullWidth sx={{ mt: 2 }}>
+                            <FormLabel>Previous homework completed</FormLabel>
+                            <RadioGroup value={formData.previousHomeworkCompleted} onChange={handleChange('previousHomeworkCompleted')} row>
+                                <FormControlLabel value="yes" control={<Radio />} label="Yes" />
+                                <FormControlLabel value="no" control={<Radio />} label="No" />
+                            </RadioGroup>
+                        </FormControl>
+                        <FormControl fullWidth sx={{ mt: 2 }}>
+                            <FormLabel>Homework for the next session</FormLabel>
+                            <RadioGroup value={formData.nextHomework} onChange={handleChange('nextHomework')} row>
+                                <FormControlLabel value="worksheets" control={<Radio />} label="Worksheets" />
+                                <FormControlLabel value="school-materials" control={<Radio />} label="School materials" />
+                            </RadioGroup>
+                        </FormControl>
+                    </Box>
+                    <Box sx={{ mt: 2 }}>
+                        <FormLabel component="legend">4. Notes from the Tutor</FormLabel>
+                        <TextField
+                            label="Additional comments"
+                            value={formData.tutorRemarks}
+                            onChange={handleChange('tutorRemarks')}
+                            multiline
+                            rows={4}
+                            fullWidth
+                            margin="normal"
+                        />
+                    </Box>
+                </Box>
+            );
 
-    // Function to calculate payment amount based on session type
+        default:
+            return null;
+    }
+};
+
+const AddSessionReportForm: React.FC<AddSessionReportFormProps> = ({
+    isOpen,
+    onClose,
+    onSave,
+    studentName,
+    classSessionId,
+    studentId,
+    user,
+    teacher,
+    sessionDate
+}) => {
+    const { t } = useTranslation();
+    const [activeStep, setActiveStep] = useState(0);
+    const [formData, setFormData] = useState({
+        lessonTopic: '',
+        coveredMaterials: '',
+        progress: 'good',
+        learningAssessment: '',
+        activeParticipation: 'no',
+        concentration: 'no',
+        worksIndependently: 'no',
+        cooperation: 'no',
+        previousHomeworkCompleted: 'no',
+        nextHomework: 'worksheets',
+        tutorRemarks: '',
+        participationNotes: '',
+        concentrationNotes: '',
+        independentWorkNotes: '',
+        cooperationNotes: '',
+    });
+
+    const handleStepClick = (step: number) => {
+        setActiveStep(step);
+    };
+
+    const handleChange = (field: string) => (
+        e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    ) => {
+        setFormData(prev => ({ ...prev, [field]: e.target.value }));
+    };
+
+    const handleNext = () => {
+        setActiveStep((prevStep) => prevStep + 1);
+    };
+
+    const handleBack = () => {
+        setActiveStep((prevStep) => prevStep - 1);
+    };
 
     const handleSave = async () => {
- 
-            try {
-                // Create session report
-                const newReport = await addSessionReport({
-                    
-                    classSessionId,
-                    studentId,
-                    lessonTopic,
-                    coveredMaterials,
-                    progress,
-                    learningAssessment,
-                    activeParticipation,
-                    concentration,
-                    worksIndependently,
-                    cooperation,
-                    previousHomeworkCompleted,
-                    nextHomework,
-                    tutorRemarks
-                });
-
-                onSave(newReport);  // Pass the newly created report to the parent to refresh UI
-  
-                setLessonTopic('');
-                setCoveredMaterials('');
-                setProgress('');
-                setLearningAssessment('');
-                setActiveParticipation(false);
-                setConcentration(false);
-                setWorksIndependently(false);
-                setCooperation(false);
-                setPreviousHomeworkCompleted(false);
-                setNextHomework('');
-                setTutorRemarks('');
-                onClose();  // Close dialog
-
-            } catch (error) {
-                console.error('Error saving session report:', error);
-            
+        try {
+            console.log("classSessionId", classSessionId);
+            console.log("studentId", studentId);
+            console.log("formData", formData);
+        } catch (error) {
+            console.error('Error saving session report:', error);
         }
     };
 
     return (
-        <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
-            <DialogTitle>{t('Add Session Report for')} {studentName}</DialogTitle>
+        <Dialog open={isOpen} onClose={onClose} maxWidth="md" fullWidth>
+            <DialogTitle>
+                <Box sx={{ mb: 2 }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                        <Typography variant="h6">
+                            {t('Lesson Protocol')}
+                        </Typography>
+                        <Typography variant="body1">
+                            <strong>{t('Session Date')}:</strong> {sessionDate || '-'}
+                        </Typography>
+                    </Box>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+                        <Typography variant="body1">
+                            <strong>{t('Student')}:</strong> {user?.user?.firstName ? `${user.user.firstName} ${user.user.lastName}` : '-'}
+                        </Typography>
+                        <Typography variant="body1">
+                            <strong>{t('Teacher')}:</strong> {teacher?.user?.firstName ? `${teacher.user.firstName} ${teacher.user.lastName}` : '-'}
+                        </Typography>
+                    </Box>
+                </Box>
+            </DialogTitle>
             <DialogContent>
-                <Box display="flex" flexDirection="column" gap={2} mt={2}>
-
-
-                    <TextField
-                        label={t('Lesson Topic')}
-                        value={lessonTopic}
-                        onChange={(e) => setLessonTopic(e.target.value)}
-                        fullWidth
-                    />
-
-                    <TextField
-                        label={t('Covered Materials')}
-                        value={coveredMaterials}
-                        onChange={(e) => setCoveredMaterials(e.target.value)}
-                        fullWidth
-                    />
-
-                    <TextField
-                        label={t('Progress')}
-                        value={progress}
-                        onChange={(e) => setProgress(e.target.value)}
-                        fullWidth
-                    />
-
-                    <TextField
-                        label={t('Learning Assessment')}
-                        value={learningAssessment}
-                        onChange={(e) => setLearningAssessment(e.target.value)}
-                        multiline
-                        rows={3}
-                        fullWidth
-                    />
-
-                    <FormControlLabel
-                        control={<Checkbox checked={activeParticipation} onChange={(e) => setActiveParticipation(e.target.checked)} />}
-                        label={t('Active Participation')}
-                    />
-
-                    <FormControlLabel
-                        control={<Checkbox checked={concentration} onChange={(e) => setConcentration(e.target.checked)} />}
-                        label={t('Concentration')}
-                    />
-
-                    <FormControlLabel
-                        control={<Checkbox checked={worksIndependently} onChange={(e) => setWorksIndependently(e.target.checked)} />}
-                        label={t('Works Independently')}
-                    />
-
-                    <FormControlLabel
-                        control={<Checkbox checked={cooperation} onChange={(e) => setCooperation(e.target.checked)} />}
-                        label={t('Cooperation')}
-                    />
-
-                    <FormControlLabel
-                        control={<Checkbox checked={previousHomeworkCompleted} onChange={(e) => setPreviousHomeworkCompleted(e.target.checked)} />}
-                        label={t('Previous Homework Completed')}
-                    />
-
-                    <TextField
-                        label={t('Next Homework')}
-                        value={nextHomework}
-                        onChange={(e) => setNextHomework(e.target.value)}
-                        fullWidth
-                    />
-
-                    <TextField
-                        label={t('Tutor Remarks')}
-                        value={tutorRemarks}
-                        onChange={(e) => setTutorRemarks(e.target.value)}
-                        multiline
-                        rows={3}
-                        fullWidth
-                    />
-
- 
+                <Box sx={{ width: '100%', mt: 2 }}>
+                    <Stepper activeStep={activeStep} alternativeLabel>
+                        {steps.map((label, index) => (
+                            <Step key={label} sx={{ cursor: 'pointer' }} onClick={() => handleStepClick(index)}>
+                                <StepLabel StepIconProps={{
+                                    sx: {
+                                        cursor: 'pointer',
+                                        '&:hover': {
+                                            transform: 'scale(1.1)',
+                                            transition: 'transform 0.2s'
+                                        }
+                                    }
+                                }}>
+                                    {label}
+                                </StepLabel>
+                            </Step>
+                        ))}
+                    </Stepper>
+                    <Box sx={{ mt: 4 }}>
+                        <StepContent
+                            step={activeStep}
+                            formData={formData}
+                            handleChange={handleChange}
+                            user={user}
+                            teacher={teacher}
+                            sessionDate={sessionDate}
+                        />
+                    </Box>
                 </Box>
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose} color="secondary">
                     {t('Cancel')}
                 </Button>
-                <Button onClick={handleSave} color="primary" variant="contained">
-                    {t('Save Report')}
-                </Button>
+                <Box sx={{ display: 'flex', gap: 1 }}>
+                    {activeStep > 0 && (
+                        <Button onClick={handleBack}>
+                            {t('Back')}
+                        </Button>
+                    )}
+                    {activeStep === steps.length - 1 ? (
+                        <Button onClick={handleSave} variant="contained" color="primary">
+                            {t('Save')}
+                        </Button>
+                    ) : (
+                        <Button onClick={handleNext} variant="contained" color="primary">
+                            {t('Next')}
+                        </Button>
+                    )}
+                </Box>
             </DialogActions>
         </Dialog>
     );
