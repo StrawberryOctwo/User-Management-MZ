@@ -1,4 +1,14 @@
-import { Grid, Typography, Box, CardContent, TextField } from '@mui/material';
+import {
+  Grid,
+  Typography,
+  Box,
+  CardContent,
+  TextField,
+  MenuItem,
+  Select,
+  FormControl,
+  InputLabel
+} from '@mui/material';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import Text from 'src/components/Text';
@@ -13,6 +23,7 @@ interface TeacherInfo {
   contractEndDate: string;
   hourlyRate: number;
   employeeNumber: string;
+  invoiceDay: number; // Added invoiceDay field
 }
 
 interface TeacherDetailsProps {
@@ -31,7 +42,8 @@ function TeacherDetails({ user, isEditing, setUser }: TeacherDetailsProps) {
     contractStartDate: '',
     contractEndDate: '',
     hourlyRate: 0,
-    employeeNumber: ''
+    employeeNumber: '',
+    invoiceDay: 1 // Default to 1
   });
 
   useEffect(() => {
@@ -44,11 +56,12 @@ function TeacherDetails({ user, isEditing, setUser }: TeacherDetailsProps) {
       contractStartDate: user.teacherDetails.contractStartDate,
       contractEndDate: user.teacherDetails.contractEndDate,
       hourlyRate: user.teacherDetails.hourlyRate,
-      employeeNumber: user.teacherDetails.employeeNumber
+      employeeNumber: user.teacherDetails.employeeNumber,
+      invoiceDay: user.teacherDetails.invoiceDay || 1 // Default to 1
     });
   }, [user]);
 
-  const handleInputChange = (field: keyof TeacherInfo, value: string) => {
+  const handleInputChange = (field: keyof TeacherInfo, value: any) => {
     const updatedInfo = { ...teacherInfo, [field]: value };
     setTeacherInfo(updatedInfo);
     setUser((prev: any) => ({
@@ -108,6 +121,32 @@ function TeacherDetails({ user, isEditing, setUser }: TeacherDetailsProps) {
             </Grid>
             <Grid item xs={12} sm={8} md={9}>
               <Text color="black">€{teacherInfo.hourlyRate}/hr</Text>
+            </Grid>
+          </Grid>
+
+          {/* Invoice Day Selection */}
+          <Grid container alignItems="center" sx={{ mb: 2 }}>
+            <Grid item xs={12} sm={4} md={3} textAlign={{ sm: 'right' }}>
+              <Box pr={3}>Invoice Day:</Box>
+            </Grid>
+            <Grid item xs={12} sm={8} md={9}>
+              {isEditing ? (
+                <FormControl fullWidth>
+                  <InputLabel id="invoice-day-label">Select Invoice Day</InputLabel>
+                  <Select
+                    labelId="invoice-day-label"
+                    value={teacherInfo.invoiceDay}
+                    onChange={(e) =>
+                      handleInputChange('invoiceDay', e.target.value)
+                    }
+                  >
+                    <MenuItem value={1}>1st</MenuItem>
+                    <MenuItem value={15}>15th</MenuItem>
+                  </Select>
+                </FormControl>
+              ) : (
+                <Text color="black">{teacherInfo.invoiceDay === 1 ? '1st' : '15th'}</Text>
+              )}
             </Grid>
           </Grid>
         </Grid>

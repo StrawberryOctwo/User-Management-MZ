@@ -1,116 +1,154 @@
-import html2pdf from 'html2pdf.js';
+import jsPDF from 'jspdf';
+import 'jspdf-autotable';
 
+/**
+ * Generates a professional and polished PDF invoice for a teacher.
+ *
+ * @param {Object} invoice - The invoice data.
+ * @param {Object} teacher - The teacher data.
+ * @param {boolean} preview - If true, opens the PDF in a new tab for preview instead of downloading.
+ */
 const generateTeacherInvoicePDF = async (invoice, teacher, preview = false) => {
-    const element = document.createElement('div');
+    const doc = new jsPDF({
+        orientation: 'portrait',
+        unit: 'mm',
+        format: 'a4',
+    });
 
-    // Calculate total hours worked based on invoice data
+    // Helper Functions
+    const formatDate = (date) => new Date(date).toLocaleDateString('de-DE');
+    const formatCurrency = (amount) => `€${Number(amount).toFixed(2)}`;
+    const loadImage = (src) =>
+        new Promise((resolve, reject) => {
+            const img = new Image();
+            img.onload = () => resolve(img);
+            img.onerror = reject;
+            img.src = src;
+        });
+
+    // Formatting details
+    const invoiceDate = formatDate(invoice.createdAt);
+    const monthYear = new Date(invoice.createdAt).toLocaleString('default', { month: 'long', year: 'numeric' });
     const hoursWorked = (invoice.totalAmount / teacher.hourlyRate).toFixed(2);
-    const invoiceDate = new Date(invoice.createdAt);
-    const month = invoiceDate.toLocaleString('default', { month: 'long', year: 'numeric' });
-    const currentDate = new Date().toLocaleDateString();
+    const currentDate = formatDate(new Date());
 
-    element.innerHTML = `
-      <div style="font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; padding: 30px; color: #333;">
-        <!-- Header Section -->
-        <header style="border-bottom: 2px solid #4CAF50; padding-bottom: 20px; margin-bottom: 30px;">
-          <h1 style="text-align: center; color: #4CAF50; margin: 0;">Honorarabrechnung Vorlage</h1>
-          <p style="text-align: right; margin: 5px 0; font-size: 14px;">
-            <strong>Steuernummer:</strong> ${teacher.taxNumber}
-          </p>
-        </header>
-
-        <!-- Teacher and Franchise Information -->
-        <section style="width: 100%; display: flex; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap;">
-          <!-- Teacher Information -->
-          <div style="flex: 1; min-width: 250px; margin-right: 20px;">
-            <h2 style="font-size: 18px; margin-bottom: 10px; color: #555;">Lehrkraft Details</h2>
-            <p><strong>Name:</strong> ${teacher.user.firstName} ${teacher.user.lastName}</p>
-            <p><strong>Adresse:</strong> ${teacher.user.address}</p>
-            <p><strong>Postleitzahl:</strong> ${teacher.user.postalCode}</p>
-            <p><strong>Telefon:</strong> ${teacher.user.phoneNumber}</p>
-          </div>
-
-          <!-- Franchise Information -->
-          <div style="width: 300px; min-width: 250px;">
-            <h2 style="font-size: 18px; margin-bottom: 10px; color: #555;">Franchise Details</h2>
-            <p><strong>${teacher.locations[0].franchise.name}</strong></p>
-            <p>${teacher.locations[0].franchise.address}</p>
-            <p>${teacher.locations[0].franchise.postalCode} ${teacher.locations[0].franchise.city}</p>
-          </div>
-        </section>
-
-        <!-- Date Section -->
-        <div style="text-align: right; margin-bottom: 30px;">
-          <p style="font-size: 14px;">${teacher.user.city}, den ${currentDate}</p>
-        </div>
-
-        <!-- Invoice Information -->
-        <section style="margin-bottom: 20px;">
-          <h2 style="font-size: 16px; margin-bottom: 10px; color: #4CAF50;">Honorarrechnung Nr. ${invoice.invoiceId}</h2>
-          <p>Sehr geehrte Damen und Herren,</p>
-          <p>Nachfolgend finden Sie die Abrechnung für den Unterricht, den ${teacher.user.firstName} ${teacher.user.lastName} im Monat ${month} durchgeführt hat.</p>
-        </section>
-
-        <!-- Invoice Table -->
-        <table style="width: 100%; border-collapse: collapse; margin-top: 20px;">
-          <thead>
-            <tr style="background-color: #f9f9f9;">
-              <th style="border: 1px solid #ddd; padding: 12px; text-align: left;">Monat</th>
-              <th style="border: 1px solid #ddd; padding: 12px; text-align: right;">Geleistete Stunden</th>
-              <th style="border: 1px solid #ddd; padding: 12px; text-align: right;">Stundensatz (60min)</th>
-              <th style="border: 1px solid #ddd; padding: 12px; text-align: right;">Summe (€)</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr style="background-color: #fff;">
-              <td style="border: 1px solid #ddd; padding: 10px;">${month}</td>
-              <td style="border: 1px solid #ddd; padding: 10px; text-align: right;">${hoursWorked} hrs</td>
-              <td style="border: 1px solid #ddd; padding: 10px; text-align: right;">€${teacher.hourlyRate}</td>
-              <td style="border: 1px solid #ddd; padding: 10px; text-align: right;">€${invoice.totalAmount}</td>
-            </tr>
-          </tbody>
-        </table>
-
-        <!-- Payment Information -->
-        <section style="margin-top: 30px;">
-          <p>Der Betrag wird innerhalb der nächsten 14 Tage auf das folgende Konto überwiesen:</p>
-          <p><strong>Kontoinhaber:</strong> ${teacher.user.firstName} ${teacher.user.lastName}</p>
-          <p><strong>IBAN:</strong> ${teacher.iban}</p>
-          <p><strong>Bankname:</strong> ${teacher.bank}</p>
-        </section>
-
-        <!-- Closing Section -->
-        <footer style="margin-top: 40px; border-top: 1px solid #ddd; padding-top: 10px;">
-          <p>Mit freundlichen Grüßen,</p>
-          <p><strong>${teacher.locations[0].franchise.name}</strong></p>
-          <p>${teacher.user.firstName} ${teacher.user.lastName}</p>
-        </footer>
-      </div>
-    `;
-
-    const options = {
-        margin: 15,
-        filename: `teacher-invoice-${invoice.invoiceId}.pdf`,
-        html2canvas: { scale: 2 },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-    };
-
-    if (preview) {
-        try {
-            // Generate PDF as Blob to preview
-            const pdfBlob = await html2pdf().set(options).from(element).outputPdf('blob');
-            const pdfURL = URL.createObjectURL(pdfBlob);
-            
-            // Open in a new tab for preview
-            window.open(pdfURL, '_blank');
-        } catch (error) {
-            console.error('Error generating PDF preview:', error);
+    // Header Section: Invoice Info (Left) and Logo (Right)
+    try {
+        if (teacher.locations[0].franchise.franchiseLogo) {
+            const logo = await loadImage(teacher.locations[0].franchise.franchiseLogo);
+            doc.addImage(logo, 'PNG', 150, 10, 26, 26); // Logo sized 26x26
         }
+    } catch (error) {
+        console.warn('Teacher logo could not be loaded:', error);
+    }
+
+    doc.setFont('helvetica', 'bold').setFontSize(20).setTextColor(33, 37, 41);
+    doc.text('Honorarabrechnung', 15, 20); // Left-aligned title
+
+    doc.setFont('helvetica', 'normal').setFontSize(12).setTextColor(99, 110, 114);
+    doc.text(`Rechnung Nr.: ${invoice.invoiceId}`, 15, 28);
+    doc.text(`Datum: ${invoiceDate}`, 15, 34);
+
+    // Add a huge line for separation
+    doc.setDrawColor(0); // Black color
+    doc.setLineWidth(0.5); // Thick line
+    doc.line(15, 40, 195, 40);
+
+    // Teacher and Franchise Details Section
+    const startY = 50;
+
+    // Teacher Details
+    doc.setFontSize(14).setFont('helvetica', 'bold').setTextColor(33, 37, 41);
+    doc.text('Lehrkraft Details', 15, startY);
+
+    doc.setFontSize(12).setFont('helvetica', 'normal');
+    doc.text(`Name: ${teacher.user.firstName} ${teacher.user.lastName}`, 15, startY + 6);
+    doc.text(`Adresse: ${teacher.user.address}`, 15, startY + 12);
+    doc.text(`Postleitzahl: ${teacher.user.postalCode}`, 15, startY + 18);
+    doc.text(`Telefon: ${teacher.user.phoneNumber}`, 15, startY + 24);
+
+    // Franchise Details
+    doc.setFontSize(14).setFont('helvetica', 'bold').setTextColor(33, 37, 41);
+    doc.text('Franchise Details', 15, startY + 36);
+
+    const franchise = teacher.locations[0]?.franchise || {};
+    doc.setFontSize(12).setFont('helvetica', 'normal');
+    doc.text(franchise.name || 'Franchise nicht verfügbar', 15, startY + 42);
+    doc.text(franchise.address || 'Adresse nicht verfügbar', 15, startY + 48);
+    doc.text(
+        `${franchise.postalCode || ''} ${franchise.city || ''}`.trim(),
+        15,
+        startY + 54
+    );
+
+    // Invoice Information Section
+    const invoiceInfoY = startY + 66;
+    doc.setFontSize(16).setFont('helvetica', 'bold').setTextColor(0, 102, 204);
+    doc.text(`Honorarrechnung für ${teacher.user.firstName} ${teacher.user.lastName} (${monthYear})`, 15, invoiceInfoY);
+
+    doc.setFontSize(12).setFont('helvetica', 'normal').setTextColor(33, 37, 41);
+    doc.text('Sehr geehrte Damen und Herren,', 15, invoiceInfoY + 10);
+    doc.text(
+        `nachfolgend finden Sie die Abrechnung für den Unterricht, den ${teacher.user.firstName} ${teacher.user.lastName} im Monat ${monthYear} durchgeführt hat:`,
+        15,
+        invoiceInfoY + 16
+    );
+
+    // Table Section
+    const tableColumns = ['Monat', 'Geleistete Stunden', 'Stundensatz (€)', 'Summe (€)'];
+    const tableRows = [
+        [
+            monthYear,
+            `${hoursWorked} hrs`,
+            formatCurrency(teacher.hourlyRate),
+            formatCurrency(invoice.totalAmount),
+        ],
+    ];
+
+    doc.autoTable({
+        head: [tableColumns],
+        body: tableRows,
+        startY: invoiceInfoY + 30,
+        styles: { halign: 'right', fontSize: 10 },
+        headStyles: { fillColor: [230, 230, 230], textColor: 33 },
+        columnStyles: {
+            0: { halign: 'left' },
+            1: { halign: 'right' },
+            2: { halign: 'right' },
+            3: { halign: 'right' },
+        },
+    });
+
+    // Payment Information Section
+    const paymentInfoY = doc.lastAutoTable.finalY + 10;
+    doc.setFontSize(12).setFont('helvetica', 'normal').setTextColor(33, 37, 41);
+    doc.text('Der Betrag wird innerhalb der nächsten 14 Tage auf das folgende Konto überwiesen:', 15, paymentInfoY);
+    doc.text(`Kontoinhaber: ${teacher.user.firstName} ${teacher.user.lastName}`, 15, paymentInfoY + 6);
+    doc.text(`IBAN: ${teacher.iban}`, 15, paymentInfoY + 12);
+    doc.text(`Bankname: ${teacher.bank}`, 15, paymentInfoY + 18);
+
+    // Footer Section
+    const closingY = paymentInfoY + 30;
+    doc.setFontSize(12).setFont('helvetica', 'italic').setTextColor(99, 110, 114);
+    doc.text(
+        '„Für weitere Fragen oder Anmerkungen stehen wir Ihnen gerne zur Verfügung.“',
+        15,
+        closingY,
+        { maxWidth: 180 }
+    );
+
+    doc.setFont('helvetica', 'bold').setFontSize(14).setTextColor(33, 37, 41);
+    doc.text('Mit freundlichen Grüßen', 105, closingY + 20, { align: 'center' });
+    doc.setFontSize(12);
+    doc.text('- Empfehlen Sie uns an Ihre Freunde & Familie weiter -', 105, closingY + 26, { align: 'center' });
+
+    // Finalize PDF
+    if (preview) {
+        const pdfBlob = doc.output('blob');
+        const pdfURL = URL.createObjectURL(pdfBlob);
+        window.open(pdfURL, '_blank');
     } else {
-        // Directly save the PDF if no preview is needed
-        html2pdf().set(options).from(element).save()
-            .then(() => console.log('Teacher PDF generated!'))
-            .catch((error) => console.error('Error generating PDF:', error));
+        doc.save(`teacher-invoice-${invoice.invoiceId}.pdf`);
     }
 };
 

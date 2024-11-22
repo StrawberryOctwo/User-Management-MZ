@@ -24,6 +24,10 @@ const CreateFranchise = () => {
                 city: data.city,
                 address: data.address,
                 postalCode: data.postalCode,
+                emailAddress: data.emailAddress, // New field
+                phoneNumber: data.phoneNumber,   // New field
+                // Assuming you have a field to handle logo upload
+                franchiseLogo: data.franchiseLogo, // New field
             };
             const response = await addFranchise(payload);
             return response
@@ -54,6 +58,9 @@ const CreateFranchise = () => {
         { name: 'city', label: t('city'), type: 'text', required: true, section: 'Franchise Information' },
         { name: 'address', label: t('address'), type: 'text', required: true, section: 'Franchise Information' },
         { name: 'postalCode', label: t('postalCode'), type: 'text', required: true, section: 'Franchise Information' },
+        { name: 'franchiseLogo', label: t('franchise_logo'), type: 'logo_file', required: false, section: 'Additional Information' },
+        { name: 'emailAddress', label: t('email_address'), type: 'email', required: true, section: 'Contact Information' },
+        { name: 'phoneNumber', label: t('phone_number'), type: 'tel', required: true, section: 'Contact Information' },
 
     ];
     return (
