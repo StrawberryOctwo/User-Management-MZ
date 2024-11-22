@@ -75,7 +75,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
   const [deactivateDialogOpen, setDeactivateDialogOpen] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
   const [isSessionEnded, setIsSessionEnded] = useState<boolean>(false);
-  
+
   // New state variables for submission
   const [isSubmittingReports, setIsSubmittingReports] = useState<boolean>(false);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
@@ -543,9 +543,8 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       </ReusableDialog>
       <ReusableDialog
         open={deactivateDialogOpen}
-        title={`Confirm ${
-          classSession?.isActive ? 'Deactivation' : 'Reactivation'
-        }`}
+        title={`Confirm ${classSession?.isActive ? 'Deactivation' : 'Reactivation'
+          }`}
         onClose={() => setDeactivateDialogOpen(false)}
         actions={
           <>

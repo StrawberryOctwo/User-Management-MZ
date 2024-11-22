@@ -83,9 +83,6 @@ const AddSessionReportForm: React.FC<AddSessionReportFormProps> = ({ isOpen, onC
 
                 onSave(newReport);  // Pass the newly created report to the parent to refresh UI
   
-
-  
-
                 setLessonTopic('');
                 setCoveredMaterials('');
                 setProgress('');
