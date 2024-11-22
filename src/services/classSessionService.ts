@@ -192,9 +192,9 @@ export interface Holiday {
 }
 
 // Fetch holidays
-export const fetchHolidays = async () => {
+export const fetchHolidays = async (ids: number[]) => {
   try {
-    const response = await api.get('/holidays');
+    const response = await api.post('/getHolidaysByLocationIds', ids);
     return response.data;
   } catch (error) {
     console.error('Error fetching holidays:', error);
@@ -202,10 +202,10 @@ export const fetchHolidays = async () => {
   }
 };
 
-// Fetch closing days
-export const fetchClosingDays = async () => {
+// Updated to accept locationIds
+export const fetchClosingDays = async (locationIds: number[]) => {
   try {
-    const response = await api.get('/closing-days');
+    const response = await api.post('/getClosingDaysByLocationIds', locationIds);
     return response.data;
   } catch (error) {
     console.error('Error fetching closing days:', error);

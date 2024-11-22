@@ -65,21 +65,69 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
   const [passwordVisibility, setPasswordVisibility] = useState<
     Record<string, boolean>
   >({});
+  
+  // New state for logo preview
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
 
   useEffect(() => {
     if (Object.keys(initialData).length > 0) {
       setFormData(getInitialFormData());
+
+      // If initialData has a logo URL, set it as the preview
+      if (initialData.franchiseLogo) {
+        setLogoPreview(initialData.franchiseLogo); // Assuming initialData.franchiseLogo is a URL string
+      }
     }
+    // Cleanup function to revoke object URL on unmount
+    return () => {
+      if (logoPreview && logoPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(logoPreview);
+      }
+    };
   }, [initialData, fields]);
 
-  const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement> | SelectChangeEvent<any>
+  // Handler for TextField and other input changes
+  const handleInputChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (
+    event
   ) => {
     const { name, value } = event.target;
     setFormData((prev) => ({
       ...prev,
       [name!]: value
     }));
+  };
+
+  // Handler for Select changes
+  const handleSelectChange = (event: SelectChangeEvent<any>) => {
+    const { name, value } = event.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name!]: value
+    }));
+  };
+
+  // Handler for logo file changes
+  const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, files } = event.target;
+  
+    if (files && files.length > 0) {
+      const file = files[0];
+      if (file.size > 500 * 1024) { // 500KB in bytes
+        alert('File size exceeds 500KB. Please choose a smaller file.');
+        return;
+      }
+  
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setFormData((prev) => ({
+          ...prev,
+          [name]: base64String
+        }));
+        setLogoPreview(base64String); // Use Base64 string for preview
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -94,6 +142,7 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
             return acc;
           }, {} as Record<string, any>)
         );
+        setLogoPreview(null); // Reset logo preview on add
       }
     } catch (error: any) {
       console.error(`Failed to ${entintyFunction} ${entityName}:`, error);
@@ -141,7 +190,7 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
                         name={field.name}
                         label={field.label}
                         value={formData[field.name] ?? ''}
-                        onChange={handleChange}
+                        onChange={handleSelectChange}
                         required={field.required}
                         disabled={field.disabled}
                       >
@@ -152,6 +201,33 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
                         ))}
                       </Select>
                     </FormControl>
+                  ) : field.type === 'logo_file' ? (
+                    <Box sx={{ width: '100%' }}>
+                      <Button
+                        variant="contained"
+                        component="label"
+                        sx={{ width: '95%', mb: 2 }}
+                      >
+                        {formData[field.name] ? 'Change Logo' : 'Upload Logo'}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          hidden
+                          name={field.name}
+                          onChange={handleLogoChange}
+                        />
+                      </Button>
+                      {/* Display logo preview if available */}
+                      {logoPreview && (
+                        <Box sx={{ textAlign: 'center' }}>
+                          <img
+                            src={logoPreview}
+                            alt="Logo Preview"
+                            style={{ maxWidth: '100px', maxHeight: '100px' }}
+                          />
+                        </Box>
+                      )}
+                    </Box>
                   ) : field.component ? (
                     field.component
                   ) : (
@@ -166,8 +242,12 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
                           : field.type
                       }
                       sx={{ width: '95%' }}
-                      value={formData[field.name] ?? ''}
-                      onChange={field.onChange || handleChange}
+                      value={
+                        field.type === 'logo_file'
+                          ? undefined
+                          : formData[field.name] ?? ''
+                      }
+                      onChange={field.onChange || handleInputChange}
                       required={field.required}
                       disabled={field.disabled}
                       InputLabelProps={
@@ -176,23 +256,23 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
                       InputProps={
                         field.type === 'password'
                           ? {
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <IconButton
-                                  onClick={() =>
-                                    togglePasswordVisibility(field.name)
-                                  }
-                                  edge="end"
-                                >
-                                  {passwordVisibility[field.name] ? (
-                                    <VisibilityOff />
-                                  ) : (
-                                    <Visibility />
-                                  )}
-                                </IconButton>
-                              </InputAdornment>
-                            )
-                          }
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <IconButton
+                                    onClick={() =>
+                                      togglePasswordVisibility(field.name)
+                                    }
+                                    edge="end"
+                                  >
+                                    {passwordVisibility[field.name] ? (
+                                      <VisibilityOff />
+                                    ) : (
+                                      <Visibility />
+                                    )}
+                                  </IconButton>
+                                </InputAdornment>
+                              )
+                            }
                           : undefined
                       }
                     />

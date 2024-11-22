@@ -8,15 +8,16 @@ export interface Holiday {
   name: string;
   start_date: string;
   end_date: string;
-  createdAt: string;
-  updatedAt: string;
-  deletedAt: string | null;
+  locationId: number;
 }
 
-export interface HolidayInput {
-  name: string;
-  start_date: string;
-  end_date: string;
+export interface HolidayResponse {
+  message: string;
+  holidays: Holiday[];
+  meta: {
+    locationsRequested: number;
+    holidaysFound: number;
+  };
 }
 
 export interface SpecialDayData {

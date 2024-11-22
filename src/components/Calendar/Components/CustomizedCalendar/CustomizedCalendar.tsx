@@ -49,13 +49,17 @@ type DemoProps = {
   onDateChange: (date: string) => void;
   loadClassSessions: () => void;
   selectedLocations: any[];
+  holidays: Holiday[];
+  closingDays: Holiday[];
 };
 
 export default function CustomizedCalendar({
   classSessionEvents,
   onDateChange,
   loadClassSessions,
-  selectedLocations
+  selectedLocations,
+  holidays,
+  closingDays
 }: DemoProps) {
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
   const [selectedClassSessionId, setSelectedClassSession] = useState<any>(null);
@@ -81,8 +85,7 @@ export default function CustomizedCalendar({
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
-  const [holidays, setHolidays] = useState<Holiday[]>([]);
-  const [closingDays, setClosingDays] = useState<Holiday[]>([]);
+
   const [isHolidayModalOpen, setIsHolidayModalOpen] = useState(false);
   const [isClosingDayModalOpen, setIsClosingDayModalOpen] = useState(false);
   const [selectedSpecialDay, setSelectedSpecialDay] = useState<any>(null);
@@ -91,7 +94,6 @@ export default function CustomizedCalendar({
   const { userRoles } = useAuth();
 
   const calendarRef = useRef<any>(null);
-  const datePickerButtonRef = useRef<HTMLButtonElement>(null);
   const isHandlingClick = useRef(false);
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
   const resources = useMemo(() => {
@@ -108,10 +110,6 @@ export default function CustomizedCalendar({
 
     return unsortedResources.sort((a, b) => a.sortOrder - b.sortOrder);
   }, [selectedLocations]);
-
-  useEffect(() => {
-    fetchData();
-  }, []);
 
   useEffect(() => {
     const mappedEvents = classSessionEvents.map((session) => {
@@ -141,22 +139,6 @@ export default function CustomizedCalendar({
 
     setEvents(mappedEvents);
   }, [classSessionEvents]);
-
-  const fetchData = async () => {
-    try {
-      // For development, use mock data
-      setHolidays(mockHolidays);
-      setClosingDays(mockClosingDays);
-
-      // For production, uncomment these lines
-      // const holidaysData = await fetchHolidays();
-      // const closingDaysData = await fetchClosingDays();
-      // setHolidays(holidaysData);
-      // setClosingDays(closingDaysData);
-    } catch (error) {
-      console.error('Error fetching holidays and closing days:', error);
-    }
-  };
 
   const getDateStatus = (date: Date) => {
     const dateStr = moment(date).format('YYYY-MM-DD');
@@ -188,10 +170,7 @@ export default function CustomizedCalendar({
   };
 
   const handleSpecialDaySuccess = () => {
-    // Refresh your calendar data
     loadClassSessions();
-    // Refresh holidays and closing days
-    fetchData();
   };
 
   const handleDatePickerClick = (event: MouseEvent) => {
@@ -384,11 +363,9 @@ export default function CustomizedCalendar({
         setIsAddModalOpen(true);
         break;
       case 'Holiday':
-        // You'll need to create these modals
         setIsHolidayModalOpen(true);
         break;
       case 'Closing Day':
-        // You'll need to create these modals
         setIsClosingDayModalOpen(true);
         break;
       default:

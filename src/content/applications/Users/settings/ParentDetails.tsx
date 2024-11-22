@@ -1,4 +1,4 @@
-import { Grid, Typography, Box, CardContent, TextField } from '@mui/material';
+import { Grid, Typography, Box, CardContent, TextField, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { useEffect, useState } from 'react';
 import Text from 'src/components/Text';
 
@@ -6,6 +6,7 @@ interface ParentInfo {
   accountHolder: string;
   iban: string;
   bic: string;
+  invoiceDay: number; // Added invoiceDay field
 }
 
 interface ParentDetailsProps {
@@ -18,18 +19,20 @@ function ParentDetails({ user, isEditing, setUser }: ParentDetailsProps) {
   const [parentInfo, setParentInfo] = useState<ParentInfo>({
     accountHolder: '',
     iban: '',
-    bic: ''
+    bic: '',
+    invoiceDay: 1 // Default to 1
   });
 
   useEffect(() => {
     setParentInfo({
       accountHolder: user.parentDetails.accountHolder,
       iban: user.parentDetails.iban,
-      bic: user.parentDetails.bic
+      bic: user.parentDetails.bic,
+      invoiceDay: user.parentDetails.invoiceDay || 1 // Default to 1
     });
   }, [user]);
 
-  const handleInputChange = (field: keyof ParentInfo, value: string) => {
+  const handleInputChange = (field: keyof ParentInfo, value: any) => {
     const updatedInfo = { ...parentInfo, [field]: value };
     setParentInfo(updatedInfo);
     setUser((prev: any) => ({
@@ -70,6 +73,32 @@ function ParentDetails({ user, isEditing, setUser }: ParentDetailsProps) {
               </Grid>
             </Grid>
           ))}
+
+          {/* Invoice Day Selection */}
+          <Grid container alignItems="center" sx={{ mb: 2 }}>
+            <Grid item xs={12} sm={4} md={3} textAlign={{ sm: 'right' }}>
+              <Box pr={3}>Invoice Day:</Box>
+            </Grid>
+            <Grid item xs={12} sm={8} md={9}>
+              {isEditing ? (
+                <FormControl fullWidth>
+                  <InputLabel id="invoice-day-label">Select Invoice Day</InputLabel>
+                  <Select
+                    labelId="invoice-day-label"
+                    value={parentInfo.invoiceDay}
+                    onChange={(e) =>
+                      handleInputChange('invoiceDay', e.target.value)
+                    }
+                  >
+                    <MenuItem value={1}>1st</MenuItem>
+                    <MenuItem value={15}>15th</MenuItem>
+                  </Select>
+                </FormControl>
+              ) : (
+                <Text color="black">{parentInfo.invoiceDay === 1 ? '1st' : '15th'}</Text>
+              )}
+            </Grid>
+          </Grid>
         </Grid>
       </Typography>
     </CardContent>
