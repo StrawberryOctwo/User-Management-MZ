@@ -31,7 +31,8 @@ const EditFranchise = () => {
     const handleFranchiseSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
         setSubmitLoading(true);
         try {
-            const payload = {
+            // Prepare payload, including handling of logo file if present
+            const payload: Record<string, any> = {
                 name: data.name,
                 ownerName: data.ownerName,
                 cardHolderName: data.cardHolderName,
@@ -43,8 +44,23 @@ const EditFranchise = () => {
                 city: data.city,
                 address: data.address,
                 postalCode: data.postalCode,
+                emailAddress: data.emailAddress, // New field
+                phoneNumber: data.phoneNumber,   // New field
+                // Assuming you have a field to handle logo upload
+                franchiseLogo: data.franchiseLogo, // New field
             };
-            const response = await updateFranchise(Number(id), payload);
+
+            // If franchiseLogo is a File, handle it appropriately (e.g., using FormData)
+            let finalPayload: any = payload;
+            if (data.franchiseLogo instanceof File) {
+                finalPayload = new FormData();
+                Object.entries(payload).forEach(([key, value]) => {
+                    finalPayload.append(key, value as any);
+                });
+                finalPayload.append('franchiseLogo', data.franchiseLogo);
+            }
+
+            const response = await updateFranchise(Number(id), finalPayload);
             fetchFranchise();
             return response;
         } catch (error: any) {
@@ -73,6 +89,11 @@ const EditFranchise = () => {
         { name: 'city', label: t('city'), type: 'text', required: true, section: 'Franchise Information' },
         { name: 'address', label: t('address'), type: 'text', required: true, section: 'Franchise Information' },
         { name: 'postalCode', label: t('postalCode'), type: 'text', required: true, section: 'Franchise Information' },
+        
+        // New Fields
+        { name: 'franchiseLogo', label: t('franchise_logo'), type: 'logo_file', required: false, section: 'Additional Information' },
+        { name: 'emailAddress', label: t('email_address'), type: 'email', required: true, section: 'Contact Information' },
+        { name: 'phoneNumber', label: t('phone_number'), type: 'tel', required: true, section: 'Contact Information' },
     ];
 
     return (
