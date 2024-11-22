@@ -26,7 +26,8 @@ const EditContract = () => {
         try {
             const sessionTypesData = await fetchSessionTypes();
             const discountsData = await fetchDiscounts();
-            setSessionTypes(sessionTypesData);
+ 
+            setSessionTypes(sessionTypesData.data);
             setDiscounts(discountsData);
 
             // Fetch the contract data by ID
