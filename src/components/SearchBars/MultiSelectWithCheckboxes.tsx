@@ -15,11 +15,11 @@ import CheckBoxIcon from '@mui/icons-material/CheckBox';
 
 interface MultiSelectWithCheckboxesProps {
   label: string;
-  fetchData: (query: string) => Promise<any[]>; // Function to fetch data based on the query
-  onSelect: (selectedItems: any[]) => void; // Callback when items are selected
-  displayProperty: string; // Property to display in the options
-  placeholder?: string; // Placeholder text
-  initialValue?: any[]; // Initial selected values for edit or pre-filled forms
+  fetchData: (query: string) => Promise<any[]>;
+  onSelect: (selectedItems: any[]) => void;
+  displayProperty: string;
+  placeholder?: string;
+  initialValue?: any[];
   width?: string | number;
   disabled?: boolean;
 }
@@ -38,47 +38,62 @@ const MultiSelectWithCheckboxes = forwardRef(
     }: MultiSelectWithCheckboxesProps,
     ref
   ) => {
-    const [query, setQuery] = useState('');
     const [options, setOptions] = useState<any[]>(initialValue || []);
     const [selectedItems, setSelectedItems] = useState<any[]>(
       initialValue || []
     );
     const [loading, setLoading] = useState(false);
-    const [focused, setFocused] = useState(false); // Track focus state
+    const [focused, setFocused] = useState(false);
+    const [inputValue, setInputValue] = useState('');
+    const [initialDataLoaded, setInitialDataLoaded] = useState(false);
 
     useImperativeHandle(ref, () => ({
       reset: () => {
-        setQuery('');
         setSelectedItems([]);
         setOptions([]);
+        setInitialDataLoaded(false);
       },
-      selectedItems // Expose selectedItems
+      selectedItems
     }));
 
     useEffect(() => {
-      if (initialValue.length > 0) {
-        setOptions(initialValue);
+      const loadInitialData = async () => {
+        if (!initialDataLoaded && !disabled) {
+          setLoading(true);
+          try {
+            const data = await fetchData('');
+            setOptions(data);
+            setInitialDataLoaded(true);
+          } catch (error) {
+            console.error('Error fetching initial data:', error);
+          } finally {
+            setLoading(false);
+          }
+        }
+      };
+
+      loadInitialData();
+    }, [fetchData, disabled, initialDataLoaded]);
+
+    useEffect(() => {
+      if (initialValue?.length > 0) {
         setSelectedItems(initialValue);
       }
     }, [initialValue]);
 
     useEffect(() => {
       let active = true;
-
-      const fetchOptions = async () => {
-        if (focused && !disabled) {
+      const timeoutId = setTimeout(async () => {
+        if (focused && !disabled && inputValue.length >= 2) {
           setLoading(true);
           try {
-            const data = await fetchData(query);
+            const data = await fetchData(inputValue);
             if (active) {
-              const mergedOptions = [
-                ...selectedItems,
-                ...data.filter(
-                  (item) =>
-                    !selectedItems.some((selected) => selected.id === item.id)
-                )
-              ];
-              setOptions(mergedOptions);
+              const mergedOptions = data.filter(
+                (item) =>
+                  !selectedItems.some((selected) => selected.id === item.id)
+              );
+              setOptions([...mergedOptions, ...selectedItems]);
             }
           } catch (error) {
             console.error('Error fetching options:', error);
@@ -88,19 +103,19 @@ const MultiSelectWithCheckboxes = forwardRef(
             }
           }
         }
-      };
-
-      if (query.length >= 2 || query === '') {
-        fetchOptions();
-      }
+      }, 300);
 
       return () => {
         active = false;
+        clearTimeout(timeoutId);
       };
-    }, [focused, query, fetchData, selectedItems, disabled]);
+    }, [focused, inputValue, fetchData, disabled, selectedItems]);
 
-    const handleFocus = () => setFocused(true); // Set focus state
-    const handleBlur = () => setFocused(false); // Reset focus state on blur
+    const handleFocus = () => setFocused(true);
+    const handleBlur = () => {
+      setFocused(false);
+      setInputValue('');
+    };
 
     const handleChange = (event: any, value: any[]) => {
       setSelectedItems(value);
@@ -120,9 +135,11 @@ const MultiSelectWithCheckboxes = forwardRef(
           getNestedProperty(option, displayProperty) || ''
         }
         onChange={handleChange}
-        onInputChange={(event, newInputValue) => setQuery(newInputValue)}
-        onFocus={handleFocus} // Handle focus
-        onBlur={handleBlur} // Handle blur
+        onInputChange={(event, newInputValue) => {
+          setInputValue(newInputValue);
+        }}
+        onFocus={handleFocus}
+        onBlur={handleBlur}
         loading={loading}
         isOptionEqualToValue={(option, value) => option.id === value.id}
         renderOption={(props, option, { selected }) => (

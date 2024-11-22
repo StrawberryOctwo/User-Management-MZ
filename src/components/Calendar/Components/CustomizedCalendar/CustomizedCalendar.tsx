@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Box, Button, ClickAwayListener, Paper, Popper } from '@mui/material';
+import { Box, ClickAwayListener, Paper, Popper } from '@mui/material';
 import moment from 'moment';
 import { Views } from 'react-big-calendar';
 import './index.css';
@@ -11,10 +11,6 @@ import { useAuth } from 'src/hooks/useAuth';
 import {
   deleteClassSession,
   toggleClassSessionActivation,
-  fetchHolidays,
-  fetchClosingDays,
-  mockHolidays,
-  mockClosingDays,
   Holiday
 } from 'src/services/classSessionService';
 import FullCalendar from '@fullcalendar/react';
@@ -467,7 +463,7 @@ export default function CustomizedCalendar({
         isOpen={isEventTypeModalOpen}
         onClose={handleCloseEventTypeModal}
         onContinue={handleContinue}
-        userRole={strongestRoles[0]} // Pass the user role
+        userRole={strongestRoles[0]}
       />
 
       <EditAppointmentModal
