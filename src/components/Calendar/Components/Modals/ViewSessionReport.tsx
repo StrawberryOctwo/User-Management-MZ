@@ -24,6 +24,7 @@ interface ViewSessionReportFormProps {
   onClose: () => void;
   onDelete: () => void;
   readOnly?: boolean;
+  submissionSuccess?: boolean;
 }
 
 const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
@@ -31,7 +32,8 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
   onClose,
   reportId,
   onDelete,
-  readOnly = false
+  readOnly = false,
+  submissionSuccess
 }) => {
   const [lessonTopic, setLessonTopic] = useState<string>('');
   const [coveredMaterials, setCoveredMaterials] = useState<string>('');
@@ -51,6 +53,10 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
+  useEffect(() => {
+    console.log('submissionSuccess', submissionSuccess);
+  }, [submissionSuccess]);
+
   // Fetch the session report when the dialog opens
   useEffect(() => {
     if (isOpen && reportId) {
@@ -67,7 +73,9 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
           setConcentration(report.data.concentration || false);
           setWorksIndependently(report.data.worksIndependently || false);
           setCooperation(report.data.cooperation || false);
-          setPreviousHomeworkCompleted(report.data.previousHomeworkCompleted || false);
+          setPreviousHomeworkCompleted(
+            report.data.previousHomeworkCompleted || false
+          );
           setNextHomework(report.data.nextHomework || '');
           setTutorRemarks(report.data.tutorRemarks || '');
 
@@ -81,7 +89,9 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
             }
           }
 
-          setStudentName(`${report.data.student.user.firstName} ${report.data.student.user.lastName}`);
+          setStudentName(
+            `${report.data.student.user.firstName} ${report.data.student.user.lastName}`
+          );
         } catch (error) {
           console.error('Error fetching session report:', error);
         } finally {
@@ -161,7 +171,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
         }}
         title="Confirm Deletion"
         content="Are you sure you want to delete this session report?"
-        confirmButtonColor='error'
+        confirmButtonColor="error"
       />
 
       <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
@@ -315,9 +325,11 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
         </DialogContent>
         {!readOnly && (
           <DialogActions>
-            <Button onClick={handleOpenConfirmDelete} color="error">
-              Delete Report
-            </Button>
+            {!submissionSuccess && (
+              <Button onClick={handleOpenConfirmDelete} color="error">
+                Delete Report
+              </Button>
+            )}
 
             <Button onClick={handleSave} color="primary" variant="contained">
               Save Report
