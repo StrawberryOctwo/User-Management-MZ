@@ -38,7 +38,7 @@ const MultiSelectWithCheckboxes = forwardRef(
     }: MultiSelectWithCheckboxesProps,
     ref
   ) => {
-    const [options, setOptions] = useState<any[]>(initialValue || []);
+    const [options, setOptions] = useState<any[]>([]);
     const [selectedItems, setSelectedItems] = useState<any[]>(
       initialValue || []
     );
@@ -56,13 +56,26 @@ const MultiSelectWithCheckboxes = forwardRef(
       selectedItems
     }));
 
+    // Load initial data and ensure selected items are in options
     useEffect(() => {
       const loadInitialData = async () => {
         if (!initialDataLoaded && !disabled) {
           setLoading(true);
           try {
             const data = await fetchData('');
-            setOptions(data);
+            // Create a unique set of options including both fetched data and initial values
+            const allOptions = [...data];
+
+            // Add any selected items that aren't in the initial fetch
+            if (initialValue?.length > 0) {
+              initialValue.forEach(selectedItem => {
+                if (!allOptions.some(option => option.id === selectedItem.id)) {
+                  allOptions.push(selectedItem);
+                }
+              });
+            }
+
+            setOptions(allOptions);
             setInitialDataLoaded(true);
           } catch (error) {
             console.error('Error fetching initial data:', error);
@@ -73,11 +86,21 @@ const MultiSelectWithCheckboxes = forwardRef(
       };
 
       loadInitialData();
-    }, [fetchData, disabled, initialDataLoaded]);
+    }, [fetchData, disabled, initialDataLoaded, initialValue]);
 
     useEffect(() => {
       if (initialValue?.length > 0) {
         setSelectedItems(initialValue);
+        // Ensure selected items are always in options
+        setOptions(prevOptions => {
+          const newOptions = [...prevOptions];
+          initialValue.forEach(selectedItem => {
+            if (!newOptions.some(option => option.id === selectedItem.id)) {
+              newOptions.push(selectedItem);
+            }
+          });
+          return newOptions;
+        });
       }
     }, [initialValue]);
 
@@ -89,11 +112,17 @@ const MultiSelectWithCheckboxes = forwardRef(
           try {
             const data = await fetchData(inputValue);
             if (active) {
-              const mergedOptions = data.filter(
-                (item) =>
-                  !selectedItems.some((selected) => selected.id === item.id)
-              );
-              setOptions([...mergedOptions, ...selectedItems]);
+              // Merge new results with selected items
+              const newOptions = [...data];
+
+              // Ensure all selected items remain in options
+              selectedItems.forEach(selectedItem => {
+                if (!newOptions.some(option => option.id === selectedItem.id)) {
+                  newOptions.push(selectedItem);
+                }
+              });
+
+              setOptions(newOptions);
             }
           } catch (error) {
             console.error('Error fetching options:', error);
