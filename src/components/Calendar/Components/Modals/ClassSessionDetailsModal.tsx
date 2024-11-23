@@ -42,6 +42,8 @@ interface ClassSessionDetailsModalProps {
   canAddReport: boolean;
   canReactivate: boolean;
   onDeactivateComplete: () => void;
+  sessionEnded: boolean;
+  setIsSessionEnded: (sessionEnded: boolean) => void;
 }
 
 const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
@@ -54,7 +56,9 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
   onDeactivateComplete,
   canEdit,
   canReactivate,
-  canAddReport
+  canAddReport,
+  sessionEnded,
+  setIsSessionEnded
 }) => {
   const [classSession, setClassSession] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -74,7 +78,6 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deactivateDialogOpen, setDeactivateDialogOpen] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
-  const [isSessionEnded, setIsSessionEnded] = useState<boolean>(false);
 
   // New state variables for submission
   const [isSubmittingReports, setIsSubmittingReports] =
@@ -261,7 +264,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       >
         <Typography variant="h6">Class Session Details</Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
-          {canEdit && !isSessionEnded && (
+          {canEdit && (
             <IconButton
               onClick={handleEdit}
               color="primary"
@@ -282,7 +285,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
               'Teacher'
             ]}
           >
-            {classSession?.isActive && !isSessionEnded ? (
+            {classSession?.isActive && !sessionEnded ? (
               <IconButton
                 onClick={() => setDeactivateDialogOpen(true)}
                 color="warning"
