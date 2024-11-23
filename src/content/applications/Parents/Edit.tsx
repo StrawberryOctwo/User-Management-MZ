@@ -7,12 +7,15 @@ import { fetchParentById, updateParent } from 'src/services/parentService';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
 import { fetchFranchises } from 'src/services/franchiseService';
+import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
+import { fetchStudents } from 'src/services/studentService';
 
 const EditParent = () => {
     const { id } = useParams<{ id: string }>();
     const [parentData, setParentData] = useState<Record<string, any> | null>(null);
     const [loading, setLoading] = useState(true);
     const [selectedFranchise, setSelectedFranchise] = useState(null);
+    const [selectedStudents, setSelectedStudents] = useState(null);
     const { showMessage } = useSnackbar();
 
     const fetchParent = async () => {
@@ -38,6 +41,7 @@ const EditParent = () => {
             };
 
             setSelectedFranchise(fetchedData.franchise);
+            setSelectedStudents(fetchedData.students);
             setParentData(flattenedData);
         } catch (error) {
             console.error('Error fetching Parent:', error);
@@ -74,7 +78,8 @@ const EditParent = () => {
                     accountHolder: data.accountHolder,
                     iban: data.iban,
                     bic: data.bic,
-                    franchise: selectedFranchise.id
+                    franchise: selectedFranchise.id,
+                    studentIds: selectedStudents?.map((student: any) => student.id) || [], // Extract student IDs
                 },
             };
 
@@ -127,6 +132,34 @@ const EditParent = () => {
                 />
             )
         },
+        {
+            name: 'student',
+            label: t('student'),
+            type: 'number',
+            required: true,
+            section: 'User Information',
+            component: (
+                <MultiSelectWithCheckboxes
+                    label="Select student"
+                    fetchData={(query) =>
+                        fetchStudents(1, 5, query).then((data) =>
+                            data.data.map((student: any) => ({
+                                ...student,
+                                fullName: `${student.firstName} ${student.lastName}`,
+                            }))
+                        )
+                    }
+                    onSelect={(students) => setSelectedStudents(students)}
+                    displayProperty="fullName"
+                    placeholder="Search student"
+                    initialValue={selectedStudents?.map((student: any) => ({
+                        ...student,
+                        fullName: `${student.firstName} ${student.lastName}`,
+                    }))}
+                />
+            ),
+        }
+
     ];
 
     const bankingFields: FieldConfig[] = [

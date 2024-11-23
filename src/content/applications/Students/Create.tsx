@@ -6,10 +6,6 @@ import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelect
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
 import { addDocument } from 'src/services/fileUploadService';
 import { fetchLocations } from 'src/services/locationService';
-import {
-  assignOrUpdateParentStudents,
-  fetchParents
-} from 'src/services/parentService';
 import { addStudent } from 'src/services/studentService';
 import { assignStudentToTopics, fetchTopics } from 'src/services/topicService';
 import UploadSection from 'src/components/Files/UploadDocuments';
@@ -31,7 +27,6 @@ import { daysOfWeek } from './utils';
 
 export default function CreateStudent() {
   const [selectedLocationIds, setSelectedLocationIds] = useState<number[]>([]); // Update to handle multiple IDs
-  const [selectedParentId, setSelectedParentId] = useState<number | null>(null);
   const [selectedContractId, setSelectedContractId] = useState<number | null>(
     null
   );
@@ -64,11 +59,6 @@ export default function CreateStudent() {
   const handleLocationSelect = (locations: any[]) => {
     setSelectedLocationIds(locations.map((location) => location.id));
   };
-
-  const handleParentSelect = (parent: any) => {
-    setSelectedParentId(parent ? parent.id : null);
-  };
-
   const handleContractSelect = (contract: any) => {
     setSelectedContractId(contract ? contract.id : null);
   };
@@ -91,10 +81,6 @@ export default function CreateStudent() {
       showMessage('Location field is required', 'error');
       return;
     }
-    if (!selectedParentId) {
-      showMessage('Parent field is required', 'error');
-      return;
-    }
     if (selectedTopics.length === 0) {
       showMessage("Topics field can't be empty", 'error');
       return;
@@ -113,7 +99,6 @@ export default function CreateStudent() {
           notes: data['notes'],
           availableDates: selectedDays,
           locationIds: selectedLocationIds,
-          parentId: selectedParentId,
           schoolType: selectedSchoolTypeId
         },
         user: {
@@ -131,9 +116,6 @@ export default function CreateStudent() {
 
       const response = await addStudent(payload);
       await assignStudentToTopics(response.studentId, topicIds);
-      await assignOrUpdateParentStudents(selectedParentId, [
-        response.studentId
-      ]);
       await assignStudentToContract(response.studentId, selectedContractId);
 
       const userId = response.userId;
@@ -147,7 +129,6 @@ export default function CreateStudent() {
       }
 
       setSelectedLocationIds([]);
-      setSelectedParentId(null);
       setSelectedContractId(null);
       setSelectedTopics([]);
       setUploadedFiles([]);
@@ -161,29 +142,6 @@ export default function CreateStudent() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const parentSelectionField = {
-    name: 'parent',
-    label: 'Select Parent',
-    type: 'custom',
-    section: 'Student Assignment',
-    component: (
-      <SingleSelectWithAutocomplete
-        label="Search Parent"
-        fetchData={(query) =>
-          fetchParents(1, 5, query).then((data) =>
-            data.data.map((parent) => ({
-              ...parent,
-              displayName: parent.user.firstName
-            }))
-          )
-        }
-        onSelect={handleParentSelect}
-        displayProperty="displayName"
-        placeholder="Type to search parent"
-      />
-    )
   };
   const schoolTypeSelectionField = {
     name: 'schoolType',
@@ -392,7 +350,6 @@ export default function CreateStudent() {
       )
     },
     locationSelectionField,
-    parentSelectionField,
     {
       name: 'topics',
       label: 'Assign Topics',

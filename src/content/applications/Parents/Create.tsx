@@ -4,15 +4,18 @@ import { t } from 'i18next';
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
 import { addParent } from 'src/services/parentService';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
+import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import { useAuth } from 'src/hooks/useAuth';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import { fetchFranchises } from 'src/services/franchiseService';
+import { fetchStudents } from 'src/services/studentService';
 
 const CreateParent = () => {
   const [loading, setLoading] = useState(false);
   const { userId, userRoles } = useAuth();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
   const [selectedFranchise, setSelectedFranchise] = useState(null);
+  const [selectedStudents, setSelectedStudents] = useState(null);
 
   const handleSubmit = async (
     data: Record<string, any>
@@ -42,7 +45,8 @@ const CreateParent = () => {
           accountHolder: data.accountHolder,
           iban: data.iban,
           bic: data.bic,
-          franchise: selectedFranchise.id
+          franchise: selectedFranchise.id,
+          studentIds: selectedStudents?.map((student: any) => student.id) || [] // Add student IDs to payload
         }
       };
 
@@ -136,6 +140,30 @@ const CreateParent = () => {
           displayProperty="name"
           placeholder="Search Franchise"
           initialValue={selectedFranchise}
+        />
+      )
+    },
+    {
+      name: 'student',
+      label: t('student'),
+      type: 'number',
+      required: true,
+      section: 'Parent Information',
+      component: (
+        <MultiSelectWithCheckboxes
+          label="Select student"
+          fetchData={(query) =>
+            fetchStudents(1, 5, query).then((data) =>
+              data.data.map((student: any) => ({
+                ...student,
+                fullName: `${student.firstName} ${student.lastName}`,
+              }))
+            )
+          }
+          onSelect={(students) => setSelectedStudents(students)}
+          displayProperty="fullName"
+          placeholder="Search student"
+          initialValue={[]}
         />
       )
     },
