@@ -5,11 +5,14 @@ import { useParams } from 'react-router-dom';
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
 import { fetchParentById, updateParent } from 'src/services/parentService';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
+import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
+import { fetchFranchises } from 'src/services/franchiseService';
 
 const EditParent = () => {
     const { id } = useParams<{ id: string }>();
     const [parentData, setParentData] = useState<Record<string, any> | null>(null);
     const [loading, setLoading] = useState(true);
+    const [selectedFranchise, setSelectedFranchise] = useState(null);
     const { showMessage } = useSnackbar();
 
     const fetchParent = async () => {
@@ -17,6 +20,7 @@ const EditParent = () => {
         try {
             const fetchedData = await fetchParentById(Number(id));
 
+            console.log(fetchedData);
             const flattenedData = {
                 firstName: fetchedData.user.firstName,
                 lastName: fetchedData.user.lastName,
@@ -30,8 +34,10 @@ const EditParent = () => {
                 accountHolder: fetchedData.accountHolder,
                 iban: fetchedData.iban,
                 bic: fetchedData.bic,
+                franchise: fetchedData.franchise
             };
 
+            setSelectedFranchise(fetchedData.franchise);
             setParentData(flattenedData);
         } catch (error) {
             console.error('Error fetching Parent:', error);
@@ -68,8 +74,11 @@ const EditParent = () => {
                     accountHolder: data.accountHolder,
                     iban: data.iban,
                     bic: data.bic,
+                    franchise: selectedFranchise.id
                 },
             };
+
+            console.log(payload);
 
             const response = await updateParent(Number(id), payload);
             await fetchParent();
@@ -99,6 +108,25 @@ const EditParent = () => {
         { name: 'phoneNumber', label: t('phone_number'), type: 'text', required: true, section: 'User Information' },
         { name: 'password', label: t('new_password'), type: 'password', required: false, section: 'Change Password' },
         { name: 'confirmPassword', label: t('confirm_password'), type: 'password', required: false, section: 'Change Password' },
+        {
+            name: 'franchise',
+            label: t('franchise'),
+            type: 'number',
+            required: true,
+            section: 'User Information',
+            component: (
+                <SingleSelectWithAutocomplete
+                    label="Select Franchise"
+                    fetchData={(query) =>
+                        fetchFranchises(1, 5, query).then((data) => data.data)
+                    }
+                    onSelect={(franchise) => setSelectedFranchise(franchise)}
+                    displayProperty="name"
+                    placeholder="Search Franchise"
+                    initialValue={selectedFranchise}
+                />
+            )
+        },
     ];
 
     const bankingFields: FieldConfig[] = [
