@@ -191,76 +191,69 @@ export interface Holiday {
   deletedAt: string | null;
 }
 
-// Fetch holidays
-export const fetchHolidays = async (ids: number[]) => {
-  try {
-    const response = await api.post('/getHolidaysByLocationIds', ids);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching holidays:', error);
-    throw error;
-  }
-};
-
-// Updated to accept locationIds
-export const fetchClosingDays = async (locationIds: number[]) => {
-  try {
-    const response = await api.post('/getClosingDaysByLocationIds', locationIds);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching closing days:', error);
-    throw error;
-  }
-};
-
-// Mock data for development
-export const mockHolidays: Holiday[] = [
-  {
-    id: 1,
-    name: 'Thanksgiving',
-    start_date: '2024-11-28', // Current test date
-    end_date: '2024-11-28',
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    deletedAt: null
-  },
-  {
-    id: 2,
-    name: 'Christmas',
-    start_date: '2024-12-24',
-    end_date: '2024-12-26',
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    deletedAt: null
-  }
-];
-
-export const mockClosingDays: Holiday[] = [
-  {
-    id: 3,
-    name: 'Staff Training',
-    start_date: '2024-11-28', // Current test date
-    end_date: '2024-11-28',
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    deletedAt: null
-  },
-  {
-    id: 4,
-    name: 'Maintenance Day',
-    start_date: '2024-11-25',
-    end_date: '2024-11-25',
-    createdAt: '2024-01-01T00:00:00Z',
-    updatedAt: '2024-01-01T00:00:00Z',
-    deletedAt: null
-  }
-];
+interface PaginatedResponse<T> {
+  data: T[];
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
 
 interface HolidayInput {
   name: string;
   start_date: string;
   end_date: string;
 }
+
+
+// Fetch holidays
+// export const fetchHolidays = async (
+//   page: number = 1,
+//   limit: number = 10,
+//   search?: string
+// ): Promise<PaginatedResponse<Holiday>> => {
+//   try {
+//     const response = await api.get('/holidays', {
+//       params: {
+//         page,
+//         limit,
+//         search
+//       }
+//     });
+//     return response.data;
+//   } catch (error) {
+//     console.error('Error fetching holidays:', error);
+//     throw error;
+//   }
+// };
+
+export const fetchHolidaysByLocationIds = async (locationIds?: number[], page?: number, limit?: number, search?: string) => {
+  // Build the payload dynamically, excluding undefined values
+  const payload: Record<string, any> = {};
+  if (locationIds) payload.locationIds = locationIds;
+  if (page) payload.page = page;
+  if (limit) payload.limit = limit;
+  if (search) payload.search = search;
+
+  try {
+    const response = await api.post('/holidays', payload);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching holidays by location:', error);
+    throw error;
+  }
+};
+
+
+export const fetchHolidayById = async (id: number) => {
+  try {
+    const response = await api.get(`/holiday/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching holiday:', error);
+    throw error;
+  }
+};
 
 // Add a holiday
 export const addHoliday = async (holidayData: HolidayInput) => {
@@ -285,15 +278,21 @@ export const updateHoliday = async (id: number, holidayData: HolidayInput) => {
 };
 
 // Delete a holiday
-export const deleteHoliday = async (id: number) => {
+export const deleteHoliday = async (ids: number[]) => {
+  const id = ids[0]
   try {
-    const response = await api.delete(`/holiday/${id}`);
+    const response = await api.delete('/holiday', {
+      data: { id }
+    });
     return response.data;
   } catch (error) {
     console.error('Error deleting holiday:', error);
     throw error;
   }
 };
+
+
+
 
 // Add a closing day (uses same endpoint as holiday but marks it as a closing day)
 export const addClosingDay = async (closingDayData: HolidayInput) => {
@@ -321,12 +320,63 @@ export const updateClosingDay = async (
 };
 
 // Delete a closing day
-export const deleteClosingDay = async (id: number) => {
+export const deleteClosingDay = async (ids: number[]) => {
+  const id = ids[0]
   try {
-    const response = await api.delete(`/closing-day/${id}`);
+    const response = await api.delete('/closing-day', {
+      data: { id }
+    });
     return response.data;
   } catch (error) {
-    console.error('Error deleting closing day:', error);
+    console.error('Error deleting holiday:', error);
+    throw error;
+  }
+};
+
+
+export const fetchClosingDayById = async (id: number) => {
+  try {
+    const response = await api.get(`/closing-day/${id}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching closing day:', error);
+    throw error;
+  }
+};
+
+// Updated to accept locationIds
+export const fetchClosingDays = async (
+  page: number = 1,
+  limit: number = 10,
+  search?: string
+): Promise<PaginatedResponse<Holiday>> => {
+  try {
+    const response = await api.get('/closing-days', {
+      params: {
+        page,
+        limit,
+        search
+      }
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching closing days:', error);
+    throw error;
+  }
+};
+
+export const fetchClosingDaysByLocationIds = async (locationIds?: number[], page?: number, limit?: number, search?: string) => {
+  const payload: Record<string, any> = {};
+  if (locationIds) payload.locationIds = locationIds;
+  if (page) payload.page = page;
+  if (limit) payload.limit = limit;
+  if (search) payload.search = search;
+
+  try {
+    const response = await api.post('/closing-days', payload);
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching closing days by location:', error);
     throw error;
   }
 };

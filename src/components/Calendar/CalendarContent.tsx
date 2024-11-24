@@ -13,10 +13,10 @@ import { getStrongestRoles } from 'src/hooks/roleUtils';
 import {
   Holiday,
   fetchClassSessions,
-  fetchClosingDays,
-  fetchHolidays,
+  fetchClosingDaysByLocationIds,
+  fetchHolidaysByLocationIds,
   fetchParentClassSessions,
-  fetchUserClassSessions
+  fetchUserClassSessions,
 } from 'src/services/classSessionService';
 import { calendarsharedService } from './CalendarSharedService';
 
@@ -198,8 +198,8 @@ const CalendarContent: React.FC = () => {
       const locationIds = locations.map(loc => loc.id);
 
       const [holidaysResponse, closingDaysResponse] = await Promise.all([
-        fetchHolidays(locationIds),
-        fetchClosingDays(locationIds)
+        fetchHolidaysByLocationIds(locationIds),
+        fetchClosingDaysByLocationIds(locationIds)
       ]);
 
       setHolidays(holidaysResponse.holidays);

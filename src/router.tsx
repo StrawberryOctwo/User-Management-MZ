@@ -179,6 +179,18 @@ const EditContract = Loader(
   lazy(() => import('src/content/applications/Contracts/Edit'))
 );
 
+const DaysOff = Loader(
+  lazy(() => import('src/content/applications/DaysOff'))
+);
+
+const DaysOffEditHoliday = Loader(
+  lazy(() => import('src/content/applications/DaysOff/EditHoliday'))
+);
+
+const DaysOffEditClosingDay = Loader(
+  lazy(() => import('src/content/applications/DaysOff/EditClosingDay'))
+);
+
 const UserProfile = Loader(
   lazy(() => import('src/content/applications/Users/profile'))
 );
@@ -506,6 +518,18 @@ const routes: RouteObject[] = [
           {
             path: 'contracts/edit/:id',
             element: <EditContract />
+          },
+          {
+            path: 'daysoff',
+            element: <DaysOff />
+          },
+          {
+            path: 'daysoff/holiday/edit/:id',
+            element: <DaysOffEditHoliday />
+          },
+          {
+            path: 'daysoff/closingDay/edit/:id',
+            element: <DaysOffEditClosingDay />
           },
           {
             path: 'profile',
