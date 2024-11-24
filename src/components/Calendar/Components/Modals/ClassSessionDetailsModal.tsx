@@ -30,6 +30,7 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { calculateEndTimeInMinutes } from 'src/utils/teacherUtils';
 import StudentDetailCard from './StudentDetailCArd';
+import ConfirmationDialog from './ConfirmationDialog';
 
 interface ClassSessionDetailsModalProps {
   isOpen: boolean;
@@ -86,6 +87,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
   const [submissionSuccess, setSubmissionSuccess] = useState<boolean | null>(
     null
   );
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   // Fetch class session details
   const loadClassSession = async () => {
@@ -116,9 +118,14 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       setReportStatus(studentReportsStatus);
 
       // Check if all reports are completed
-      const allCompleted = response.students.every(
-        (student: any) => studentReportsStatus[student.id].reportCompleted
-      );
+      // const allCompleted = response.students.every(
+      //   (student: any) => studentReportsStatus[student.id].reportCompleted
+      // );
+
+      // Check if all reports are submitted
+      const allCompleted = response.reportsSubmitted
+
+      // console.log()
       setAllReportsCompleted(allCompleted);
       setSubmissionSuccess(allCompleted);
     } catch (error) {
@@ -164,7 +171,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
   const refreshClassSessionData = async () => {
     setLoading(true);
     try {
-      await loadClassSession(); // Reload the session data
+      await loadClassSession();
     } catch (error) {
       console.error('Error refreshing class session data:', error);
     } finally {
@@ -173,7 +180,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
   };
 
   const handleSaveReport = async (newReport: any) => {
-    refreshClassSessionData();
+    await refreshClassSessionData();
     setReportFormOpen(false);
   };
 
@@ -239,12 +246,18 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       await loadClassSession();
     } catch (error) {
       console.error('Error submitting reports:', error);
-      setSubmissionError(
-        'Failed to submit all session reports. Please try again.'
-      );
     } finally {
       setIsSubmittingReports(false);
     }
+  };
+
+
+  const handleOpenConfirm = () => {
+    setConfirmOpen(true);
+  };
+
+  const handleCloseConfirm = () => {
+    setConfirmOpen(false);
   };
 
   return (
@@ -255,6 +268,17 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       maxWidth={false}
       sx={{ '& .MuiDialog-paper': { width: '750px', maxWidth: '750px' } }} // Set the custom width
     >
+      <ConfirmationDialog
+        open={confirmOpen}
+        onClose={handleCloseConfirm}
+        onConfirm={() => {
+          handleSubmitAllReports();
+          handleCloseConfirm();
+        }}
+        title="Confirm Report Submission"
+        content="Are you sure you want to submit all the session reports?"
+        confirmButtonColor="error"
+      />
       <DialogTitle
         sx={{
           display: 'flex',
@@ -440,7 +464,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                   <Button
                     variant="contained"
                     color="primary"
-                    onClick={handleSubmitAllReports}
+                    onClick={handleOpenConfirm}
                     disabled={
                       classSession.reportsSubmitted || isSubmittingReports
                     }
@@ -455,7 +479,11 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                 {/* Add Session Report Form Dialog */}
                 <AddSessionReportForm
                   isOpen={isReportFormOpen}
-                  onClose={() => setReportFormOpen(false)}
+                  onClose={async () => {
+                    await refreshClassSessionData();
+                    setReportFormOpen(false)
+                  }
+                  }
                   onSave={handleSaveReport}
                   studentName={
                     selectedStudent
@@ -562,9 +590,8 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       </ReusableDialog>
       <ReusableDialog
         open={deactivateDialogOpen}
-        title={`Confirm ${
-          classSession?.isActive ? 'Deactivation' : 'Reactivation'
-        }`}
+        title={`Confirm ${classSession?.isActive ? 'Deactivation' : 'Reactivation'
+          }`}
         onClose={() => setDeactivateDialogOpen(false)}
         actions={
           <>
