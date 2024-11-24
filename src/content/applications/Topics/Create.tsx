@@ -29,7 +29,6 @@ const CreateTopic = () => {
             // Prepare the payload for topic creation
             const payload = {
                 name: data.name,
-                description: data.description,
                 franchiseId: franchiseId, // Include the selected franchise ID
             };
 
@@ -51,7 +50,6 @@ const CreateTopic = () => {
     // Topic Data fields configuration
     const topicFields: FieldConfig[] = [
         { name: 'name', label: t('topic_name'), type: 'text', required: true, section: 'Topic Information' },
-        { name: 'description', label: t('description'), type: 'textarea', required: true, section: 'Topic Information' },
     ];
 
     // Franchise Selection field configuration
