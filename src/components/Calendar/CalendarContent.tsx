@@ -16,7 +16,7 @@ import {
   fetchClosingDaysByLocationIds,
   fetchHolidaysByLocationIds,
   fetchParentClassSessions,
-  fetchUserClassSessions,
+  fetchUserClassSessions
 } from 'src/services/classSessionService';
 import { calendarsharedService } from './CalendarSharedService';
 
@@ -46,16 +46,16 @@ const CalendarContent: React.FC = () => {
       const role = roles.includes('SuperAdmin')
         ? 'SuperAdmin'
         : roles.includes('FranchiseAdmin')
-          ? 'FranchiseAdmin'
-          : roles.includes('LocationAdmin')
-            ? 'LocationAdmin'
-            : roles.includes('Teacher')
-              ? 'Teacher'
-              : roles.includes('Parent')
-                ? 'Parent'
-                : roles.includes('Student')
-                  ? 'Student'
-                  : null;
+        ? 'FranchiseAdmin'
+        : roles.includes('LocationAdmin')
+        ? 'LocationAdmin'
+        : roles.includes('Teacher')
+        ? 'Teacher'
+        : roles.includes('Parent')
+        ? 'Parent'
+        : roles.includes('Student')
+        ? 'Student'
+        : null;
       setStrongestRole(role);
     }
   }, [userRoles]);
@@ -195,7 +195,7 @@ const CalendarContent: React.FC = () => {
     try {
       if (locations.length === 0) return;
 
-      const locationIds = locations.map(loc => loc.id);
+      const locationIds = locations.map((loc) => loc.id);
 
       const [holidaysResponse, closingDaysResponse] = await Promise.all([
         fetchHolidaysByLocationIds(locationIds),
@@ -260,13 +260,13 @@ const CalendarContent: React.FC = () => {
       {['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin'].includes(
         strongestRole || ''
       ) && (
-          <FilterToolbar
-            onFranchiseChange={handleFranchiseChange}
-            onLocationsChange={handleLocationsChange}
-            selectedFranchise={selectedFranchise}
-            selectedLocations={selectedLocations}
-          />
-        )}
+        <FilterToolbar
+          onFranchiseChange={handleFranchiseChange}
+          onLocationsChange={handleLocationsChange}
+          selectedFranchise={selectedFranchise}
+          selectedLocations={selectedLocations}
+        />
+      )}
 
       <Box sx={{ position: 'relative', height: '100%', overflow: 'hidden' }}>
         <CustomizedCalendar
