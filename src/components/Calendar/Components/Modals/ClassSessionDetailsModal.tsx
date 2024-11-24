@@ -42,6 +42,8 @@ interface ClassSessionDetailsModalProps {
   canAddReport: boolean;
   canReactivate: boolean;
   onDeactivateComplete: () => void;
+  sessionEnded: boolean;
+  setIsSessionEnded: (sessionEnded: boolean) => void;
 }
 
 const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
@@ -54,7 +56,9 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
   onDeactivateComplete,
   canEdit,
   canReactivate,
-  canAddReport
+  canAddReport,
+  sessionEnded,
+  setIsSessionEnded
 }) => {
   const [classSession, setClassSession] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -74,12 +78,14 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [deactivateDialogOpen, setDeactivateDialogOpen] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
-  const [isSessionEnded, setIsSessionEnded] = useState<boolean>(false);
 
   // New state variables for submission
-  const [isSubmittingReports, setIsSubmittingReports] = useState<boolean>(false);
+  const [isSubmittingReports, setIsSubmittingReports] =
+    useState<boolean>(false);
   const [submissionError, setSubmissionError] = useState<string | null>(null);
-  const [submissionSuccess, setSubmissionSuccess] = useState<string | null>(null);
+  const [submissionSuccess, setSubmissionSuccess] = useState<boolean | null>(
+    null
+  );
 
   // Fetch class session details
   const loadClassSession = async () => {
@@ -114,6 +120,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
         (student: any) => studentReportsStatus[student.id].reportCompleted
       );
       setAllReportsCompleted(allCompleted);
+      setSubmissionSuccess(allCompleted);
     } catch (error) {
       setErrorMessage('Failed to load class session details.');
       console.error('Error fetching class session details:', error);
@@ -227,12 +234,14 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
 
     try {
       await submitTeacherReports({ classSessionId: classSession.id });
-      setSubmissionSuccess('All session reports have been successfully submitted.');
+      setSubmissionSuccess(true);
       // Refresh the class session data to update the `reportsSubmitted` status
       await loadClassSession();
     } catch (error) {
       console.error('Error submitting reports:', error);
-      setSubmissionError('Failed to submit all session reports. Please try again.');
+      setSubmissionError(
+        'Failed to submit all session reports. Please try again.'
+      );
     } finally {
       setIsSubmittingReports(false);
     }
@@ -255,7 +264,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       >
         <Typography variant="h6">Class Session Details</Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
-          {canEdit && !isSessionEnded && (
+          {canEdit && (
             <IconButton
               onClick={handleEdit}
               color="primary"
@@ -276,7 +285,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
               'Teacher'
             ]}
           >
-            {classSession?.isActive && !isSessionEnded ? (
+            {classSession?.isActive && !sessionEnded ? (
               <IconButton
                 onClick={() => setDeactivateDialogOpen(true)}
                 color="warning"
@@ -411,8 +420,13 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
 
                 {/* Display success or error messages */}
                 {submissionSuccess && (
-                  <Typography variant="body2" color="success.main" sx={{ mt: 2 }}>
-                    {submissionSuccess}
+                  <Typography
+                    variant="body2"
+                    color="success.main"
+                    sx={{ mt: 2 }}
+                  >
+                    {submissionSuccess &&
+                      'All session reports have been successfully submitted.'}
                   </Typography>
                 )}
                 {submissionError && (
@@ -427,14 +441,16 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                     variant="contained"
                     color="primary"
                     onClick={handleSubmitAllReports}
-                    disabled={classSession.reportsSubmitted || isSubmittingReports}
-                    startIcon={isSubmittingReports && <CircularProgress size={20} />}
+                    disabled={
+                      classSession.reportsSubmitted || isSubmittingReports
+                    }
+                    startIcon={
+                      isSubmittingReports && <CircularProgress size={20} />
+                    }
                   >
                     Submit All Reports
                   </Button>
                 </Box>
-
-
 
                 {/* Add Session Report Form Dialog */}
                 <AddSessionReportForm
@@ -460,6 +476,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                     onClose={handleCloseReportForm}
                     reportId={selectedReportId}
                     onDelete={handleCloseReportForm}
+                    submissionSuccess={submissionSuccess}
                   />
                 )}
 
@@ -545,8 +562,9 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       </ReusableDialog>
       <ReusableDialog
         open={deactivateDialogOpen}
-        title={`Confirm ${classSession?.isActive ? 'Deactivation' : 'Reactivation'
-          }`}
+        title={`Confirm ${
+          classSession?.isActive ? 'Deactivation' : 'Reactivation'
+        }`}
         onClose={() => setDeactivateDialogOpen(false)}
         actions={
           <>

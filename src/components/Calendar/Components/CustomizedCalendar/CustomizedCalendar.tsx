@@ -85,6 +85,7 @@ export default function CustomizedCalendar({
   const [isHolidayModalOpen, setIsHolidayModalOpen] = useState(false);
   const [isClosingDayModalOpen, setIsClosingDayModalOpen] = useState(false);
   const [selectedSpecialDay, setSelectedSpecialDay] = useState<any>(null);
+  const [sessionEnded, setIsSessionEnded] = useState<boolean | null>(false);
 
   const { showMessage } = useSnackbar();
   const { userRoles } = useAuth();
@@ -472,6 +473,7 @@ export default function CustomizedCalendar({
         appointmentId={selectedAppointment}
         classSessionId={selectedClassSessionId}
         sessionDetails={selectedSessionDetails}
+        sessionEnded={sessionEnded}
       />
 
       <AddClassSessionModal
@@ -499,6 +501,8 @@ export default function CustomizedCalendar({
         canEdit={canEditSession}
         canAddReport={canAddReport}
         canReactivate={canReactivate}
+        sessionEnded={sessionEnded}
+        setIsSessionEnded={setIsSessionEnded}
       />
 
       <SpecialDayModal
