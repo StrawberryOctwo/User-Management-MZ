@@ -167,7 +167,7 @@ const EditTeacher = () => {
         { name: 'city', label: t('city'), type: 'text', required: true, section: 'User Information' },
         { name: 'address', label: t('address'), type: 'text', required: true, section: 'User Information' },
         { name: 'postalCode', label: t('postal_code'), type: 'text', required: true, section: 'User Information' },
-        { name: 'phoneNumber', label: t('phone_number'), type: 'text', required: true, section: 'User Information' },
+        { name: 'phoneNumber', label: t('phone_number'), type: 'number', required: true, section: 'User Information' },
         { name: 'password', label: t('new_password'), type: 'password', required: false, section: 'Change Password' },
         { name: 'confirmPassword', label: t('confirm_password'), type: 'password', required: false, section: 'Change Password' },
     ];

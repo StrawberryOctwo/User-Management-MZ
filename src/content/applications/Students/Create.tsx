@@ -37,9 +37,16 @@ export default function CreateStudent() {
     number | null
   >(null);
 
+  const [studentData, setStudentData] = useState<Record<string, any> | null>(
+    null
+  );
   const [loading, setLoading] = useState(false);
   const dropdownRef = useRef<any>(null);
   const { showMessage } = useSnackbar();
+  const gradeOptions = Array.from({ length: 12 }, (_, i) => ({
+    id: i + 1,
+    name: `Grade ${i + 1}`
+  }));
 
   const handleDayChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = event.target;
@@ -259,7 +266,7 @@ export default function CreateStudent() {
     {
       name: 'phoneNumber',
       label: t('phone_number'),
-      type: 'text',
+      type: 'number',
       required: true,
       section: 'User Information'
     }
@@ -277,9 +284,30 @@ export default function CreateStudent() {
     {
       name: 'gradeLevel',
       label: t('grade_level'),
-      type: 'number',
+      type: 'custom',
       required: true,
-      section: 'Student Information'
+      section: 'Student Information',
+      component: (
+        <SingleSelectWithAutocomplete
+          label="Select Grade Level"
+          fetchData={() => Promise.resolve(gradeOptions)} // Static data function
+          onSelect={(selectedGrade) =>
+            setStudentData((prevData) => ({
+              ...prevData,
+              gradeLevel: selectedGrade ? selectedGrade.id : null
+            }))
+          }
+          displayProperty="name"
+          placeholder="Select Grade"
+          initialValue={
+            studentData?.gradeLevel
+              ? gradeOptions.find(
+                (grade) => grade.id === studentData.gradeLevel
+              )
+              : null
+          }
+        />
+      )
     },
     {
       name: 'contractEndDate',

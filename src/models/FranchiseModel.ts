@@ -7,7 +7,7 @@ export interface Admin {
     email: string;
     address: string;
     postalCode: string;
-    phoneNumber: string;
+    phoneNumber: number;
 }
 
 export interface Location {

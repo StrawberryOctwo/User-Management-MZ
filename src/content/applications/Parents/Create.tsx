@@ -120,7 +120,7 @@ const CreateParent = () => {
     {
       name: 'phoneNumber',
       label: t('phone_number'),
-      type: 'text',
+      type: 'number',
       required: true,
       section: 'Parent Information'
     },

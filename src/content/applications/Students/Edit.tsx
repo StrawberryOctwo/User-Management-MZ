@@ -314,7 +314,7 @@ const EditStudent = () => {
     {
       name: 'phoneNumber',
       label: t('phone_number'),
-      type: 'text',
+      type: 'number',
       required: true,
       section: 'User Information'
     },
