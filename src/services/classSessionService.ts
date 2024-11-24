@@ -205,7 +205,6 @@ interface HolidayInput {
   end_date: string;
 }
 
-
 // Fetch holidays
 // export const fetchHolidays = async (
 //   page: number = 1,
@@ -227,7 +226,12 @@ interface HolidayInput {
 //   }
 // };
 
-export const fetchHolidaysByLocationIds = async (locationIds?: number[], page?: number, limit?: number, search?: string) => {
+export const fetchHolidaysByLocationIds = async (
+  locationIds?: number[],
+  page?: number,
+  limit?: number,
+  search?: string
+) => {
   // Build the payload dynamically, excluding undefined values
   const payload: Record<string, any> = {};
   if (locationIds) payload.locationIds = locationIds;
@@ -243,7 +247,6 @@ export const fetchHolidaysByLocationIds = async (locationIds?: number[], page?: 
     throw error;
   }
 };
-
 
 export const fetchHolidayById = async (id: number) => {
   try {
@@ -279,7 +282,7 @@ export const updateHoliday = async (id: number, holidayData: HolidayInput) => {
 
 // Delete a holiday
 export const deleteHoliday = async (ids: number[]) => {
-  const id = ids[0]
+  const id = ids[0];
   try {
     const response = await api.delete('/holiday', {
       data: { id }
@@ -290,9 +293,6 @@ export const deleteHoliday = async (ids: number[]) => {
     throw error;
   }
 };
-
-
-
 
 // Add a closing day (uses same endpoint as holiday but marks it as a closing day)
 export const addClosingDay = async (closingDayData: HolidayInput) => {
@@ -321,7 +321,7 @@ export const updateClosingDay = async (
 
 // Delete a closing day
 export const deleteClosingDay = async (ids: number[]) => {
-  const id = ids[0]
+  const id = ids[0];
   try {
     const response = await api.delete('/closing-day', {
       data: { id }
@@ -332,7 +332,6 @@ export const deleteClosingDay = async (ids: number[]) => {
     throw error;
   }
 };
-
 
 export const fetchClosingDayById = async (id: number) => {
   try {
@@ -365,7 +364,12 @@ export const fetchClosingDays = async (
   }
 };
 
-export const fetchClosingDaysByLocationIds = async (locationIds?: number[], page?: number, limit?: number, search?: string) => {
+export const fetchClosingDaysByLocationIds = async (
+  locationIds?: number[],
+  page?: number,
+  limit?: number,
+  search?: string
+) => {
   const payload: Record<string, any> = {};
   if (locationIds) payload.locationIds = locationIds;
   if (page) payload.page = page;
