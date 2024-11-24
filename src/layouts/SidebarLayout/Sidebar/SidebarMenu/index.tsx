@@ -323,7 +323,7 @@ function SidebarMenu() {
               </ProtectedListItem>
 
               <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'LocationAdmin']}
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin']}
               >
                 <ListItem component="div">
                   <Button
