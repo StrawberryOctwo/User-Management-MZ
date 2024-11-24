@@ -26,13 +26,11 @@ export default function StudentsContent() {
   useEffect(() => {
     // Only set userRoles if it is empty and authUserRoles is populated
     if (!authLoading && authUserRoles && userRoles.length === 0) {
-      console.log("Setting userRoles:", authUserRoles);
       setUserRoles(authUserRoles);
     }
 
     // Trigger loadStudents if userRoles is populated
     if (userRoles.length > 0) {
-      console.log("User Roles inside useEffect:", userRoles);
       loadStudents();
     }
   }, [authLoading, authUserRoles, userRoles]);
@@ -43,7 +41,6 @@ export default function StudentsContent() {
 
     try {
       let result;
-      console.log("User Roles at load:", userRoles);
       if (userRoles.length === 0) { return }
       if (userRoles.includes('Parent')) {
         result = await fetchParentStudents(page + 1, limit, searchQuery);

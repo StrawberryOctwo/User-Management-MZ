@@ -73,7 +73,6 @@ function AbsenceNotifications() {
         try {
             const data = await getSelfAbsences(pageNumber, limit);
             setAbsences((prevAbsences) => (pageNumber === 1 ? data.data : [...prevAbsences, ...data.data]));
-            console.log(data)
             setPage(pageNumber);
         } catch (error) {
             console.error('Failed to fetch absences:', error);

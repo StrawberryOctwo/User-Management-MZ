@@ -140,8 +140,6 @@ export default function CustomizedCalendar({
   const getDateStatus = (date: Date) => {
     const dateStr = moment(date).format('YYYY-MM-DD');
 
-    console.log("holidays", holidays);
-
     const holidayMatch = holidays?.length
       ? holidays.find((holiday) =>
           moment(dateStr).isBetween(
@@ -163,9 +161,6 @@ export default function CustomizedCalendar({
           )
         )
       : null;
-    
-    console.log('holidayMatch', holidayMatch);
-    console.log('closingDayMatch', closingDayMatch);
 
     return {
       isHoliday: !!holidayMatch,

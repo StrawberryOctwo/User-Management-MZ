@@ -18,7 +18,6 @@ interface TextInputQuestionProps {
 const TextInputQuestion: React.FC<TextInputQuestionProps> = ({ question, onChange }) => {
   const handleTextChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const updatedText = e.target.value;
-    console.log('TextInputQuestion - Updating text to:', updatedText); // Debugging
     onChange({ ...question, text: updatedText });
   };
 

@@ -23,7 +23,6 @@ const EditParent = () => {
         try {
             const fetchedData = await fetchParentById(Number(id));
 
-            console.log(fetchedData);
             const flattenedData = {
                 firstName: fetchedData.user.firstName,
                 lastName: fetchedData.user.lastName,
@@ -82,8 +81,6 @@ const EditParent = () => {
                     studentIds: selectedStudents?.map((student: any) => student.id) || [], // Extract student IDs
                 },
             };
-
-            console.log(payload);
 
             const response = await updateParent(Number(id), payload);
             await fetchParent();

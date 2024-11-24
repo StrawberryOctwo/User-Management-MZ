@@ -202,8 +202,8 @@ const CalendarContent: React.FC = () => {
         fetchClosingDaysByLocationIds(locationIds)
       ]);
 
-      setHolidays(holidaysResponse.holidays);
-      setClosingDays(closingDaysResponse.holidays);
+      setHolidays(holidaysResponse.data);
+      setClosingDays(closingDaysResponse.data);
     } catch (error) {
       console.error('Error fetching special days:', error);
     }
