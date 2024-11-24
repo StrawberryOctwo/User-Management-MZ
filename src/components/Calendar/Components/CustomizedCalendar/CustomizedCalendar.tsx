@@ -140,23 +140,32 @@ export default function CustomizedCalendar({
   const getDateStatus = (date: Date) => {
     const dateStr = moment(date).format('YYYY-MM-DD');
 
-    const holidayMatch = holidays.find((holiday) =>
-      moment(dateStr).isBetween(
-        holiday.start_date,
-        holiday.end_date,
-        'day',
-        '[]'
-      )
-    );
+    console.log("holidays", holidays);
 
-    const closingDayMatch = closingDays.find((closingDay) =>
-      moment(dateStr).isBetween(
-        closingDay.start_date,
-        closingDay.end_date,
-        'day',
-        '[]'
-      )
-    );
+    const holidayMatch = holidays?.length
+      ? holidays.find((holiday) =>
+          moment(dateStr).isBetween(
+            holiday.start_date,
+            holiday.end_date,
+            'day',
+            '[]'
+          )
+        )
+      : null;
+
+    const closingDayMatch = closingDays?.length
+      ? closingDays.find((closingDay) =>
+          moment(dateStr).isBetween(
+            closingDay.start_date,
+            closingDay.end_date,
+            'day',
+            '[]'
+          )
+        )
+      : null;
+    
+    console.log('holidayMatch', holidayMatch);
+    console.log('closingDayMatch', closingDayMatch);
 
     return {
       isHoliday: !!holidayMatch,
