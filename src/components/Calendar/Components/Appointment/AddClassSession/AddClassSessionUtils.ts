@@ -18,8 +18,10 @@ export interface ClassSession {
   studentIds: number[];
 }
 
+export const allowedDurations = [45, 60, 90, 120];
+
 export const recurrenceOptions = [
-  // { value: 'once', label: 'Once' },
+  { value: 'once', label: 'Once' },
   { value: 'weekly', label: 'Weekly' },
   { value: 'custom', label: 'Custom' }
 ];
@@ -66,4 +68,9 @@ export const validateTime = (
     }
   }
   return false;
+};
+
+export const getDayLabel = (dayValue: string) => {
+  const day = daysOfWeek.find((d) => d.value === dayValue);
+  return day ? day.label : dayValue;
 };

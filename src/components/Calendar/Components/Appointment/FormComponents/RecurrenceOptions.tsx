@@ -6,11 +6,14 @@ import {
   Typography,
   ToggleButton,
   ToggleButtonGroup,
-  TextField
+  TextField,
+  Select,
+  MenuItem
 } from '@mui/material';
-import { useEffect, useState } from 'react';
 import {
+  allowedDurations,
   daysOfWeek,
+  getDayLabel,
   recurrenceOptions
 } from '../AddClassSession/AddClassSessionUtils';
 
@@ -21,38 +24,6 @@ export default function RecurrenceOptions({
   setDayDetail,
   resetDayDetails
 }) {
-  const [durationError, setDurationError] = useState<Record<string, string>>(
-    {}
-  );
-
-  const validateDuration = (value: string) => {
-    const allowedDurations = [45, 60, 90, 120];
-    return allowedDurations.includes(Number(value));
-  };
-
-  const handleDurationChange = (day: string, value: string) => {
-    const numericValue = Number(value); // Convert the string value to a number
-
-    // Temporarily allow input but show error if invalid
-    if (value === '' || !Number.isNaN(numericValue)) {
-      setDayDetail(day, 'duration', numericValue);
-
-      if (validateDuration(value)) {
-        setDurationError((prev) => ({ ...prev, [day]: '' })); // Clear error
-      } else {
-        setDurationError((prev) => ({
-          ...prev,
-          [day]: 'Duration must be 45, 60, 90, or 120'
-        }));
-      }
-    }
-  };
-
-  const getDayLabel = (dayValue: string) => {
-    const day = daysOfWeek.find((d) => d.value === dayValue);
-    return day ? day.label : dayValue;
-  };
-
   const onlySelectedDay = Object.keys(dayDetails)[0];
 
   const handleDayToggle = (
@@ -61,8 +32,8 @@ export default function RecurrenceOptions({
   ) => {
     let updatedDayDetails = { ...dayDetails };
 
-    if (recurrenceOption === 'weekly') {
-      // Allow only one day to be selected for 'weekly'
+    if (recurrenceOption === 'weekly' || recurrenceOption === 'once') {
+      // Allow only one day to be selected for 'weekly' and 'once'
       if (!newDay || newDay.length === 0) {
         // If unselecting the currently selected day
         updatedDayDetails = {};
@@ -134,7 +105,7 @@ export default function RecurrenceOptions({
         value={Object.keys(dayDetails)}
         onChange={handleDayToggle}
         aria-label="days of the week"
-        exclusive={recurrenceOption === 'weekly'}
+        exclusive={recurrenceOption === 'weekly' || recurrenceOption === 'once'}
         sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.2 }}
       >
         {daysOfWeek.map((day) => (
@@ -147,7 +118,8 @@ export default function RecurrenceOptions({
               height: 51,
               fontSize: '0.8rem',
               padding: '0.5rem',
-              borderRadius: 1
+              borderRadius: 1,
+              mb: 1
             }}
           >
             {day.label.slice(0, 3).toUpperCase()}
@@ -156,32 +128,42 @@ export default function RecurrenceOptions({
       </ToggleButtonGroup>
 
       {/* Weekly Start Time and Duration */}
-      {recurrenceOption === 'weekly' && onlySelectedDay && (
-        <Box sx={{ display: 'flex', gap: 2 }}>
-          <TextField
-            label="Start Time"
-            type="time"
-            fullWidth
-            value={dayDetails[onlySelectedDay]?.startTime || ''}
-            onChange={(e) =>
-              setDayDetail(onlySelectedDay, 'startTime', e.target.value)
-            }
-            InputLabelProps={{ shrink: true }}
-          />
-          <TextField
-            label="Duration (mins)"
-            type="number"
-            fullWidth
-            value={dayDetails[onlySelectedDay]?.duration || ''}
-            onChange={(e) =>
-              handleDurationChange(onlySelectedDay, e.target.value)
-            }
-            InputLabelProps={{ shrink: true }}
-            error={!!durationError['weekly']}
-            helperText={durationError['weekly']}
-          />
-        </Box>
-      )}
+      {(recurrenceOption === 'weekly' || recurrenceOption === 'once') &&
+        onlySelectedDay && (
+          <Box sx={{ display: 'flex', gap: 2 }}>
+            <TextField
+              label="Start Time"
+              type="time"
+              fullWidth
+              value={dayDetails[onlySelectedDay]?.startTime || ''}
+              onChange={(e) =>
+                setDayDetail(onlySelectedDay, 'startTime', e.target.value)
+              }
+              InputLabelProps={{ shrink: true }}
+            />
+            <Select
+              fullWidth
+              value={dayDetails[onlySelectedDay]?.duration || ''}
+              onChange={(e) =>
+                setDayDetail(
+                  onlySelectedDay,
+                  'duration',
+                  Number(e.target.value)
+                )
+              }
+              displayEmpty
+            >
+              <MenuItem value="" disabled>
+                Select Duration
+              </MenuItem>
+              {allowedDurations.map((duration) => (
+                <MenuItem key={duration} value={duration}>
+                  {duration} mins
+                </MenuItem>
+              ))}
+            </Select>
+          </Box>
+        )}
 
       {/* Custom Start Time and Duration */}
       {recurrenceOption === 'custom' &&
@@ -195,16 +177,23 @@ export default function RecurrenceOptions({
               onChange={(e) => setDayDetail(day, 'startTime', e.target.value)}
               InputLabelProps={{ shrink: true }}
             />
-            <TextField
-              label="Duration (mins)"
-              type="number"
+            <Select
               fullWidth
               value={dayDetails[day]?.duration || ''}
-              onChange={(e) => handleDurationChange(day, e.target.value)}
-              InputLabelProps={{ shrink: true }}
-              error={!!durationError[day]}
-              helperText={durationError[day]}
-            />
+              onChange={(e) =>
+                setDayDetail(day, 'duration', Number(e.target.value))
+              }
+              displayEmpty
+            >
+              <MenuItem value="" disabled>
+                Select Duration
+              </MenuItem>
+              {allowedDurations.map((duration) => (
+                <MenuItem key={duration} value={duration}>
+                  {duration} mins
+                </MenuItem>
+              ))}
+            </Select>
           </Box>
         ))}
     </Box>
