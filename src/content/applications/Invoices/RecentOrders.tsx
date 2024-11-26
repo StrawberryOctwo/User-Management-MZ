@@ -56,7 +56,7 @@ export default function ViewInvoices() {
       const invoiceData = await fetchInvoiceById(invoiceId, userId);
       if (userRoles.includes('Parent')) {
         if (isMounted.current) generateParentInvoicePDF(invoiceData,true);
-      } else {
+      } else if (userRoles.includes('Teacher')){
         // Fetch additional teacher data if not a parent
         const teacherData = await fetchTeacherInvoiceInfoByUserId(userId);
         if (isMounted.current) generateTeacherInvoicePDF(invoiceData, teacherData,true);
