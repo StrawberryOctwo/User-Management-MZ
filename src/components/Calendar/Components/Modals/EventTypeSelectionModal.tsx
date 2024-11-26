@@ -11,6 +11,7 @@ import {
   Box,
   Typography
 } from '@mui/material';
+import RoleBasedComponent from 'src/components/ProtectedComponent';
 
 type EventTypeSelectionModalProps = {
   isOpen: boolean;
@@ -39,7 +40,6 @@ export default function EventTypeSelectionModal({
     onClose();
   };
 
-  const showAdminOptions = userRole === 'SuperAdmin';
 
   return (
     <Dialog
@@ -66,9 +66,10 @@ export default function EventTypeSelectionModal({
               control={<Radio />}
               label="Class Session"
             />
-            <FormControlLabel value="To-Do" control={<Radio />} label="To-Do" />
+            {/* <FormControlLabel value="To-Do" control={<Radio />} label="To-Do" /> */}
 
-            {showAdminOptions && (
+
+            <RoleBasedComponent allowedRoles={['SuperAdmin', 'FranchiseAdmin']}>
               <>
                 <Box mt={2}>
                   <Typography
@@ -90,7 +91,7 @@ export default function EventTypeSelectionModal({
                   label="Closing Day"
                 />
               </>
-            )}
+            </RoleBasedComponent>
           </RadioGroup>
         </Box>
       </DialogContent>

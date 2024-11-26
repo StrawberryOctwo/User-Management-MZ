@@ -31,7 +31,6 @@ const ViewParent: React.FC = () => {
         address: parentData.user?.address,
         postalCode: parentData.user?.postalCode,
         phoneNumber: parentData.user?.phoneNumber,
-        franchise: parentData.franchise?.name,
         students: parentData.students.map((student: any) => ({
           ...student,
           firstName: student.user?.firstName,
@@ -71,11 +70,6 @@ const ViewParent: React.FC = () => {
     {
       name: 'phoneNumber',
       label: t('phone_number'),
-      section: t('parent_details')
-    },
-    {
-      name: 'franchise',
-      label: t('franchise'),
       section: t('parent_details')
     },
     {

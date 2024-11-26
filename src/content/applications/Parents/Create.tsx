@@ -7,26 +7,18 @@ import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelect
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import { useAuth } from 'src/hooks/useAuth';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
-import { fetchFranchises } from 'src/services/franchiseService';
 import { fetchStudents } from 'src/services/studentService';
 
 const CreateParent = () => {
   const [loading, setLoading] = useState(false);
   const { userId, userRoles } = useAuth();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
-  const [selectedFranchise, setSelectedFranchise] = useState(null);
   const [selectedStudents, setSelectedStudents] = useState(null);
 
   const handleSubmit = async (
     data: Record<string, any>
   ): Promise<{ message: string }> => {
     setLoading(true);
-
-    if (!selectedFranchise) {
-      alert('Please select a franchise');
-      setLoading(false);
-      return;
-    }
 
     try {
       const payload = {
@@ -45,7 +37,6 @@ const CreateParent = () => {
           accountHolder: data.accountHolder,
           iban: data.iban,
           bic: data.bic,
-          franchise: selectedFranchise.id,
           studentIds: selectedStudents?.map((student: any) => student.id) || [] // Add student IDs to payload
         }
       };
@@ -123,25 +114,6 @@ const CreateParent = () => {
       type: 'number',
       required: true,
       section: 'Parent Information'
-    },
-    {
-      name: 'franchise',
-      label: t('franchise'),
-      type: 'number',
-      required: true,
-      section: 'Parent Information',
-      component: (
-        <SingleSelectWithAutocomplete
-          label="Select Franchise"
-          fetchData={(query) =>
-            fetchFranchises(1, 5, query).then((data) => data.data)
-          }
-          onSelect={(franchise) => setSelectedFranchise(franchise)}
-          displayProperty="name"
-          placeholder="Search Franchise"
-          initialValue={selectedFranchise}
-        />
-      )
     },
     {
       name: 'student',

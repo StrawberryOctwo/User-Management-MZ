@@ -689,7 +689,7 @@ const routes: RouteObject[] = [
               {
                 path: 'settings',
                 element:
-                  <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+                  <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN, ROLES.TEACHER, ROLES.PARENT, ROLES.STUDENT]}>
                     <UserSettings />
                   </ProtectedRoute>
               }

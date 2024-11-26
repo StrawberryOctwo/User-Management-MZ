@@ -33,6 +33,7 @@ export default function CreateStudent() {
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [selectedTopics, setSelectedTopics] = useState<any[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
+  const [selectedGradeLevel, setSelectedGradeLevel] = useState<number | null>(null);
   const [selectedSchoolTypeId, setSelectedSchoolTypeId] = useState<
     number | null
   >(null);
@@ -100,7 +101,7 @@ export default function CreateStudent() {
       const payload = {
         student: {
           status: data['status'],
-          gradeLevel: data['gradeLevel'],
+          gradeLevel: selectedGradeLevel,
           contract: data['contract'],
           contractEndDate: data['contractEndDate'],
           notes: data['notes'],
@@ -150,6 +151,14 @@ export default function CreateStudent() {
       setLoading(false);
     }
   };
+
+  const handleGradeLevelSelect = (selectedGrade: any) => {
+    // Update the form data directly instead of using separate state
+    console.log('selectedGrade:', selectedGrade);
+    setSelectedGradeLevel(selectedGrade.id);
+    return selectedGrade ? selectedGrade.id : null;
+  };
+
   const schoolTypeSelectionField = {
     name: 'schoolType',
     label: 'School Type',
@@ -290,24 +299,15 @@ export default function CreateStudent() {
       component: (
         <SingleSelectWithAutocomplete
           label="Select Grade Level"
-          fetchData={() => Promise.resolve(gradeOptions)} // Static data function
-          onSelect={(selectedGrade) =>
-            setStudentData((prevData) => ({
-              ...prevData,
-              gradeLevel: selectedGrade ? selectedGrade.id : null
-            }))
-          }
+          fetchData={() => Promise.resolve(gradeOptions)}
+          onSelect={handleGradeLevelSelect}
           displayProperty="name"
           placeholder="Select Grade"
-          initialValue={
-            studentData?.gradeLevel
-              ? gradeOptions.find(
-                (grade) => grade.id === studentData.gradeLevel
-              )
-              : null
-          }
+          initialValue={null}
+          ref={dropdownRef}
         />
-      )
+      ),
+      getValue: (selectedValue: any) => selectedValue // Add this line
     },
     {
       name: 'contractEndDate',
