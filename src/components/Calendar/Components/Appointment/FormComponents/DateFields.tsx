@@ -38,8 +38,6 @@ export default function DateFields({ session, setSession, isPartial }) {
     }
 
     if (normalizedStartDate || normalizedEndDate) {
-
-
       if (
         normalizedEndDate &&
         normalizedStartDate &&

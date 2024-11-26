@@ -108,7 +108,6 @@ function HeaderNotifications() {
     eventSource.onmessage = (event) => {
       try {
         const notification: INotification = JSON.parse(event.data);
-        console.log('New notification received:', notification);
         setNotifications((prev) => [notification, ...prev]);
         setUnreadCount((prev) => prev + 1);
       } catch (error) {

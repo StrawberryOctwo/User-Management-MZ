@@ -11,15 +11,6 @@ export interface Holiday {
   locationId: number;
 }
 
-export interface HolidayResponse {
-  message: string;
-  holidays: Holiday[];
-  meta: {
-    locationsRequested: number;
-    holidaysFound: number;
-  };
-}
-
 export interface SpecialDayData {
   id?: number;
   name: string;

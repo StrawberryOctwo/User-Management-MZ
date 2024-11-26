@@ -27,6 +27,7 @@ interface EditClassSessionModalProps {
   appointmentId?: string;
   classSessionId?: string;
   sessionDetails?: any;
+  sessionEnded?: boolean;
 }
 
 const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
@@ -34,7 +35,8 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
   onClose,
   appointmentId,
   classSessionId,
-  sessionDetails
+  sessionDetails,
+  sessionEnded
 }) => {
   const [editInstance, setEditInstance] = useState({});
   const { userId, userRoles } = useAuth();
@@ -76,7 +78,7 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} maxWidth="md" fullWidth>
+    <Dialog open={isOpen} onClose={handleClose} maxWidth="lg" fullWidth>
       <Tabs
         value={tabIndex}
         onChange={handleTabChange}
@@ -87,8 +89,8 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
         }}
       >
         <Tab label="Edit Current Session" />
-        <Tab label="Edit Class (All Sessions)" />
-        <Tab label="Edit Class (Partial)" />
+        {!sessionEnded && <Tab label="Edit Class (All Sessions)" />}
+        {!sessionEnded && <Tab label="Edit Class (Partial)" />}
       </Tabs>
       <DialogContent
         sx={{
@@ -100,9 +102,10 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
             session={editInstance}
             setSession={setEditInstance}
             editSession={sessionDetails}
+            sessionEnded={sessionEnded}
           />
         )}
-        {tabIndex === 1 && (
+        {!sessionEnded && tabIndex === 1 && (
           <FormFields
             strongestRoles={strongestRoles}
             userId={userId}
@@ -110,7 +113,7 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
             isPartial={false}
           />
         )}
-        {tabIndex === 2 && (
+        {!sessionEnded && tabIndex === 2 && (
           <FormFields
             strongestRoles={strongestRoles}
             userId={userId}

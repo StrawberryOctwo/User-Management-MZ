@@ -5,11 +5,17 @@ import { useParams } from 'react-router-dom';
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
 import { fetchParentById, updateParent } from 'src/services/parentService';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
+import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
+import { fetchFranchises } from 'src/services/franchiseService';
+import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
+import { fetchStudents } from 'src/services/studentService';
 
 const EditParent = () => {
     const { id } = useParams<{ id: string }>();
     const [parentData, setParentData] = useState<Record<string, any> | null>(null);
     const [loading, setLoading] = useState(true);
+    const [selectedFranchise, setSelectedFranchise] = useState(null);
+    const [selectedStudents, setSelectedStudents] = useState(null);
     const { showMessage } = useSnackbar();
 
     const fetchParent = async () => {
@@ -30,8 +36,11 @@ const EditParent = () => {
                 accountHolder: fetchedData.accountHolder,
                 iban: fetchedData.iban,
                 bic: fetchedData.bic,
+                franchise: fetchedData.franchise
             };
 
+            setSelectedFranchise(fetchedData.franchise);
+            setSelectedStudents(fetchedData.students);
             setParentData(flattenedData);
         } catch (error) {
             console.error('Error fetching Parent:', error);
@@ -68,6 +77,8 @@ const EditParent = () => {
                     accountHolder: data.accountHolder,
                     iban: data.iban,
                     bic: data.bic,
+                    franchise: selectedFranchise.id,
+                    studentIds: selectedStudents?.map((student: any) => student.id) || [], // Extract student IDs
                 },
             };
 
@@ -96,9 +107,56 @@ const EditParent = () => {
         { name: 'city', label: t('city'), type: 'text', required: true, section: 'User Information' },
         { name: 'address', label: t('address'), type: 'text', required: true, section: 'User Information' },
         { name: 'postalCode', label: t('postal_code'), type: 'text', required: true, section: 'User Information' },
-        { name: 'phoneNumber', label: t('phone_number'), type: 'text', required: true, section: 'User Information' },
+        { name: 'phoneNumber', label: t('phone_number'), type: 'number', required: true, section: 'User Information' },
         { name: 'password', label: t('new_password'), type: 'password', required: false, section: 'Change Password' },
         { name: 'confirmPassword', label: t('confirm_password'), type: 'password', required: false, section: 'Change Password' },
+        {
+            name: 'franchise',
+            label: t('franchise'),
+            type: 'number',
+            required: true,
+            section: 'User Information',
+            component: (
+                <SingleSelectWithAutocomplete
+                    label="Select Franchise"
+                    fetchData={(query) =>
+                        fetchFranchises(1, 5, query).then((data) => data.data)
+                    }
+                    onSelect={(franchise) => setSelectedFranchise(franchise)}
+                    displayProperty="name"
+                    placeholder="Search Franchise"
+                    initialValue={selectedFranchise}
+                />
+            )
+        },
+        {
+            name: 'student',
+            label: t('student'),
+            type: 'number',
+            required: true,
+            section: 'User Information',
+            component: (
+                <MultiSelectWithCheckboxes
+                    label="Select student"
+                    fetchData={(query) =>
+                        fetchStudents(1, 5, query).then((data) =>
+                            data.data.map((student: any) => ({
+                                ...student,
+                                fullName: `${student.firstName} ${student.lastName}`,
+                            }))
+                        )
+                    }
+                    onSelect={(students) => setSelectedStudents(students)}
+                    displayProperty="fullName"
+                    placeholder="Search student"
+                    initialValue={selectedStudents?.map((student: any) => ({
+                        ...student,
+                        fullName: `${student.firstName} ${student.lastName}`,
+                    }))}
+                />
+            ),
+        }
+
     ];
 
     const bankingFields: FieldConfig[] = [

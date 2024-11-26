@@ -93,7 +93,7 @@ const EditFranchise = () => {
         // New Fields
         { name: 'franchiseLogo', label: t('franchise_logo'), type: 'logo_file', required: false, section: 'Additional Information' },
         { name: 'emailAddress', label: t('email_address'), type: 'email', required: true, section: 'Contact Information' },
-        { name: 'phoneNumber', label: t('phone_number'), type: 'tel', required: true, section: 'Contact Information' },
+        { name: 'phoneNumber', label: t('phone_number'), type: 'number', required: true, section: 'Contact Information' },
     ];
 
     return (

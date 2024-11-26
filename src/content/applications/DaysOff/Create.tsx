@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Box from '@mui/material/Box';
 import { t } from 'i18next';
-import { CircularProgress, Switch, FormControlLabel } from '@mui/material';
+import { CircularProgress, Switch, FormControlLabel, Button } from '@mui/material';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
 import ReusableForm from 'src/components/Table/tableRowCreate';
 import { fetchFranchises } from 'src/services/franchiseService';
@@ -15,104 +15,76 @@ const CreateContract = () => {
     const [discounts, setDiscounts] = useState<any[]>([]);
     const [formLoading, setFormLoading] = useState(true);
     const [isVatExempt, setIsVatExempt] = useState(false);
-    const [vatPercentage, setVatPercentage] = useState(19);
+    const [vatPercentage, setVatPercentage] = useState(19); // Default VAT percentage
     const franchiseRef = useRef<any>(null);
     const { showMessage } = useSnackbar();
 
     useEffect(() => {
         const loadData = async () => {
-            setFormLoading(true);
             try {
-                const [sessionTypesData, discountsData] = await Promise.all([
-                    fetchSessionTypes(),
-                    fetchDiscounts()
-                ]);
-
-                // Ensure we're setting arrays, with fallbacks if the API returns unexpected data
-                setSessionTypes(Array.isArray(sessionTypesData) ? sessionTypesData : []);
-                setDiscounts(Array.isArray(discountsData) ? discountsData : []);
+                const sessionTypesData = await fetchSessionTypes();
+                const discountsData = await fetchDiscounts();
+                setSessionTypes(sessionTypesData);
+                setDiscounts(discountsData);
             } catch (error) {
                 console.error("Error fetching session types and discounts:", error);
-                showMessage('Failed to load form data. Please try again.', 'error');
-                // Set empty arrays as fallback
-                setSessionTypes([]);
-                setDiscounts([]);
             } finally {
                 setFormLoading(false);
             }
         };
         loadData();
-    }, [showMessage]);
+    }, []);
 
     const handleFranchiseSelect = (selectedItem: any) => {
         setSelectedFranchise(selectedItem);
     };
 
-    const handleContractSubmit = async (data: Record<string, any>) => {
-        if (!selectedFranchise) {
+    const handleContractSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
+        if (selectedFranchise === null) {
             showMessage('Please select a franchise.', 'error');
-            return Promise.reject(new Error('Franchise selection required'));
+            return;
         }
-
         setLoading(true);
         try {
-            // Ensure sessionTypes is an array before mapping
-            const sessionTypePrices = Array.isArray(sessionTypes)
-                ? sessionTypes.map(type => ({
-                    sessionTypeId: type.id,
-                    price: Number(data[`sessionPrice_${type.id}`]) || 0,
-                }))
-                : [];
-
-            // Ensure discounts is an array before mapping
-            const discountPrices = Array.isArray(discounts)
-                ? discounts.map(discount => ({
-                    discountId: discount.id,
-                    price: Number(data[`discountPrice_${discount.id}`]) || 0,
-                }))
-                : [];
-
+            if (!selectedFranchise) {
+                throw new Error('Please select a franchise.');
+            }
             const payload = {
                 name: data.name,
                 contractName: data.contractName,
-                monthlyFee: Number(data.monthlyFee) || 0,
-                oneTimeFee: Number(data.oneTimeFee) || 0,
-                initialSessionBalance: Number(data.initialSessionBalance) || 0,
+                monthlyFee: data.monthlyFee,
+                oneTimeFee: data.oneTimeFee,
+                initialSessionBalance: data.initialSessionBalance,
                 isVatExempt,
                 vatPercentage: isVatExempt ? 0 : vatPercentage,
                 franchiseId: selectedFranchise.id,
-                sessionTypePrices,
-                discounts: discountPrices,
+                sessionTypePrices: sessionTypes.map(type => ({
+                    sessionTypeId: type.id,
+                    price: data[`sessionPrice_${type.id}`],
+                })),
+                discounts: discounts.map(discount => ({
+                    discountId: discount.id,
+                    price: data[`discountPrice_${discount.id}`],
+                })),
             };
-
             const response = await addContractPackage(payload);
 
-            // Reset form state on success
             setSelectedFranchise(null);
             setIsVatExempt(false);
             setVatPercentage(19);
             if (franchiseRef.current) {
                 franchiseRef.current.reset();
             }
-
-            showMessage('Contract package created successfully', 'success');
             return response;
         } catch (error: any) {
             console.error("Error adding contract package:", error);
-            showMessage(error.message || 'Failed to create contract package', 'error');
             throw error;
         } finally {
             setLoading(false);
         }
     };
 
-    if (formLoading) {
-        return (
-            <Box display="flex" justifyContent="center" alignItems="center" minHeight="200px">
-                <CircularProgress />
-            </Box>
-        );
-    }
+    if (formLoading) return <CircularProgress />;
 
     const contractFields = [
         { name: 'name', label: t('contract_name'), type: 'text', required: true, section: 'Contract Information' },
@@ -127,15 +99,7 @@ const CreateContract = () => {
             section: 'Contract Information',
             component: (
                 <FormControlLabel
-                    control={
-                        <Switch
-                            checked={isVatExempt}
-                            onChange={() => {
-                                setIsVatExempt(!isVatExempt);
-                                if (!isVatExempt) setVatPercentage(19);
-                            }}
-                        />
-                    }
+                    control={<Switch checked={isVatExempt} onChange={() => { setIsVatExempt(!isVatExempt); if (!isVatExempt) setVatPercentage(19); }} />}
                     label={t('VAT Exempt')}
                 />
             ),
@@ -160,33 +124,25 @@ const CreateContract = () => {
                 <SingleSelectWithAutocomplete
                     ref={franchiseRef}
                     label={t("Search_and_assign_franchises")}
-                    fetchData={async (query) => {
-                        try {
-                            const response = await fetchFranchises(1, 5, query);
-                            return response.data || [];
-                        } catch (error) {
-                            console.error('Error fetching franchises:', error);
-                            return [];
-                        }
-                    }}
+                    fetchData={(query) => fetchFranchises(1, 5, query).then((data) => data.data)}
                     onSelect={handleFranchiseSelect}
                     displayProperty="name"
                     placeholder="Type to search franchises"
                 />
             ),
         },
-        ...(Array.isArray(sessionTypes) ? sessionTypes : []).map(type => ({
+        ...sessionTypes.map(type => ({
             name: `sessionPrice_${type.id}`,
             label: `${type.name} Price`,
             type: 'number',
             required: true,
             section: 'Session Type Prices',
         })),
-        ...(Array.isArray(discounts) ? discounts : []).map(discount => ({
+        ...discounts.map(discount => ({
             name: `discountPrice_${discount.id}`,
             label: `${discount.name} Discount Percentage`,
             type: 'number',
-            required: false,
+            required: false, // Discounts are optional
             section: 'Discounts',
         })),
     ];
@@ -198,7 +154,6 @@ const CreateContract = () => {
                 onSubmit={handleContractSubmit}
                 entityName="Contract Package"
                 entintyFunction="Add"
-            // loading={loading}
             />
         </Box>
     );

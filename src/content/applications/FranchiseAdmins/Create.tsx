@@ -68,7 +68,7 @@ export default function CreateFranchiseAdmin() {
         { name: 'city', label: t('city'), type: 'text', required: true, section: 'User Information' },
         { name: 'address', label: t('address'), type: 'text', required: true, section: 'User Information' },
         { name: 'postalCode', label: t('postal_code'), type: 'text', required: true, section: 'User Information' },
-        { name: 'phoneNumber', label: t('phone_Number'), type: 'text', required: true, section: 'User Information' },
+        { name: 'phoneNumber', label: t('phone_Number'), type: 'number', required: true, section: 'User Information' },
     ];
 
     const otherFields = [

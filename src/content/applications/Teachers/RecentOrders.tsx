@@ -61,7 +61,7 @@ export default function TeachersContent() {
     { field: 'fullName', headerName: 'Full Name' },
     { field: 'franchise', headerName: 'Franchise Name' },
     { field: 'email', headerName: 'Email' },
-    { field: 'employeeNumber', headerName: 'Employee Number' },
+    { field: 'employeeNumber', headerName: 'Teacher Number' },
     {
       field: 'contractPeriod',
       headerName: 'Contract Period',

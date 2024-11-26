@@ -48,7 +48,6 @@ const ViewStudentPage: React.FC = () => {
 
     try {
       const studentData = await fetchStudentById(Number(id));
-      console.log('studentData:', studentData);
 
       // Transform availableDates: Binary to Array of Day Names
       studentData.availableDates = decodeAvailableDates(

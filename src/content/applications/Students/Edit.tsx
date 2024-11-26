@@ -16,10 +16,6 @@ import {
 import { assignStudentToTopics, fetchTopics } from 'src/services/topicService';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
 import {
-  assignOrUpdateParentStudents,
-  fetchParents
-} from 'src/services/parentService';
-import {
   assignStudentToContract,
   fetchContractPackagesByEntity
 } from 'src/services/contractPackagesService';
@@ -39,7 +35,6 @@ const EditStudent = () => {
     null
   );
   const [selectedLocations, setSelectedLocations] = useState<any[]>([]); // Changed to an array for multiple locations
-  const [selectedParent, setSelectedParent] = useState<any | null>(null);
   const [selectedContract, setSelectedContract] = useState<any | null>(null);
   const [selectedSchoolType, setSelectedSchoolType] = useState<any | null>(
     null
@@ -87,17 +82,10 @@ const EditStudent = () => {
           contractEndDate: fetchedData.contractEndDate
             ? formatDateForInput(fetchedData.contractEndDate)
             : '',
-          parent: fetchedData.parent
-            ? {
-              id: fetchedData.parent.id,
-              accountHolder: fetchedData.parent.user.firstName
-            }
-            : null // Set parent to null if not present
         };
 
         setStudentData(flattenedData);
         setSelectedLocations(fetchedData.locations || []); // Set multiple locations
-        setSelectedParent(flattenedData.parent);
         setSelectedTopics(fetchedData.topics || []);
         setSelectedContract(fetchedData.contract);
         setSelectedSchoolType(fetchedData.schoolType);
@@ -132,9 +120,6 @@ const EditStudent = () => {
   const handleContractSelect = (contract) => {
     setSelectedContract(contract);
   };
-  const handleParentSelect = (parent) => {
-    setSelectedParent(parent); // Store the full parent object
-  };
   const handleSchoolTypeSelect = (schoolType: any) =>
     setSelectedSchoolType(schoolType);
 
@@ -156,10 +141,6 @@ const EditStudent = () => {
   ): Promise<{ message: string }> => {
     if (data.password && data.password !== data.confirmPassword) {
       showMessage('Passwords do not match', 'error');
-      return;
-    }
-    if (!selectedParent) {
-      showMessage('Parent field is required', 'error');
       return;
     }
     if (selectedLocations.length === 0) {
@@ -206,9 +187,6 @@ const EditStudent = () => {
         studentPayload
       );
       await assignStudentToTopics(Number(id), topicIds);
-      await assignOrUpdateParentStudents(selectedParent.id, [
-        response.studentId
-      ]);
       if (
         selectedContract &&
         (!studentData.contract ||
@@ -277,30 +255,6 @@ const EditStudent = () => {
     )
   };
 
-  const parentSelectionField = {
-    name: 'parent',
-    label: 'Select Parent',
-    type: 'custom',
-    section: 'Student Assignment',
-    component: (
-      <SingleSelectWithAutocomplete
-        label="Search Parent"
-        fetchData={(query) =>
-          fetchParents(1, 5, query).then((response) =>
-            response.data.map((parent) => ({
-              ...parent,
-              accountHolder: parent.user.firstName // Use user.firstName as accountHolder
-            }))
-          )
-        }
-        onSelect={handleParentSelect}
-        displayProperty="accountHolder"
-        placeholder="Type to search parent"
-        initialValue={selectedParent}
-      />
-    )
-  };
-
   const statusOptions = [
     { label: t('active'), value: 'active' },
     { label: t('inactive'), value: 'inactive' },
@@ -360,7 +314,7 @@ const EditStudent = () => {
     {
       name: 'phoneNumber',
       label: t('phone_number'),
-      type: 'text',
+      type: 'number',
       required: true,
       section: 'User Information'
     },
@@ -450,7 +404,6 @@ const EditStudent = () => {
         />
       )
     },
-    parentSelectionField,
     contractSelectionField,
     schoolTypeSelectionField,
     {

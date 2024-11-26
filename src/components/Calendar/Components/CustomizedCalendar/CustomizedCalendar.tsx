@@ -85,6 +85,7 @@ export default function CustomizedCalendar({
   const [isHolidayModalOpen, setIsHolidayModalOpen] = useState(false);
   const [isClosingDayModalOpen, setIsClosingDayModalOpen] = useState(false);
   const [selectedSpecialDay, setSelectedSpecialDay] = useState<any>(null);
+  const [sessionEnded, setIsSessionEnded] = useState<boolean | null>(false);
 
   const { showMessage } = useSnackbar();
   const { userRoles } = useAuth();
@@ -139,23 +140,27 @@ export default function CustomizedCalendar({
   const getDateStatus = (date: Date) => {
     const dateStr = moment(date).format('YYYY-MM-DD');
 
-    const holidayMatch = holidays.find((holiday) =>
-      moment(dateStr).isBetween(
-        holiday.start_date,
-        holiday.end_date,
-        'day',
-        '[]'
-      )
-    );
+    const holidayMatch = holidays?.length
+      ? holidays.find((holiday) =>
+          moment(dateStr).isBetween(
+            holiday.start_date,
+            holiday.end_date,
+            'day',
+            '[]'
+          )
+        )
+      : null;
 
-    const closingDayMatch = closingDays.find((closingDay) =>
-      moment(dateStr).isBetween(
-        closingDay.start_date,
-        closingDay.end_date,
-        'day',
-        '[]'
-      )
-    );
+    const closingDayMatch = closingDays?.length
+      ? closingDays.find((closingDay) =>
+          moment(dateStr).isBetween(
+            closingDay.start_date,
+            closingDay.end_date,
+            'day',
+            '[]'
+          )
+        )
+      : null;
 
     return {
       isHoliday: !!holidayMatch,
@@ -472,6 +477,7 @@ export default function CustomizedCalendar({
         appointmentId={selectedAppointment}
         classSessionId={selectedClassSessionId}
         sessionDetails={selectedSessionDetails}
+        sessionEnded={sessionEnded}
       />
 
       <AddClassSessionModal
@@ -499,6 +505,8 @@ export default function CustomizedCalendar({
         canEdit={canEditSession}
         canAddReport={canAddReport}
         canReactivate={canReactivate}
+        sessionEnded={sessionEnded}
+        setIsSessionEnded={setIsSessionEnded}
       />
 
       <SpecialDayModal

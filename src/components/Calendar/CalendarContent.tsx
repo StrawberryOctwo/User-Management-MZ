@@ -13,8 +13,8 @@ import { getStrongestRoles } from 'src/hooks/roleUtils';
 import {
   Holiday,
   fetchClassSessions,
-  fetchClosingDays,
-  fetchHolidays,
+  fetchClosingDaysByLocationIds,
+  fetchHolidaysByLocationIds,
   fetchParentClassSessions,
   fetchUserClassSessions
 } from 'src/services/classSessionService';
@@ -46,16 +46,16 @@ const CalendarContent: React.FC = () => {
       const role = roles.includes('SuperAdmin')
         ? 'SuperAdmin'
         : roles.includes('FranchiseAdmin')
-          ? 'FranchiseAdmin'
-          : roles.includes('LocationAdmin')
-            ? 'LocationAdmin'
-            : roles.includes('Teacher')
-              ? 'Teacher'
-              : roles.includes('Parent')
-                ? 'Parent'
-                : roles.includes('Student')
-                  ? 'Student'
-                  : null;
+        ? 'FranchiseAdmin'
+        : roles.includes('LocationAdmin')
+        ? 'LocationAdmin'
+        : roles.includes('Teacher')
+        ? 'Teacher'
+        : roles.includes('Parent')
+        ? 'Parent'
+        : roles.includes('Student')
+        ? 'Student'
+        : null;
       setStrongestRole(role);
     }
   }, [userRoles]);
@@ -195,15 +195,15 @@ const CalendarContent: React.FC = () => {
     try {
       if (locations.length === 0) return;
 
-      const locationIds = locations.map(loc => loc.id);
+      const locationIds = locations.map((loc) => loc.id);
 
       const [holidaysResponse, closingDaysResponse] = await Promise.all([
-        fetchHolidays(locationIds),
-        fetchClosingDays(locationIds)
+        fetchHolidaysByLocationIds(locationIds),
+        fetchClosingDaysByLocationIds(locationIds)
       ]);
 
-      setHolidays(holidaysResponse.holidays);
-      setClosingDays(closingDaysResponse.holidays);
+      setHolidays(holidaysResponse.data);
+      setClosingDays(closingDaysResponse.data);
     } catch (error) {
       console.error('Error fetching special days:', error);
     }
@@ -251,6 +251,7 @@ const CalendarContent: React.FC = () => {
       strongestRole &&
       (strongestRole !== 'SuperAdmin' || selectedLocations.length > 0)
     ) {
+      fetchSpecialDays(selectedLocations);
       loadClassSessions();
     }
   }, [date, selectedFranchise, selectedLocations, strongestRole]);
@@ -260,13 +261,13 @@ const CalendarContent: React.FC = () => {
       {['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin'].includes(
         strongestRole || ''
       ) && (
-          <FilterToolbar
-            onFranchiseChange={handleFranchiseChange}
-            onLocationsChange={handleLocationsChange}
-            selectedFranchise={selectedFranchise}
-            selectedLocations={selectedLocations}
-          />
-        )}
+        <FilterToolbar
+          onFranchiseChange={handleFranchiseChange}
+          onLocationsChange={handleLocationsChange}
+          selectedFranchise={selectedFranchise}
+          selectedLocations={selectedLocations}
+        />
+      )}
 
       <Box sx={{ position: 'relative', height: '100%', overflow: 'hidden' }}>
         <CustomizedCalendar

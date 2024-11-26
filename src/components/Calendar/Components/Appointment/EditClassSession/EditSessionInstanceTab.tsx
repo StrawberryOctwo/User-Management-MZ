@@ -19,7 +19,12 @@ import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWith
 import { fetchStudents } from 'src/services/studentService';
 import { fetchSessionTypes } from 'src/services/contractPackagesService';
 
-const EditSessionInstanceTab = ({ session, setSession, editSession }) => {
+const EditSessionInstanceTab = ({
+  session,
+  setSession,
+  editSession,
+  sessionEnded
+}) => {
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [selectedStudents, setSelectedStudents] = useState([]);
   const { userId, userRoles } = useAuth();
@@ -91,6 +96,7 @@ const EditSessionInstanceTab = ({ session, setSession, editSession }) => {
                 })
               }
               label="Status"
+              disabled={sessionEnded}
             >
               <MenuItem value="active">Active</MenuItem>
               <MenuItem value="inactive">Inactive</MenuItem>
@@ -105,6 +111,7 @@ const EditSessionInstanceTab = ({ session, setSession, editSession }) => {
             value={session.date}
             onChange={(e) => setSession({ ...session, date: e.target.value })}
             InputLabelProps={{ shrink: true }}
+            disabled={sessionEnded}
           />
         </Grid>
       </Grid>
@@ -119,6 +126,7 @@ const EditSessionInstanceTab = ({ session, setSession, editSession }) => {
               setSession({ ...session, startTime: e.target.value })
             }
             InputLabelProps={{ shrink: true }}
+            disabled={sessionEnded}
           />
         </Grid>
         <Grid item xs={6}>
@@ -131,6 +139,7 @@ const EditSessionInstanceTab = ({ session, setSession, editSession }) => {
               setSession({ ...session, duration: e.target.value })
             }
             InputLabelProps={{ shrink: true }}
+            disabled={sessionEnded}
           />
         </Grid>
       </Grid>
@@ -138,6 +147,7 @@ const EditSessionInstanceTab = ({ session, setSession, editSession }) => {
         <Grid item xs={6}>
           <FormControl fullWidth>
             <SingleSelectWithAutocomplete
+              disabled={sessionEnded}
               width="100%"
               label="Search Teacher"
               fetchData={(query) =>
@@ -167,6 +177,7 @@ const EditSessionInstanceTab = ({ session, setSession, editSession }) => {
         <Grid item xs={6}>
           <FormControl fullWidth>
             <MultiSelectWithCheckboxes
+              disabled={sessionEnded}
               width="100%"
               label="Search Students"
               fetchData={(query) =>
@@ -193,6 +204,7 @@ const EditSessionInstanceTab = ({ session, setSession, editSession }) => {
           <FormControl fullWidth>
             <InputLabel>Room</InputLabel>
             <Select
+              disabled={sessionEnded}
               label="Room"
               value={session.room || ''}
               onChange={(e) => setSession({ ...session, room: e.target.value })}
@@ -209,6 +221,7 @@ const EditSessionInstanceTab = ({ session, setSession, editSession }) => {
           <FormControl fullWidth>
             <InputLabel>Session Type</InputLabel>
             <Select
+              disabled={sessionEnded}
               label="Session Type"
               value={session.sessionType || ''}
               onChange={(e) =>

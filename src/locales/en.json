@@ -3,7 +3,7 @@
   "last_name": "Last Name",
   "franchise_name": "Franchise Name",
   "email": "Email",
-  "employee_number": "Employee Number",
+  "employee_number": "Teacher Number",
   "contract_start_date": "Contract Start Date",
   "contract_end_date": "Contract End Date",
   "hourly_rate": "Hourly Rate (60 min)",

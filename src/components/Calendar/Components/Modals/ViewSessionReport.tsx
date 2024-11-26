@@ -24,6 +24,7 @@ interface ViewSessionReportFormProps {
   onClose: () => void;
   onDelete: () => void;
   readOnly?: boolean;
+  submissionSuccess?: boolean;
 }
 
 const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
@@ -31,7 +32,8 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
   onClose,
   reportId,
   onDelete,
-  readOnly = false
+  readOnly = false,
+  submissionSuccess
 }) => {
   const [lessonTopic, setLessonTopic] = useState<string>('');
   const [coveredMaterials, setCoveredMaterials] = useState<string>('');
@@ -51,15 +53,17 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
   const [loading, setLoading] = useState<boolean>(true);
   const [confirmDeleteOpen, setConfirmDeleteOpen] = useState(false);
 
+  useEffect(() => {
+    console.log('submissionSuccess', submissionSuccess);
+  }, [submissionSuccess]);
+
   // Fetch the session report when the dialog opens
   useEffect(() => {
     if (isOpen && reportId) {
       const fetchReport = async () => {
         setLoading(true);
         try {
-          const report = await getSessionReportById(reportId); // Fetch the report by ID
-
-          // Set all fields to the values from the fetched report
+          const report = await getSessionReportById(reportId);
 
           setLessonTopic(report.data.lessonTopic || '');
           setCoveredMaterials(report.data.coveredMaterials || '');
@@ -75,10 +79,16 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
           setNextHomework(report.data.nextHomework || '');
           setTutorRemarks(report.data.tutorRemarks || '');
 
-          // Set session date and student name, which are read-only
-          setSessionDate(
-            format(new Date(report.data.session.sessionStartDate), 'yyyy-MM-dd')
-          );
+          // Fix date formatting
+          if (report.data.session.date) {
+            const date = new Date(report.data.session.date);
+            if (!isNaN(date.getTime())) {
+              setSessionDate(format(date, 'yyyy-MM-dd'));
+            } else {
+              setSessionDate('');
+            }
+          }
+
           setStudentName(
             `${report.data.student.user.firstName} ${report.data.student.user.lastName}`
           );
@@ -161,7 +171,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
         }}
         title="Confirm Deletion"
         content="Are you sure you want to delete this session report?"
-        confirmButtonColor='error'
+        confirmButtonColor="error"
       />
 
       <Dialog open={isOpen} onClose={onClose} maxWidth="sm" fullWidth>
@@ -315,10 +325,12 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
         </DialogContent>
         {!readOnly && (
           <DialogActions>
-            <Button onClick={handleOpenConfirmDelete} color="error">
-              Delete Report
-            </Button>
-            
+            {!submissionSuccess && (
+              <Button onClick={handleOpenConfirmDelete} color="error">
+                Delete Report
+              </Button>
+            )}
+
             <Button onClick={handleSave} color="primary" variant="contained">
               Save Report
             </Button>

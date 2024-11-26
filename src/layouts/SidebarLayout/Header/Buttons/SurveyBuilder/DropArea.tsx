@@ -82,14 +82,12 @@ function DropArea({ questions, onEdit, onDelete }: DropAreaProps) {
   const [currentQuestion, setCurrentQuestion] = useState<Question | null>(null);
 
   const handleEditClick = (question: Question) => {
-    console.log('DropArea - Editing Question:', question);
     setCurrentQuestion(question);
     setModalOpen(true);
   };
 
   const handleSaveQuestion = () => {
     if (currentQuestion) {
-      console.log('DropArea - Saving Question:', currentQuestion);
       onEdit(currentQuestion);
       setModalOpen(false);
     }
