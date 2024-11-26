@@ -1,5 +1,22 @@
 import moment from 'moment';
+import dayjs from 'dayjs';
+import 'dayjs/locale/de'; 
+dayjs.locale('de');
 
+export const processAvailabilities = (availabilities) => {
+  const dayOrder = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+
+  return availabilities
+      // Filter out entries where both startTime and endTime are "00:00:00"
+      .filter(({ startTime, endTime }) => !(startTime === '00:00:00' && endTime === '00:00:00'))
+      // Map updatedAt to German date format
+      .map(item => ({
+          ...item,
+          updatedAt: dayjs(item.updatedAt).format('DD.MM.YYYY HH:mm'),
+      }))
+      // Sort by day of the week
+      .sort((a, b) => dayOrder.indexOf(a.dayOfWeek) - dayOrder.indexOf(b.dayOfWeek));
+};
 export const generateEmployeeNumber = (firstName: string, lastName: string, dob: string): string => {
   // Extract initials
   const initials = `${firstName[0].toUpperCase()}${lastName[0].toUpperCase()}`;

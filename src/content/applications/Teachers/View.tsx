@@ -9,6 +9,7 @@ import { fetchTeacherById, fetchTeacherDocumentsById } from 'src/services/teache
 import ReusableDetails from 'src/components/View';
 import FileActions from 'src/components/Files/FileActions';
 import { getPaymentsForUser, updatePaymentStatus } from 'src/services/paymentService';
+import { processAvailabilities } from 'src/utils/teacherUtils';
 
 const ViewTeacherPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -27,6 +28,7 @@ const ViewTeacherPage: React.FC = () => {
 
         try {
             const teacherData = await fetchTeacherById(Number(id));
+            teacherData.availabilities=processAvailabilities(teacherData.availabilities);
             setTeacher(teacherData);
 
             const teacherDocuments = await fetchTeacherDocumentsById(Number(id));
@@ -100,6 +102,19 @@ const ViewTeacherPage: React.FC = () => {
             ),
         },
         {
+            name: 'availabilities',
+            label: t('availabilities'),
+            section: t('availabilities'),
+            isArray: true,
+            columns: [
+                { field: 'dayOfWeek', headerName: t('dayOfWeek'), flex: 1 },
+                { field: 'startTime', headerName: t('startTime'), flex: 1 },
+                { field: 'endTime', headerName: t('endTime'), flex: 1 },
+                { field: 'updatedAt', headerName: t('lastUpdatedAt'), flex: 1 },
+            ],
+        },
+        
+        {
             name: 'locations',
             label: t('locations'),
             section: t('locations'),
@@ -127,7 +142,7 @@ const ViewTeacherPage: React.FC = () => {
                 },
             ],
         },
-        ,
+        
 
         {
             name: 'documents',
