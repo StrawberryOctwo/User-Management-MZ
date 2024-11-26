@@ -20,7 +20,6 @@ export default function ViewSessionReports() {
 
   const isMounted = useRef(false);
 
-
   const { userId } = useAuth();
 
   useEffect(() => {
@@ -33,13 +32,17 @@ export default function ViewSessionReports() {
 
   const loadSessionReports = async (searchQuery = '') => {
     if (!userId) {
-      console.warn("User ID is null, skipping API call");
+      console.warn('User ID is null, skipping API call');
       return;
     }
 
     setLoading(true);
     try {
-      const { data, total } = await fetchParentSessionReports(userId, page + 1, limit);
+      const { data, total } = await fetchParentSessionReports(
+        userId,
+        page + 1,
+        limit
+      );
       setPayments(data);
       setTotalCount(total);
     } catch (error) {
@@ -55,20 +58,17 @@ export default function ViewSessionReports() {
     {
       field: 'sessionStartDate',
       headerName: 'Session Start Date',
-      render: (value: any) =>
-        formatDateTime(value)
+      render: (value: any) => formatDateTime(value)
     },
     {
       field: 'sessionEndDate',
       headerName: 'Session End Date',
-      render: (value: any) =>
-        formatDateTime(value)
+      render: (value: any) => formatDateTime(value)
     },
     {
       field: 'reportDate',
       headerName: 'Report Date',
-      render: (value: any) =>
-        formatDateTime(value)
+      render: (value: any) => formatDateTime(value)
     },
     { field: 'lessonTopic', headerName: 'Lesson Topic' },
     {
@@ -78,13 +78,13 @@ export default function ViewSessionReports() {
         <Button
           variant="outlined"
           color="primary"
-          size='small'
+          size="small"
           onClick={() => handleView(row.id)}
         >
           View Report
         </Button>
-      ),
-    },
+      )
+    }
   ];
 
   const formatDateTime = (date: string | Date): string => {
@@ -100,9 +100,8 @@ export default function ViewSessionReports() {
     })}`;
   };
 
-
   const handleEdit = (id: any) => {
-    openReportDialog(id)
+    openReportDialog(id);
   };
 
   const openReportDialog = (reportId: string) => {
@@ -111,9 +110,8 @@ export default function ViewSessionReports() {
   };
 
   const handleView = (id: any) => {
-    openReportDialog(id)
+    openReportDialog(id);
   };
-
 
   const handlePageChange = (newPage: number) => {
     setPage(newPage);
@@ -127,7 +125,7 @@ export default function ViewSessionReports() {
   const closeReportDialog = () => {
     setIsReportDialogOpen(false);
     setSelectedReportId(null);
-    loadSessionReports()
+    loadSessionReports();
   };
 
   if (errorMessage) return <div>{errorMessage}</div>;
@@ -154,7 +152,11 @@ export default function ViewSessionReports() {
         onClose={() => setDialogOpen(false)}
         actions={
           <>
-            <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
+            <Button
+              onClick={() => setDialogOpen(false)}
+              color="inherit"
+              disabled={loading}
+            >
               Cancel
             </Button>
             <Button
@@ -182,4 +184,4 @@ export default function ViewSessionReports() {
       )}
     </Box>
   );
-};
+}

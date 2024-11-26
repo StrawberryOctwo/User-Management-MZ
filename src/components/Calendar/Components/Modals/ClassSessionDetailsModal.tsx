@@ -123,7 +123,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       // );
 
       // Check if all reports are submitted
-      const allCompleted = response.reportsSubmitted
+      const allCompleted = response.reportsSubmitted;
 
       // console.log()
       setAllReportsCompleted(allCompleted);
@@ -186,7 +186,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
 
   const handleCloseReportForm = () => {
     setViewReportFormOpen(false);
-    refreshClassSessionData();
+    // refreshClassSessionData();
   };
 
   const handleCloseAbsenceModel = async () => {
@@ -250,7 +250,6 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       setIsSubmittingReports(false);
     }
   };
-
 
   const handleOpenConfirm = () => {
     setConfirmOpen(true);
@@ -481,9 +480,8 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                   isOpen={isReportFormOpen}
                   onClose={async () => {
                     await refreshClassSessionData();
-                    setReportFormOpen(false)
-                  }
-                  }
+                    setReportFormOpen(false);
+                  }}
                   onSave={handleSaveReport}
                   studentName={
                     selectedStudent
@@ -590,8 +588,9 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       </ReusableDialog>
       <ReusableDialog
         open={deactivateDialogOpen}
-        title={`Confirm ${classSession?.isActive ? 'Deactivation' : 'Reactivation'
-          }`}
+        title={`Confirm ${
+          classSession?.isActive ? 'Deactivation' : 'Reactivation'
+        }`}
         onClose={() => setDeactivateDialogOpen(false)}
         actions={
           <>
