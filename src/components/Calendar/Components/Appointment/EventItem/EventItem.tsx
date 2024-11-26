@@ -26,7 +26,7 @@ const EventItem = ({ eventInfo }) => {
   const [anchorEl, setAnchorEl] = useState(null);
 
   const maxVisibleStudents = 3;
-  const baseHeight = 100;
+  const baseHeight = topicName.length > 15 ? 125 : 105;
   const studentHeight = 16;
   const extraButtonHeight = 22;
   const eventHeight =
