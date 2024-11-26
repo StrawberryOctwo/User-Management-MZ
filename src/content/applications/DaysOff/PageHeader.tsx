@@ -26,14 +26,14 @@ function PageHeader() {
         </Typography>
       </Grid>
       <Grid item>
-        <Button
+        {/* <Button
           sx={{ mt: { xs: 2, md: 0 } }}
           variant="contained"
           startIcon={<AddTwoToneIcon fontSize="small" />}
           onClick={handleCreateDaysOff} // Add onClick handler
         >
           Create Day Off
-        </Button>
+        </Button> */}
       </Grid>
     </Grid>
   );
