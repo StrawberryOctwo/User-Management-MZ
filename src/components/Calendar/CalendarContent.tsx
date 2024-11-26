@@ -251,6 +251,7 @@ const CalendarContent: React.FC = () => {
       strongestRole &&
       (strongestRole !== 'SuperAdmin' || selectedLocations.length > 0)
     ) {
+      fetchSpecialDays(selectedLocations);
       loadClassSessions();
     }
   }, [date, selectedFranchise, selectedLocations, strongestRole]);

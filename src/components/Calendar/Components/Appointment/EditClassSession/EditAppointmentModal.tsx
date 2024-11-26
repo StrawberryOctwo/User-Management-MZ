@@ -78,7 +78,7 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
   };
 
   return (
-    <Dialog open={isOpen} onClose={handleClose} maxWidth="md" fullWidth>
+    <Dialog open={isOpen} onClose={handleClose} maxWidth="lg" fullWidth>
       <Tabs
         value={tabIndex}
         onChange={handleTabChange}

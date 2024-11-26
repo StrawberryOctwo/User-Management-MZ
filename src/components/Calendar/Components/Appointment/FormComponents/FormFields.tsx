@@ -245,14 +245,14 @@ export default function FormFields({
       </Grid>
 
       {/* Right Column */}
-      <Grid item xs={12} md={6}>
-        <Box sx={{ mb: 1 }}>
-          <DateFields
-            session={session}
-            setSession={setSession}
-            isPartial={isPartial}
-          />
-        </Box>
+      <Grid
+        item
+        xs={12}
+        md={6}
+        sx={{
+          pt: '80px !important'
+        }}
+      >
         <Box sx={{ mb: 1 }}>
           <FormControlLabel
             control={
@@ -267,12 +267,14 @@ export default function FormFields({
               />
             }
             label="Holiday Course"
+            labelPlacement="start"
+            sx={{ marginLeft: 0 }}
           />
         </Box>
-        <Box>
+        <Box sx={{ mb: 4 }}>
           <RecurrenceOptions
             recurrenceOption={session.recurrenceOption}
-            handleRecurrenceChange={(e) =>
+            handleRecurrenceChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               setSession({
                 ...session,
                 recurrenceOption: e.target.value as string
@@ -281,6 +283,13 @@ export default function FormFields({
             dayDetails={session.dayDetails}
             setDayDetail={setDayDetail}
             resetDayDetails={resetDayDetails}
+          />
+        </Box>
+        <Box>
+          <DateFields
+            session={session}
+            setSession={setSession}
+            isPartial={isPartial}
           />
         </Box>
       </Grid>
