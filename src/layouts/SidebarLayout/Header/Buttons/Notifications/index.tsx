@@ -24,6 +24,7 @@ import { handleMarkAsRead } from 'src/services/notificationService';
 import { useAuth } from 'src/hooks/useAuth';
 import { INotification, fetchNotifications } from './utils';
 import { GridCloseIcon } from '@mui/x-data-grid';
+import { api } from 'src/services/api';
 
 const NotificationsBadge = styled(Badge)(
   ({ theme }) => `
@@ -98,7 +99,7 @@ function HeaderNotifications() {
     if (!userId) return;
 
     const eventSource = new EventSource(
-      `http://localhost:3003/api/notifications/connect?userId=${userId}`
+      `${api.defaults.baseURL}/notifications/connect?userId=${userId}`
     );
 
     eventSource.onopen = () => {
