@@ -238,14 +238,14 @@ const CreateTeacher = () => {
     },
     {
       name: 'employeeNumber',
-      label: 'Employee Number',
+      label: 'Teacher Number',
       type: 'custom',
       required: true,
       section: 'Teacher Information',
       component: (
         <Box display="flex" alignItems="center" gap={1} sx={{ width: '95%' }}>
           <TextField
-            label="Employee Number *"
+            label="Teacher Number *"
             value={employeeNumber}
             variant="outlined"
             fullWidth
