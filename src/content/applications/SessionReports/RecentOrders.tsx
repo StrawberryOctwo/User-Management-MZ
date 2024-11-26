@@ -125,7 +125,6 @@ export default function ViewSessionReports() {
   const closeReportDialog = () => {
     setIsReportDialogOpen(false);
     setSelectedReportId(null);
-    loadSessionReports();
   };
 
   if (errorMessage) return <div>{errorMessage}</div>;
