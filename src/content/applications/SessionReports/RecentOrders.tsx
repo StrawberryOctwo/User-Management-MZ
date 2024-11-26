@@ -178,7 +178,7 @@ export default function ViewSessionReports() {
           reportId={selectedReportId}
           onClose={closeReportDialog}
           onDelete={closeReportDialog}
-          readOnly={true}
+          isEditable={false}
         />
       )}
     </Box>
