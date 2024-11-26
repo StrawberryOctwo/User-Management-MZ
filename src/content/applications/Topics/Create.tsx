@@ -59,8 +59,8 @@ const CreateTopic = () => {
       section: 'Topic Information',
       validation: {
         pattern: {
-          value: /^[a-zA-Z0-9\s]{3,20}$/,
-          message: 'Please enter a topic name shorter than 20 characters and more than 3.'
+          value: /^[a-zA-Z0-9\s]{3,30}$/,
+          message: 'Please enter a topic name between 3 and 30 characters.'
         }
       }
     }

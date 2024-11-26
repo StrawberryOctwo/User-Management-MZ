@@ -30,10 +30,18 @@ export interface FieldConfig {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   disabled?: boolean;
   value?: string | number;
-  initialValue?: string | number; // New property for initial value
+  initialValue?: string | number;
   validation?: {
-    pattern: {
+    pattern?: {
       value: RegExp;
+      message: string;
+    };
+    maxLength?: {
+      value: number;
+      message: string;
+    };
+    minLength?: {
+      value: number;
       message: string;
     };
   };
@@ -74,6 +82,10 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
 
   // New state for logo preview
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+
+  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>(
+    {}
+  );
 
   useEffect(() => {
     if (Object.keys(initialData).length > 0) {
@@ -281,6 +293,32 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
                               )
                             }
                           : undefined
+                      }
+                      inputProps={{
+                        maxLength: field.validation?.maxLength?.value,
+                        minLength: field.validation?.minLength?.value,
+                        pattern: field.validation?.pattern?.value.source
+                      }}
+                      error={
+                        !!field.validation?.pattern?.value &&
+                        !new RegExp(field.validation.pattern.value).test(
+                          formData[field.name]
+                        )
+                      }
+                      helperText={
+                        touchedFields[field.name] &&
+                        !!field.validation?.pattern?.value &&
+                        !new RegExp(field.validation.pattern.value).test(
+                          formData[field.name]
+                        )
+                          ? field.validation?.pattern?.message
+                          : ''
+                      }
+                      onBlur={() =>
+                        setTouchedFields((prev) => ({
+                          ...prev,
+                          [field.name]: true
+                        }))
                       }
                     />
                   )}
