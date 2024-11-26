@@ -19,20 +19,18 @@ export default function StudentsContent() {
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(25);
   const { userRoles: authUserRoles, loading: authLoading } = useAuth();
-  
+
 
   const navigate = useNavigate();
 
   useEffect(() => {
     // Only set userRoles if it is empty and authUserRoles is populated
     if (!authLoading && authUserRoles && userRoles.length === 0) {
-      console.log("Setting userRoles:", authUserRoles);
       setUserRoles(authUserRoles);
     }
 
     // Trigger loadStudents if userRoles is populated
     if (userRoles.length > 0) {
-      console.log("User Roles inside useEffect:", userRoles);
       loadStudents();
     }
   }, [authLoading, authUserRoles, userRoles]);
@@ -43,8 +41,7 @@ export default function StudentsContent() {
 
     try {
       let result;
-      console.log("User Roles at load:", userRoles);
-      if(userRoles.length === 0){return}
+      if (userRoles.length === 0) { return }
       if (userRoles.includes('Parent')) {
         result = await fetchParentStudents(page + 1, limit, searchQuery);
       } else {
@@ -65,7 +62,7 @@ export default function StudentsContent() {
       setLoading(false);
     }
   };
-  
+
 
 
 
@@ -86,7 +83,7 @@ export default function StudentsContent() {
       await loadStudents();
     } catch (error: any) {
       setErrorMessage('Failed to delete students.');
-    
+
     }
   };
 
@@ -115,9 +112,7 @@ export default function StudentsContent() {
           { field: 'fullName', headerName: 'Full Name' },
           { field: 'email', headerName: 'Email' },
           { field: 'gradeLevel', headerName: 'Grade Level' },
-          { field: 'status', headerName: 'Status' },
-          { field: 'payPerHour', headerName: 'Pay Per Hour' },
-        ]}
+          { field: 'status', headerName: 'Status' },]}
         title="Student List"
         onEdit={handleEdit}
         onView={handleView}

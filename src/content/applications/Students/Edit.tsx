@@ -16,10 +16,6 @@ import {
 import { assignStudentToTopics, fetchTopics } from 'src/services/topicService';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
 import {
-  assignOrUpdateParentStudents,
-  fetchParents
-} from 'src/services/parentService';
-import {
   assignStudentToContract,
   fetchContractPackagesByEntity
 } from 'src/services/contractPackagesService';
@@ -39,7 +35,6 @@ const EditStudent = () => {
     null
   );
   const [selectedLocations, setSelectedLocations] = useState<any[]>([]); // Changed to an array for multiple locations
-  const [selectedParent, setSelectedParent] = useState<any | null>(null);
   const [selectedContract, setSelectedContract] = useState<any | null>(null);
   const [selectedSchoolType, setSelectedSchoolType] = useState<any | null>(
     null
@@ -80,23 +75,17 @@ const EditStudent = () => {
           lastName: fetchedData.user.lastName,
           dob: formatDateForInput(fetchedData.user.dob),
           email: fetchedData.user.email,
+          city: fetchedData.user.city,
           address: fetchedData.user.address,
           postalCode: fetchedData.user.postalCode,
           phoneNumber: fetchedData.user.phoneNumber,
           contractEndDate: fetchedData.contractEndDate
             ? formatDateForInput(fetchedData.contractEndDate)
             : '',
-          parent: fetchedData.parent
-            ? {
-                id: fetchedData.parent.id,
-                accountHolder: fetchedData.parent.user.firstName
-              }
-            : null // Set parent to null if not present
         };
 
         setStudentData(flattenedData);
         setSelectedLocations(fetchedData.locations || []); // Set multiple locations
-        setSelectedParent(flattenedData.parent);
         setSelectedTopics(fetchedData.topics || []);
         setSelectedContract(fetchedData.contract);
         setSelectedSchoolType(fetchedData.schoolType);
@@ -131,9 +120,6 @@ const EditStudent = () => {
   const handleContractSelect = (contract) => {
     setSelectedContract(contract);
   };
-  const handleParentSelect = (parent) => {
-    setSelectedParent(parent); // Store the full parent object
-  };
   const handleSchoolTypeSelect = (schoolType: any) =>
     setSelectedSchoolType(schoolType);
 
@@ -157,10 +143,6 @@ const EditStudent = () => {
       showMessage('Passwords do not match', 'error');
       return;
     }
-    if (!selectedParent) {
-      showMessage('Parent field is required', 'error');
-      return;
-    }
     if (selectedLocations.length === 0) {
       showMessage('At least one location must be selected', 'error');
       return;
@@ -180,6 +162,7 @@ const EditStudent = () => {
         lastName: data.lastName,
         dob: data.dob,
         email: data.email,
+        city: data.city,
         address: data.address,
         postalCode: data.postalCode,
         phoneNumber: data.phoneNumber,
@@ -204,9 +187,6 @@ const EditStudent = () => {
         studentPayload
       );
       await assignStudentToTopics(Number(id), topicIds);
-      await assignOrUpdateParentStudents(selectedParent.id, [
-        response.studentId
-      ]);
       if (
         selectedContract &&
         (!studentData.contract ||
@@ -274,30 +254,12 @@ const EditStudent = () => {
       />
     )
   };
-  
-  const parentSelectionField = {
-    name: 'parent',
-    label: 'Select Parent',
-    type: 'custom',
-    section: 'Student Assignment',
-    component: (
-      <SingleSelectWithAutocomplete
-        label="Search Parent"
-        fetchData={(query) =>
-          fetchParents(1, 5, query).then((response) =>
-            response.data.map((parent) => ({
-              ...parent,
-              accountHolder: parent.user.firstName // Use user.firstName as accountHolder
-            }))
-          )
-        }
-        onSelect={handleParentSelect}
-        displayProperty="accountHolder"
-        placeholder="Type to search parent"
-        initialValue={selectedParent}
-      />
-    )
-  };
+
+  const statusOptions = [
+    { label: t('active'), value: 'active' },
+    { label: t('inactive'), value: 'inactive' },
+    { label: t('interested'), value: 'interested' },
+  ];
 
   const userFields: FieldConfig[] = [
     {
@@ -329,6 +291,13 @@ const EditStudent = () => {
       section: 'User Information'
     },
     {
+      name: 'city',
+      label: t('city'),
+      type: 'text',
+      required: true,
+      section: 'User Information'
+    },
+    {
       name: 'address',
       label: t('address'),
       type: 'text',
@@ -345,7 +314,7 @@ const EditStudent = () => {
     {
       name: 'phoneNumber',
       label: t('phone_number'),
-      type: 'text',
+      type: 'number',
       required: true,
       section: 'User Information'
     },
@@ -369,9 +338,10 @@ const EditStudent = () => {
     {
       name: 'status',
       label: t('status'),
-      type: 'text',
+      type: 'select',
       required: true,
-      section: 'Student Information'
+      section: 'Student Information',
+      options: statusOptions
     },
     {
       name: 'gradeLevel',
@@ -394,8 +364,8 @@ const EditStudent = () => {
           initialValue={
             studentData?.gradeLevel
               ? gradeOptions.find(
-                  (grade) => grade.id === studentData.gradeLevel
-                )
+                (grade) => grade.id === studentData.gradeLevel
+              )
               : null
           }
         />
@@ -434,7 +404,6 @@ const EditStudent = () => {
         />
       )
     },
-    parentSelectionField,
     contractSelectionField,
     schoolTypeSelectionField,
     {

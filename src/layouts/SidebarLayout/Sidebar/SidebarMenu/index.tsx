@@ -14,10 +14,11 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { NavLink as RouterLink } from 'react-router-dom';
 import { SidebarContext } from 'src/contexts/SidebarContext';
 import EditCalendarIcon from '@mui/icons-material/CalendarMonth';
-import { AttachMoney, BusinessOutlined, FileUploadSharp, LocationSearching, LocationSearchingTwoTone, MoneyRounded, Person, PersonAddAlt1Sharp, Topic } from '@mui/icons-material';
+import { AttachMoney, BusinessOutlined, FileUploadSharp, Interests, LocationSearching, LocationSearchingTwoTone, MoneyRounded, Person, PersonAddAlt1Sharp, Topic } from '@mui/icons-material';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import withRole from 'src/hooks/withRole';
+import EventBusyIcon from '@mui/icons-material/EventBusy';
 
 const MenuWrapper = styled(Box)(
   ({ theme }) => `
@@ -196,7 +197,23 @@ function SidebarMenu() {
                   </Button>
                 </ListItem>
               </ProtectedListItem>
+              <ProtectedListItem
+                allowedRoles={['SuperAdmin']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/dashboard/interests"
+                    startIcon={<Interests />}
+                  >
+                    Interests
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
             </List>
+
           </SubMenuWrapper>
         </List>
         <List
@@ -322,7 +339,7 @@ function SidebarMenu() {
               </ProtectedListItem>
 
               <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher','Parent']}
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher', 'Parent']}
               >
                 <ListItem component="div">
                   <Button
@@ -338,7 +355,7 @@ function SidebarMenu() {
               </ProtectedListItem>
 
               <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin','Parent','Student','LocationAdmin','Teacher']}
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'Parent', 'Student', 'LocationAdmin', 'Teacher']}
               >
                 <ListItem component="div">
                   <Button
@@ -384,7 +401,7 @@ function SidebarMenu() {
                 </ListItem>
               </ProtectedListItem>
               <ProtectedListItem
-                allowedRoles={['Parent','Student']}
+                allowedRoles={['Parent', 'Student']}
               >
                 <ListItem component="div">
                   <Button
@@ -425,6 +442,22 @@ function SidebarMenu() {
                     startIcon={<ReceiptIcon />}
                   >
                     Monthly Invoices
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
+
+              <ProtectedListItem
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/management/daysoff"
+                    startIcon={<EventBusyIcon />}
+                  >
+                    Days Off
                   </Button>
                 </ListItem>
               </ProtectedListItem>

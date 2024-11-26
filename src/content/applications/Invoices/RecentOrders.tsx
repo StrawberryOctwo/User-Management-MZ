@@ -5,7 +5,7 @@ import { fetchInvoiceById, fetchUserInvoices } from 'src/services/invoiceService
 import { useAuth } from 'src/hooks/useAuth';
 import ViewInvoiceDetails from 'src/components/Invoices/ViewInvoiceDetails';
 import generateTeacherInvoicePDF from './teacherInvoice';
-import { fetchTeacherById, fetchTeacherByUserId } from 'src/services/teacherService';
+import { fetchTeacherById, fetchTeacherByUserId, fetchTeacherInvoiceInfoByUserId } from 'src/services/teacherService';
 import generateParentInvoicePDF from './parentInvoice';
 
 export default function ViewInvoices() {
@@ -56,9 +56,9 @@ export default function ViewInvoices() {
       const invoiceData = await fetchInvoiceById(invoiceId, userId);
       if (userRoles.includes('Parent')) {
         if (isMounted.current) generateParentInvoicePDF(invoiceData,true);
-      } else {
+      } else if (userRoles.includes('Teacher')){
         // Fetch additional teacher data if not a parent
-        const teacherData = await fetchTeacherByUserId(userId);
+        const teacherData = await fetchTeacherInvoiceInfoByUserId(userId);
         if (isMounted.current) generateTeacherInvoicePDF(invoiceData, teacherData,true);
       }  } catch (error) {
       console.error('Error generating invoice PDF:', error);
@@ -70,7 +70,7 @@ export default function ViewInvoices() {
     { field: 'totalAmount', headerName: 'Total Amount' },
     { field: 'status', headerName: 'Status' },
     {
-      field: 'created_at',
+      field: 'createdAt',
       headerName: 'Created At',
       render: (value: any) => new Date(value).toLocaleString(),
     },

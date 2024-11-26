@@ -62,7 +62,7 @@ function SurveySubmitDialog({ surveyId, onClose, onSubmitSuccess }: SurveySubmit
     const answerArray = survey.questions.map((question) => ({
       questionId: question.id,
       question: question.text,
-      text: question.type === 'TextInput' || question.type === 'Dropdown' ? answers[question.id]?.text || '' : null,
+      text: question.type === 'Text Input' || question.type === 'Dropdown' ? answers[question.id]?.text || '' : null,
       selectedOptions: question.type === 'Checkbox' ? answers[question.id]?.selectedOptions || [] : null,
     }));
 
@@ -112,12 +112,12 @@ function SurveySubmitDialog({ surveyId, onClose, onSubmitSuccess }: SurveySubmit
               <Typography variant="h6" color="textPrimary" gutterBottom>
                 {question.text}
               </Typography>
-              {question.type === 'TextInput' && (
+              {question.type === 'Text Input' && (
                 <TextField
                   fullWidth
                   variant="outlined"
                   value={answers[question.id]?.text || ''}
-                  onChange={(e) => handleChange(question.id, e.target.value, 'TextInput')}
+                  onChange={(e) => handleChange(question.id, e.target.value, 'Text Input')}
                   placeholder="Enter your answer here"
                 />
               )}

@@ -3,7 +3,6 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
-  DialogActions,
   Button,
   Typography,
   Box,
@@ -12,36 +11,40 @@ import {
   CircularProgress,
   Tabs,
   Tab,
-  TextField
+  IconButton
 } from '@mui/material';
 import moment from 'moment';
 import {
-  deleteClassSession,
   fetchClassSessionById,
   getClassSessionReportsStatus,
-  getStudentSessionReportStatus
+  getStudentSessionReportStatus,
+  submitTeacherReports // Added import
 } from 'src/services/classSessionService';
 import AddSessionReportForm from './AddSessionReportForm';
 import ViewSessionReportForm from './ViewSessionReport';
-import ViewPaymentDetails from './ViewPaymentDetails'; // New Component for payment view
-import StudentDetailCard from './StudentDetailCArd';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
-import { getPaymentsForUserByClassSession } from 'src/services/paymentService'; // Fix the path if needed
-import { sessionTypeFunc } from 'src/utils/sessionType';
-import AbsenceForm from './AbsenceTab';
 import AbsenceTab from './AbsenceTab';
 import RoleBasedComponent from 'src/components/ProtectedComponent';
+import EditIcon from '@mui/icons-material/Edit';
+import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import { calculateEndTimeInMinutes } from 'src/utils/teacherUtils';
+import StudentDetailCard from './StudentDetailCArd';
+import ConfirmationDialog from './ConfirmationDialog';
 
 interface ClassSessionDetailsModalProps {
   isOpen: boolean;
   onClose: () => void;
   appointmentId: string;
-  onEdit: () => void;
+  onEdit: (classSession: any) => void;
   onDelete: () => void;
   onDeactivate: (appointmentId: any, newStatus: any) => void;
   canEdit: boolean;
   canAddReport: boolean;
-  onDeactivateComplete: () => void; // New prop
+  canReactivate: boolean;
+  onDeactivateComplete: () => void;
+  sessionEnded: boolean;
+  setIsSessionEnded: (sessionEnded: boolean) => void;
 }
 
 const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
@@ -53,7 +56,10 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
   onDeactivate,
   onDeactivateComplete,
   canEdit,
-  canAddReport
+  canReactivate,
+  canAddReport,
+  sessionEnded,
+  setIsSessionEnded
 }) => {
   const [classSession, setClassSession] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -74,6 +80,15 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
   const [deactivateDialogOpen, setDeactivateDialogOpen] = useState(false);
   const [tabIndex, setTabIndex] = useState(0);
 
+  // New state variables for submission
+  const [isSubmittingReports, setIsSubmittingReports] =
+    useState<boolean>(false);
+  const [submissionError, setSubmissionError] = useState<string | null>(null);
+  const [submissionSuccess, setSubmissionSuccess] = useState<boolean | null>(
+    null
+  );
+  const [confirmOpen, setConfirmOpen] = useState(false);
+
   // Fetch class session details
   const loadClassSession = async () => {
     setLoading(true);
@@ -82,9 +97,6 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     try {
       const response = await fetchClassSessionById(appointmentId);
       setClassSession(response);
-
-      const reportResponse = await getClassSessionReportsStatus(appointmentId);
-      setAllReportsCompleted(reportResponse.allReportsCompleted);
 
       const studentReportsStatus: {
         [studentId: string]: {
@@ -104,6 +116,18 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       }
 
       setReportStatus(studentReportsStatus);
+
+      // Check if all reports are completed
+      // const allCompleted = response.students.every(
+      //   (student: any) => studentReportsStatus[student.id].reportCompleted
+      // );
+
+      // Check if all reports are submitted
+      const allCompleted = response.reportsSubmitted;
+
+      // console.log()
+      setAllReportsCompleted(allCompleted);
+      setSubmissionSuccess(allCompleted);
     } catch (error) {
       setErrorMessage('Failed to load class session details.');
       console.error('Error fetching class session details:', error);
@@ -117,11 +141,6 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       loadClassSession();
     }
   }, [isOpen, appointmentId]);
-
-  useEffect(() => {
-    if (allReportsCompleted) {
-    }
-  }, [allReportsCompleted]);
 
   const handleAddReport = (student: any) => {
     setSelectedStudent(student);
@@ -152,7 +171,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
   const refreshClassSessionData = async () => {
     setLoading(true);
     try {
-      await loadClassSession(); // Reload the session data
+      await loadClassSession();
     } catch (error) {
       console.error('Error refreshing class session data:', error);
     } finally {
@@ -161,11 +180,15 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
   };
 
   const handleSaveReport = async (newReport: any) => {
-    refreshClassSessionData();
+    await refreshClassSessionData();
     setReportFormOpen(false);
   };
 
   const handleCloseReportForm = () => {
+    setViewReportFormOpen(false);
+  };
+
+  const handleDeleteReportForm = () => {
     setViewReportFormOpen(false);
     refreshClassSessionData();
   };
@@ -176,23 +199,68 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     await refreshClassSessionData();
   };
 
-  const handleDelete = async () => {
-    setDeleteDialogOpen(true);
-  };
-
-  const handleDeactivate = async () => {
-    setDeactivateDialogOpen(true);
-  };
-
   const handleTabChange = (event: React.ChangeEvent<{}>, newValue: number) => {
     setTabIndex(newValue);
   };
 
   const handleToggleActivation = async () => {
     const newStatus = !classSession.isActive;
-    await onDeactivate(appointmentId, newStatus); // Toggle activation status
+    await onDeactivate(appointmentId, newStatus);
     setDeactivateDialogOpen(false);
     onDeactivateComplete(); // Refresh sessions in parent component
+  };
+
+  const handleEdit = () => {
+    if (classSession) {
+      onEdit(classSession);
+    }
+  };
+
+  useEffect(() => {
+    if (classSession) {
+      const endTime = moment(classSession.startTime, 'HH:mm:ss')
+        .add(classSession.duration, 'minutes')
+        .format('HH:mm:ss');
+      const endDateTime = moment(
+        `${classSession.date} ${endTime}`,
+        'YYYY-MM-DD HH:mm:ss'
+      );
+      const currentDateTime = moment();
+
+      if (currentDateTime.isAfter(endDateTime)) {
+        setIsSessionEnded(true);
+      } else {
+        setIsSessionEnded(false);
+      }
+    }
+  }, [classSession]);
+
+  // New handler for submitting all reports
+  const handleSubmitAllReports = async () => {
+    if (!classSession) return;
+
+    setIsSubmittingReports(true);
+    setSubmissionError(null);
+    setSubmissionSuccess(null);
+
+    try {
+      await submitTeacherReports({ classSessionId: classSession.id });
+      setSubmissionSuccess(true);
+      // Refresh the class session data to update the `reportsSubmitted` status
+      await loadClassSession();
+    } catch (error) {
+      console.error('Error submitting reports:', error);
+    } finally {
+      setIsSubmittingReports(false);
+    }
+  };
+
+  const handleOpenConfirm = () => {
+    setConfirmOpen(true);
+  };
+
+  const handleCloseConfirm = () => {
+    setConfirmOpen(false);
   };
 
   return (
@@ -203,7 +271,78 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       maxWidth={false}
       sx={{ '& .MuiDialog-paper': { width: '750px', maxWidth: '750px' } }} // Set the custom width
     >
-      <DialogTitle>Class Session Details</DialogTitle>
+      <ConfirmationDialog
+        open={confirmOpen}
+        onClose={handleCloseConfirm}
+        onConfirm={() => {
+          handleSubmitAllReports();
+          handleCloseConfirm();
+        }}
+        title="Confirm Report Submission"
+        content="Are you sure you want to submit all the session reports?"
+        confirmButtonColor="error"
+      />
+      <DialogTitle
+        sx={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center'
+        }}
+      >
+        <Typography variant="h6">Class Session Details</Typography>
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          {canEdit && (
+            <IconButton
+              onClick={handleEdit}
+              color="primary"
+              sx={{
+                backgroundColor: '#f0f0f0',
+                borderRadius: '50%',
+                '&:hover': { backgroundColor: '#e0e0e0' }
+              }}
+            >
+              <EditIcon />
+            </IconButton>
+          )}
+          <RoleBasedComponent
+            allowedRoles={[
+              'SuperAdmin',
+              'FranchiseAdmin',
+              'LocationAdmin',
+              'Teacher'
+            ]}
+          >
+            {classSession?.isActive && !sessionEnded ? (
+              <IconButton
+                onClick={() => setDeactivateDialogOpen(true)}
+                color="warning"
+                sx={{
+                  backgroundColor: '#f0f0f0',
+                  borderRadius: '50%',
+                  '&:hover': { backgroundColor: '#e0e0e0' }
+                }}
+              >
+                <VisibilityOffIcon />
+              </IconButton>
+            ) : (
+              !classSession?.isActive &&
+              canReactivate && (
+                <IconButton
+                  onClick={() => setDeactivateDialogOpen(true)}
+                  color="success"
+                  sx={{
+                    backgroundColor: '#f0f0f0',
+                    borderRadius: '50%',
+                    '&:hover': { backgroundColor: '#e0e0e0' }
+                  }}
+                >
+                  <VisibilityIcon />
+                </IconButton>
+              )
+            )}
+          </RoleBasedComponent>
+        </Box>
+      </DialogTitle>
       <DialogContent sx={{ minHeight: '370px' }} className="djfhjdf">
         <Tabs
           value={tabIndex}
@@ -226,7 +365,8 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
               <Card variant="outlined" sx={{ mb: 3 }}>
                 <CardContent>
                   <Typography variant="subtitle1">
-                    <strong>Session Name:</strong> {classSession.name}
+                    <strong>Session Name:</strong>{' '}
+                    {classSession.classSession.name}
                   </Typography>
                   <Typography variant="subtitle1">
                     <strong>Teacher:</strong>{' '}
@@ -234,7 +374,8 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                     {classSession.teacher?.user?.lastName}
                   </Typography>
                   <Typography variant="subtitle1">
-                    <strong>Topic:</strong> {classSession.topic?.name}
+                    <strong>Topic:</strong>{' '}
+                    {classSession.classSession.topic?.name}
                   </Typography>
                   <Typography variant="subtitle1">
                     <strong>Location:</strong> {classSession.location.name}
@@ -245,11 +386,14 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                   </Typography>
                   <Typography variant="subtitle1">
                     <strong>Start Time:</strong>{' '}
-                    {moment(classSession.sessionStartDate).format('LLL')}
+                    {classSession.startTime.slice(0, 5)}
                   </Typography>
                   <Typography variant="subtitle1">
                     <strong>End Time:</strong>{' '}
-                    {moment(classSession.sessionEndDate).format('LLL')}
+                    {calculateEndTimeInMinutes(
+                      classSession.startTime,
+                      classSession.duration
+                    )}
                   </Typography>
                 </CardContent>
                 <CardContent>
@@ -273,7 +417,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                       }
                     }}
                   >
-                    {classSession.note}
+                    {classSession.note || 'No notes available.'}
                   </Typography>
                 </CardContent>
               </Card>
@@ -301,34 +445,47 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                   <Typography variant="body2">No students enrolled.</Typography>
                 )}
 
-                {allReportsCompleted && (
-                  <Box
-                    display="flex"
-                    justifyContent="center"
-                    alignItems="center"
-                    mt={3}
+                {/* Display success or error messages */}
+                {submissionSuccess && (
+                  <Typography
+                    variant="body2"
+                    color="success.main"
+                    sx={{ mt: 2 }}
                   >
-                    <Typography
-                      variant="h5"
-                      color="green"
-                      sx={{
-                        fontWeight: 'bold',
-                        textAlign: 'center',
-                        backgroundColor: '#e0f2f1',
-                        padding: '10px',
-                        borderRadius: '5px',
-                        border: '1px solid green'
-                      }}
-                    >
-                      Session Reports Submitted
-                    </Typography>
-                  </Box>
+                    {submissionSuccess &&
+                      'All session reports have been successfully submitted.'}
+                  </Typography>
                 )}
+                {submissionError && (
+                  <Typography variant="body2" color="error" sx={{ mt: 2 }}>
+                    {submissionError}
+                  </Typography>
+                )}
+
+                {/* Submit All Reports Button */}
+                <Box display="flex" justifyContent="center" mt={3}>
+                  <Button
+                    variant="contained"
+                    color="primary"
+                    onClick={handleOpenConfirm}
+                    disabled={
+                      classSession.reportsSubmitted || isSubmittingReports
+                    }
+                    startIcon={
+                      isSubmittingReports && <CircularProgress size={20} />
+                    }
+                  >
+                    Submit All Reports
+                  </Button>
+                </Box>
 
                 {/* Add Session Report Form Dialog */}
                 <AddSessionReportForm
                   isOpen={isReportFormOpen}
-                  onClose={() => setReportFormOpen(false)}
+                  onClose={async () => {
+                    await refreshClassSessionData();
+                    setReportFormOpen(false);
+                  }}
                   onSave={handleSaveReport}
                   studentName={
                     selectedStudent
@@ -337,7 +494,9 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                   }
                   classSessionId={appointmentId}
                   studentId={selectedStudent ? selectedStudent.id : ''}
-                  userId={selectedStudent ? selectedStudent.user.id : ''}
+                  user={selectedStudent}
+                  teacher={classSession.teacher}
+                  sessionDate={classSession.date}
                 />
 
                 {/* View Session Report Form Dialog */}
@@ -346,7 +505,8 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                     isOpen={isViewReportFormOpen}
                     onClose={handleCloseReportForm}
                     reportId={selectedReportId}
-                    onDelete={handleCloseReportForm}
+                    onDelete={handleDeleteReportForm}
+                    isEditable={true}
                   />
                 )}
 
@@ -367,21 +527,8 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
           <Typography>No class session details available.</Typography>
         )}
       </DialogContent>
-      <DialogActions sx={{ marginBottom: 2 }}>
-        {/* <Box sx={{ flexGrow: 1, paddingLeft: 2 }}>
-          {canEdit && (
-            
-          )}
-        </Box> */}
+      {/* <DialogActions sx={{ marginBottom: 2 }}>
         <Box sx={{ paddingRight: 2 }}>
-          {/* <Button
-            onClick={onClose}
-            color="secondary"
-            style={{ padding: '8px 16px' }}
-            sx={{ marginRight: 1 }}
-          >
-            Close
-          </Button> */}
           {canEdit && (
             <Box sx={{ display: 'flex', gap: 1 }}>
               <Button
@@ -415,7 +562,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
             </Box>
           )}
         </Box>
-      </DialogActions>
+      </DialogActions> */}
 
       <ReusableDialog
         open={deleteDialogOpen}
@@ -445,8 +592,9 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       </ReusableDialog>
       <ReusableDialog
         open={deactivateDialogOpen}
-        title={`Confirm ${classSession?.isActive ? 'Deactivation' : 'Reactivation'
-          }`}
+        title={`Confirm ${
+          classSession?.isActive ? 'Deactivation' : 'Reactivation'
+        }`}
         onClose={() => setDeactivateDialogOpen(false)}
         actions={
           <>

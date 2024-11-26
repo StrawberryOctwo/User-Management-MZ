@@ -30,7 +30,21 @@ export interface FieldConfig {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   disabled?: boolean;
   value?: string | number;
-  initialValue?: string | number; // New property for initial value
+  initialValue?: string | number;
+  validation?: {
+    pattern?: {
+      value: RegExp;
+      message: string;
+    };
+    maxLength?: {
+      value: number;
+      message: string;
+    };
+    minLength?: {
+      value: number;
+      message: string;
+    };
+  };
 }
 
 interface ReusableFormProps {
@@ -66,20 +80,73 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
     Record<string, boolean>
   >({});
 
+  // New state for logo preview
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
+
+  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>(
+    {}
+  );
+
   useEffect(() => {
     if (Object.keys(initialData).length > 0) {
       setFormData(getInitialFormData());
+
+      // If initialData has a logo URL, set it as the preview
+      if (initialData.franchiseLogo) {
+        setLogoPreview(initialData.franchiseLogo); // Assuming initialData.franchiseLogo is a URL string
+      }
     }
+    // Cleanup function to revoke object URL on unmount
+    return () => {
+      if (logoPreview && logoPreview.startsWith('blob:')) {
+        URL.revokeObjectURL(logoPreview);
+      }
+    };
   }, [initialData, fields]);
 
-  const handleChange = (
-    event: React.ChangeEvent<HTMLInputElement> | SelectChangeEvent<any>
-  ) => {
+  // Handler for TextField and other input changes
+  const handleInputChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLTextAreaElement
+  > = (event) => {
     const { name, value } = event.target;
     setFormData((prev) => ({
       ...prev,
       [name!]: value
     }));
+  };
+
+  // Handler for Select changes
+  const handleSelectChange = (event: SelectChangeEvent<any>) => {
+    const { name, value } = event.target;
+    setFormData((prev) => ({
+      ...prev,
+      [name!]: value
+    }));
+  };
+
+  // Handler for logo file changes
+  const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, files } = event.target;
+
+    if (files && files.length > 0) {
+      const file = files[0];
+      if (file.size > 500 * 1024) {
+        // 500KB in bytes
+        alert('File size exceeds 500KB. Please choose a smaller file.');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        const base64String = reader.result as string;
+        setFormData((prev) => ({
+          ...prev,
+          [name]: base64String
+        }));
+        setLogoPreview(base64String); // Use Base64 string for preview
+      };
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleSubmit = async (event: React.FormEvent) => {
@@ -94,6 +161,7 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
             return acc;
           }, {} as Record<string, any>)
         );
+        setLogoPreview(null); // Reset logo preview on add
       }
     } catch (error: any) {
       console.error(`Failed to ${entintyFunction} ${entityName}:`, error);
@@ -134,21 +202,51 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
                   sm={field.sm || 6}
                   sx={{ display: 'flex', justifyContent: 'center' }}
                 >
-                  {field.name === 'status' ? (
+                  {field.type === 'select' && field.options ? (
                     <FormControl fullWidth sx={{ width: '95%' }}>
                       <InputLabel>{field.label}</InputLabel>
                       <Select
                         name={field.name}
-                        label={field.name}
+                        label={field.label}
                         value={formData[field.name] ?? ''}
-                        onChange={handleChange} // Now correctly typed
+                        onChange={handleSelectChange}
                         required={field.required}
                         disabled={field.disabled}
                       >
-                        <MenuItem value={1}>Active</MenuItem>
-                        <MenuItem value={0}>Inactive</MenuItem>
+                        {field.options.map((option) => (
+                          <MenuItem key={option.value} value={option.value}>
+                            {option.label}
+                          </MenuItem>
+                        ))}
                       </Select>
                     </FormControl>
+                  ) : field.type === 'logo_file' ? (
+                    <Box sx={{ width: '100%' }}>
+                      <Button
+                        variant="contained"
+                        component="label"
+                        sx={{ width: '95%', mb: 2 }}
+                      >
+                        {formData[field.name] ? 'Change Logo' : 'Upload Logo'}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          hidden
+                          name={field.name}
+                          onChange={handleLogoChange}
+                        />
+                      </Button>
+                      {/* Display logo preview if available */}
+                      {logoPreview && (
+                        <Box sx={{ textAlign: 'center' }}>
+                          <img
+                            src={logoPreview}
+                            alt="Logo Preview"
+                            style={{ maxWidth: '100px', maxHeight: '100px' }}
+                          />
+                        </Box>
+                      )}
+                    </Box>
                   ) : field.component ? (
                     field.component
                   ) : (
@@ -163,8 +261,12 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
                           : field.type
                       }
                       sx={{ width: '95%' }}
-                      value={formData[field.name] ?? ''}
-                      onChange={field.onChange || handleChange}
+                      value={
+                        field.type === 'logo_file'
+                          ? undefined
+                          : formData[field.name] ?? ''
+                      }
+                      onChange={field.onChange || handleInputChange}
                       required={field.required}
                       disabled={field.disabled}
                       InputLabelProps={
@@ -191,6 +293,32 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
                               )
                             }
                           : undefined
+                      }
+                      inputProps={{
+                        maxLength: field.validation?.maxLength?.value,
+                        minLength: field.validation?.minLength?.value,
+                        pattern: field.validation?.pattern?.value.source
+                      }}
+                      error={
+                        !!field.validation?.pattern?.value &&
+                        !new RegExp(field.validation.pattern.value).test(
+                          formData[field.name]
+                        )
+                      }
+                      helperText={
+                        touchedFields[field.name] &&
+                        !!field.validation?.pattern?.value &&
+                        !new RegExp(field.validation.pattern.value).test(
+                          formData[field.name]
+                        )
+                          ? field.validation?.pattern?.message
+                          : ''
+                      }
+                      onBlur={() =>
+                        setTouchedFields((prev) => ({
+                          ...prev,
+                          [field.name]: true
+                        }))
                       }
                     />
                   )}

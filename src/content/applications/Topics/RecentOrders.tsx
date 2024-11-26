@@ -3,12 +3,12 @@ import React, { useEffect, useState } from 'react';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
-import { deleteTopic, fetchTopics } from 'src/services/topicService'; // Updated import to topicService
+import { deleteTopic, fetchTopics } from 'src/services/topicService';
 import { useNavigate } from 'react-router-dom';
 import { Topic } from 'src/models/TopicModel';
 
-export default function ViewTopicPage() { // Updated component name
-  const [topics, setTopics] = useState<Topic[]>([]); // Updated state for topics
+export default function ViewTopicPage() {
+  const [topics, setTopics] = useState<Topic[]>([]);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
@@ -21,22 +21,21 @@ export default function ViewTopicPage() { // Updated component name
   const navigate = useNavigate();
 
   useEffect(() => {
-    loadTopics(); // Updated to load topics
+    loadTopics();
   }, [limit, page]);
 
-  const loadTopics = async (searchQuery='') => {
+  const loadTopics = async (searchQuery = '') => {
     setLoading(true);
-    setErrorMessage(null); // Clear any previous error message
+    setErrorMessage(null);
     try {
       const { data, total } = await fetchTopics(page + 1, limit, searchQuery);
-      const flattenedTopics = data.map((topic: { id: any; name: any; description: any; franchise: { name: any; }; created_at: string }) => ({
+      const flattenedTopics = data.map((topic: { id: any; name: any; franchise: { name: any; }; createdAt: string }) => ({
         id: topic.id,
         name: topic.name,
-        description: topic.description,
-        franchiseName: topic.franchise?.name || 'N/A', // Flatten the franchise name
-        created_at: topic.created_at, // Retain the created_at field
+        franchiseName: topic.franchise?.name || 'N/A',
+        createdAt: topic.createdAt,
       }));
-      setTopics(flattenedTopics); // Set the transformed topics
+      setTopics(flattenedTopics);
       setTotalCount(total);
     } catch (error) {
       console.error('Failed to load topics:', error);
@@ -45,17 +44,16 @@ export default function ViewTopicPage() { // Updated component name
       setLoading(false);
     }
   };
-  
+
 
   const columns = [
-    { field: 'name', headerName: 'Topic Name' }, // Topic name
-    { field: 'description', headerName: 'Description' }, // Topic description
-    { field: 'franchiseName', headerName: 'Franchise' }, // Franchise name (flattened)
-    { field: 'created_at', headerName: 'Created At', render: (value: any) => new Date(value).toLocaleDateString() }, // Created date
+    { field: 'name', headerName: 'Topic Name' },
+    { field: 'franchiseName', headerName: 'Franchise' },
+    { field: 'createdAt', headerName: 'Created At', render: (value: any) => new Date(value).toLocaleDateString() },
   ];
-  const handleEdit = (id: any) => {
-    navigate(`edit/${id}`);
-  };
+  // const handleEdit = (id: any) => {
+  //   navigate(`edit/${id}`);
+  // };
 
   const handleView = (id: any) => {
     navigate(`view/${id}`);
@@ -66,9 +64,9 @@ export default function ViewTopicPage() { // Updated component name
     setLoading(true);
 
     try {
-      const response = await deleteTopic(selectedIds[0]); // Updated API call for deleting topics
+      const response = await deleteTopic(selectedIds[0]);
       showMessage(response.message, 'success');
-      await loadTopics(); // Reload topics after delete
+      await loadTopics();
     } catch (error: any) {
       const errorMessage = error.response?.data?.message || 'Failed to delete topics.';
       showMessage(errorMessage, 'error');
@@ -97,13 +95,13 @@ export default function ViewTopicPage() { // Updated component name
   return (
     <Box>
       <ReusableTable
-        data={topics} // Updated data to topics
+        data={topics}
         columns={columns}
-        title="Topic List" // Updated title
-        onEdit={handleEdit}
+        title="Topic List"
+        // onEdit={handleEdit}
         onView={handleView}
         onDelete={confirmDelete}
-        onSearchChange={loadTopics} // Updated search handler
+        onSearchChange={loadTopics}
         loading={loading}
         error={!!errorMessage}
         page={page}

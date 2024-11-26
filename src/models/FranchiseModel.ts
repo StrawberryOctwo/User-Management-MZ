@@ -7,7 +7,7 @@ export interface Admin {
     email: string;
     address: string;
     postalCode: string;
-    phoneNumber: string;
+    phoneNumber: number;
 }
 
 export interface Location {
@@ -26,9 +26,7 @@ export interface Franchise {
     bic: string;
     status: string;
     totalEmployees: number;
-    is_deleted: boolean;
-    created_at: string;
-    updated_at: string;
+    createdAt: string;
     admins?: Admin[]; // Optional: In case admins data isn't always present
     locations?: Location[]; // Optional: In case locations data isn't always present
 }

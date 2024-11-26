@@ -48,12 +48,20 @@ const ViewStudentPage: React.FC = () => {
 
     try {
       const studentData = await fetchStudentById(Number(id));
-      console.log('studentData:', studentData);
+
+      // Transform availableDates: Binary to Array of Day Names
       studentData.availableDates = decodeAvailableDates(
         studentData.availableDates
       ).map(capitalizeFirstLetter);
+
+      // Transform locations: Array of Objects to Array of Names
+      if (studentData.locations && Array.isArray(studentData.locations)) {
+        studentData.locations = studentData.locations.map((location: any) => location.name);
+      }
+
+      // Format Dates
       studentData.contractEndDate = formatDate(studentData.contractEndDate);
-      studentData.created_at = formatDate(studentData.created_at);
+      studentData.createdAt = formatDate(studentData.createdAt);
       studentData.user.dob = formatDate(studentData.user.dob);
 
       setStudent(studentData);
@@ -73,6 +81,7 @@ const ViewStudentPage: React.FC = () => {
       setLoading(false);
     }
   };
+
 
   const handleUpdateStatus = async (paymentId: number, newStatus: string) => {
     setPayments((prevPayments) =>
@@ -107,6 +116,7 @@ const ViewStudentPage: React.FC = () => {
     lastName: student?.user?.lastName || '',
     dob: student?.user?.dob || '',
     email: student?.user?.email || '',
+    city: student?.user?.city || '',
     address: student?.user?.address || '',
     postalCode: student?.user?.postalCode || '',
     phoneNumber: student?.user?.phoneNumber || '',
@@ -134,6 +144,7 @@ const ViewStudentPage: React.FC = () => {
     { name: 'lastName', label: t('last_name'), section: t('user_details') },
     { name: 'dob', label: t('dob'), section: t('user_details') },
     { name: 'email', label: t('email'), section: t('user_details') },
+    { name: 'city', label: t('city'), section: t('user_details') },
     { name: 'address', label: t('address'), section: t('user_details') },
     { name: 'postalCode', label: t('postal_code'), section: t('user_details') },
     {
@@ -171,7 +182,7 @@ const ViewStudentPage: React.FC = () => {
       isTextArray: true // Display available dates as comma-separated
     },
     {
-      name: 'created_at',
+      name: 'createdAt',
       label: t('created_date'),
       section: t('student_details')
     },

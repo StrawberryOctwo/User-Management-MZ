@@ -8,12 +8,12 @@ import { fetchFranchises } from 'src/services/franchiseService';
 import { addLocation } from 'src/services/locationService';
 
 export default function CreateLocation() {
-    const [selectedFranchise, setSelectedFranchise] = useState<any>(null); // Store single selected franchise
-    const [loading, setLoading] = useState(false); // Unified loading state for both fetching and deleting
-    const franchiseRef = useRef<any>(null); // Ref to access the reset method in SingleSelectWithAutocomplete
+    const [selectedFranchise, setSelectedFranchise] = useState<any>(null); 
+    const [loading, setLoading] = useState(false); 
+    const franchiseRef = useRef<any>(null); 
 
     const handleFranchiseSelect = (selectedItem: any) => {
-        setSelectedFranchise(selectedItem); // Save the selected franchise
+        setSelectedFranchise(selectedItem); 
     };
 
     const handleLocationSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
@@ -29,15 +29,15 @@ export default function CreateLocation() {
                 address: data['address'],
                 city: data['city'],
                 postalCode: data['postalCode'],
-                franchiseId: selectedFranchise.id, // Use single franchise ID in the payload
+                numberOfRooms: data['numberOfRooms'],
+                franchiseId: selectedFranchise.id,
             };
 
-            const response = await addLocation(payload); // Call your API service with the structured payload
+            const response = await addLocation(payload);
 
-            // Reset the form fields and selected franchise
             setSelectedFranchise(null);
             if (franchiseRef.current) {
-                franchiseRef.current.reset(); // Reset the franchise autocomplete input
+                franchiseRef.current.reset(); 
             }
             return response;
         } catch (error: any) {
@@ -53,6 +53,7 @@ export default function CreateLocation() {
         { name: 'address', label: t('address'), type: 'text', required: true, section: 'Location Information' },
         { name: 'city', label: t('city'), type: 'text', required: true, section: 'Location Information' },
         { name: 'postalCode', label: t('postal_code'), type: 'text', required: true, section: 'Location Information' },
+        { name: 'numberOfRooms', label: t('number_of_rooms'), type: 'number', required: true, section: 'Location Information' },
         {
             name: 'franchises',
             label: 'Franchise',
@@ -60,7 +61,7 @@ export default function CreateLocation() {
             section: 'Location Assignment',
             component: (
                 <SingleSelectWithAutocomplete
-                    ref={franchiseRef} // Attach the ref to the SingleSelectWithAutocomplete
+                    ref={franchiseRef}
                     label={t("Search_and_assign_franchises")}
                     fetchData={(query) => fetchFranchises(1, 5, query).then((data) => data.data)}
                     onSelect={handleFranchiseSelect}

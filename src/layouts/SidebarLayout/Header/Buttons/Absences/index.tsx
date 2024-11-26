@@ -64,6 +64,11 @@ function AbsenceNotifications() {
         await fetchAbsences(1);
     };
 
+    useEffect(() => {
+        fetchAbsences(1);
+      }, []);
+
+      
     const fetchAbsences = async (pageNumber) => {
         try {
             const data = await getSelfAbsences(pageNumber, limit);
@@ -127,7 +132,7 @@ function AbsenceNotifications() {
         <>
             <Tooltip arrow title="Absences">
                 <IconButton color="primary" ref={ref} onClick={handleOpen}>
-                    <AbsencesBadge badgeContent={absences.length}>
+                    <AbsencesBadge badgeContent={ absences.filter(absence => absence.status === null).length}>
                         <EventBusyIcon />
                     </AbsencesBadge>
                 </IconButton>

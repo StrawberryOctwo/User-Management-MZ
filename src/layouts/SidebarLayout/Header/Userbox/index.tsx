@@ -19,6 +19,7 @@ import ExpandMoreTwoToneIcon from '@mui/icons-material/ExpandMoreTwoTone';
 import LockOpenTwoToneIcon from '@mui/icons-material/LockOpenTwoTone';
 import { useAuth } from '../../../../hooks/useAuth';
 import { PersonOffOutlined, Settings } from '@mui/icons-material';
+import HeaderLocalization from '../Buttons/Localization';
 
 const UserBoxButton = styled(Button)(
   ({ theme }) => `
@@ -65,7 +66,7 @@ function HeaderUserbox() {
   const getInitials = (name: string): string => {
     const initials = name
       .split(' ')
-      .map(n => n[0])
+      .map((n) => n[0])
       .join('');
     return initials.toUpperCase();
   };
@@ -86,9 +87,9 @@ function HeaderUserbox() {
     navigate('/logout'); // Redirect to /logout route
   };
   const handleProfile = (): void => {
+    handleClose();
     navigate('/management/profile/settings'); // Redirect to /logout route
   };
-
 
   return (
     <>
@@ -139,6 +140,9 @@ function HeaderUserbox() {
             <Settings sx={{ mr: 1 }} />
             Settings
           </Button>
+        </Box>
+        <Box sx={{ m: 1 }}>
+          <HeaderLocalization />
         </Box>
         <Box sx={{ m: 1 }}>
           <Button color="primary" fullWidth onClick={handleLogout}>

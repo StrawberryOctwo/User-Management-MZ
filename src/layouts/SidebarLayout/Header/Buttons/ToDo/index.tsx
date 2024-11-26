@@ -1,52 +1,91 @@
-import React, { useState } from 'react';
+// src/components/ToDoHeader.tsx
+
+import React, { useEffect, useState } from 'react';
 import {
   Box,
-  Button,
   Dialog,
-  DialogActions,
   DialogContent,
   DialogTitle,
   IconButton,
   Typography,
-  TextField,
-  Pagination,
   Tooltip,
   Divider,
-  Paper,
-  Grid,
-  Checkbox,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Chip,
-  Table,
-  TableBody,
-  TableCell,
-  TableContainer,
-  TableHead,
-  TableRow,
   AccordionDetails,
   AccordionSummary,
   Accordion,
+  Button,
+  Chip,
+  useTheme,
 } from '@mui/material';
-import AssignmentIcon from '@mui/icons-material/Assignment';
-import { fetchToDosByAssignedBy, createToDo, toggleToDoCompletion, assignToDoToRole } from 'src/services/todoService';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore'; // Import the ExpandMoreIcon component from the appropriate package
+import SpatialAudioOffIcon from '@mui/icons-material/SpatialAudioOff';
+import AddIcon from '@mui/icons-material/Add';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import CloseIcon from '@mui/icons-material/Close';
 import RoleBasedComponent from 'src/components/ProtectedComponent';
+import {
+  fetchToDosByAssignedBy,
+  createToDo,
+  toggleToDoCompletion,
+  assignToDoToRole,
+  assignToDoToUsers,
+  fetchAssignedUsersForTodo,
+} from 'src/services/todoService';
+import { fetchFranchiseAdmins } from 'src/services/franchiseAdminService';
+import { fetchLocationAdmins } from 'src/services/locationAdminService';
+import { fetchStudents } from 'src/services/studentService';
+import { fetchTeachers } from 'src/services/teacherService';
+import CustomRoleDialog from './CustomRoleDialog';
+import AddToDoForm from './AddToDoForm';
+import ToDoTable from './ToDoTable';
+import { styled, alpha } from '@mui/material/styles';
+
+// Styled Components for enhanced visuals
+const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
+  backgroundColor: theme.palette.primary.main,
+  color: theme.palette.primary.contrastText,
+  display: 'flex',
+  alignItems: 'center',
+  justifyContent: 'space-between',
+}));
+
+const StyledAccordionSummary = styled(AccordionSummary)(({ theme }) => ({
+  backgroundColor: alpha(theme.palette.primary.light, 0.1),
+  borderRadius: '4px',
+}));
+
+const ActiveChip = styled(Chip)(({ theme }) => ({
+  cursor: 'pointer',
+  '&.MuiChip-filled': {
+    backgroundColor: theme.palette.primary.main,
+    color: theme.palette.primary.contrastText,
+  },
+  '&.MuiChip-outlined': {
+    borderColor: theme.palette.primary.main,
+    color: theme.palette.primary.main,
+  },
+}));
 
 const ToDoHeader: React.FC = () => {
+  const theme = useTheme();
   const [todos, setTodos] = useState<any[]>([]);
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
-  const [newTitle, setNewTitle] = useState('');
-  const [newDescription, setNewDescription] = useState('');
-  const [newPriority, setNewPriority] = useState('Medium');
-  const [newDueDate, setNewDueDate] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [customRoleDialogOpen, setCustomRoleDialogOpen] = useState(false);
+  const [selectedCustomTodoId, setSelectedCustomTodoId] = useState<number | null>(null);
+  const [customRoleDialogOrigin, setCustomRoleDialogOrigin] = useState<string | null>(null);
+  const [selectedUsers, setSelectedUsers] = useState({
+    FranchiseAdmin: [],
+    LocationAdmin: [],
+    Teacher: [],
+    Student: [],
+  });
 
-  const limit = 5; // Pagination limit per page
+  const [expanded, setExpanded] = useState<string | false>('add'); // 'add' or 'view'
+
+  const limit = 5;
 
   const loadToDos = async (pageNumber: number) => {
     try {
@@ -61,241 +100,250 @@ const ToDoHeader: React.FC = () => {
 
   const handleOpenDialog = () => {
     setIsDialogOpen(true);
-    loadToDos(page); // Load ToDos only when dialog is opened
+    loadToDos(page);
   };
 
   const handleCloseDialog = () => {
     setIsDialogOpen(false);
-    setNewTitle('');
-    setNewDescription('');
-    setNewPriority('Medium');
-    setNewDueDate('');
     setErrorMessage(null);
-    setTodos([]); // Clear the ToDos list when closing the dialog
+    setTodos([]);
   };
 
-  const handleAddToDo = async () => {
-    if (!newTitle || !newDueDate) {
-      setErrorMessage('ToDo title and due date are required.');
-      return;
-    }
-
-    try {
-      await createToDo({
-        title: newTitle,
-        description: newDescription,
-        priority: newPriority,
-        dueDate: newDueDate,
-      });
-      handleCloseDialog();
-      loadToDos(page); // Refresh ToDo list
-    } catch (error) {
-      console.error('Failed to add ToDo:', error);
-      setErrorMessage('Failed to add ToDo');
-    }
+  const handleCloseCustomRoleDialog = () => {
+    setCustomRoleDialogOpen(false);
+    setSelectedUsers({
+      FranchiseAdmin: [],
+      LocationAdmin: [],
+      Teacher: [],
+      Student: [],
+    });
   };
 
   const handleToggleCompletion = async (todoId: number) => {
     try {
       await toggleToDoCompletion(todoId);
-      loadToDos(page); // Refresh list to show updated status
+      loadToDos(page);
     } catch (error) {
       console.error('Failed to toggle ToDo completion:', error);
       setErrorMessage('Failed to update ToDo');
     }
   };
 
-  const handleAssignRole = async (todoId: number, role: string) => {
+  const handleOpenCustomRoleDialog = async (todoId: number) => {
+    setSelectedCustomTodoId(todoId);
+    setCustomRoleDialogOpen(true);
+
     try {
-      await assignToDoToRole(todoId, role);
-      loadToDos(page); // Refresh list to show updated assignment
+      const response = await fetchAssignedUsersForTodo(todoId);
+
+      if (response && Array.isArray(response.assignees)) {
+        const organizedUsers = {
+          FranchiseAdmin: [],
+          LocationAdmin: [],
+          Teacher: [],
+          Student: [],
+        };
+
+        response.assignees.forEach(user => {
+          user.roles.forEach(role => {
+            if (organizedUsers[role]) {
+              organizedUsers[role].push({
+                ...user,
+                id: user.id || user.userId,
+              });
+            }
+          });
+        });
+
+        setSelectedUsers(organizedUsers);
+      } else {
+        throw new Error('Assigned users data is not structured as expected');
+      }
     } catch (error) {
-      console.error('Failed to assign role to ToDo:', error);
-      setErrorMessage('Failed to assign role');
+      console.error('Failed to fetch assigned users:', error);
+      setErrorMessage('Failed to load assigned users');
     }
+  };
+
+  const handleAssignRole = async (todoId: number, role: string) => {
+    if (role === 'Custom') {
+      setSelectedCustomTodoId(todoId);
+      setCustomRoleDialogOrigin('AssignRole');
+      reloadTable();
+      handleOpenCustomRoleDialog(todoId);
+    } else {
+      await assignToDoToRole(todoId, role);
+      setTodos((prevTodos) =>
+        prevTodos.map((todo) =>
+          todo.id === todoId ? { ...todo, assignedRole: role } : todo
+        )
+      );
+    }
+  };
+
+  const reloadTable = () => {
+    loadToDos(page);
   };
 
   const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
     setPage(value);
-    loadToDos(value); // Load the ToDos for the new page
+    loadToDos(value);
   };
 
-  const priorityColor = (priority: string) => {
-    switch (priority) {
-      case 'High':
-        return 'error';
-      case 'Medium':
-        return 'warning';
-      case 'Low':
-      default:
-        return 'success';
-    }
+  const fetchDataFunctions = {
+    FranchiseAdmin: (query: string) => fetchFranchiseAdmins(1, 5, query).then((data) => data.data),
+    LocationAdmin: (query: string) => fetchLocationAdmins(1, 5, query).then((data) => data.data),
+    Teacher: (query: string) => fetchTeachers(1, 5, query).then((data) => data.data),
+    Student: (query: string) => fetchStudents(1, 5, query).then((data) => data.data),
+  };
+
+  // Handler to view assignees
+  const handleViewAssignees = (todoId: number) => {
+    setCustomRoleDialogOrigin('ViewAssignees');
+    handleOpenCustomRoleDialog(todoId);
   };
 
   return (
-    <Box sx={{ position: 'relative', padding: 2 }}>
+    <Box sx={{ position: 'relative' }}>
       <Tooltip arrow title="Manage ToDos">
-        <IconButton color="primary" onClick={handleOpenDialog}>
-          <AssignmentIcon />
+        <IconButton
+          color="primary"
+          onClick={handleOpenDialog}
+          sx={{
+            backgroundColor: alpha(theme.palette.primary.main, 0.1),
+            '&:hover': {
+              backgroundColor: alpha(theme.palette.primary.main, 0.2),
+            },
+          }}
+        >
+          <SpatialAudioOffIcon color="primary" />
         </IconButton>
       </Tooltip>
 
       <Dialog open={isDialogOpen} onClose={handleCloseDialog} fullWidth maxWidth="md">
-        <DialogTitle>Manage My ToDos</DialogTitle>
-        <DialogContent dividers>
+        {/* Styled Dialog Title */}
+        <StyledDialogTitle>
+          <Typography variant="h6">Manage My Created ToDos</Typography>
+          <IconButton onClick={handleCloseDialog} aria-label="close dialog">
+            <CloseIcon />
+          </IconButton>
+        </StyledDialogTitle>
+        <Divider />
 
+        {/* Dialog Content */}
+        <DialogContent dividers>
           <RoleBasedComponent allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher']}>
-            <Accordion>
-              <AccordionSummary
-                expandIcon={<ExpandMoreIcon />} // Use the imported ExpandMoreIcon component
-                aria-controls="panel1-content"
-                id="panel1-header"
+            {/* Add ToDo Accordion */}
+            <Accordion
+              expanded={expanded === 'add'}
+              onChange={() => setExpanded(expanded === 'add' ? false : 'add')}
+              sx={{
+                boxShadow: theme.shadows[1],
+                borderRadius: '8px',
+                mb: 2,
+                '&:before': { display: 'none' },
+              }}
+            >
+              <StyledAccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="add-content"
+                id="add-header"
               >
-                Add New ToDo
-              </AccordionSummary>
+                <Box display="flex" alignItems="center" gap={1}>
+                  <AddIcon color="primary" />
+                  <Typography variant="subtitle1" fontWeight="bold" color="primary">
+                    Add New ToDo
+                  </Typography>
+                </Box>
+              </StyledAccordionSummary>
               <AccordionDetails>
-                <Grid container spacing={2}>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Title"
-                      variant="outlined"
-                      fullWidth
-                      value={newTitle}
-                      onChange={(e) => setNewTitle(e.target.value)}
-                      required
-                    />
-                  </Grid>
-                  <Grid item xs={12}>
-                    <TextField
-                      label="Description"
-                      variant="outlined"
-                      fullWidth
-                      multiline
-                      rows={3}
-                      value={newDescription}
-                      onChange={(e) => setNewDescription(e.target.value)}
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <TextField
-                      label="Due Date"
-                      type="date"
-                      variant="outlined"
-                      fullWidth
-                      InputLabelProps={{ shrink: true }}
-                      value={newDueDate}
-                      onChange={(e) => setNewDueDate(e.target.value)}
-                      required
-                    />
-                  </Grid>
-                  <Grid item xs={6}>
-                    <FormControl fullWidth variant="outlined">
-                      <InputLabel>Priority</InputLabel>
-                      <Select
-                        label="Priority"
-                        value={newPriority}
-                        onChange={(e) => setNewPriority(e.target.value)}
-                      >
-                        <MenuItem value="Low">Low</MenuItem>
-                        <MenuItem value="Medium">Medium</MenuItem>
-                        <MenuItem value="High">High</MenuItem>
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                </Grid>
+                <AddToDoForm onAdd={() => loadToDos(page)} />
               </AccordionDetails>
             </Accordion>
+
             <Divider sx={{ my: 2 }} />
+
+            {/* View ToDos Accordion */}
+            <Accordion
+              expanded={expanded === 'view'}
+              onChange={() => setExpanded(expanded === 'view' ? false : 'view')}
+              sx={{
+                boxShadow: theme.shadows[1],
+                borderRadius: '8px',
+                '&:before': { display: 'none' },
+              }}
+            >
+              <StyledAccordionSummary
+                expandIcon={<ExpandMoreIcon />}
+                aria-controls="view-content"
+                id="view-header"
+              >
+                <Box display="flex" alignItems="center" gap={1}>
+                  <VisibilityIcon color="secondary" />
+                  <Typography variant="subtitle1" fontWeight="bold" color="secondary">
+                    View ToDos
+                  </Typography>
+                </Box>
+              </StyledAccordionSummary>
+              <AccordionDetails>
+                <ToDoTable
+                  todos={todos}
+                  onToggleCompletion={handleToggleCompletion}
+                  onAssignRole={handleAssignRole}
+                  onViewAssignees={handleViewAssignees}
+                  page={page}
+                  totalPages={totalPages}
+                  onPageChange={handlePageChange}
+                  reloadTable={reloadTable}
+                />
+                <Box sx={{ position: 'relative', padding: 2 }}>
+                  <CustomRoleDialog
+                    open={customRoleDialogOpen}
+                    onClose={handleCloseCustomRoleDialog}
+                    assignToDoToUsers={assignToDoToUsers}
+                    selectedCustomTodoId={selectedCustomTodoId}
+                    fetchDataFunctions={fetchDataFunctions}
+                    onSave={reloadTable}
+                    originName={customRoleDialogOrigin}
+                  />
+                </Box>
+              </AccordionDetails>
+            </Accordion>
           </RoleBasedComponent>
 
+          {/* Active Section Indicators */}
+          <Box display="flex" gap={2} alignItems="center" mt={4}>
+            <Typography variant="subtitle1" color="textSecondary">
+              Current Section:
+            </Typography>
+            <ActiveChip
+              icon={<AddIcon />}
+              label="Create"
+              variant={expanded === 'add' ? 'filled' : 'outlined'}
+              color="primary"
+              onClick={() => setExpanded(expanded === 'add' ? false : 'add')}
+            />
+            <ActiveChip
+              icon={<VisibilityIcon />}
+              label="View"
+              variant={expanded === 'view' ? 'filled' : 'outlined'}
+              color="secondary"
+              onClick={() => setExpanded(expanded === 'view' ? false : 'view')}
+            />
+          </Box>
 
-
-          <Accordion defaultExpanded>
-            <AccordionSummary
-              expandIcon={<ExpandMoreIcon />}
-              aria-controls="panel1-content"
-              id="panel1-header"
-            >
-              View ToDos
-            </AccordionSummary>
-            <AccordionDetails>
-              {/* {errorMessage && (
-                <Typography color="error" variant="body2" sx={{ mb: 2 }}>
-                  {errorMessage}
-                </Typography>
-              )} */}
-              <TableContainer component={Paper} elevation={3} sx={{ maxHeight: 400 }}>
-                <Table stickyHeader>
-                  <TableHead>
-                    <TableRow>
-                      <TableCell>Completed</TableCell>
-                      <TableCell>Title</TableCell>
-                      <TableCell>Priority</TableCell>
-                      <TableCell>Due Date</TableCell>
-                      <TableCell>Assigned Role</TableCell>
-                    </TableRow>
-                  </TableHead>
-                  <TableBody>
-                    {todos.map((todo) => (
-                      <TableRow key={todo.id}>
-                        <TableCell padding="checkbox">
-                          <Checkbox
-                            checked={todo.completed}
-                            onChange={() => handleToggleCompletion(todo.id)}
-                            color="primary"
-                          />
-                        </TableCell>
-                        <TableCell>{todo.title}</TableCell>
-                        <TableCell>
-                          <Chip label={todo.priority} color={priorityColor(todo.priority)} size="small" />
-                        </TableCell>
-                        <TableCell>
-                          {todo.dueDate ? new Date(todo.dueDate).toLocaleDateString() : 'No Due Date'}
-                        </TableCell>
-                        <TableCell>
-                          <FormControl fullWidth variant="outlined">
-                            <InputLabel>Assign Role</InputLabel>
-                            <Select
-                              label="Assign Role"
-                              value={todo.assignedRole || ''}
-                              onChange={(e) => handleAssignRole(todo.id, e.target.value)}
-                            >
-                              <MenuItem value="FranchiseAdmin">Franchise Admin</MenuItem>
-                              <MenuItem value="LocationAdmin">Location Admin</MenuItem>
-                              <MenuItem value="Teacher">Teacher</MenuItem>
-                              <MenuItem value="Student">Student</MenuItem>
-                            </Select>
-                          </FormControl>
-                        </TableCell>
-                      </TableRow>
-                    ))}
-                    {todos.length === 0 && (
-                      <TableRow>
-                        <TableCell colSpan={5} align="center">
-                          No ToDos found.
-                        </TableCell>
-                      </TableRow>
-                    )}
-                  </TableBody>
-                </Table>
-              </TableContainer>
-
-              {/* Pagination */}
-              <Box display="flex" justifyContent="center" mt={2}>
-                <Pagination count={totalPages} page={page} onChange={handlePageChange} color="primary" />
-              </Box>
-            </AccordionDetails>
-          </Accordion>
+          {/* Display Error Message */}
+          {errorMessage && (
+            <Box mt={2}>
+              <Typography variant="body2" color="error">
+                {errorMessage}
+              </Typography>
+            </Box>
+          )}
         </DialogContent>
-        <DialogActions>
-          <Button onClick={handleCloseDialog} color="secondary">
-            Cancel
-          </Button>
-          <Button onClick={handleAddToDo} color="primary" variant="contained">
-            Save ToDo
-          </Button>
-        </DialogActions>
       </Dialog>
+
+
     </Box>
   );
 };

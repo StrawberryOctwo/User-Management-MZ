@@ -51,7 +51,7 @@ export default function ViewInvoiceDetails({
             <p><strong>Total Amount:</strong> ${invoice.totalAmount}</p>
             <p><strong>Extra Amount:</strong> ${invoice.extraAmount}</p>
             <p><strong>Status:</strong> {invoice.status}</p>
-            <p><strong>Created At:</strong> {new Date(invoice.created_at).toLocaleString()}</p>
+            <p><strong>Created At:</strong> {new Date(invoice.createdAt).toLocaleString()}</p>
           </div>
         )}
       </DialogContent>

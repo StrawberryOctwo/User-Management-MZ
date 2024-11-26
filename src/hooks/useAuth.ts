@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import Cookies from 'universal-cookie';
-import {jwtDecode} from 'jwt-decode'; // Ensure correct import
+import { jwtDecode } from 'jwt-decode'; // Ensure correct import
 
 interface DecodedToken {
   name: string;
@@ -26,7 +26,7 @@ export const useAuth = () => {
           resetAuthState();
         } else {
           const decoded = jwtDecode<DecodedToken>(token);
- 
+
           setUserId(decoded.id);
           setUserRoles(decoded.roles);
           setUsername(`${decoded.name} ${decoded.lastname}`);
