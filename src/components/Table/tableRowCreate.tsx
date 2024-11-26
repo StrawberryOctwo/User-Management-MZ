@@ -30,7 +30,21 @@ export interface FieldConfig {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>) => void;
   disabled?: boolean;
   value?: string | number;
-  initialValue?: string | number; // New property for initial value
+  initialValue?: string | number;
+  validation?: {
+    pattern?: {
+      value: RegExp;
+      message: string;
+    };
+    maxLength?: {
+      value: number;
+      message: string;
+    };
+    minLength?: {
+      value: number;
+      message: string;
+    };
+  };
 }
 
 interface ReusableFormProps {
@@ -65,9 +79,13 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
   const [passwordVisibility, setPasswordVisibility] = useState<
     Record<string, boolean>
   >({});
-  
+
   // New state for logo preview
   const [logoPreview, setLogoPreview] = useState<string | null>(null);
+
+  const [touchedFields, setTouchedFields] = useState<Record<string, boolean>>(
+    {}
+  );
 
   useEffect(() => {
     if (Object.keys(initialData).length > 0) {
@@ -87,9 +105,9 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
   }, [initialData, fields]);
 
   // Handler for TextField and other input changes
-  const handleInputChange: React.ChangeEventHandler<HTMLInputElement | HTMLTextAreaElement> = (
-    event
-  ) => {
+  const handleInputChange: React.ChangeEventHandler<
+    HTMLInputElement | HTMLTextAreaElement
+  > = (event) => {
     const { name, value } = event.target;
     setFormData((prev) => ({
       ...prev,
@@ -109,14 +127,15 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
   // Handler for logo file changes
   const handleLogoChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { name, files } = event.target;
-  
+
     if (files && files.length > 0) {
       const file = files[0];
-      if (file.size > 500 * 1024) { // 500KB in bytes
+      if (file.size > 500 * 1024) {
+        // 500KB in bytes
         alert('File size exceeds 500KB. Please choose a smaller file.');
         return;
       }
-  
+
       const reader = new FileReader();
       reader.onloadend = () => {
         const base64String = reader.result as string;
@@ -274,6 +293,32 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
                               )
                             }
                           : undefined
+                      }
+                      inputProps={{
+                        maxLength: field.validation?.maxLength?.value,
+                        minLength: field.validation?.minLength?.value,
+                        pattern: field.validation?.pattern?.value.source
+                      }}
+                      error={
+                        !!field.validation?.pattern?.value &&
+                        !new RegExp(field.validation.pattern.value).test(
+                          formData[field.name]
+                        )
+                      }
+                      helperText={
+                        touchedFields[field.name] &&
+                        !!field.validation?.pattern?.value &&
+                        !new RegExp(field.validation.pattern.value).test(
+                          formData[field.name]
+                        )
+                          ? field.validation?.pattern?.message
+                          : ''
+                      }
+                      onBlur={() =>
+                        setTouchedFields((prev) => ({
+                          ...prev,
+                          [field.name]: true
+                        }))
                       }
                     />
                   )}

@@ -30,7 +30,11 @@ export default function ViewLocationPage() {
   const loadLocations = async (searchQuery = '') => {
     setLoading(true);
     try {
-      const { data, total } = await fetchLocations(page + 1, limit, searchQuery);
+      const { data, total } = await fetchLocations(
+        page + 1,
+        limit,
+        searchQuery
+      );
       setLocations([...data]);
       setTotalCount(total);
     } catch (error) {
@@ -46,7 +50,7 @@ export default function ViewLocationPage() {
     { field: 'postalCode', headerName: 'Postal Code' },
     { field: 'franchiseName', headerName: 'Franchise Name' },
     { field: 'totalTeachers', headerName: 'Total Teachers' },
-    { field: 'totalStudents', headerName: 'Total Students' },
+    { field: 'totalStudents', headerName: 'Total Students' }
   ];
 
   const handleEdit = (id: any) => {
@@ -62,7 +66,7 @@ export default function ViewLocationPage() {
     setLoading(true);
 
     try {
-      const response = await deleteLocation(selectedIds);
+      const response = await deleteLocation(selectedIds[0]);
       await loadLocations();
     } catch (error: any) {
       setErrorMessage('Failed to delete the location(s).');
@@ -112,7 +116,11 @@ export default function ViewLocationPage() {
         onClose={() => setDialogOpen(false)}
         actions={
           <>
-            <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
+            <Button
+              onClick={() => setDialogOpen(false)}
+              color="inherit"
+              disabled={loading}
+            >
               Cancel
             </Button>
             <Button

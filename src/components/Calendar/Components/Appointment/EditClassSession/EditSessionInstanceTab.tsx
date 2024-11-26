@@ -18,6 +18,7 @@ import { getStrongestRoles } from 'src/hooks/roleUtils';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import { fetchStudents } from 'src/services/studentService';
 import { fetchSessionTypes } from 'src/services/contractPackagesService';
+import { allowedDurations } from '../AddClassSession/AddClassSessionUtils';
 
 const EditSessionInstanceTab = ({
   session,
@@ -130,17 +131,23 @@ const EditSessionInstanceTab = ({
           />
         </Grid>
         <Grid item xs={6}>
-          <TextField
-            label="Duration (minutes)"
-            type="number"
-            fullWidth
-            value={session.duration}
-            onChange={(e) =>
-              setSession({ ...session, duration: e.target.value })
-            }
-            InputLabelProps={{ shrink: true }}
-            disabled={sessionEnded}
-          />
+          <FormControl fullWidth>
+            <InputLabel shrink>Duration (minutes)</InputLabel>
+            <Select
+              label="Duration (minutes)"
+              value={session.duration}
+              onChange={(e) =>
+                setSession({ ...session, duration: e.target.value })
+              }
+              disabled={sessionEnded}
+            >
+              {allowedDurations.map((duration) => (
+                <MenuItem key={duration} value={duration}>
+                  {duration} minutes
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </Grid>
       </Grid>
       <Grid container spacing={2}>
