@@ -186,7 +186,11 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
 
   const handleCloseReportForm = () => {
     setViewReportFormOpen(false);
-    // refreshClassSessionData();
+  };
+
+  const handleDeleteReportForm = () => {
+    setViewReportFormOpen(false);
+    refreshClassSessionData();
   };
 
   const handleCloseAbsenceModel = async () => {
@@ -501,8 +505,8 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                     isOpen={isViewReportFormOpen}
                     onClose={handleCloseReportForm}
                     reportId={selectedReportId}
-                    onDelete={handleCloseReportForm}
-                    submissionSuccess={submissionSuccess}
+                    onDelete={handleDeleteReportForm}
+                    isEditable={true}
                   />
                 )}
 
