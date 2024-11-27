@@ -33,6 +33,7 @@ export default function ContractPage() {
 
   const handleDelete = (id: string) => {
     deleteContractPackages([id])
+    loadContracts();
   };
 
   if (errorMessage) return <div>{errorMessage}</div>;

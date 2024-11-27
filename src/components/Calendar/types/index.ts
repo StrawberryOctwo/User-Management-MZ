@@ -21,4 +21,5 @@ export type EventItem = {
   data?: { appointment?: Appointment; blockout?: Blockout };
   isDraggable?: boolean;
   resourceId?: number;
+  numberOfRooms?: number;
 };

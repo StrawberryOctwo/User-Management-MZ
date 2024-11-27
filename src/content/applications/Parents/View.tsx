@@ -33,8 +33,6 @@ const ViewParent: React.FC = () => {
         phoneNumber: parentData.user?.phoneNumber,
         students: parentData.students.map((student: any) => ({
           ...student,
-          firstName: student.user?.firstName,
-          lastName: student.user?.lastName
         }))
       };
 
