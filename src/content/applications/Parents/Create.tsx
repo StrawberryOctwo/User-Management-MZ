@@ -1,9 +1,8 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import { t } from 'i18next';
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
 import { addParent } from 'src/services/parentService';
-import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import { useAuth } from 'src/hooks/useAuth';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
@@ -37,7 +36,7 @@ const CreateParent = () => {
           accountHolder: data.accountHolder,
           iban: data.iban,
           bic: data.bic,
-          studentIds: selectedStudents?.map((student: any) => student.id) || [] // Add student IDs to payload
+          studentIds: selectedStudents?.map((student: any) => student.id) || []
         }
       };
 

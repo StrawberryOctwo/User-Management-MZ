@@ -39,59 +39,78 @@ const MultiSelectWithCheckboxes = forwardRef(
     ref
   ) => {
     const [options, setOptions] = useState<any[]>([]);
-    const [selectedItems, setSelectedItems] = useState<any[]>(
-      initialValue || []
-    );
+    const [initialOptions, setInitialOptions] = useState<any[]>([]);
+    const [selectedItems, setSelectedItems] = useState<any[]>(initialValue || []);
     const [loading, setLoading] = useState(false);
     const [focused, setFocused] = useState(false);
     const [inputValue, setInputValue] = useState('');
-    const [initialDataLoaded, setInitialDataLoaded] = useState(false);
+    const [shouldFetch, setShouldFetch] = useState(true);
+    const [isSelecting, setIsSelecting] = useState(false);
 
     useImperativeHandle(ref, () => ({
       reset: () => {
         setSelectedItems([]);
-        setOptions([]);
-        setInitialDataLoaded(false);
+        setOptions(initialOptions);
+        setShouldFetch(true);
       },
       selectedItems
     }));
 
-    // Load initial data and ensure selected items are in options
+    // Single effect to handle both initial load and search
     useEffect(() => {
-      const loadInitialData = async () => {
-        if (!initialDataLoaded && !disabled) {
+      let active = true;
+      const timeoutId = setTimeout(async () => {
+        // Only fetch if:
+        // 1. Component is focused AND query has 2+ chars, OR
+        // 2. Options are empty (initial load)
+        // AND not currently selecting an item
+        if (!shouldFetch || isSelecting) return;
+
+        if ((focused && inputValue.length >= 2) || options.length === 0) {
           setLoading(true);
           try {
-            const data = await fetchData('');
-            // Create a unique set of options including both fetched data and initial values
-            const allOptions = [...data];
+            const data = await fetchData(inputValue);
+            if (active) {
+              const newOptions = Array.isArray(data) ? data : [];
 
-            // Add any selected items that aren't in the initial fetch
-            if (initialValue?.length > 0) {
-              initialValue.forEach(selectedItem => {
-                if (!allOptions.some(option => option.id === selectedItem.id)) {
-                  allOptions.push(selectedItem);
+              // Ensure all selected items remain in options
+              selectedItems.forEach(selectedItem => {
+                if (!newOptions.some(option => option.id === selectedItem.id)) {
+                  newOptions.push(selectedItem);
                 }
               });
+
+              setOptions(newOptions);
+
+              // Save initial options if this is the first load
+              if (options.length === 0 && inputValue === '') {
+                setInitialOptions(newOptions);
+              }
             }
-
-            setOptions(allOptions);
-            setInitialDataLoaded(true);
           } catch (error) {
-            console.error('Error fetching initial data:', error);
+            console.error('Error fetching options:', error);
           } finally {
-            setLoading(false);
+            if (active) {
+              setLoading(false);
+              setShouldFetch(false);
+            }
           }
+        } else if (inputValue.length === 0) {
+          // If query is empty, restore initial options
+          setOptions(initialOptions);
         }
+      }, 300);
+
+      return () => {
+        active = false;
+        clearTimeout(timeoutId);
       };
+    }, [focused, inputValue, fetchData, disabled, selectedItems, shouldFetch, isSelecting]);
 
-      loadInitialData();
-    }, [fetchData, disabled, initialDataLoaded, initialValue]);
-
+    // Handle initial value changes
     useEffect(() => {
       if (initialValue?.length > 0) {
         setSelectedItems(initialValue);
-        // Ensure selected items are always in options
         setOptions(prevOptions => {
           const newOptions = [...prevOptions];
           initialValue.forEach(selectedItem => {
@@ -104,51 +123,21 @@ const MultiSelectWithCheckboxes = forwardRef(
       }
     }, [initialValue]);
 
-    useEffect(() => {
-      let active = true;
-      const timeoutId = setTimeout(async () => {
-        if (focused && !disabled && inputValue.length >= 2) {
-          setLoading(true);
-          try {
-            const data = await fetchData(inputValue);
-            if (active) {
-              // Merge new results with selected items
-              const newOptions = [...data];
-
-              // Ensure all selected items remain in options
-              selectedItems.forEach(selectedItem => {
-                if (!newOptions.some(option => option.id === selectedItem.id)) {
-                  newOptions.push(selectedItem);
-                }
-              });
-
-              setOptions(newOptions);
-            }
-          } catch (error) {
-            console.error('Error fetching options:', error);
-          } finally {
-            if (active) {
-              setLoading(false);
-            }
-          }
-        }
-      }, 300);
-
-      return () => {
-        active = false;
-        clearTimeout(timeoutId);
-      };
-    }, [focused, inputValue, fetchData, disabled, selectedItems]);
-
     const handleFocus = () => setFocused(true);
     const handleBlur = () => {
       setFocused(false);
       setInputValue('');
+      setOptions(initialOptions);
     };
 
     const handleChange = (event: any, value: any[]) => {
+      setIsSelecting(true);
       setSelectedItems(value);
       onSelect(value);
+      // Reset after selection
+      setTimeout(() => {
+        setIsSelecting(false);
+      }, 100);
     };
 
     const getNestedProperty = (option: any, path: string) =>
@@ -164,8 +153,14 @@ const MultiSelectWithCheckboxes = forwardRef(
           getNestedProperty(option, displayProperty) || ''
         }
         onChange={handleChange}
-        onInputChange={(event, newInputValue) => {
-          setInputValue(newInputValue);
+        onInputChange={(event, newInputValue, reason) => {
+          // Only update input value if not selecting an option
+          if (reason !== 'reset' && !isSelecting) {
+            setInputValue(newInputValue);
+            if (newInputValue.length >= 2) {
+              setShouldFetch(true);
+            }
+          }
         }}
         onFocus={handleFocus}
         onBlur={handleBlur}
