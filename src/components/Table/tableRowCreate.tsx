@@ -179,7 +179,7 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (!isValidIBAN(formData.iban)) {
+    if (formData.iban && !isValidIBAN(formData.iban)) {
       alert('Please enter a valid IBAN.');
       return;
     }
