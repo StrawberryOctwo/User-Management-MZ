@@ -51,7 +51,7 @@ export default function ViewInvoices() {
     }
   };
 
-  const handleDownloadPDF = async (invoiceId: number) => {
+  const handlePreviewPDF = async (invoiceId: number) => {
     try {
       const invoiceData = await fetchInvoiceById(invoiceId, userId);
       if (userRoles.includes('Parent')) {
@@ -65,6 +65,19 @@ export default function ViewInvoices() {
     }
   };
 
+  const handleDownloadPDF = async (invoiceId: number) => {
+    try {
+      const invoiceData = await fetchInvoiceById(invoiceId, userId);
+      if (userRoles.includes('Parent')) {
+        if (isMounted.current) generateParentInvoicePDF(invoiceData,false);
+      } else if (userRoles.includes('Teacher')){
+        // Fetch additional teacher data if not a parent
+        const teacherData = await fetchTeacherInvoiceInfoByUserId(userId);
+        if (isMounted.current) generateTeacherInvoicePDF(invoiceData, teacherData,false);
+      }  } catch (error) {
+      console.error('Error generating invoice PDF:', error);
+    }
+  };
   const columns = [
     { field: 'invoiceId', headerName: 'Invoice ID' },
     { field: 'totalAmount', headerName: 'Total Amount' },
@@ -79,6 +92,15 @@ export default function ViewInvoices() {
       headerName: 'Actions',
       render: (value: any, row: any) => (
         <div>
+
+          <Button
+            variant="outlined"
+            color="secondary"
+            size="small"
+            onClick={() => handlePreviewPDF(row.id)}
+          >
+            View PDF
+          </Button>
 
           <Button
             variant="outlined"
