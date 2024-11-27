@@ -36,7 +36,7 @@ const CalendarContent: React.FC = () => {
   const [selectedFranchise, setSelectedFranchise] = useState<any | null>(null);
   const [selectedLocations, setSelectedLocations] = useState<any[]>([]); // Updated to array
   const [strongestRole, setStrongestRole] = useState<string | null>(null);
-
+  const [parentNbOfRooms, setParentNbOfRooms] = useState<number>(0);
   const { userId, userRoles } = useAuth();
   // const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
 
@@ -46,16 +46,16 @@ const CalendarContent: React.FC = () => {
       const role = roles.includes('SuperAdmin')
         ? 'SuperAdmin'
         : roles.includes('FranchiseAdmin')
-        ? 'FranchiseAdmin'
-        : roles.includes('LocationAdmin')
-        ? 'LocationAdmin'
-        : roles.includes('Teacher')
-        ? 'Teacher'
-        : roles.includes('Parent')
-        ? 'Parent'
-        : roles.includes('Student')
-        ? 'Student'
-        : null;
+          ? 'FranchiseAdmin'
+          : roles.includes('LocationAdmin')
+            ? 'LocationAdmin'
+            : roles.includes('Teacher')
+              ? 'Teacher'
+              : roles.includes('Parent')
+                ? 'Parent'
+                : roles.includes('Student')
+                  ? 'Student'
+                  : null;
       setStrongestRole(role);
     }
   }, [userRoles]);
@@ -94,8 +94,10 @@ const CalendarContent: React.FC = () => {
   }, []);
 
   const transformClassSessionsToEvents = (
-    classSessions: any[]
+    classSessions: any[],
   ): EventItem[] => {
+    // console.log('classSessions:', classSessions);
+    if (classSessions === undefined) return [];
     return classSessions.map((session) => {
       const resource = session.room || 'R2';
 
@@ -132,7 +134,7 @@ const CalendarContent: React.FC = () => {
             date: session.date
           }
         },
-        resourceId: resource
+        resourceId: resource,
       };
     });
   };
@@ -160,6 +162,8 @@ const CalendarContent: React.FC = () => {
           ) {
             setSelectedLocations(response.userLocations);
           }
+          const teacherEvents = transformClassSessionsToEvents(response.sessionInstances);
+          setClassSessionEvents(teacherEvents);
           break;
         case 'Parent':
           response = await fetchParentClassSessions(
@@ -167,6 +171,9 @@ const CalendarContent: React.FC = () => {
             date,
             date
           );
+          const parentEvents = transformClassSessionsToEvents(response.sessionInstances,);
+          setParentNbOfRooms(response.numberOfRooms);
+          setClassSessionEvents(parentEvents);
           break;
         case 'SuperAdmin':
         case 'FranchiseAdmin':
@@ -175,14 +182,13 @@ const CalendarContent: React.FC = () => {
             return;
           }
           response = await fetchClassSessions(date, date, locationIds);
+          const adminEvents = transformClassSessionsToEvents(response.sessionInstances);
+          setClassSessionEvents(adminEvents);
           break;
         default:
           console.error('Invalid role: Unrecognized role encountered.');
           throw new Error('Invalid role');
       }
-
-      const events = transformClassSessionsToEvents(response.sessionInstances);
-      setClassSessionEvents(events);
     } catch (error) {
       console.error('Failed to load class sessions', error);
       setErrorMessage('Failed to load class sessions. Please try again.');
@@ -261,13 +267,13 @@ const CalendarContent: React.FC = () => {
       {['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin'].includes(
         strongestRole || ''
       ) && (
-        <FilterToolbar
-          onFranchiseChange={handleFranchiseChange}
-          onLocationsChange={handleLocationsChange}
-          selectedFranchise={selectedFranchise}
-          selectedLocations={selectedLocations}
-        />
-      )}
+          <FilterToolbar
+            onFranchiseChange={handleFranchiseChange}
+            onLocationsChange={handleLocationsChange}
+            selectedFranchise={selectedFranchise}
+            selectedLocations={selectedLocations}
+          />
+        )}
 
       <Box sx={{ position: 'relative', height: '100%', overflow: 'hidden' }}>
         <CustomizedCalendar
@@ -277,6 +283,7 @@ const CalendarContent: React.FC = () => {
           selectedLocations={selectedLocations}
           holidays={holidays}
           closingDays={closingDays}
+          parentNumberOfRooms={parentNbOfRooms}
         />
         {selectedLocations.length === 0 &&
           strongestRole !== 'Teacher' &&
