@@ -8,7 +8,7 @@ export interface LocationAdmin {
     email: string;
     address: string;
     postalCode: string;
-    phoneNumber: string;
+    phoneNumber: number;
     locationNames: string[]; // Array of location names the admin manages
   }
   

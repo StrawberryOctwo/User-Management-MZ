@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { Navigate, Outlet, useNavigate } from 'react-router-dom';
+import { Navigate, Outlet, useLocation } from 'react-router-dom';
 import Cookies from 'universal-cookie';
-import { jwtDecode } from 'jwt-decode'; // Ensure it's correctly imported
-import { isTokenExpired } from './hooks/useAuth'; // Your existing logic
+import { jwtDecode } from 'jwt-decode';
+import { isTokenExpired } from './hooks/useAuth';
 
 interface DecodedToken {
   id: number;
@@ -10,53 +10,61 @@ interface DecodedToken {
   exp: number;
 }
 
-const ProtectedRoute: React.FC<{ requiredRoles?: string[] }> = ({ requiredRoles }) => {
-  const cookies = new Cookies();
-  const navigate = useNavigate();
-  const token = cookies.get('token');
+interface ProtectedRouteProps {
+  requiredRoles?: string[];
+  children?: React.ReactNode;
+}
 
-  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null); // Use `null` for pending state
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ requiredRoles, children }) => {
+  const cookies = new Cookies();
+  const location = useLocation();
+  const token = cookies.get('token');
+  const [isAuthorized, setIsAuthorized] = useState<boolean | null>(null);
 
   useEffect(() => {
-    const validateToken = () => {
+    const validateAccess = () => {
       if (!token || isTokenExpired(token)) {
-        setIsAuthorized(false); // Mark as unauthorized if token is missing/expired
+        setIsAuthorized(false);
         return;
       }
 
       try {
         const decoded = jwtDecode<DecodedToken>(token);
-        if (
-          requiredRoles &&
-          !requiredRoles.some((role) => decoded.roles.includes(role))
-        ) {
-          console.warn('User does not have the required roles:', requiredRoles);
-          setIsAuthorized(false); // Mark as unauthorized if roles don’t match
+
+        // If no specific roles are required, just check if the token is valid
+        if (!requiredRoles) {
+          setIsAuthorized(true);
           return;
         }
 
-        setIsAuthorized(true); // Token is valid and user is authorized
+        const hasRequiredRole = requiredRoles.some(role =>
+          decoded.roles.includes(role)
+        );
+
+        setIsAuthorized(hasRequiredRole);
+
       } catch (error) {
-        console.error('Failed to decode token:', error);
-        setIsAuthorized(false); // Invalid token format
+        console.error('Token validation error:', error);
+        setIsAuthorized(false);
       }
     };
 
-    validateToken(); // Call token validation on component mount
-  }, [token, requiredRoles]); // Add only necessary dependencies
+    validateAccess();
+  }, [token, requiredRoles, location.pathname]);
 
-  // If validation is pending, render nothing (or a loading spinner)
   if (isAuthorized === null) {
-    return <div>Loading...</div>; // Optional: Show a loading state
+    return <div>Loading...</div>;
   }
 
-  // If unauthorized, navigate to login
   if (!isAuthorized) {
-    return <Navigate to="/login" replace />;
+    // Redirect to login if not authenticated, or to 403 page if authenticated but unauthorized
+    return token ?
+      <Navigate to="/status/403" replace state={{ from: location }} /> :
+      <Navigate to="/login" replace state={{ from: location }} />;
   }
 
-  // If authorized, render the protected content
-  return <Outlet />;
+  // If there are children, render them, otherwise render the Outlet
+  return children ? <>{children}</> : <Outlet />;
 };
 
 export default ProtectedRoute;

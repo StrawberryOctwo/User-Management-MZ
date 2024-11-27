@@ -25,10 +25,10 @@ export const fetchContractPackageById = async (contractId?: string) => {
     }
 };
 
-export const fetchContractPackagesByEntity = async (page: number, limit: Number,search) => {
+export const fetchContractPackagesByEntity = async (page: number, limit: Number, search) => {
     try {
         const response = await api.get('/contract-packages/franchises', {
-            params: { page, limit ,search},
+            params: { page, limit, search },
         });
         return response.data;
     } catch (error) {
@@ -49,9 +49,11 @@ export const assignStudentToContract = async (studentId: number, contractId: Num
 
 
 // Fetch all session types
-export const fetchSessionTypes = async () => {
+export const fetchSessionTypes = async (page?: number, limit?: number, search?) => {
     try {
-        const response = await api.get('/session-types'); // Adjust endpoint as necessary
+        const response = await api.get('/session-types', {
+            params: { page, limit, search },
+        }); // Adjust endpoint as necessary
         return response.data;
     } catch (error) {
         console.error('Error fetching session types:', error);
@@ -72,10 +74,10 @@ export const fetchDiscounts = async () => {
 
 
 // Fetch contract packages by franchise ID with pagination
-export const fetchContractPackagesByFranchise = async (franchiseId: number, page: number, limit: number,search:'') => {
+export const fetchContractPackagesByFranchise = async (franchiseId: number, page: number, limit: number, search: '') => {
     try {
         const response = await api.get(`/contract-packages/franchise/${franchiseId}`, {
-            params: { page, limit,search },
+            params: { page, limit, search },
         });
         return response.data;
     } catch (error) {

@@ -1,5 +1,5 @@
 import { Box, Button, CircularProgress } from '@mui/material';
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { fetchStudents, deleteStudent, fetchParentStudents } from 'src/services/studentService';
@@ -12,39 +12,30 @@ export default function StudentsContent() {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [selectedIds, setSelectedIds] = useState<number[]>([]);
-  const [loadingStudents, setLoadingStudents] = useState(false);
   const [userRoles, setUserRoles] = useState<string[]>([]); // State for userRoles
 
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(25);
   const { userRoles: authUserRoles, loading: authLoading } = useAuth();
-  
 
   const navigate = useNavigate();
 
+  // First useEffect: Set userRoles from authUserRoles
   useEffect(() => {
-    // Only set userRoles if it is empty and authUserRoles is populated
     if (!authLoading && authUserRoles && userRoles.length === 0) {
-      console.log("Setting userRoles:", authUserRoles);
       setUserRoles(authUserRoles);
     }
+  }, [authLoading, authUserRoles, userRoles.length]);
 
-    // Trigger loadStudents if userRoles is populated
-    if (userRoles.length > 0) {
-      console.log("User Roles inside useEffect:", userRoles);
-      loadStudents();
-    }
-  }, [authLoading, authUserRoles, userRoles]);
-
-  const loadStudents = async (searchQuery = '') => {
+  // Memoize loadStudents to prevent unnecessary re-creations
+  const loadStudents = useCallback(async (searchQuery = '') => {
     setLoading(true);
     setErrorMessage(null);
 
     try {
       let result;
-      console.log("User Roles at load:", userRoles);
-      if(userRoles.length === 0){return}
+      if (userRoles.length === 0) { return; }
       if (userRoles.includes('Parent')) {
         result = await fetchParentStudents(page + 1, limit, searchQuery);
       } else {
@@ -64,10 +55,14 @@ export default function StudentsContent() {
     } finally {
       setLoading(false);
     }
-  };
-  
+  }, [userRoles, page, limit]);
 
-
+  // Second useEffect: Fetch students when userRoles, page, or limit change
+  useEffect(() => {
+    if (userRoles.length > 0) {
+      loadStudents();
+    }
+  }, [userRoles, page, limit, loadStudents]);
 
   const handleEdit = (id: any) => {
     navigate(`edit/${id}`);
@@ -86,7 +81,8 @@ export default function StudentsContent() {
       await loadStudents();
     } catch (error: any) {
       setErrorMessage('Failed to delete students.');
-    
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -116,7 +112,6 @@ export default function StudentsContent() {
           { field: 'email', headerName: 'Email' },
           { field: 'gradeLevel', headerName: 'Grade Level' },
           { field: 'status', headerName: 'Status' },
-          { field: 'payPerHour', headerName: 'Pay Per Hour' },
         ]}
         title="Student List"
         onEdit={handleEdit}

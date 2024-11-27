@@ -78,7 +78,7 @@ const StudentExamsHeader: React.FC = () => {
   };
 
   return (
-    <Box sx={{ position: 'relative', padding: 2 }}>
+    <Box sx={{ position: 'relative' }}>
       <Tooltip arrow title="View Exams">
         <IconButton color="primary" onClick={handleOpenDialog}>
           <SchoolIcon />
@@ -97,23 +97,23 @@ const StudentExamsHeader: React.FC = () => {
           {/* Exams List */}
           <Paper elevation={3} sx={{ mb: 2 }}>
             <List>
-                {exams.map((exam) => (
+              {exams.map((exam) => (
                 <ListItem key={exam.id} divider>
-                    <ListItemText
+                  <ListItemText
                     primary={<Typography variant="body1" fontWeight="bold">{exam.name}</Typography>}
                     secondary={`Grade: ${exam.grade}`}
-                    />
+                  />
                 </ListItem>
-                ))}
-                {exams.length === 0 && (
+              ))}
+              {exams.length === 0 && (
                 <Box p={2}>
-                    <Typography variant="body2" color="textSecondary">
+                  <Typography variant="body2" color="textSecondary">
                     No exams found.
-                    </Typography>
+                  </Typography>
                 </Box>
-                )}
+              )}
             </List>
-            </Paper>
+          </Paper>
 
 
           {/* Pagination */}

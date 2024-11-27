@@ -6,10 +6,6 @@ import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelect
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
 import { addDocument } from 'src/services/fileUploadService';
 import { fetchLocations } from 'src/services/locationService';
-import {
-  assignOrUpdateParentStudents,
-  fetchParents
-} from 'src/services/parentService';
 import { addStudent } from 'src/services/studentService';
 import { assignStudentToTopics, fetchTopics } from 'src/services/topicService';
 import UploadSection from 'src/components/Files/UploadDocuments';
@@ -31,20 +27,27 @@ import { daysOfWeek } from './utils';
 
 export default function CreateStudent() {
   const [selectedLocationIds, setSelectedLocationIds] = useState<number[]>([]); // Update to handle multiple IDs
-  const [selectedParentId, setSelectedParentId] = useState<number | null>(null);
   const [selectedContractId, setSelectedContractId] = useState<number | null>(
     null
   );
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [selectedTopics, setSelectedTopics] = useState<any[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
+  const [selectedGradeLevel, setSelectedGradeLevel] = useState<number | null>(null);
   const [selectedSchoolTypeId, setSelectedSchoolTypeId] = useState<
     number | null
   >(null);
 
+  const [studentData, setStudentData] = useState<Record<string, any> | null>(
+    null
+  );
   const [loading, setLoading] = useState(false);
   const dropdownRef = useRef<any>(null);
   const { showMessage } = useSnackbar();
+  const gradeOptions = Array.from({ length: 12 }, (_, i) => ({
+    id: i + 1,
+    name: `Grade ${i + 1}`
+  }));
 
   const handleDayChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const { value, checked } = event.target;
@@ -64,11 +67,6 @@ export default function CreateStudent() {
   const handleLocationSelect = (locations: any[]) => {
     setSelectedLocationIds(locations.map((location) => location.id));
   };
-
-  const handleParentSelect = (parent: any) => {
-    setSelectedParentId(parent ? parent.id : null);
-  };
-
   const handleContractSelect = (contract: any) => {
     setSelectedContractId(contract ? contract.id : null);
   };
@@ -91,10 +89,6 @@ export default function CreateStudent() {
       showMessage('Location field is required', 'error');
       return;
     }
-    if (!selectedParentId) {
-      showMessage('Parent field is required', 'error');
-      return;
-    }
     if (selectedTopics.length === 0) {
       showMessage("Topics field can't be empty", 'error');
       return;
@@ -107,13 +101,12 @@ export default function CreateStudent() {
       const payload = {
         student: {
           status: data['status'],
-          gradeLevel: data['gradeLevel'],
+          gradeLevel: selectedGradeLevel,
           contract: data['contract'],
           contractEndDate: data['contractEndDate'],
           notes: data['notes'],
           availableDates: selectedDays,
           locationIds: selectedLocationIds,
-          parentId: selectedParentId,
           schoolType: selectedSchoolTypeId
         },
         user: {
@@ -122,6 +115,7 @@ export default function CreateStudent() {
           dob: data['dob'],
           email: data['email'],
           password: data['password'],
+          city: data['city'],
           address: data['address'],
           postalCode: data['postalCode'],
           phoneNumber: data['phoneNumber']
@@ -130,9 +124,6 @@ export default function CreateStudent() {
 
       const response = await addStudent(payload);
       await assignStudentToTopics(response.studentId, topicIds);
-      await assignOrUpdateParentStudents(selectedParentId, [
-        response.studentId
-      ]);
       await assignStudentToContract(response.studentId, selectedContractId);
 
       const userId = response.userId;
@@ -146,7 +137,6 @@ export default function CreateStudent() {
       }
 
       setSelectedLocationIds([]);
-      setSelectedParentId(null);
       setSelectedContractId(null);
       setSelectedTopics([]);
       setUploadedFiles([]);
@@ -162,28 +152,13 @@ export default function CreateStudent() {
     }
   };
 
-  const parentSelectionField = {
-    name: 'parent',
-    label: 'Select Parent',
-    type: 'custom',
-    section: 'Student Assignment',
-    component: (
-      <SingleSelectWithAutocomplete
-        label="Search Parent"
-        fetchData={(query) =>
-          fetchParents(1, 5, query).then((data) =>
-            data.data.map((parent) => ({
-              ...parent,
-              displayName: parent.user.firstName
-            }))
-          )
-        }
-        onSelect={handleParentSelect}
-        displayProperty="displayName"
-        placeholder="Type to search parent"
-      />
-    )
+  const handleGradeLevelSelect = (selectedGrade: any) => {
+    // Update the form data directly instead of using separate state
+    console.log('selectedGrade:', selectedGrade);
+    setSelectedGradeLevel(selectedGrade.id);
+    return selectedGrade ? selectedGrade.id : null;
   };
+
   const schoolTypeSelectionField = {
     name: 'schoolType',
     label: 'School Type',
@@ -234,6 +209,12 @@ export default function CreateStudent() {
     )
   };
 
+  const statusOptions = [
+    { label: t('active'), value: 'active' },
+    { label: t('inactive'), value: 'inactive' },
+    { label: t('interested'), value: 'interested' },
+  ];
+
   const userFields: FieldConfig[] = [
     {
       name: 'firstName',
@@ -271,6 +252,13 @@ export default function CreateStudent() {
       section: 'User Information'
     },
     {
+      name: 'city',
+      label: t('city'),
+      type: 'text',
+      required: true,
+      section: 'User Information'
+    },
+    {
       name: 'address',
       label: t('address'),
       type: 'text',
@@ -287,7 +275,7 @@ export default function CreateStudent() {
     {
       name: 'phoneNumber',
       label: t('phone_number'),
-      type: 'text',
+      type: 'number',
       required: true,
       section: 'User Information'
     }
@@ -297,16 +285,29 @@ export default function CreateStudent() {
     {
       name: 'status',
       label: t('status'),
-      type: 'text',
+      type: 'select',
       required: true,
-      section: 'Student Information'
+      section: 'Student Information',
+      options: statusOptions
     },
     {
       name: 'gradeLevel',
       label: t('grade_level'),
-      type: 'number',
+      type: 'custom',
       required: true,
-      section: 'Student Information'
+      section: 'Student Information',
+      component: (
+        <SingleSelectWithAutocomplete
+          label="Select Grade Level"
+          fetchData={() => Promise.resolve(gradeOptions)}
+          onSelect={handleGradeLevelSelect}
+          displayProperty="name"
+          placeholder="Select Grade"
+          initialValue={null}
+          ref={dropdownRef}
+        />
+      ),
+      getValue: (selectedValue: any) => selectedValue // Add this line
     },
     {
       name: 'contractEndDate',
@@ -377,7 +378,6 @@ export default function CreateStudent() {
       )
     },
     locationSelectionField,
-    parentSelectionField,
     {
       name: 'topics',
       label: 'Assign Topics',

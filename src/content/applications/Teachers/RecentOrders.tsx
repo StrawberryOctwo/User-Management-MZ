@@ -42,6 +42,7 @@ export default function TeachersContent() {
         contractPeriod: `${format(new Date(teacher.contractStartDate), 'dd/MM/yyyy')} - ${format(new Date(teacher.contractEndDate), 'dd/MM/yyyy')}`,
         hourlyRate: teacher.hourlyRate,
         email: teacher.email,
+        status: teacher.status,
         franchise: teacher.franchiseName,
       }));
 
@@ -60,13 +61,14 @@ export default function TeachersContent() {
     { field: 'fullName', headerName: 'Full Name' },
     { field: 'franchise', headerName: 'Franchise Name' },
     { field: 'email', headerName: 'Email' },
-    { field: 'employeeNumber', headerName: 'Employee Number' },
+    { field: 'employeeNumber', headerName: 'Teacher Number' },
     {
       field: 'contractPeriod',
       headerName: 'Contract Period',
       render: (value: any, row: any) =>
         `${row.contractStartDate} - ${row.contractEndDate}`,
     },
+    { field: 'status', headerName: 'Status' },
     { field: 'hourlyRate', headerName: 'Hourly Rate' },
   ];
 

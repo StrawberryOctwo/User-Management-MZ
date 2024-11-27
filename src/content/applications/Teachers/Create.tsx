@@ -6,7 +6,10 @@ import UploadSection from 'src/components/Files/UploadDocuments';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
 import { addDocument } from 'src/services/fileUploadService';
-import { assignTeacherToLocations, fetchLocations } from 'src/services/locationService';
+import {
+  assignTeacherToLocations,
+  fetchLocations
+} from 'src/services/locationService';
 import { addTeacher } from 'src/services/teacherService';
 import { assignTeacherToTopics, fetchTopics } from 'src/services/topicService';
 import { generateEmployeeNumber } from 'src/utils/teacherUtils';
@@ -14,208 +17,362 @@ import { TextField } from '@mui/material';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
 
 const CreateTeacher = () => {
-    const [selectedLocations, setSelectedLocations] = useState<any[]>([]);
-    const [selectedTopics, setSelectedTopics] = useState<any[]>([]);
-    const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
-    const [loading, setLoading] = useState(false);
-    const [employeeNumber, setEmployeeNumber] = useState(''); // Only tracking employeeNumber
-    const { showMessage } = useSnackbar();
+  const [selectedLocations, setSelectedLocations] = useState<any[]>([]);
+  const [selectedTopics, setSelectedTopics] = useState<any[]>([]);
+  const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [employeeNumber, setEmployeeNumber] = useState('');
+  const { showMessage } = useSnackbar();
 
-    // Function to generate the employee number based on form data
-    const handleGenerateEmployeeNumber = (formData: { firstName: string; lastName: string; dob: string }) => {
-        if (formData.firstName && formData.lastName && formData.dob) {
-            const generatedEmployeeNumber = generateEmployeeNumber(formData.firstName, formData.lastName, formData.dob);
-            setEmployeeNumber(generatedEmployeeNumber); // Update the employeeNumber state
-        } else {
-            alert('Please fill in First Name, Last Name, and Date of Birth before generating the employee number.');
+  const handleGenerateEmployeeNumber = (formData: {
+    firstName: string;
+    lastName: string;
+    dob: string;
+  }) => {
+    if (formData.firstName && formData.lastName && formData.dob) {
+      const generatedEmployeeNumber = generateEmployeeNumber(
+        formData.firstName,
+        formData.lastName,
+        formData.dob
+      );
+      setEmployeeNumber(generatedEmployeeNumber);
+    } else {
+      alert(
+        'Please fill in First Name, Last Name, and Date of Birth before generating the employee number.'
+      );
+    }
+  };
+
+  const handleLocationSelect = (selectedItems: any[]) => {
+    setSelectedLocations(selectedItems);
+  };
+
+  const handleTopicSelect = (selectedItems: any[]) => {
+    setSelectedTopics(selectedItems);
+  };
+
+  const handleFilesChange = (files: any[]) => {
+    setUploadedFiles(files);
+  };
+
+  const handleTeacherSubmit = async (
+    data: Record<string, any>
+  ): Promise<{ message: string }> => {
+    if (selectedLocations.length == 0) {
+      showMessage('Locations field is required', 'error');
+      return;
+    }
+    if (selectedTopics.length == 0) {
+      showMessage("Topics field can't be empty", 'error');
+      return;
+    }
+    setLoading(true);
+    try {
+      const locationIds = selectedLocations.map((location) => location.id);
+      const topicIds = selectedTopics.map((topic) => topic.id);
+
+      const payload = {
+        user: {
+          firstName: data.firstName,
+          lastName: data.lastName,
+          dob: data.dob,
+          email: data.email,
+          password: data.password,
+          city: data.city,
+          address: data.address,
+          postalCode: data.postalCode,
+          phoneNumber: data.phoneNumber
+        },
+        teacher: {
+          status: data.status,
+          employeeNumber: employeeNumber,
+          idNumber: data.idNumber,
+          taxNumber: data.taxNumber,
+          contractStartDate: data.contractStartDate,
+          contractEndDate: data.contractEndDate,
+          hourlyRate: data.hourlyRate,
+          rateMultiplier: data.rateMultiplier,
+          sessionRateMultiplier: data.sessionRateMultiplier,
+          bank: data.bank,
+          iban: data.iban,
+          bic: data.bic
         }
-    };
+      };
 
-    const handleLocationSelect = (selectedItems: any[]) => {
-        setSelectedLocations(selectedItems);
-    };
+      const response = await addTeacher(payload);
+      await assignTeacherToLocations(response.teacherId, locationIds);
+      await assignTeacherToTopics(response.teacherId, topicIds);
 
-    const handleTopicSelect = (selectedItems: any[]) => {
-        setSelectedTopics(selectedItems);
-    };
+      const userId = response.userId;
+      for (const file of uploadedFiles) {
+        const documentPayload = {
+          type: file.fileType,
+          customFileName: file.fileName,
+          userId: userId
+        };
+        await addDocument(documentPayload, file.file);
+      }
 
-    const handleFilesChange = (files: any[]) => {
-        setUploadedFiles(files);
-    };
+      setSelectedLocations([]);
+      setSelectedTopics([]);
+      setTimeout(() => {
+        window.location.reload();
+      }, 2000);
+      return response;
+    } catch (error: any) {
+      console.error('Error adding teacher:', error);
+      throw error;
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const handleTeacherSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
+  const statusOptions = [
+    { label: t('active'), value: 'active' },
+    { label: t('inactive'), value: 'inactive' },
+    { label: t('interested'), value: 'interested' }
+  ];
 
-        if (selectedLocations.length == 0) {
-            showMessage("Locations field is required", 'error')
-            return
-        }
-        if (selectedTopics.length == 0) {
-            showMessage("Topics field can't be empty", 'error')
-            return
-        }
-        setLoading(true);
-        try {
-            const locationIds = selectedLocations.map(location => location.id);
-            const topicIds = selectedTopics.map(topic => topic.id);
+  const userFields: FieldConfig[] = [
+    {
+      name: 'firstName',
+      label: t('first_name'),
+      type: 'text',
+      required: true,
+      section: 'User Information'
+    },
+    {
+      name: 'lastName',
+      label: t('last_name'),
+      type: 'text',
+      required: true,
+      section: 'User Information'
+    },
+    {
+      name: 'dob',
+      label: t('dob'),
+      type: 'date',
+      required: true,
+      section: 'User Information'
+    },
+    {
+      name: 'email',
+      label: t('email'),
+      type: 'email',
+      required: true,
+      section: 'User Information'
+    },
+    {
+      name: 'password',
+      label: t('password'),
+      type: 'password',
+      required: true,
+      section: 'User Information'
+    },
+    {
+      name: 'city',
+      label: t('city'),
+      type: 'text',
+      required: true,
+      section: 'User Information'
+    },
+    {
+      name: 'address',
+      label: t('address'),
+      type: 'text',
+      required: true,
+      section: 'User Information'
+    },
+    {
+      name: 'postalCode',
+      label: t('postal_code'),
+      type: 'text',
+      required: true,
+      section: 'User Information'
+    },
+    {
+      name: 'phoneNumber',
+      label: t('phone_number'),
+      type: 'number',
+      required: true,
+      section: 'User Information'
+    }
+  ];
 
-            const payload = {
-                user: {
-                    firstName: data.firstName,  // Using the value entered in the form fields
-                    lastName: data.lastName,    // Using the value entered in the form fields
-                    dob: data.dob,              // Using the value entered in the form fields
-                    email: data.email,
-                    password: data.password,
-                    address: data.address,
-                    postalCode: data.postalCode,
-                    phoneNumber: data.phoneNumber,
-                },
-                teacher: {
-                    employeeNumber: employeeNumber, // Use the generated employee number
-                    idNumber: data.idNumber,
-                    taxNumber: data.taxNumber,
-                    contractStartDate: data.contractStartDate,
-                    contractEndDate: data.contractEndDate,
-                    hourlyRate: data.hourlyRate,
-                    rateMultiplier : data.rateMultiplier,
-                    sessionRateMultiplier : data.sessionRateMultiplier,
-                    bank: data.bank,
-                    iban: data.iban,
-                    bic: data.bic,
-                }
-            };
-
-            const response = await addTeacher(payload);
-            await assignTeacherToLocations(response.teacherId, locationIds);
-            await assignTeacherToTopics(response.teacherId, topicIds);
-
-            const userId = response.userId;
-            for (const file of uploadedFiles) {
-                const documentPayload = {
-                    type: file.fileType,
-                    customFileName: file.fileName,
-                    userId: userId,
-                };
-                await addDocument(documentPayload, file.file);
+  const teacherFields = [
+    {
+      name: 'status',
+      label: t('status'),
+      type: 'select',
+      required: true,
+      section: 'Teacher Information',
+      options: statusOptions
+    },
+    {
+      name: 'hourlyRate',
+      label: 'Hourly Rate',
+      type: 'number',
+      required: true,
+      section: 'Teacher Information'
+    },
+    {
+      name: 'rateMultiplier',
+      label: 'rateMultiplier',
+      type: 'number',
+      required: true,
+      section: 'Teacher Information'
+    },
+    {
+      name: 'sessionRateMultiplier',
+      label: 'sessionRateMultiplier',
+      type: 'number',
+      required: true,
+      section: 'Teacher Information'
+    },
+    {
+      name: 'taxNumber',
+      label: 'Tax Number',
+      type: 'text',
+      required: true,
+      section: 'Teacher Information'
+    },
+    {
+      name: 'employeeNumber',
+      label: 'Teacher Number',
+      type: 'custom',
+      required: true,
+      section: 'Teacher Information',
+      component: (
+        <Box display="flex" alignItems="center" gap={1} sx={{ width: '95%' }}>
+          <TextField
+            label="Teacher Number *"
+            value={employeeNumber}
+            variant="outlined"
+            fullWidth
+            InputProps={{
+              readOnly: true
+            }}
+          />
+          <Button
+            variant="contained"
+            onClick={() =>
+              handleGenerateEmployeeNumber({
+                firstName:
+                  document.querySelector<HTMLInputElement>('[name="firstName"]')
+                    ?.value || '',
+                lastName:
+                  document.querySelector<HTMLInputElement>('[name="lastName"]')
+                    ?.value || '',
+                dob:
+                  document.querySelector<HTMLInputElement>('[name="dob"]')
+                    ?.value || ''
+              })
             }
-
-            setSelectedLocations([]);
-            setSelectedTopics([]);
-            return response;
-        } catch (error: any) {
-            console.error("Error adding teacher:", error);
-            throw error;
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const userFields: FieldConfig[] = [
-        { name: 'firstName', label: t('first_name'), type: 'text', required: true, section: 'User Information' },
-        { name: 'lastName', label: t('last_name'), type: 'text', required: true, section: 'User Information' },
-        { name: 'dob', label: t('dob'), type: 'date', required: true, section: 'User Information' },
-        { name: 'email', label: t('email'), type: 'email', required: true, section: 'User Information' },
-        { name: 'password', label: t('password'), type: 'password', required: true, section: 'User Information' },
-        { name: 'address', label: t('address'), type: 'text', required: true, section: 'User Information' },
-        { name: 'postalCode', label: t('postal_code'), type: 'text', required: true, section: 'User Information' },
-        { name: 'phoneNumber', label: t('phone_number'), type: 'text', required: true, section: 'User Information' },
-    ];
-
-    const teacherFields = [
-        { name: 'hourlyRate', label: 'Hourly Rate', type: 'number', required: true, section: 'Teacher Information' },
-        { name: 'rateMultiplier', label: 'rateMultiplier', type: 'number', required: true, section: 'Teacher Information' },
-        { name: 'sessionRateMultiplier', label: 'sessionRateMultiplier', type: 'number', required: true, section: 'Teacher Information' },
-        { name: 'taxNumber', label: 'Tax Number', type: 'text', required: true, section: 'Teacher Information' },
-        {
-            name: 'employeeNumber',
-            label: 'Employee Number',
-            type: 'custom',
-            required: true,
-            section: 'Teacher Information',
-            component: (
-                <Box display="flex" alignItems="center" gap={1} sx={{ width: '95%' }}>
-                    <TextField
-                        label="Employee Number *"
-                        value={employeeNumber}
-                        variant="outlined"
-                        fullWidth
-                        InputProps={{
-                            readOnly: true,
-                        }}
-                    />
-                    <Button
-                        variant="contained"
-                        onClick={() =>
-                            handleGenerateEmployeeNumber({
-                                firstName: document.querySelector<HTMLInputElement>('[name="firstName"]')?.value || '',
-                                lastName: document.querySelector<HTMLInputElement>('[name="lastName"]')?.value || '',
-                                dob: document.querySelector<HTMLInputElement>('[name="dob"]')?.value || '',
-                            })
-                        }
-                        sx={{ height: '50px' }} // Matching the height of TextField for better alignment
-                    >
-                        Generate
-                    </Button>
-                </Box>
-            ),
-        },
-        { name: 'idNumber', label: 'ID Number', type: 'text', required: false, section: 'Teacher Information' },
-        { name: 'contractStartDate', label: 'Contract Start Date', type: 'date', required: true, section: 'Teacher Information' },
-        { name: 'contractEndDate', label: 'Contract End Date', type: 'date', required: true, section: 'Teacher Information' },
-        { name: 'bank', label: 'Bank', type: 'text', required: true, section: 'Bank Details' },
-        { name: 'iban', label: 'IBAN', type: 'text', required: true, section: 'Bank Details' },
-        { name: 'bic', label: 'BIC', type: 'text', required: false, section: 'Bank Details' },
-        {
-            name: 'locations',
-            label: 'Locations',
-            type: 'custom',
-            required: true,
-            section: 'Teacher Assignment',
-            component: (
-                <MultiSelectWithCheckboxes
-                    label={t('Search_and_assign_locations')}
-                    fetchData={(query) => fetchLocations(1, 5, query).then((data) => data.data)}
-                    onSelect={handleLocationSelect}
-                    displayProperty="name"
-                    placeholder="Type to search locations"
-                />
-            ),
-        },
-        {
-            name: 'topics',
-            label: 'Topics',
-            type: 'custom',
-            section: 'Teacher Assignment',
-            component: (
-                <MultiSelectWithCheckboxes
-                    label={t('Search_and_assign_topics')}
-                    fetchData={(query) => fetchTopics(1, 5, query, 'name').then((data) => data.data)}
-                    onSelect={handleTopicSelect}
-                    displayProperty="name"
-                    placeholder="Type to search topics"
-                />
-            ),
-        },
-        {
-            name: 'documents',
-            label: 'Upload Documents',
-            type: 'custom',
-            section: 'Documents',
-            component: <UploadSection onUploadChange={handleFilesChange} />,
-            xs: 12,
-            sm: 12,
-        }
-    ];
-
-    return (
-        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-            <ReusableForm
-                fields={[...userFields, ...teacherFields]} // Merge both field arrays
-                onSubmit={handleTeacherSubmit}
-                entityName="Teacher"
-                entintyFunction='Add'
-            />
+            sx={{ height: '50px' }}
+          >
+            Generate
+          </Button>
         </Box>
-    );
+      )
+    },
+    {
+      name: 'idNumber',
+      label: 'ID Number',
+      type: 'text',
+      required: false,
+      section: 'Teacher Information'
+    },
+    {
+      name: 'contractStartDate',
+      label: 'Contract Start Date',
+      type: 'date',
+      required: true,
+      section: 'Teacher Information'
+    },
+    {
+      name: 'contractEndDate',
+      label: 'Contract End Date',
+      type: 'date',
+      required: true,
+      section: 'Teacher Information'
+    },
+    {
+      name: 'bank',
+      label: 'Bank',
+      type: 'text',
+      required: true,
+      section: 'Bank Details'
+    },
+    {
+      name: 'iban',
+      label: 'IBAN',
+      type: 'text',
+      required: true,
+      section: 'Bank Details'
+    },
+    {
+      name: 'bic',
+      label: 'BIC',
+      type: 'text',
+      required: false,
+      section: 'Bank Details'
+    },
+    {
+      name: 'locations',
+      label: 'Locations',
+      type: 'custom',
+      required: true,
+      section: 'Teacher Assignment',
+      component: (
+        <MultiSelectWithCheckboxes
+          label={t('Search_and_assign_locations')}
+          fetchData={(query) =>
+            fetchLocations(1, 5, query).then((data) => data.data)
+          }
+          onSelect={handleLocationSelect}
+          displayProperty="name"
+          placeholder="Type to search locations"
+        />
+      )
+    },
+    {
+      name: 'topics',
+      label: 'Topics',
+      type: 'custom',
+      section: 'Teacher Assignment',
+      component: (
+        <MultiSelectWithCheckboxes
+          label={t('Search_and_assign_topics')}
+          fetchData={(query) =>
+            fetchTopics(1, 5, query, 'name').then((data) => data.data)
+          }
+          onSelect={handleTopicSelect}
+          displayProperty="name"
+          placeholder="Type to search topics"
+        />
+      )
+    },
+    {
+      name: 'documents',
+      label: 'Upload Documents',
+      type: 'custom',
+      section: 'Documents',
+      component: <UploadSection onUploadChange={handleFilesChange} />,
+      xs: 12,
+      sm: 12
+    }
+  ];
+
+  return (
+    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+      <ReusableForm
+        fields={[...userFields, ...teacherFields]}
+        onSubmit={handleTeacherSubmit}
+        entityName="Teacher"
+        entintyFunction="Add"
+      />
+    </Box>
+  );
 };
 
 export default CreateTeacher;

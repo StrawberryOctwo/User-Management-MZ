@@ -9,6 +9,7 @@ import { fetchTeacherById, fetchTeacherDocumentsById } from 'src/services/teache
 import ReusableDetails from 'src/components/View';
 import FileActions from 'src/components/Files/FileActions';
 import { getPaymentsForUser, updatePaymentStatus } from 'src/services/paymentService';
+import { processAvailabilities } from 'src/utils/teacherUtils';
 
 const ViewTeacherPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -27,6 +28,7 @@ const ViewTeacherPage: React.FC = () => {
 
         try {
             const teacherData = await fetchTeacherById(Number(id));
+            teacherData.availabilities=processAvailabilities(teacherData.availabilities);
             setTeacher(teacherData);
 
             const teacherDocuments = await fetchTeacherDocumentsById(Number(id));
@@ -65,6 +67,7 @@ const ViewTeacherPage: React.FC = () => {
         { name: 'user.lastName', label: t('last_name'), section: t('user_details') },
         { name: 'user.dob', label: t('dob'), section: t('user_details') },
         { name: 'user.email', label: t('email'), section: t('user_details') },
+        { name: 'user.city', label: t('city'), section: t('user_details') },
         { name: 'user.address', label: t('address'), section: t('user_details') },
         { name: 'user.postalCode', label: t('postal_code'), section: t('user_details') },
         { name: 'user.phoneNumber', label: t('phone_Number'), section: t('user_details') },
@@ -99,6 +102,19 @@ const ViewTeacherPage: React.FC = () => {
             ),
         },
         {
+            name: 'availabilities',
+            label: t('availabilities'),
+            section: t('availabilities'),
+            isArray: true,
+            columns: [
+                { field: 'dayOfWeek', headerName: t('dayOfWeek'), flex: 1 },
+                { field: 'startTime', headerName: t('startTime'), flex: 1 },
+                { field: 'endTime', headerName: t('endTime'), flex: 1 },
+                { field: 'updatedAt', headerName: t('lastUpdatedAt'), flex: 1 },
+            ],
+        },
+        
+        {
             name: 'locations',
             label: t('locations'),
             section: t('locations'),
@@ -108,7 +124,7 @@ const ViewTeacherPage: React.FC = () => {
                 { field: 'franchise.name', headerName: t('franchise_name'), flex: 1 },
                 { field: 'address', headerName: t('address'), flex: 1 },
                 { field: 'postalCode', headerName: t('postal_code'), flex: 1 },
-                { field: 'created_at', headerName: t('created_date'), flex: 1 },
+                { field: 'createdAt', headerName: t('created_date'), flex: 1 },
                 {
                     field: 'actions',
                     headerName: t('actions'),
@@ -126,8 +142,8 @@ const ViewTeacherPage: React.FC = () => {
                 },
             ],
         },
-       ,
-    
+        
+
         {
             name: 'documents',
             label: t('documents'),
@@ -158,6 +174,7 @@ const ViewTeacherPage: React.FC = () => {
         'user.lastName': teacher?.user?.lastName,
         'user.dob': formattedDob,
         'user.email': teacher?.user?.email,
+        'user.city': teacher?.user?.city,
         'user.address': teacher?.user?.address,
         'user.postalCode': teacher?.user?.postalCode,
         'user.phoneNumber': teacher?.user?.phoneNumber,
@@ -166,7 +183,7 @@ const ViewTeacherPage: React.FC = () => {
         'locations': teacher?.locations.map((location: any) => ({
             ...location,
             'franchise.name': location?.franchise?.name,
-            created_at: location.created_at ? format(new Date(location.created_at), 'dd-MM-yyyy') : '',
+            createdAt: location.createdAt ? format(new Date(location.createdAt), 'dd-MM-yyyy') : '',
         })),
         'topics': teacher?.topics,
         'documents': documents,
@@ -185,7 +202,7 @@ const ViewTeacherPage: React.FC = () => {
                     />
                 )
             )}
-                       <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
+            <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
                 <DialogTitle>{t('update_payment_status')}</DialogTitle>
                 <DialogContent>
                     <Select
@@ -202,7 +219,7 @@ const ViewTeacherPage: React.FC = () => {
                     <Button onClick={handleCloseDialog} color="secondary">
                         {t('cancel')}
                     </Button>
-                    <Button  color="primary">
+                    <Button color="primary">
                         {t('submit')}
                     </Button>
                 </DialogActions>

@@ -12,18 +12,34 @@ export const createSurvey = async (title: string, questions: { text: string, typ
 };
 
 // Fetch all surveys with pagination
-export const fetchAllSurveys = async (page: number = 1, limit: number = 10) => {
+export const fetchAllSurveys = async (
+    page: number = 1,
+    limit: number = 10,
+    search: string = '',
+    options: { signal?: AbortSignal } = {}
+  ) => {
     try {
-        const response = await api.get('/surveys', {
-            params: { page, limit },
-        });
-        return response.data;
+      const response = await api.get('/surveys', {
+        params: { page, limit, search },
+        signal: options.signal, // Pass the signal for request cancellation
+      });
+      return response.data;
     } catch (error) {
-        console.error('Error fetching surveys:', error);
-        throw error;
+      console.error('Error fetching surveys:', error);
+      throw error;
     }
-};
-
+  };
+export const getSurveyAnswers = async (surveyId, page = 1, limit = 10,sort = '',search='') => {
+    try {
+      const response = await api.get(`surveys/${surveyId}/answers`, {
+        params: { page, limit, search, sort },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching survey answers:', error);
+      throw error;
+    }
+  };
 // Fetch a survey by ID
 export const fetchSurveyById = async (surveyId: number) => {
     try {
@@ -46,7 +62,7 @@ export const skipSurveyForSelf = async (surveyId: number) => {
 };
 
 // Update a survey by ID, including updating questions
-export const updateSurvey = async (surveyId: number, title: string, questions: { text: string, type: string, options: string[] }[]) => {
+export const updateSurvey = async (surveyId: string, title: string, questions: { text: string, type: string, options: string[] }[]) => {
     try {
         const response = await api.put(`/survey/${surveyId}`, { title, questions });
         return response.data;
@@ -68,10 +84,10 @@ export const deleteSurvey = async (surveyId: number) => {
 };
 
 // Submit survey responses (this example assumes a separate endpoint for responses)
-export const getSurveysForSelf = async (page = 1, limit = 10) => {
+export const getSurveysForSelf = async (page = 1, limit = 10,search='') => {
     try {
         const response = await api.get('/surveys/self', {
-            params: { page, limit },
+            params: { page, limit,search },
         });
         return response.data;
     } catch (error) {

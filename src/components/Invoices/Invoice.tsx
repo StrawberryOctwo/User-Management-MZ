@@ -26,7 +26,7 @@ export default function InvoiceComponent() {
   // Generate PDF once invoice data is loaded
   useEffect(() => {
     if (invoiceData) {
-      generateInvoicePDF(invoiceData);
+      // generateInvoicePDF(invoiceData);
       setInvoiceData(null); // Reset invoice data after generating the PDF to avoid repeated generation
     }
   }, [invoiceData]);

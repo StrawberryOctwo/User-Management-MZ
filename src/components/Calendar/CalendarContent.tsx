@@ -11,8 +11,10 @@ import CalendarLegend from './Components/CalendarLegend';
 import { useAuth } from 'src/hooks/useAuth';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import {
-  addClassSessions,
+  Holiday,
   fetchClassSessions,
+  fetchClosingDaysByLocationIds,
+  fetchHolidaysByLocationIds,
   fetchParentClassSessions,
   fetchUserClassSessions
 } from 'src/services/classSessionService';
@@ -22,6 +24,8 @@ const CalendarContent: React.FC = () => {
   const [classSessionEvents, setClassSessionEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [holidays, setHolidays] = useState<Holiday[]>([]);
+  const [closingDays, setClosingDays] = useState<Holiday[]>([]);
   const [startDate, setStartDate] = useState<string>(
     moment().startOf('month').format('YYYY-MM-DD')
   );
@@ -32,7 +36,7 @@ const CalendarContent: React.FC = () => {
   const [selectedFranchise, setSelectedFranchise] = useState<any | null>(null);
   const [selectedLocations, setSelectedLocations] = useState<any[]>([]); // Updated to array
   const [strongestRole, setStrongestRole] = useState<string | null>(null);
-
+  const [parentNbOfRooms, setParentNbOfRooms] = useState<number>(0);
   const { userId, userRoles } = useAuth();
   // const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
 
@@ -64,7 +68,9 @@ const CalendarContent: React.FC = () => {
       setSelectedFranchise(JSON.parse(savedFranchise));
     }
     if (savedLocations) {
-      setSelectedLocations(JSON.parse(savedLocations));
+      const parsedLocations = JSON.parse(savedLocations);
+      setSelectedLocations(parsedLocations);
+      fetchSpecialDays(parsedLocations);
     }
   }, []);
 
@@ -77,6 +83,7 @@ const CalendarContent: React.FC = () => {
         setSelectedLocations(storedLocations);
       }
       loadClassSessions(storedLocations);
+      fetchSpecialDays(storedLocations);
     };
 
     calendarsharedService.on('absenceUpdated', onAbsenceUpdated);
@@ -87,42 +94,47 @@ const CalendarContent: React.FC = () => {
   }, []);
 
   const transformClassSessionsToEvents = (
-    classSessions: any[]
+    classSessions: any[],
   ): EventItem[] => {
+    // console.log('classSessions:', classSessions);
+    if (classSessions === undefined) return [];
     return classSessions.map((session) => {
-      const resource = session.name || 1;
-      const teacherName = session.teacher?.user
-        ? `${session.teacher.user.firstName} ${session.teacher.user.lastName}`
-        : 'Unknown Teacher';
+      const resource = session.room || 'R2';
 
-      const studentsWithStatus = session.students.map((student) => ({
-        firstName: student.firstName,
-        absenceStatus: student.absenceStatus,
-        gradeLevel: student.gradeLevel
-      }));
+      const studentsWithStatus = session.students.map(
+        (student: {
+          firstName: string;
+          gradeLevel: string;
+          abscenceStatus: boolean;
+        }) => ({
+          firstName: student.firstName,
+          gradeLevel: student.gradeLevel,
+          absenceStatus: student.abscenceStatus
+        })
+      );
 
       return {
-        start: moment(session.sessionStartDate).toDate(),
-        end: moment(session.sessionEndDate).toDate(),
         data: {
           appointment: {
             id: session.id,
-            status: session.isActive,
+            sessionId: session.sessionId,
+            status: session.status,
             location: session.location?.name || 'Unknown Location',
             topic: session.topic?.name || 'Unknown Topic',
-            resource: session.name || 'Unknown Teacher',
+            resource: session.room || 'Unknown Teacher',
             address: session.location || 'Unknown address',
-            className: session.name,
-            teacher: teacherName,
+            className: session.room,
+            teacher: session.teacherName,
             studentCount: session.students.length,
-            students: studentsWithStatus, // Array of first names of students
-            startTime: moment(session.sessionStartDate).format('HH:mm'),
-            endTime: moment(session.sessionEndDate).format('HH:mm'),
+            students: studentsWithStatus,
+            startTime: session.startTime,
+            endTime: session.endTime,
             sessionType: session.sessionType,
             reportStatus: session.reportStatus,
+            date: session.date
           }
         },
-        resourceId: resource
+        resourceId: resource,
       };
     });
   };
@@ -133,7 +145,9 @@ const CalendarContent: React.FC = () => {
 
     try {
       let response;
-      const locationIds = locations.map((location) => location.id);
+      const validLocations = Array.isArray(locations) ? locations : [];
+      const locationIds = validLocations.map((location) => location.id);
+
       switch (strongestRole) {
         case 'Teacher':
         case 'Student':
@@ -142,6 +156,14 @@ const CalendarContent: React.FC = () => {
             date,
             date
           );
+          if (
+            JSON.stringify(response.userLocations) !==
+            JSON.stringify(selectedLocations)
+          ) {
+            setSelectedLocations(response.userLocations);
+          }
+          const teacherEvents = transformClassSessionsToEvents(response.sessionInstances);
+          setClassSessionEvents(teacherEvents);
           break;
         case 'Parent':
           response = await fetchParentClassSessions(
@@ -149,27 +171,47 @@ const CalendarContent: React.FC = () => {
             date,
             date
           );
+          const parentEvents = transformClassSessionsToEvents(response.sessionInstances,);
+          setParentNbOfRooms(response.numberOfRooms);
+          setClassSessionEvents(parentEvents);
           break;
         case 'SuperAdmin':
         case 'FranchiseAdmin':
         case 'LocationAdmin':
-          if (locations.length === 0) {
+          if (validLocations.length === 0) {
             return;
           }
           response = await fetchClassSessions(date, date, locationIds);
+          const adminEvents = transformClassSessionsToEvents(response.sessionInstances);
+          setClassSessionEvents(adminEvents);
           break;
         default:
           console.error('Invalid role: Unrecognized role encountered.');
           throw new Error('Invalid role');
       }
-
-      const events = transformClassSessionsToEvents(response.data);
-      setClassSessionEvents(events);
     } catch (error) {
       console.error('Failed to load class sessions', error);
       setErrorMessage('Failed to load class sessions. Please try again.');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchSpecialDays = async (locations: any[]) => {
+    try {
+      if (locations.length === 0) return;
+
+      const locationIds = locations.map((loc) => loc.id);
+
+      const [holidaysResponse, closingDaysResponse] = await Promise.all([
+        fetchHolidaysByLocationIds(locationIds),
+        fetchClosingDaysByLocationIds(locationIds)
+      ]);
+
+      setHolidays(holidaysResponse.data);
+      setClosingDays(closingDaysResponse.data);
+    } catch (error) {
+      console.error('Error fetching special days:', error);
     }
   };
 
@@ -184,24 +226,6 @@ const CalendarContent: React.FC = () => {
       calendarsharedService.off('absenceUpdated', onAbsenceUpdated);
     };
   }, []);
-
-  const handleSaveClassSession = async (
-    newSessionArray: any[],
-    callback?: () => void
-  ) => {
-    try {
-      for (const session of newSessionArray) {
-        const sessionPayload = {
-          ...session,
-          locationId: session.locationId || selectedLocations[0]?.id || 0
-        };
-        await addClassSessions(sessionPayload);
-      }
-      loadClassSessions();
-    } catch (error) {
-      console.error('Failed to add class sessions:', error);
-    }
-  };
 
   const handleFranchiseChange = (franchise: any) => {
     setSelectedFranchise(franchise);
@@ -216,13 +240,15 @@ const CalendarContent: React.FC = () => {
   };
 
   const handleLocationsChange = (locations: any[]) => {
-    // Updated to multiple locations
     setSelectedLocations(locations);
     setClassSessionEvents([]);
     if (locations.length > 0) {
       localStorage.setItem('selectedLocations', JSON.stringify(locations));
+      fetchSpecialDays(locations);
     } else {
       localStorage.removeItem('selectedLocations');
+      setHolidays([]);
+      setClosingDays([]);
     }
   };
 
@@ -231,11 +257,10 @@ const CalendarContent: React.FC = () => {
       strongestRole &&
       (strongestRole !== 'SuperAdmin' || selectedLocations.length > 0)
     ) {
+      fetchSpecialDays(selectedLocations);
       loadClassSessions();
     }
   }, [date, selectedFranchise, selectedLocations, strongestRole]);
-
- 
 
   return (
     <Box sx={{ position: 'relative', height: '74vh' }}>
@@ -254,9 +279,11 @@ const CalendarContent: React.FC = () => {
         <CustomizedCalendar
           classSessionEvents={classSessionEvents}
           onDateChange={setDate}
-          handleSaveClassSession={handleSaveClassSession}
           loadClassSessions={loadClassSessions}
           selectedLocations={selectedLocations}
+          holidays={holidays}
+          closingDays={closingDays}
+          parentNumberOfRooms={parentNbOfRooms}
         />
         {selectedLocations.length === 0 &&
           strongestRole !== 'Teacher' &&

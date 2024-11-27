@@ -48,7 +48,7 @@ export default function FileUploadContent() {
       render: (value, row) => `${row.user?.firstName || ''} ${row.user?.lastName || ''}`
     },
     {
-      field: 'created_at',
+      field: 'createdAt',
       headerName: 'Created At',
       render: (value) => new Date(value).toLocaleDateString()
     },

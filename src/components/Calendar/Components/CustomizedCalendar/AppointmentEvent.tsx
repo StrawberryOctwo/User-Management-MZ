@@ -1,10 +1,10 @@
-import { Box, Typography } from "@mui/material";
-import { AppointmentStatusCode, EVENT_STATUS_COLORS } from "../../constants";
-import { Appointment } from "../../types";
+import { Box, Typography } from '@mui/material';
+import { AppointmentStatusCode, EVENT_STATUS_COLORS } from '../../constants';
+import { Appointment } from '../../types';
 
 export default function AppointmentEvent({
   appointment,
-  isMonthView,
+  isMonthView
 }: {
   appointment: Appointment;
   isMonthView?: boolean;
@@ -18,10 +18,10 @@ export default function AppointmentEvent({
     studentCount,
     startTime,
     endTime,
-    sessionType,
+    sessionType
   } = appointment;
 
-  type EventStatusOrType = AppointmentStatusCode | "Online" | "Group" | "1on1";
+  type EventStatusOrType = AppointmentStatusCode | 'Online' | 'Group' | '1on1';
 
   function isEventStatusOrType(value: any): value is EventStatusOrType {
     return value in EVENT_STATUS_COLORS;
@@ -31,28 +31,28 @@ export default function AppointmentEvent({
   const background =
     (isEventStatusOrType(sessionType) && EVENT_STATUS_COLORS[sessionType]) ||
     (isEventStatusOrType(status) && EVENT_STATUS_COLORS[status]) ||
-    "#ffffff"; // Default color if none matches
+    '#ffffff'; // Default color if none matches
 
   const borderColor =
-    (sessionType === "Online" && "#c17ab7") || // Stronger lavender
-    (sessionType === "Group" && "#ffb74d") || // Stronger peach
-    (sessionType === "1on1" && "#81c784") || // Stronger green
-    "#000000"; // Default to black if no match
+    (sessionType === 'Online' && '#c17ab7') || // Stronger lavender
+    (sessionType === 'Group' && '#ffb74d') || // Stronger peach
+    (sessionType === '1on1' && '#81c784') || // Stronger green
+    '#000000'; // Default to black if no match
 
   return (
     <Box
       sx={{
         backgroundColor: background, // Maintain original background color
         border: `2px solid ${borderColor}`, // Add border with strong color
-        borderRadius: "4px", // Optional: Rounded corners
+        borderRadius: '4px', // Optional: Rounded corners
         padding: 1,
-        height: "100%",
-        boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)", // Optional: Subtle shadow
-        color: "black",
-        ...(isMonthView ? { overflow: "hidden", height: 56 } : {}),
+        height: '100%',
+        boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)', // Optional: Subtle shadow
+        color: 'black',
+        ...(isMonthView ? { overflow: 'hidden', height: 56 } : {})
       }}
     >
-      <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
+      <Box sx={{ display: 'flex', flexDirection: 'column', height: '100%' }}>
         <Typography fontSize={15} variant="subtitle2" fontWeight="bold">
           {topic} - {className}
         </Typography>
@@ -61,13 +61,9 @@ export default function AppointmentEvent({
         </Typography>
 
         <Typography fontSize={13} variant="caption" mt={1} fontWeight="bold">
-          {teacher ? teacher : "Unknown Teacher"}
+          {teacher ? teacher : 'Unknown Teacher'}
         </Typography>
-        {location && (
-          <Typography variant="caption">
-            {location}
-          </Typography>
-        )}
+        {location && <Typography variant="caption">{location}</Typography>}
         {/* <Typography variant="caption"to">
           Students: {studentCount}
         </Typography> */}

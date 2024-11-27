@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import Box from '@mui/material/Box';
 import Grid from '@mui/material/Grid';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
@@ -25,20 +25,32 @@ const FilterToolbar: React.FC<FilterToolbarProps> = ({
   userRole,
 }) => {
   const [franchiseId, setFranchiseId] = useState<number | null>(null);
-  const [isLocationEnabled, setIsLocationEnabled] = useState(!!selectedFranchise);
+  const [isLocationEnabled, setIsLocationEnabled] = useState(
+    !!selectedFranchise || userRole === 'LocationAdmin'
+  );
   const { userRoles } = useAuth();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
   const hasFranchiseAccess = strongestRoles.includes('SuperAdmin') || strongestRoles.includes('FranchiseAdmin');
+  const isLocationAdmin = strongestRoles.includes('LocationAdmin');
+  const locationRef = useRef<any>(null); // Ref for MultiSelectWithCheckboxes
 
   useEffect(() => {
     if (selectedFranchise) {
       setFranchiseId(selectedFranchise.id);
     }
-  }, [selectedFranchise]);
+    // Update `isLocationEnabled` whenever `selectedFranchise` changes
+    setIsLocationEnabled(!!selectedFranchise || isLocationAdmin);
+  }, [selectedFranchise, isLocationAdmin]);
 
   const handleFranchiseChange = (franchise: any) => {
     setFranchiseId(franchise?.id || null);
-    setIsLocationEnabled(!!franchise?.id);
+    setIsLocationEnabled(!!franchise?.id || isLocationAdmin);
+
+    onLocationsChange([]);
+    if (locationRef.current) {
+      locationRef.current.reset(); // Reset the MultiSelectWithCheckboxes input
+    }
+
     onFranchiseChange(franchise);
   };
 
@@ -57,7 +69,9 @@ const FilterToolbar: React.FC<FilterToolbarProps> = ({
           <Grid item xs={12} sm={12} md={3} sx={{ ml: 2 }}>
             <SingleSelectWithAutocomplete
               label="Select Franchise"
-              fetchData={(query) => fetchFranchises(1, 5, query).then((data) => data.data)}
+              fetchData={(query) =>
+                fetchFranchises(1, 5, query).then((data) => data.data)
+              }
               onSelect={handleFranchiseChange}
               displayProperty="name"
               placeholder="Search Franchise"
@@ -67,6 +81,7 @@ const FilterToolbar: React.FC<FilterToolbarProps> = ({
         )}
         <Grid item xs={12} sm={12} md={3} sx={{ ml: 1, mr: 2, pl: 0 }}>
           <MultiSelectWithCheckboxes
+            ref={locationRef}
             label={t('Search_and_assign_locations')}
             fetchData={(query) => {
               if (hasFranchiseAccess && franchiseId) {
@@ -75,11 +90,12 @@ const FilterToolbar: React.FC<FilterToolbarProps> = ({
                 return fetchLocations(1, 5, query).then((response) => response.data);
               }
             }}
-            onSelect={handleLocationsChange}  // Updated to handle multiple locations
+            onSelect={handleLocationsChange}
             displayProperty="name"
             placeholder="Type to search locations"
             initialValue={selectedLocations}
             width="100%"
+            disabled={!isLocationEnabled}
           />
         </Grid>
       </Grid>
