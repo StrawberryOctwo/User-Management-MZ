@@ -178,7 +178,7 @@ const generateParentInvoicePDF = async (invoice, preview = false) => {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.download = `direct-debit-${invoice.invoiceId}.xml`;
+        link.download = `${parentName}-direct-debit-${invoice.invoiceId}.xml`;
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);
@@ -205,7 +205,7 @@ const generateParentInvoicePDF = async (invoice, preview = false) => {
         const pdfURL = URL.createObjectURL(pdfBlob);
         window.open(pdfURL, '_blank');
     } else {
-        doc.save(`parent-invoice-${invoice.invoiceId}.pdf`);
+        doc.save(`${parentName}-invoice-${invoice.invoiceId}.pdf`);
         downloadSEPA();
     }
 };

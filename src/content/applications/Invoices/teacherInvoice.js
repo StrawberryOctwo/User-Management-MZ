@@ -192,7 +192,7 @@ const generateTeacherInvoicePDF = async (invoice, teacher, preview = false) => {
       const url = URL.createObjectURL(blob);
       const link = document.createElement('a');
       link.href = url;
-      link.download = `sepa-invoice-${invoice.invoiceId}.xml`;
+      link.download = `${teacher.user.firstName}-${teacher.user.lastName}-sepa-invoice-${invoice.invoiceId}.xml`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -206,7 +206,7 @@ const generateTeacherInvoicePDF = async (invoice, teacher, preview = false) => {
       window.open(pdfURL, '_blank');
   } else {
       // Download PDF
-      doc.save(`teacher-invoice-${invoice.invoiceId}.pdf`);
+      doc.save(`${teacher.user.firstName}-${teacher.user.lastName}-invoice-${invoice.invoiceId}.pdf`);
 
       // Download SEPA XML
       downloadSEPA();
