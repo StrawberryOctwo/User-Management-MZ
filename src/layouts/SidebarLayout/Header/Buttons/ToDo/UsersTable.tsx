@@ -1,4 +1,3 @@
-// UsersTable.tsx
 import React from 'react';
 import {
     Table,
@@ -58,6 +57,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
                             const isLastInRole =
                                 index === array.length - 1 ||
                                 user.roles[0] !== array[index + 1]?.roles[0];
+                            const isLastRow = index === array.length - 1;
 
                             return (
                                 <React.Fragment key={user.userId || user.id}>
@@ -76,7 +76,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
                                             </IconButton>
                                         </TableCell>
                                     </TableRow>
-                                    {isLastInRole && (
+                                    {isLastInRole && !isLastRow && (
                                         <TableRow>
                                             <TableCell
                                                 colSpan={4}
