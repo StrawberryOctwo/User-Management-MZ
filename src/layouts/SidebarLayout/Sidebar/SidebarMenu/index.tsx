@@ -431,7 +431,7 @@ function SidebarMenu() {
                 </ListItem>
               </ProtectedListItem>
               <ProtectedListItem
-                allowedRoles={['Teacher', 'Parent']}
+                allowedRoles={['FranchiseAdmin','Teacher', 'Parent']}
               >
                 <ListItem component="div">
                   <Button

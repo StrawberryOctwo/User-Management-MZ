@@ -47,6 +47,7 @@ type DemoProps = {
   selectedLocations: any[];
   holidays: Holiday[];
   closingDays: Holiday[];
+  parentNumberOfRooms: Number;
 };
 
 export default function CustomizedCalendar({
@@ -55,7 +56,8 @@ export default function CustomizedCalendar({
   loadClassSessions,
   selectedLocations,
   holidays,
-  closingDays
+  closingDays,
+  parentNumberOfRooms
 }: DemoProps) {
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
   const [selectedClassSessionId, setSelectedClassSession] = useState<any>(null);
@@ -94,10 +96,12 @@ export default function CustomizedCalendar({
   const isHandlingClick = useRef(false);
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
   const resources = useMemo(() => {
-    const maxRooms = selectedLocations.reduce(
-      (max, location) => Math.max(max, location.numberOfRooms || 0),
-      0
-    );
+    const maxRooms = strongestRoles[0] === 'Parent'
+      ? parentNumberOfRooms
+      : selectedLocations.reduce(
+        (max, location) => Math.max(max, location.numberOfRooms || 0),
+        0
+      );
 
     const unsortedResources = Array.from({ length: maxRooms }, (_, index) => ({
       id: `R${index + 1}`,
@@ -106,7 +110,7 @@ export default function CustomizedCalendar({
     }));
 
     return unsortedResources.sort((a, b) => a.sortOrder - b.sortOrder);
-  }, [selectedLocations]);
+  }, [selectedLocations, strongestRoles, classSessionEvents]);
 
   useEffect(() => {
     const mappedEvents = classSessionEvents.map((session) => {
@@ -142,24 +146,24 @@ export default function CustomizedCalendar({
 
     const holidayMatch = holidays?.length
       ? holidays.find((holiday) =>
-          moment(dateStr).isBetween(
-            holiday.start_date,
-            holiday.end_date,
-            'day',
-            '[]'
-          )
+        moment(dateStr).isBetween(
+          holiday.start_date,
+          holiday.end_date,
+          'day',
+          '[]'
         )
+      )
       : null;
 
     const closingDayMatch = closingDays?.length
       ? closingDays.find((closingDay) =>
-          moment(dateStr).isBetween(
-            closingDay.start_date,
-            closingDay.end_date,
-            'day',
-            '[]'
-          )
+        moment(dateStr).isBetween(
+          closingDay.start_date,
+          closingDay.end_date,
+          'day',
+          '[]'
         )
+      )
       : null;
 
     return {

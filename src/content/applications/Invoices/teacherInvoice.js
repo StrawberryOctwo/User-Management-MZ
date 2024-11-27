@@ -1,8 +1,8 @@
 import jsPDF from 'jspdf';
 import 'jspdf-autotable';
-
+import SEPA from 'sepa';
 /**
- * Generates a professional and polished PDF invoice for a teacher.
+ * Generates a professional PDF invoice for a teacher and creates a SEPA XML for payment.
  *
  * @param {Object} invoice - The invoice data.
  * @param {Object} teacher - The teacher data.
@@ -14,13 +14,13 @@ const generateTeacherInvoicePDF = async (invoice, teacher, preview = false) => {
         unit: 'mm',
         format: 'a4',
     });
-
     // Helper Functions
     const formatDate = (date) => new Date(date).toLocaleDateString('de-DE');
     const formatCurrency = (amount) => `€${Number(amount).toFixed(2)}`;
     const loadImage = (src) =>
         new Promise((resolve, reject) => {
             const img = new Image();
+            img.crossOrigin = 'Anonymous'; // Handle cross-origin if needed
             img.onload = () => resolve(img);
             img.onerror = reject;
             img.src = src;
@@ -36,22 +36,31 @@ const generateTeacherInvoicePDF = async (invoice, teacher, preview = false) => {
     try {
         if (teacher.locations[0].franchise.franchiseLogo) {
             const logo = await loadImage(teacher.locations[0].franchise.franchiseLogo);
-            doc.addImage(logo, 'PNG', 150, 10, 26, 26); // Logo sized 26x26
+            // Convert the image to a data URL
+            const canvas = document.createElement('canvas');
+            canvas.width = logo.width;
+            canvas.height = logo.height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(logo, 0, 0);
+            const logoDataURL = canvas.toDataURL('image/png');
+            doc.addImage(logoDataURL, 'PNG', 150, 10, 26, 26); // Logo sized 26x26
         }
     } catch (error) {
         console.warn('Teacher logo could not be loaded:', error);
     }
 
+    // Title
     doc.setFont('helvetica', 'bold').setFontSize(20).setTextColor(33, 37, 41);
     doc.text('Honorarabrechnung', 15, 20); // Left-aligned title
 
+    // Invoice Information
     doc.setFont('helvetica', 'normal').setFontSize(12).setTextColor(99, 110, 114);
     doc.text(`Rechnung Nr.: ${invoice.invoiceId}`, 15, 28);
     doc.text(`Datum: ${invoiceDate}`, 15, 34);
 
-    // Add a huge line for separation
+    // Separation Line
     doc.setDrawColor(0); // Black color
-    doc.setLineWidth(0.5); // Thick line
+    doc.setLineWidth(0.5); // Line width
     doc.line(15, 40, 195, 40);
 
     // Teacher and Franchise Details Section
@@ -142,14 +151,66 @@ const generateTeacherInvoicePDF = async (invoice, teacher, preview = false) => {
     doc.setFontSize(12);
     doc.text('- Empfehlen Sie uns an Ihre Freunde & Familie weiter -', 105, closingY + 26, { align: 'center' });
 
-    // Finalize PDF
-    if (preview) {
-        const pdfBlob = doc.output('blob');
-        const pdfURL = URL.createObjectURL(pdfBlob);
-        window.open(pdfURL, '_blank');
-    } else {
-        doc.save(`teacher-invoice-${invoice.invoiceId}.pdf`);
+
+
+    const sepaDoc = new SEPA.Document('pain.001.001.09');
+
+    // Group Header
+    sepaDoc.grpHdr.id = `INV-${invoice.invoiceId}`;
+    sepaDoc.grpHdr.created = new Date(invoice.createdAt);
+    sepaDoc.grpHdr.initiatorName = teacher.locations[0].franchise.name || 'Franchise Name';
+
+// Payment Information
+    const paymentInfo = sepaDoc.createPaymentInfo();
+    paymentInfo.requestedExecutionDate = new Date(invoice.createdAt); // Execution date
+    paymentInfo.debtorIBAN = teacher.locations[0].franchise.iban; // Franchise IBAN
+    if (teacher.bic) {
+        paymentInfo.debtorBIC = teacher.locations[0].franchise.bic; // Franchise BIC (optional)
     }
+    paymentInfo.debtorName = teacher.locations[0].franchise.name; // Franchise Name
+    sepaDoc.addPaymentInfo(paymentInfo);
+
+    // Transaction Details
+    const transaction = paymentInfo.createTransaction();
+    transaction.creditorName = `${teacher.user.firstName} ${teacher.user.lastName}`;
+    transaction.creditorIBAN = teacher.iban; // Teacher IBAN
+    if (teacher.bic) {
+        transaction.creditorBIC = teacher.bic; // Teacher BIC (optional)
+    }
+    transaction.amount = Number(invoice.totalAmount);
+    transaction.remittanceInfo = `Rechnung ${invoice.invoiceId}`; // Payment Reference
+    transaction.end2endId = `INV-${invoice.invoiceId}`; // Unique Transaction ID
+    paymentInfo.addTransaction(transaction);
+
+
+  // Convert SEPA XML to string
+  const sepaXML = sepaDoc.toString();
+
+  // Handle SEPA XML (e.g., download or send to server)
+  const downloadSEPA = () => {
+      const blob = new Blob([sepaXML], { type: 'application/xml' });
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${teacher.user.firstName}-${teacher.user.lastName}-sepa-invoice-${invoice.invoiceId}.xml`;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+  };
+
+  // Finalize PDF and SEPA XML
+  if (preview) {
+      // Preview PDF
+      const pdfBlob = doc.output('blob');
+      const pdfURL = URL.createObjectURL(pdfBlob);
+      window.open(pdfURL, '_blank');
+  } else {
+      // Download PDF
+      doc.save(`${teacher.user.firstName}-${teacher.user.lastName}-invoice-${invoice.invoiceId}.pdf`);
+
+      // Download SEPA XML
+      downloadSEPA();
+  }
 };
 
 export default generateTeacherInvoicePDF;

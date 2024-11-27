@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Button } from '@mui/material';
+import { Box, Button, IconButton, Tooltip } from '@mui/material';
 import ReusableTable from 'src/components/Table';
 import { fetchInvoiceById, fetchUserInvoices } from 'src/services/invoiceService';
 import { useAuth } from 'src/hooks/useAuth';
@@ -7,6 +7,7 @@ import ViewInvoiceDetails from 'src/components/Invoices/ViewInvoiceDetails';
 import generateTeacherInvoicePDF from './teacherInvoice';
 import { fetchTeacherById, fetchTeacherByUserId, fetchTeacherInvoiceInfoByUserId } from 'src/services/teacherService';
 import generateParentInvoicePDF from './parentInvoice';
+import { Visibility, Download } from '@mui/icons-material';
 
 export default function ViewInvoices() {
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -17,19 +18,20 @@ export default function ViewInvoices() {
   const [limit, setLimit] = useState(25);
   const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false);
   const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null);
-  const { userId,userRoles } = useAuth();
+
+  const { userId, userRoles } = useAuth();
   const isMounted = useRef(false); // Check if component is mounted
 
   // Handle component mount and unmount
   useEffect(() => {
+    isMounted.current = true;
     if (userId) {
       loadUserInvoices();
     }
-    else {
-      isMounted.current = true;
-    }
 
- 
+    return () => {
+      isMounted.current = false;
+    };
   }, [userId, page, limit]);
 
   const loadUserInvoices = async () => {
@@ -51,22 +53,65 @@ export default function ViewInvoices() {
     }
   };
 
-  const handleDownloadPDF = async (invoiceId: number) => {
+  const handlePreviewPDF = async (invoiceId: number, invoiceUserId: number) => {
     try {
-      const invoiceData = await fetchInvoiceById(invoiceId, userId);
+      let fetchingUserId = userRoles.includes('FranchiseAdmin') ? invoiceUserId : userId;
+      const invoiceData = await fetchInvoiceById(invoiceId, fetchingUserId);
       if (userRoles.includes('Parent')) {
-        if (isMounted.current) generateParentInvoicePDF(invoiceData,true);
-      } else if (userRoles.includes('Teacher')){
-        // Fetch additional teacher data if not a parent
-        const teacherData = await fetchTeacherInvoiceInfoByUserId(userId);
-        if (isMounted.current) generateTeacherInvoicePDF(invoiceData, teacherData,true);
-      }  } catch (error) {
+        if (isMounted.current) generateParentInvoicePDF(invoiceData, true);
+      } else if (userRoles.includes('Teacher')) {
+        const teacherData = await fetchTeacherInvoiceInfoByUserId(fetchingUserId);
+        if (isMounted.current) generateTeacherInvoicePDF(invoiceData, teacherData, true);
+      } else if (userRoles.includes('FranchiseAdmin')) {
+        if (invoiceData.student) {
+          console.log(invoiceData);
+          if (isMounted.current) generateParentInvoicePDF(invoiceData, true);
+        } else {
+          const teacherData = await fetchTeacherInvoiceInfoByUserId(fetchingUserId);
+          if (isMounted.current) generateTeacherInvoicePDF(invoiceData, teacherData, true);
+        }
+      }
+    } catch (error) {
+      console.error('Error generating invoice PDF:', error);
+    }
+  };
+  const handleDownloadPDF = async (invoiceId: number, invoiceUserId: number) => {
+    try {
+      let fetchingUserId = userRoles.includes('FranchiseAdmin') ? invoiceUserId : userId;
+      const invoiceData = await fetchInvoiceById(invoiceId, fetchingUserId);
+      if (userRoles.includes('Parent')) {
+        if (isMounted.current) generateParentInvoicePDF(invoiceData, true);
+      } else if (userRoles.includes('Teacher')) {
+        const teacherData = await fetchTeacherInvoiceInfoByUserId(fetchingUserId);
+        if (isMounted.current) generateTeacherInvoicePDF(invoiceData, teacherData, true);
+      } else if (userRoles.includes('FranchiseAdmin')) {
+        if (invoiceData.student) {
+          console.log(invoiceData);
+          if (isMounted.current) generateParentInvoicePDF(invoiceData, false);
+        } else {
+          const teacherData = await fetchTeacherInvoiceInfoByUserId(fetchingUserId);
+          if (isMounted.current) generateTeacherInvoicePDF(invoiceData, teacherData, false);
+        }
+      }
+    } catch (error) {
       console.error('Error generating invoice PDF:', error);
     }
   };
 
+
   const columns = [
     { field: 'invoiceId', headerName: 'Invoice ID' },
+    {
+      field: 'firstName',
+      headerName: 'First Name',
+      render: (value: any, row: any) => row.user.firstName,
+    },
+    {
+      field: 'lastName',
+      headerName: 'Last Name',
+      render: (value: any, row: any) => row.user.lastName,
+    },
+
     { field: 'totalAmount', headerName: 'Total Amount' },
     { field: 'status', headerName: 'Status' },
     {
@@ -79,29 +124,40 @@ export default function ViewInvoices() {
       headerName: 'Actions',
       render: (value: any, row: any) => (
         <div>
-
-          <Button
-            variant="outlined"
-            color="secondary"
-            size="small"
-            onClick={() => handleDownloadPDF(row.id)}
-          >
-            Download PDF
-          </Button>
+          {/* View PDF Icon Button */}
+          <Tooltip title="View Invoice">
+            <IconButton
+              color="secondary"
+              size="small"
+              onClick={() => handlePreviewPDF(row.id, row.user.id)}
+            >
+              <Visibility />
+            </IconButton>
+          </Tooltip>
+    
+          {/* Conditionally Render Download PDF Icon Button for FranchiseAdmin */}
+          {userRoles.includes('FranchiseAdmin') && (
+            <Tooltip title="Download Sepa & Invoice">
+              <IconButton
+                color="primary"
+                size="small"
+                onClick={() => handleDownloadPDF(row.id, row.user.id)}
+              >
+                <Download />
+              </IconButton>
+            </Tooltip>
+          )}
         </div>
       ),
     },
+    
   ];
-
-
 
   const handlePageChange = (newPage: number) => setPage(newPage);
   const handleLimitChange = (newLimit: number) => {
     setLimit(newLimit);
     setPage(0);
   };
-
-
 
   if (errorMessage) return <div>{errorMessage}</div>;
 
@@ -119,8 +175,6 @@ export default function ViewInvoices() {
         onLimitChange={handleLimitChange}
         showDefaultActions={false}
       />
-
-  
     </Box>
   );
 }
