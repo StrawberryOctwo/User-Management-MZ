@@ -38,9 +38,10 @@ import CloseIcon from '@mui/icons-material/Close';
 import RoleBasedComponent from 'src/components/ProtectedComponent';
 import MultiSelectWithCheckboxesNoSelect from 'src/components/SearchBars/MultiSelectWithCkeckboxesNoSelect';
 import { useAuth } from 'src/hooks/useAuth';
-import { fetchAssignedUsersForTodo } from 'src/services/todoService';
+import { fetchAssignedUsersForTodo, removeUserFromToDo } from 'src/services/todoService';
 import { styled, alpha, useTheme } from '@mui/material/styles';
 import UsersTable from './UsersTable';
+import ConfirmationDialog from 'src/components/Calendar/Components/Modals/ConfirmationDialog';
 
 interface User {
     id?: number;
@@ -50,6 +51,12 @@ interface User {
     email: string;
     roles: string[];
     completed: boolean;
+}
+
+interface UserToRemove {
+    user: User;
+    role: string;
+    isNewlySelected: boolean;
 }
 
 interface CustomRoleDialogProps {
@@ -134,6 +141,8 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
     const [total, setTotal] = useState(0);
     const [loading, setLoading] = useState(false);
     const [newlySelectedUsers, setNewlySelectedUsers] = useState<User[]>([]);
+    const [userToRemove, setUserToRemove] = useState<UserToRemove | null>(null);
+    const [confirmOpen, setConfirmOpen] = useState(false);
     const [initialAssignees, setInitialAssignees] = useState<User[]>([]);
     const [snackbar, setSnackbar] = useState<{
         open: boolean;
@@ -265,19 +274,6 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
         });
     };
 
-    // Modified handleRemoveUser to handle both tables
-    const handleRemoveUser = (role: string, userToRemove: User, isNewlySelected: boolean) => {
-        if (isNewlySelected) {
-            setNewlySelectedUsers(prev => prev.filter(user =>
-                !(user.userId === userToRemove.userId || user.id === userToRemove.id)
-            ));
-        } else {
-            setInitialAssignees(prev => prev.filter(user =>
-                !(user.userId === userToRemove.userId || user.id === userToRemove.id)
-            ));
-        }
-    };
-
     const filterOutAssignedUsers = async (role: string, fetchFunction: (query: string) => Promise<any[]>, query: string) => {
         try {
             const fetchedUsers = await fetchFunction(query);
@@ -297,6 +293,51 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
             return [];
         }
     };
+
+    const handleRemoveUser = (role: string, user: User, isNewlySelected: boolean) => {
+        setUserToRemove({ user, role, isNewlySelected });
+        setConfirmOpen(true);
+    };
+
+    const handleConfirmRemove = async () => {
+        if (!userToRemove || !selectedCustomTodoId) return;
+
+        const { user, isNewlySelected } = userToRemove;
+        const userId = user.userId || user.id;
+
+        try {
+            if (!isNewlySelected) {
+                // Only call API for already assigned users
+                await removeUserFromToDo(selectedCustomTodoId, userId);
+            }
+
+            // Update local state
+            if (isNewlySelected) {
+                setNewlySelectedUsers(prevUsers =>
+                    prevUsers.filter(currentUser =>
+                        (currentUser.userId || currentUser.id) !== userId
+                    )
+                );
+            } else {
+                setInitialAssignees(prevUsers =>
+                    prevUsers.filter(currentUser =>
+                        (currentUser.userId || currentUser.id) !== userId
+                    )
+                );
+            }
+        } catch (error) {
+            console.error('Error removing user:', error);
+        } finally {
+            setConfirmOpen(false);
+            setUserToRemove(null);
+        }
+    };
+
+    const handleCloseConfirm = () => {
+        setConfirmOpen(false);
+        setUserToRemove(null);
+    };
+
 
     return (
         <Dialog open={open} onClose={onClose} fullWidth maxWidth="md">
@@ -507,6 +548,16 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                     </Button>
                 )}
             </DialogActions>
+
+            <ConfirmationDialog
+                open={confirmOpen}
+                onClose={handleCloseConfirm}
+                onConfirm={handleConfirmRemove}
+                title="Confirm Remove User"
+                content={userToRemove ? `Are you sure you want to remove ${userToRemove.user.firstName} ${userToRemove.user.lastName}?` : ''}
+                confirmButtonText="Remove"
+                confirmButtonColor="error"
+            />
         </Dialog>
     );
 };

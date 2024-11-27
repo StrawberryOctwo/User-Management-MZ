@@ -125,6 +125,16 @@ export const deleteToDo = async (todoId: number) => {
   }
 };
 
+export const removeUserFromToDo = async (todoId: number, userId: number) => {
+  try {
+    const response = await api.delete(`/todos/${todoId}/users/${userId}`);
+    return response.data;
+  } catch (error) {
+    console.error('Error removing user from ToDo:', error);
+    throw error;
+  }
+};
+
 export const assignToDoToUsers = async (todoId: number, userIds: number[]) => {
   try {
     const response = await api.put(`/todos/${todoId}/assign-users`, { userIds });
