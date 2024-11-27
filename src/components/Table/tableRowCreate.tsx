@@ -15,6 +15,7 @@ import {
   InputAdornment,
   IconButton
 } from '@mui/material';
+import { isValid as isValidIBAN } from 'iban';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 
 export interface FieldConfig {
@@ -44,6 +45,9 @@ export interface FieldConfig {
       value: number;
       message: string;
     };
+    iban?: {
+      message: string;
+    };
   };
 }
 
@@ -64,14 +68,19 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
 }) => {
   const getInitialFormData = () => {
     return fields.reduce((acc, field) => {
-      // Use initialValue from field config, fallback to initialData, or sensible default
-      acc[field.name] =
-        field.initialValue ??
-        initialData[field.name] ??
-        (field.type === 'number' ? 0 : '');
+      const initialValue =
+        field.initialValue ?? initialData[field.name] ?? (field.type === 'number' ? 0 : '');
+      acc[field.name] = initialValue;
+
+      // Validate IBAN for pre-filled values
+      if (field.name === 'iban') {
+        acc[`${field.name}_valid`] = isValidIBAN(initialValue || '');
+      }
+
       return acc;
     }, {} as Record<string, any>);
   };
+
 
   const [formData, setFormData] = useState<Record<string, any>>(
     getInitialFormData()
@@ -87,16 +96,24 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
     {}
   );
 
+  const initializeTouchedFields = () => {
+    return fields.reduce((acc, field) => {
+      if (field.name === 'iban' && initialData[field.name] && !isValidIBAN(initialData[field.name])) {
+        acc[field.name] = true; // Mark IBAN field as touched if invalid
+      }
+      return acc;
+    }, {} as Record<string, boolean>);
+  };
+
   useEffect(() => {
     if (Object.keys(initialData).length > 0) {
       setFormData(getInitialFormData());
+      setTouchedFields(initializeTouchedFields());
 
-      // If initialData has a logo URL, set it as the preview
       if (initialData.franchiseLogo) {
-        setLogoPreview(initialData.franchiseLogo); // Assuming initialData.franchiseLogo is a URL string
+        setLogoPreview(initialData.franchiseLogo);
       }
     }
-    // Cleanup function to revoke object URL on unmount
     return () => {
       if (logoPreview && logoPreview.startsWith('blob:')) {
         URL.revokeObjectURL(logoPreview);
@@ -104,11 +121,21 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
     };
   }, [initialData, fields]);
 
-  // Handler for TextField and other input changes
   const handleInputChange: React.ChangeEventHandler<
     HTMLInputElement | HTMLTextAreaElement
   > = (event) => {
     const { name, value } = event.target;
+
+    if (name === 'iban') {
+      const isValid = isValidIBAN(value);
+      setFormData((prev) => ({
+        ...prev,
+        [name]: value,
+        [`${name}_valid`]: isValid
+      }));
+      return;
+    }
+
     setFormData((prev) => ({
       ...prev,
       [name!]: value
@@ -151,6 +178,12 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
+
+    if (!isValidIBAN(formData.iban)) {
+      alert('Please enter a valid IBAN.');
+      return;
+    }
+
     try {
       const response = await onSubmit(formData);
       if (entintyFunction.toLowerCase() === 'add') {
@@ -262,9 +295,7 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
                       }
                       sx={{ width: '95%' }}
                       value={
-                        field.type === 'logo_file'
-                          ? undefined
-                          : formData[field.name] ?? ''
+                        field.type === 'logo_file' ? undefined : formData[field.name] ?? ''
                       }
                       onChange={field.onChange || handleInputChange}
                       required={field.required}
@@ -275,23 +306,23 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
                       InputProps={
                         field.type === 'password'
                           ? {
-                              endAdornment: (
-                                <InputAdornment position="end">
-                                  <IconButton
-                                    onClick={() =>
-                                      togglePasswordVisibility(field.name)
-                                    }
-                                    edge="end"
-                                  >
-                                    {passwordVisibility[field.name] ? (
-                                      <VisibilityOff />
-                                    ) : (
-                                      <Visibility />
-                                    )}
-                                  </IconButton>
-                                </InputAdornment>
-                              )
-                            }
+                            endAdornment: (
+                              <InputAdornment position="end">
+                                <IconButton
+                                  onClick={() =>
+                                    togglePasswordVisibility(field.name)
+                                  }
+                                  edge="end"
+                                >
+                                  {passwordVisibility[field.name] ? (
+                                    <VisibilityOff />
+                                  ) : (
+                                    <Visibility />
+                                  )}
+                                </IconButton>
+                              </InputAdornment>
+                            )
+                          }
                           : undefined
                       }
                       inputProps={{
@@ -300,19 +331,22 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
                         pattern: field.validation?.pattern?.value.source
                       }}
                       error={
-                        !!field.validation?.pattern?.value &&
-                        !new RegExp(field.validation.pattern.value).test(
-                          formData[field.name]
-                        )
+                        (field.name === 'iban' && formData[field.name] && !formData[`${field.name}_valid`]) ||
+                        (!!field.validation?.pattern?.value &&
+                          !new RegExp(field.validation.pattern.value).test(formData[field.name]))
                       }
                       helperText={
-                        touchedFields[field.name] &&
-                        !!field.validation?.pattern?.value &&
-                        !new RegExp(field.validation.pattern.value).test(
-                          formData[field.name]
-                        )
-                          ? field.validation?.pattern?.message
-                          : ''
+                        field.name === 'iban'
+                          ? touchedFields[field.name] &&
+                            formData[field.name] &&
+                            !formData[`${field.name}_valid`]
+                            ? 'Invalid iban format. Please enter a valid IBAN.'
+                            : ''
+                          : touchedFields[field.name] &&
+                            !!field.validation?.pattern?.value &&
+                            !new RegExp(field.validation.pattern.value).test(formData[field.name])
+                            ? field.validation?.pattern?.message
+                            : ''
                       }
                       onBlur={() =>
                         setTouchedFields((prev) => ({
