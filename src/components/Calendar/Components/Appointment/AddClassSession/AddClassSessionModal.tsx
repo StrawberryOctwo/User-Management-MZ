@@ -41,7 +41,7 @@ const AddClassSessionModal: React.FC<AddClassSessionModalProps> = ({
     if (
       !session.startDate ||
       !(session.startDate instanceof Date) ||
-      session.startDate < now
+      (session.startDate < now && session.startDate.toDateString() !== now.toDateString())
     )
       return false;
 
