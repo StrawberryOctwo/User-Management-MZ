@@ -1,9 +1,10 @@
-import { Avatar, Box, Button, useTheme } from '@mui/material';
+import { Box, Button, useTheme } from '@mui/material';
 import SendTwoToneIcon from '@mui/icons-material/SendTwoTone';
 import { user, MessageInputWrapper } from './styles';
 import { useAuth } from 'src/hooks/useAuth';
 import { sendMessage } from 'src/services/chatService';
 import { useState } from 'react';
+import AvatarWithInitials from '../../utils/Avatar';
 
 function BottomBarContent() {
   const theme = useTheme();
@@ -30,11 +31,7 @@ function BottomBarContent() {
       }}
     >
       <Box flexGrow={1} display="flex" alignItems="center">
-        <Avatar
-          sx={{ display: { xs: 'none', sm: 'flex' }, mr: 1 }}
-          alt={user.name}
-          src={user.avatar}
-        />
+        <AvatarWithInitials firstName="John" lastName="Doe" />
         <MessageInputWrapper
           autoFocus
           placeholder="Write your message here..."
