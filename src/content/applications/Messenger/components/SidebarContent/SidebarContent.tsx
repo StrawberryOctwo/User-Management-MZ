@@ -169,8 +169,8 @@ function SidebarContent() {
                     }}
                     primary={displayName}
                     secondary={
-                      typeof chat.lastMessage === 'string'
-                        ? chat.lastMessage
+                      typeof chat.lastMessage.content === 'string'
+                        ? chat.lastMessage.content
                         : 'No Recent Messages'
                     }
                   />
