@@ -13,7 +13,9 @@ export const AvatarSuccess = styled(Avatar)(
 
 export const RootWrapper = styled(Box)(
   ({ theme }) => `
-        padding: ${theme.spacing(2.5)};
+        padding: ${theme.spacing(1)} ${theme.spacing(2.5)} ${theme.spacing(
+    2.5
+  )} ${theme.spacing(2.5)};
   `
 );
 

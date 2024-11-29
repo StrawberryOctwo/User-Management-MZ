@@ -2,26 +2,54 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import ScheduleTwoToneIcon from '@mui/icons-material/ScheduleTwoTone';
 import { formatDistance } from 'date-fns';
+import { io } from 'socket.io-client';
 import {
   DividerWrapper,
   CardWrapperPrimary,
   CardWrapperSecondary
 } from './styles';
-import {
-  fetchMessages,
-  formatDateDivider
-} from '../../utils/chat';
+import { fetchMessages, formatDateDivider } from '../../utils/chat';
 import AvatarWithInitials from '../../utils/Avatar';
 import { useAuth } from 'src/hooks/useAuth';
+import { useChat } from '../../context/ChatContext';
+
+const SOCKET_SERVER_URL =
+  process.env.REACT_APP_SOCKET_SERVER_URL || 'http://localhost:4000';
 
 function ChatContent() {
   const [messages, setMessages] = useState([]);
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
   const { userId } = useAuth();
+  const { chatRoomId, firstName, lastName } = useChat();
 
   useEffect(() => {
-    fetchMessages(setMessages, setLoading);
-  }, []);
+    if (!chatRoomId) return;
+
+    fetchMessages(chatRoomId, setMessages, setLoading);
+
+    const socket = io(SOCKET_SERVER_URL, {
+      withCredentials: true,
+      extraHeaders: {
+        Authorization: `Bearer ${localStorage.getItem('token')}`
+      }
+    });
+
+    socket.on('connect', () => {
+      console.log('Connected to WebSocket server');
+    });
+
+    socket.on('newMessage', (message) => {
+      setMessages((prevMessages) => [...prevMessages, message]);
+    });
+
+    socket.on('disconnect', () => {
+      console.log('Disconnected from WebSocket server');
+    });
+
+    return () => {
+      socket.disconnect();
+    };
+  }, [chatRoomId]);
 
   return (
     <Box p={3}>
@@ -29,7 +57,7 @@ function ChatContent() {
         <Box display="flex" justifyContent="center" mt={2}>
           <CircularProgress />
         </Box>
-      ) : messages.length === 0 ? (
+      ) : !Array.isArray(messages) || messages.length === 0 ? (
         <Box
           display="flex"
           justifyContent="center"
@@ -60,7 +88,7 @@ function ChatContent() {
               );
             }
 
-            const isSender = message.sender.id === userId;
+            const isSender = message.sender?.id === userId;
 
             acc.push(
               <Box
@@ -72,8 +100,8 @@ function ChatContent() {
               >
                 {!isSender && (
                   <AvatarWithInitials
-                    firstName={message.sender.firstName}
-                    lastName={message.sender.lastName}
+                    firstName={message.sender?.firstName}
+                    lastName={message.sender?.lastName}
                   />
                 )}
                 <Box
@@ -111,7 +139,10 @@ function ChatContent() {
                   </Typography>
                 </Box>
                 {isSender && (
-                  <AvatarWithInitials firstName="Ahmad" lastName="Jaffal" />
+                  <AvatarWithInitials
+                    firstName={firstName}
+                    lastName={lastName}
+                  />
                 )}
               </Box>
             );

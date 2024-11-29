@@ -9,13 +9,20 @@ interface AvatarWithInitialsProps {
 }
 
 const AvatarWithInitials: React.FC<AvatarWithInitialsProps> = ({
-  firstName,
-  lastName,
+  firstName = 'Jhon',
+  lastName = 'Doe',
   avatarUrl,
-  size = 50 // Default size is 50
+  size = 40
 }) => {
+  const isValidName = (name: string) => {
+    return /^[a-zA-Z]+$/.test(name);
+  };
+
   const getInitials = () => {
-    return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+    if (isValidName(firstName) && isValidName(lastName)) {
+      return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
+    }
+    return '??'; // Default initials if names are invalid
   };
 
   return (

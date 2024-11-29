@@ -1,31 +1,54 @@
-import React, { createContext, useState, useContext, ReactNode } from 'react';
+import React, {
+  createContext,
+  useState,
+  useContext,
+  ReactNode,
+  useEffect
+} from 'react';
+import { useAuth } from 'src/hooks/useAuth';
 
-// Define the shape of the context data
-interface ChatContextData {
-  chatRoomId: string | null;
-  participantsIds: string[];
-  setChatRoomId: (id: string | null) => void;
-  setParticipantsIds: (ids: string[]) => void;
+interface Participant {
+  id: number;
+  firstName: string;
+  lastName: string;
 }
 
-// Create the context with default values
+interface ChatContextData {
+  chatRoomId: number | null;
+  participants: Participant[];
+  setChatRoomId: (id: number | null) => void;
+  setParticipants: (participants: Participant[]) => void;
+  firstName: string;
+  lastName: string;
+}
+
 const ChatContext = createContext<ChatContextData>({
   chatRoomId: null,
-  participantsIds: [],
+  participants: [],
   setChatRoomId: () => {},
-  setParticipantsIds: () => {}
+  setParticipants: () => {},
+  firstName: '',
+  lastName: ''
 });
 
-// Create a provider component
 export const ChatProvider: React.FC<{ children: ReactNode }> = ({
   children
 }) => {
-  const [chatRoomId, setChatRoomId] = useState<string | null>(null);
-  const [participantsIds, setParticipantsIds] = useState<string[]>([]);
+  const { username } = useAuth();
+  const [chatRoomId, setChatRoomId] = useState<number | null>(null);
+  const [participants, setParticipants] = useState<Participant[]>([]);
+  const [firstName, lastName] = username ? username.split(' ') : ['User', ''];
 
   return (
     <ChatContext.Provider
-      value={{ chatRoomId, participantsIds, setChatRoomId, setParticipantsIds }}
+      value={{
+        chatRoomId,
+        participants,
+        setChatRoomId,
+        setParticipants,
+        firstName,
+        lastName
+      }}
     >
       {children}
     </ChatContext.Provider>

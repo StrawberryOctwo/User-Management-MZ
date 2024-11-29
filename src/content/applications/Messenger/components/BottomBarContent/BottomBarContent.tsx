@@ -5,17 +5,19 @@ import { useAuth } from 'src/hooks/useAuth';
 import { sendMessage } from 'src/services/chatService';
 import { useState } from 'react';
 import AvatarWithInitials from '../../utils/Avatar';
+import { useChat } from '../../context/ChatContext';
 
 function BottomBarContent() {
   const theme = useTheme();
   const { userId } = useAuth();
+  const { firstName, lastName } = useChat();
   const [message, setMessage] = useState('');
 
   const handleSendMessage = async (content: string) => {
     try {
       if (!content) return;
-      const response = await sendMessage(userId, content);
-      console.log('Message sent:', response);
+      await sendMessage(userId, content);
+      setMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
     }
@@ -30,8 +32,8 @@ function BottomBarContent() {
         p: 2
       }}
     >
-      <Box flexGrow={1} display="flex" alignItems="center">
-        <AvatarWithInitials firstName="John" lastName="Doe" />
+      <Box flexGrow={1} display="flex" alignItems="center" gap={1}>
+        <AvatarWithInitials firstName={firstName} lastName={lastName} />
         <MessageInputWrapper
           autoFocus
           placeholder="Write your message here..."

@@ -13,12 +13,18 @@ interface Message {
 }
 
 export const fetchMessages = async (
+  chatRoomId: number,
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
   setLoading: React.Dispatch<React.SetStateAction<boolean>>
 ) => {
+  setLoading(true);
   try {
-    const response = await getAllMessages(1);
-    setMessages(Array.isArray(response) ? response : []);
+    const response = await getAllMessages(chatRoomId);
+    if (response.messages.length === 0) {
+      setMessages([]);
+      return;
+    }
+    setMessages(response.messages);
   } catch (error) {
     console.error('Error fetching messages:', error);
     setMessages([]);

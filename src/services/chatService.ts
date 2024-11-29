@@ -12,7 +12,6 @@ export const createOrGetChatRoom = async (user2Id: number) => {
   }
 };
 
-// Fetch a single invoice by its ID
 export const sendMessage = async (chatRoomId: number, content: string) => {
   try {
     const response = await api.post(`/chat-room/send-message`, {
@@ -46,5 +45,21 @@ export const getAllMessages = async (chatRoomId: number) => {
   } catch (error) {
     console.error('Error fetching messages:', error);
     throw new Error('Could not fetch messages.');
+  }
+};
+
+export const getAllChats = async (
+  searchTerm: string,
+  page: number,
+  limit: number
+) => {
+  try {
+    const response = await api.get(
+      `/chat-rooms?page=${page}&limit=${limit}&search=${searchTerm}`
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching chats:', error);
+    throw new Error('Could not fetch chats.');
   }
 };
