@@ -1,7 +1,6 @@
 import { Box, Button, useTheme } from '@mui/material';
 import SendTwoToneIcon from '@mui/icons-material/SendTwoTone';
 import { user, MessageInputWrapper } from './styles';
-import { useAuth } from 'src/hooks/useAuth';
 import { sendMessage } from 'src/services/chatService';
 import { useState } from 'react';
 import AvatarWithInitials from '../../utils/Avatar';
@@ -9,14 +8,14 @@ import { useChat } from '../../context/ChatContext';
 
 function BottomBarContent() {
   const theme = useTheme();
-  const { userId } = useAuth();
-  const { firstName, lastName } = useChat();
+
+  const { chatRoomId, firstName, lastName } = useChat();
   const [message, setMessage] = useState('');
 
   const handleSendMessage = async (content: string) => {
     try {
       if (!content) return;
-      await sendMessage(userId, content);
+      await sendMessage(chatRoomId, content);
       setMessage('');
     } catch (error) {
       console.error('Error sending message:', error);
