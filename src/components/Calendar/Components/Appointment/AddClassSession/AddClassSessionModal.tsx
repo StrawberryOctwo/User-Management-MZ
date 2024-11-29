@@ -36,12 +36,15 @@ const AddClassSessionModal: React.FC<AddClassSessionModalProps> = ({
 
   const validateSession = (session: Session) => {
     const now = new Date();
+    const sixMonthsAgo = new Date();
+    sixMonthsAgo.setMonth(now.getMonth() - 6); // Calculate the date 6 months ago
 
     if (!session.room) return false;
+
     if (
       !session.startDate ||
       !(session.startDate instanceof Date) ||
-      (session.startDate < now && session.startDate.toDateString() !== now.toDateString())
+      session.startDate < sixMonthsAgo // Check if the start date is not earlier than 6 months ago
     )
       return false;
 
@@ -56,8 +59,10 @@ const AddClassSessionModal: React.FC<AddClassSessionModalProps> = ({
     if (!session.dayDetails || Object.keys(session.dayDetails).length === 0)
       return false;
     if (!session.recurrenceOption) return false;
+
     return true;
   };
+
 
   useEffect(() => {
     setDisabled(!validateSession(session));

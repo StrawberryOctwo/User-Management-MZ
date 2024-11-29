@@ -169,7 +169,7 @@ const EventItem = ({ eventInfo }) => {
             )}
           </ul>
         ) : (
-          <span className="no-students">No students</span>
+          <span className="no-students"></span>
         )}
       </div>
 
