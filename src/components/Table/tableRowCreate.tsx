@@ -23,7 +23,7 @@ export interface FieldConfig {
   label: string;
   type: string;
   required?: boolean;
-  options?: { label: string; value: number | string }[]; // For select fields
+  options?: { label: string; value: number | string }[];
   section?: string;
   component?: ReactNode;
   xs?: number;
@@ -69,7 +69,9 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
   const getInitialFormData = () => {
     return fields.reduce((acc, field) => {
       const initialValue =
-        field.initialValue ?? initialData[field.name] ?? (field.type === 'number' ? 0 : '');
+        field.initialValue ??
+        initialData[field.name] ??
+        (field.type === 'number' ? 0 : '');
       acc[field.name] = initialValue;
 
       // Validate IBAN for pre-filled values
@@ -80,7 +82,6 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
       return acc;
     }, {} as Record<string, any>);
   };
-
 
   const [formData, setFormData] = useState<Record<string, any>>(
     getInitialFormData()
@@ -98,7 +99,11 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
 
   const initializeTouchedFields = () => {
     return fields.reduce((acc, field) => {
-      if (field.name === 'iban' && initialData[field.name] && !isValidIBAN(initialData[field.name])) {
+      if (
+        field.name === 'iban' &&
+        initialData[field.name] &&
+        !isValidIBAN(initialData[field.name])
+      ) {
         acc[field.name] = true; // Mark IBAN field as touched if invalid
       }
       return acc;
@@ -295,7 +300,9 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
                       }
                       sx={{ width: '95%' }}
                       value={
-                        field.type === 'logo_file' ? undefined : formData[field.name] ?? ''
+                        field.type === 'logo_file'
+                          ? undefined
+                          : formData[field.name] ?? ''
                       }
                       onChange={field.onChange || handleInputChange}
                       required={field.required}
@@ -306,23 +313,23 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
                       InputProps={
                         field.type === 'password'
                           ? {
-                            endAdornment: (
-                              <InputAdornment position="end">
-                                <IconButton
-                                  onClick={() =>
-                                    togglePasswordVisibility(field.name)
-                                  }
-                                  edge="end"
-                                >
-                                  {passwordVisibility[field.name] ? (
-                                    <VisibilityOff />
-                                  ) : (
-                                    <Visibility />
-                                  )}
-                                </IconButton>
-                              </InputAdornment>
-                            )
-                          }
+                              endAdornment: (
+                                <InputAdornment position="end">
+                                  <IconButton
+                                    onClick={() =>
+                                      togglePasswordVisibility(field.name)
+                                    }
+                                    edge="end"
+                                  >
+                                    {passwordVisibility[field.name] ? (
+                                      <VisibilityOff />
+                                    ) : (
+                                      <Visibility />
+                                    )}
+                                  </IconButton>
+                                </InputAdornment>
+                              )
+                            }
                           : undefined
                       }
                       inputProps={{
@@ -331,9 +338,13 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
                         pattern: field.validation?.pattern?.value.source
                       }}
                       error={
-                        (field.name === 'iban' && formData[field.name] && !formData[`${field.name}_valid`]) ||
+                        (field.name === 'iban' &&
+                          formData[field.name] &&
+                          !formData[`${field.name}_valid`]) ||
                         (!!field.validation?.pattern?.value &&
-                          !new RegExp(field.validation.pattern.value).test(formData[field.name]))
+                          !new RegExp(field.validation.pattern.value).test(
+                            formData[field.name]
+                          ))
                       }
                       helperText={
                         field.name === 'iban'
@@ -344,9 +355,11 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
                             : ''
                           : touchedFields[field.name] &&
                             !!field.validation?.pattern?.value &&
-                            !new RegExp(field.validation.pattern.value).test(formData[field.name])
-                            ? field.validation?.pattern?.message
-                            : ''
+                            !new RegExp(field.validation.pattern.value).test(
+                              formData[field.name]
+                            )
+                          ? field.validation?.pattern?.message
+                          : ''
                       }
                       onBlur={() =>
                         setTouchedFields((prev) => ({

@@ -9,13 +9,14 @@ import SuspenseLoader from 'src/components/SuspenseLoader';
 import ProtectedRoute from './protectedRoute';
 import Login from './content/pages/Login/Login';
 import Logout from './components/Logout';
+import ApplicationsMessenger from 'src/content/applications/Messenger';
 
 const Loader = (Component) => (props) =>
-(
-  <Suspense fallback={<SuspenseLoader />}>
-    <Component {...props} />
-  </Suspense>
-);
+  (
+    <Suspense fallback={<SuspenseLoader />}>
+      <Component {...props} />
+    </Suspense>
+  );
 
 export const ROLES = {
   SUPER_ADMIN: 'SuperAdmin',
@@ -33,8 +34,9 @@ const Overview = Loader(lazy(() => import('src/content/overview')));
 // Dashboards
 
 const Crypto = Loader(lazy(() => import('src/content/dashboards/Crypto')));
-const Calendar = Loader(lazy(() => import('src/components/Calendar/CalendarContent')));
-
+const Calendar = Loader(
+  lazy(() => import('src/components/Calendar/CalendarContent'))
+);
 
 // Applications
 
@@ -43,19 +45,12 @@ const Messenger = Loader(
 );
 const Transactions = Loader(
   lazy(() => import('src/content/applications/Transactions'))
-
 );
 
-
-const Files = Loader(
-  lazy(() => import('src/content/applications/Files'))
-);
+const Files = Loader(lazy(() => import('src/content/applications/Files')));
 const CreateFile = Loader(
   lazy(() => import('src/content/applications/Files/Create'))
 );
-
-
-
 
 const FranchiseAdmins = Loader(
   lazy(() => import('src/content/applications/FranchiseAdmins'))
@@ -79,8 +74,6 @@ const ViewInterest = Loader(
   lazy(() => import('src/content/applications/Interest/View'))
 );
 
-
-
 const Location = Loader(
   lazy(() => import('src/content/applications/Locations'))
 );
@@ -96,10 +89,7 @@ const LocationEdit = Loader(
   lazy(() => import('src/content/applications/Locations/Edit'))
 );
 
-
-const Parent = Loader(
-  lazy(() => import('src/content/applications/Parents'))
-);
+const Parent = Loader(lazy(() => import('src/content/applications/Parents')));
 
 const ParentCreate = Loader(
   lazy(() => import('src/content/applications/Parents/Create'))
@@ -111,7 +101,6 @@ const ParentView = Loader(
 const ParentEdit = Loader(
   lazy(() => import('src/content/applications/Parents/Edit'))
 );
-
 
 const LocationAdmins = Loader(
   lazy(() => import('src/content/applications/LocationAdmins'))
@@ -126,8 +115,6 @@ const LocationAdminsEdit = Loader(
 const LocationAdminsView = Loader(
   lazy(() => import('src/content/applications/LocationAdmins/View'))
 );
-
-
 
 const Teachers = Loader(
   lazy(() => import('src/content/applications/Teachers'))
@@ -155,7 +142,6 @@ const StudentsEdit = Loader(
   lazy(() => import('src/content/applications/Students/Edit'))
 );
 
-
 const Franchises = Loader(
   lazy(() => import('src/content/applications/Franchises'))
 );
@@ -170,9 +156,7 @@ const FranchiseView = Loader(
   lazy(() => import('src/content/applications/Franchises/View'))
 );
 
-const Topics = Loader(
-  lazy(() => import('src/content/applications/Topics'))
-);
+const Topics = Loader(lazy(() => import('src/content/applications/Topics')));
 
 const TopicCreate = Loader(
   lazy(() => import('src/content/applications/Topics/Create'))
@@ -188,9 +172,7 @@ const EditContract = Loader(
   lazy(() => import('src/content/applications/Contracts/Edit'))
 );
 
-const DaysOff = Loader(
-  lazy(() => import('src/content/applications/DaysOff'))
-);
+const DaysOff = Loader(lazy(() => import('src/content/applications/DaysOff')));
 
 const DaysOffEditHoliday = Loader(
   lazy(() => import('src/content/applications/DaysOff/EditHoliday'))
@@ -206,7 +188,6 @@ const UserProfile = Loader(
 const UserSettings = Loader(
   lazy(() => import('src/content/applications/Users/settings'))
 );
-
 
 const Billings = Loader(
   lazy(() => import('src/content/applications/Billings'))
@@ -224,7 +205,6 @@ const SessionReports = Loader(
 const CreateBill = Loader(
   lazy(() => import('src/content/applications/Billings/Create'))
 );
-
 
 // Components
 
@@ -264,7 +244,6 @@ const StatusComingSoon = Loader(
 const StatusMaintenance = Loader(
   lazy(() => import('src/content/pages/Status/Maintenance'))
 );
-
 
 const routes: RouteObject[] = [
   {
@@ -316,10 +295,9 @@ const routes: RouteObject[] = [
     children: [
       {
         path: 'logout',
-        element: <Logout />,
+        element: <Logout />
       },
       {
-
         path: 'dashboard',
         element: <SidebarLayout />,
         children: [
@@ -358,340 +336,605 @@ const routes: RouteObject[] = [
             element: <Navigate to="transactions" replace />
           },
           {
+            path: 'chat',
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN,
+                  ROLES.TEACHER
+                ]}
+              >
+                <ApplicationsMessenger />
+              </ProtectedRoute>
+            )
+          },
+          {
             path: 'franchises',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+              >
                 <Franchises />
               </ProtectedRoute>
+            )
           },
           {
             path: 'franchises/create',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+              >
                 <FranchiseCreate />
               </ProtectedRoute>
+            )
           },
           {
             path: 'franchises/edit/:id',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+              >
                 <FranchiseEdit />
               </ProtectedRoute>
+            )
           },
           {
             path: 'franchises/view/:id',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+              >
                 <FranchiseView />
               </ProtectedRoute>
+            )
           },
 
           {
             path: 'billings',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+              >
                 <Billings />
               </ProtectedRoute>
+            )
           },
 
           {
             path: 'billings/create',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+              >
                 <CreateBill />
               </ProtectedRoute>
+            )
           },
 
           {
             path: 'session-reports',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN, ROLES.TEACHER, ROLES.PARENT, ROLES.STUDENT]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN,
+                  ROLES.TEACHER,
+                  ROLES.PARENT,
+                  ROLES.STUDENT
+                ]}
+              >
                 <SessionReports />
               </ProtectedRoute>
+            )
           },
-
 
           {
             path: 'payments',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN, ROLES.TEACHER, ROLES.PARENT]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN,
+                  ROLES.TEACHER,
+                  ROLES.PARENT
+                ]}
+              >
                 <Payments />
               </ProtectedRoute>
+            )
           },
           {
             path: 'invoices',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN, ROLES.TEACHER, ROLES.PARENT]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN,
+                  ROLES.TEACHER,
+                  ROLES.PARENT
+                ]}
+              >
                 <Invoices />
               </ProtectedRoute>
+            )
           },
-
 
           {
             path: 'files/',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN, ROLES.TEACHER, ROLES.PARENT, ROLES.STUDENT]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN,
+                  ROLES.TEACHER,
+                  ROLES.PARENT,
+                  ROLES.STUDENT
+                ]}
+              >
                 <Files />
               </ProtectedRoute>
+            )
           },
           {
             path: 'files/create',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN, ROLES.TEACHER, ROLES.PARENT, ROLES.STUDENT]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN,
+                  ROLES.TEACHER,
+                  ROLES.PARENT,
+                  ROLES.STUDENT
+                ]}
+              >
                 <CreateFile />
               </ProtectedRoute>
+            )
           },
 
           {
             path: 'franchise-admins/',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+              >
                 <FranchiseAdmins />
               </ProtectedRoute>
+            )
           },
           {
             path: 'franchise-admins/create',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+              >
                 <FranchiseAdminsCreate />
               </ProtectedRoute>
+            )
           },
           {
             path: 'franchise-admins/view/:id',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+              >
                 <FranchiseAdminsView />
               </ProtectedRoute>
+            )
           },
           {
             path: 'franchise-admins/edit/:id',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+              >
                 <FranchiseAdminsEdit />
               </ProtectedRoute>
+            )
           },
 
           {
             path: 'locations/',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN
+                ]}
+              >
                 <Location />
               </ProtectedRoute>
+            )
           },
           {
             path: 'locations/create',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+              >
                 <LocationCreate />
               </ProtectedRoute>
+            )
           },
           {
             path: 'locations/view/:id',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN
+                ]}
+              >
                 <LocationView />
               </ProtectedRoute>
+            )
           },
           {
             path: 'locations/edit/:id',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+              >
                 <LocationEdit />
               </ProtectedRoute>
+            )
           },
 
           {
             path: 'location-admins/',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+              >
                 <LocationAdmins />
               </ProtectedRoute>
+            )
           },
           {
             path: 'location-admins/create',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+              >
                 <LocationAdminsCreate />
               </ProtectedRoute>
+            )
           },
           {
             path: 'location-admins/view/:id',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+              >
                 <LocationAdminsView />
               </ProtectedRoute>
+            )
           },
           {
             path: 'location-admins/edit/:id',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+              >
                 <LocationAdminsEdit />
               </ProtectedRoute>
+            )
           },
           {
             path: 'teachers/',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN
+                ]}
+              >
                 <Teachers />
               </ProtectedRoute>
+            )
           },
           {
             path: 'teachers/create',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN
+                ]}
+              >
                 <TeachersCreate />
               </ProtectedRoute>
+            )
           },
           {
             path: 'teachers/view/:id',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN
+                ]}
+              >
                 <TeachersView />
               </ProtectedRoute>
+            )
           },
           {
             path: 'teachers/edit/:id',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN
+                ]}
+              >
                 <TeachersEdit />
               </ProtectedRoute>
+            )
           },
           {
             path: 'parents/',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN
+                ]}
+              >
                 <Parent />
               </ProtectedRoute>
+            )
           },
           {
             path: 'parents/create',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN
+                ]}
+              >
                 <ParentCreate />
               </ProtectedRoute>
+            )
           },
           {
             path: 'parents/view/:id',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN
+                ]}
+              >
                 <ParentView />
               </ProtectedRoute>
+            )
           },
           {
             path: 'parents/edit/:id',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN
+                ]}
+              >
                 <ParentEdit />
               </ProtectedRoute>
+            )
           },
           {
             path: 'students/',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN, ROLES.TEACHER, ROLES.PARENT]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN,
+                  ROLES.TEACHER,
+                  ROLES.PARENT
+                ]}
+              >
                 <Students />
               </ProtectedRoute>
+            )
           },
           {
             path: 'students/create',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN, ROLES.TEACHER]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN,
+                  ROLES.TEACHER
+                ]}
+              >
                 <StudentsCreate />
               </ProtectedRoute>
+            )
           },
 
           {
             path: 'students/view/:id',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN, ROLES.TEACHER, ROLES.PARENT]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN,
+                  ROLES.TEACHER,
+                  ROLES.PARENT
+                ]}
+              >
                 <StudentsView />
               </ProtectedRoute>
+            )
           },
           {
             path: 'students/edit/:id',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN, ROLES.TEACHER]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN,
+                  ROLES.TEACHER
+                ]}
+              >
                 <StudentsEdit />
               </ProtectedRoute>
+            )
           },
           {
             path: 'topics',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+              >
                 <Topics />
               </ProtectedRoute>
+            )
           },
           {
             path: 'topics/create',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+              >
                 <TopicCreate />
               </ProtectedRoute>
+            )
           },
           {
             path: 'contracts',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+              >
                 <Contracts />
               </ProtectedRoute>
+            )
           },
           {
             path: 'contracts/create',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+              >
                 <CreateContract />
               </ProtectedRoute>
+            )
           },
           {
             path: 'contracts/edit/:id',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+              >
                 <EditContract />
               </ProtectedRoute>
+            )
           },
           {
             path: 'daysoff',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN
+                ]}
+              >
                 <DaysOff />
               </ProtectedRoute>
+            )
           },
           {
             path: 'daysoff/holiday/edit/:id',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN
+                ]}
+              >
                 <DaysOffEditHoliday />
               </ProtectedRoute>
+            )
           },
           {
             path: 'daysoff/closingDay/edit/:id',
-            element:
-              <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN]}>
+            element: (
+              <ProtectedRoute
+                requiredRoles={[
+                  ROLES.SUPER_ADMIN,
+                  ROLES.FRANCHISE_ADMIN,
+                  ROLES.LOCATION_ADMIN
+                ]}
+              >
                 <DaysOffEditClosingDay />
               </ProtectedRoute>
+            )
           },
           {
             path: 'profile',
             children: [
               {
                 path: '',
-                element:
-                  <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+                element: (
+                  <ProtectedRoute
+                    requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+                  >
                     <Navigate to="details" replace />
                   </ProtectedRoute>
+                )
               },
               {
                 path: 'details',
-                element:
-                  <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}>
+                element: (
+                  <ProtectedRoute
+                    requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+                  >
                     <UserProfile />
                   </ProtectedRoute>
+                )
               },
               {
                 path: 'settings',
-                element:
-                  <ProtectedRoute requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN, ROLES.LOCATION_ADMIN, ROLES.TEACHER, ROLES.PARENT, ROLES.STUDENT]}>
+                element: (
+                  <ProtectedRoute
+                    requiredRoles={[
+                      ROLES.SUPER_ADMIN,
+                      ROLES.FRANCHISE_ADMIN,
+                      ROLES.LOCATION_ADMIN,
+                      ROLES.TEACHER,
+                      ROLES.PARENT,
+                      ROLES.STUDENT
+                    ]}
+                  >
                     <UserSettings />
                   </ProtectedRoute>
+                )
               }
             ]
           }
@@ -748,5 +991,3 @@ const routes: RouteObject[] = [
 ];
 
 export default routes;
-
-

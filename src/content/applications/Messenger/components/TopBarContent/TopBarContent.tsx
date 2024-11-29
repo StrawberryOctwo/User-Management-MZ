@@ -113,11 +113,11 @@ function TopBarContent() {
           />
           <Box ml={1}>
             <Typography variant="h4">Zain Baptista</Typography>
-            <Typography variant="subtitle1">
+            {/* <Typography variant="subtitle1">
               {formatDistance(subMinutes(new Date(), 8), new Date(), {
                 addSuffix: true
               })}
-            </Typography>
+            </Typography> */}
           </Box>
         </Box>
         <Box
@@ -125,7 +125,7 @@ function TopBarContent() {
             display: { xs: 'none', lg: 'flex' }
           }}
         >
-          <Tooltip placement="bottom" title="Start a voice call">
+          {/* <Tooltip placement="bottom" title="Start a voice call">
             <IconButton color="primary">
               <CallTwoToneIcon />
             </IconButton>
@@ -134,15 +134,15 @@ function TopBarContent() {
             <IconButton color="primary">
               <VideoCameraFrontTwoToneIcon />
             </IconButton>
-          </Tooltip>
-          <Tooltip placement="bottom" title="Conversation information">
+          </Tooltip> */}
+          {/* <Tooltip placement="bottom" title="Conversation information">
             <IconButton color="primary" onClick={handleDrawerToggle}>
               <InfoTwoToneIcon />
             </IconButton>
-          </Tooltip>
+          </Tooltip> */}
         </Box>
       </RootWrapper>
-      <Drawer
+      {/* <Drawer
         sx={{
           display: { xs: 'none', md: 'flex' }
         }}
@@ -335,7 +335,7 @@ function TopBarContent() {
             </AccordionDetails>
           </Accordion>
         </Box>
-      </Drawer>
+      </Drawer> */}
     </>
   );
 }

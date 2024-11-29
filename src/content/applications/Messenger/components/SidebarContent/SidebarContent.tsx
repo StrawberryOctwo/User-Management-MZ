@@ -112,11 +112,11 @@ function SidebarContent() {
 
   const [currentTab, setCurrentTab] = useState<string>('all');
 
-  const tabs = [
-    { value: 'all', label: 'All' },
-    { value: 'unread', label: 'Unread' },
-    { value: 'archived', label: 'Archived' }
-  ];
+  // const tabs = [
+  //   { value: 'all', label: 'All' },
+  //   { value: 'unread', label: 'Unread' },
+  //   { value: 'archived', label: 'Archived' }
+  // ];
 
   const handleTabsChange = (_event: ChangeEvent<{}>, value: string): void => {
     setCurrentTab(value);
@@ -124,7 +124,7 @@ function SidebarContent() {
 
   return (
     <RootWrapper>
-      <Box display="flex" alignItems="flex-start">
+      {/* <Box display="flex" alignItems="flex-start">
         <Avatar alt={user.name} src={user.avatar} />
         <Box
           sx={{
@@ -168,11 +168,10 @@ function SidebarContent() {
             label="Invisible"
           />
         </Box>
-      </Box>
+      </Box> */}
 
       <TextField
         sx={{
-          mt: 2,
           mb: 1
         }}
         size="small"
@@ -197,7 +196,7 @@ function SidebarContent() {
         Chats
       </Typography>
 
-      <TabsContainerWrapper>
+      {/* <TabsContainerWrapper>
         <Tabs
           onChange={handleTabsChange}
           value={currentTab}
@@ -210,7 +209,7 @@ function SidebarContent() {
             <Tab key={tab.value} label={tab.label} value={tab.value} />
           ))}
         </Tabs>
-      </TabsContainerWrapper>
+      </TabsContainerWrapper> */}
 
       <Box mt={2}>
         {currentTab === 'all' && (
@@ -386,7 +385,7 @@ function SidebarContent() {
           </Box>
         )}
       </Box>
-      <Box display="flex" pb={1} mt={4} alignItems="center">
+      {/* <Box display="flex" pb={1} mt={4} alignItems="center">
         <Typography
           sx={{
             mr: 1
@@ -521,7 +520,7 @@ function SidebarContent() {
             Attend
           </Button>
         </Box>
-      </MeetingBox>
+      </MeetingBox> */}
     </RootWrapper>
   );
 }

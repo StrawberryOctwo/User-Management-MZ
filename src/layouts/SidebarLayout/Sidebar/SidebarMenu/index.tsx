@@ -14,7 +14,19 @@ import LocationOnIcon from '@mui/icons-material/LocationOn';
 import { NavLink as RouterLink } from 'react-router-dom';
 import { SidebarContext } from 'src/contexts/SidebarContext';
 import EditCalendarIcon from '@mui/icons-material/CalendarMonth';
-import { AttachMoney, BusinessOutlined, FileUploadSharp, Interests, LocationSearching, LocationSearchingTwoTone, MoneyRounded, Person, PersonAddAlt1Sharp, Topic } from '@mui/icons-material';
+import {
+  AttachMoney,
+  BusinessOutlined,
+  ChatBubble,
+  FileUploadSharp,
+  Interests,
+  LocationSearching,
+  LocationSearchingTwoTone,
+  MoneyRounded,
+  Person,
+  PersonAddAlt1Sharp,
+  Topic
+} from '@mui/icons-material';
 import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import withRole from 'src/hooks/withRole';
@@ -135,9 +147,9 @@ const SubMenuWrapper = styled(Box)(
                 background: ${theme.colors.alpha.trueWhite[100]};
                 opacity: 0;
                 transition: ${theme.transitions.create([
-    'transform',
-    'opacity'
-  ])};
+                  'transform',
+                  'opacity'
+                ])};
                 width: 6px;
                 height: 6px;
                 transform: scale(0);
@@ -169,8 +181,7 @@ function SidebarMenu() {
     <>
       <MenuWrapper>
         <List component="div">
-          <SubMenuWrapper>
-          </SubMenuWrapper>
+          <SubMenuWrapper></SubMenuWrapper>
         </List>
         <List
           component="div"
@@ -183,7 +194,14 @@ function SidebarMenu() {
           <SubMenuWrapper>
             <List component="div">
               <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'Teacher', 'Student', 'Parent', 'LocationAdmin']}
+                allowedRoles={[
+                  'SuperAdmin',
+                  'FranchiseAdmin',
+                  'Teacher',
+                  'Student',
+                  'Parent',
+                  'LocationAdmin'
+                ]}
               >
                 <ListItem component="div">
                   <Button
@@ -197,9 +215,7 @@ function SidebarMenu() {
                   </Button>
                 </ListItem>
               </ProtectedListItem>
-              <ProtectedListItem
-                allowedRoles={['SuperAdmin']}
-              >
+              <ProtectedListItem allowedRoles={['SuperAdmin']}>
                 <ListItem component="div">
                   <Button
                     disableRipple
@@ -213,7 +229,6 @@ function SidebarMenu() {
                 </ListItem>
               </ProtectedListItem>
             </List>
-
           </SubMenuWrapper>
         </List>
         <List
@@ -226,6 +241,26 @@ function SidebarMenu() {
         >
           <SubMenuWrapper>
             <List component="div">
+              <ProtectedListItem
+                allowedRoles={[
+                  'SuperAdmin',
+                  'FranchiseAdmin',
+                  'LocationAdmin',
+                  'Teacher'
+                ]}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/management/chat"
+                    startIcon={<ChatBubble />}
+                  >
+                    Chat Room
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
               <ProtectedListItem
                 allowedRoles={['SuperAdmin', 'FranchiseAdmin']}
               >
@@ -274,9 +309,7 @@ function SidebarMenu() {
                 </ListItem>
               </ProtectedListItem>
 
-              <ProtectedListItem
-                allowedRoles={['SuperAdmin']}
-              >
+              <ProtectedListItem allowedRoles={['SuperAdmin']}>
                 <ListItem component="div">
                   <Button
                     disableRipple
@@ -339,7 +372,13 @@ function SidebarMenu() {
               </ProtectedListItem>
 
               <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher', 'Parent']}
+                allowedRoles={[
+                  'SuperAdmin',
+                  'FranchiseAdmin',
+                  'LocationAdmin',
+                  'Teacher',
+                  'Parent'
+                ]}
               >
                 <ListItem component="div">
                   <Button
@@ -355,7 +394,14 @@ function SidebarMenu() {
               </ProtectedListItem>
 
               <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'Parent', 'Student', 'LocationAdmin', 'Teacher']}
+                allowedRoles={[
+                  'SuperAdmin',
+                  'FranchiseAdmin',
+                  'Parent',
+                  'Student',
+                  'LocationAdmin',
+                  'Teacher'
+                ]}
               >
                 <ListItem component="div">
                   <Button
@@ -400,9 +446,7 @@ function SidebarMenu() {
                   </Button>
                 </ListItem>
               </ProtectedListItem>
-              <ProtectedListItem
-                allowedRoles={['Parent', 'Student']}
-              >
+              <ProtectedListItem allowedRoles={['Parent', 'Student']}>
                 <ListItem component="div">
                   <Button
                     disableRipple
@@ -415,9 +459,7 @@ function SidebarMenu() {
                   </Button>
                 </ListItem>
               </ProtectedListItem>
-              <ProtectedListItem
-                allowedRoles={['']}
-              >
+              <ProtectedListItem allowedRoles={['']}>
                 <ListItem component="div">
                   <Button
                     disableRipple
@@ -431,7 +473,7 @@ function SidebarMenu() {
                 </ListItem>
               </ProtectedListItem>
               <ProtectedListItem
-                allowedRoles={['FranchiseAdmin','Teacher', 'Parent']}
+                allowedRoles={['FranchiseAdmin', 'Teacher', 'Parent']}
               >
                 <ListItem component="div">
                   <Button
