@@ -86,15 +86,18 @@ function SidebarContent() {
   const handleChatClick = async (chat) => {
     setChatRoomId(chat.id);
     setParticipants(chat.participants || []);
-
-    try {
-      // Reset unread messages
-      await resetUnreadCount(chat.id);
-      console.log("Unread messages reset successfully.");
-    } catch (error) {
-      console.error("Failed to reset unread messages:", error);
+  
+    // Check if the last message sender is not the current user
+    if (chat.lastMessage?.sender?.id !== userId && !chat.lastMessage?.isRead) {
+      try {
+        // Reset unread messages
+        await resetUnreadCount(chat.id);
+        console.log("Unread messages reset successfully.");
+      } catch (error) {
+        console.error("Failed to reset unread messages:", error);
+      }
     }
-
+  
     // Update the lastMessage.isRead in the chat state
     setChats((prevChats) =>
       prevChats.map((c) =>
@@ -110,6 +113,7 @@ function SidebarContent() {
       )
     );
   };
+  
 
   const handleNewChatClick = () => {
     setIsPopupOpen(true);
