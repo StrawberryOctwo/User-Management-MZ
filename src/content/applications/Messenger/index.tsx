@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 import TopBarContent from './components/TopBarContent/TopBarContent';
 import SidebarContent from './components/SidebarContent/SidebarContent';
 import ChatContent from './components/ChatContent/ChatContent';
@@ -19,6 +19,9 @@ import { ChatProvider } from './context/ChatContext';
 function ApplicationsMessenger() {
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = useState(false);
+
+  // Unified scrollbar ref
+  const scrollbarRef = useRef<any>(null);
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -69,8 +72,9 @@ function ApplicationsMessenger() {
             <TopBarContent />
           </ChatTopBar>
           <Box flex={1}>
-            <Scrollbar>
-              <ChatContent />
+            {/* Pass scrollbarRef to ChatContent */}
+            <Scrollbar ref={scrollbarRef} autoHide>
+              <ChatContent scrollbarRef={scrollbarRef} />
             </Scrollbar>
           </Box>
           <Divider />

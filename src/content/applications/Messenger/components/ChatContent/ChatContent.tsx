@@ -2,54 +2,73 @@ import React, { useEffect, useState } from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import ScheduleTwoToneIcon from '@mui/icons-material/ScheduleTwoTone';
 import { formatDistance } from 'date-fns';
-import { io } from 'socket.io-client';
+import { fetchMessages, formatDateDivider } from '../../utils/chat';
+import AvatarWithInitials from '../../utils/Avatar';
+import { useAuth } from 'src/hooks/useAuth';
+import { useChat } from '../../context/ChatContext';
+import { useWebSocket } from 'src/utils/webSocketProvider';
 import {
   DividerWrapper,
   CardWrapperPrimary,
   CardWrapperSecondary
 } from './styles';
-import { fetchMessages, formatDateDivider } from '../../utils/chat';
-import AvatarWithInitials from '../../utils/Avatar';
-import { useAuth } from 'src/hooks/useAuth';
-import { useChat } from '../../context/ChatContext';
 
-const SOCKET_SERVER_URL =
-  process.env.REACT_APP_SOCKET_SERVER_URL || 'http://localhost:4000';
+interface ChatContentProps {
+  scrollbarRef: React.RefObject<any>;
+}
 
-function ChatContent() {
+function ChatContent({ scrollbarRef }: ChatContentProps) {
   const [messages, setMessages] = useState([]);
   const [loading, setLoading] = useState(false);
   const { userId } = useAuth();
-  const { chatRoomId, firstName, lastName } = useChat();
+  const { chatRoomId } = useChat();
+  const socket = useWebSocket();
+
+
+  const scrollToBottom = () => {
+    if (scrollbarRef.current) {
+      scrollbarRef.current.scrollToBottom(); 
+    }
+  };
 
   useEffect(() => {
     if (!chatRoomId) return;
+  
+    // Fetch messages for the chat room
+    setLoading(true);
+    fetchMessages(chatRoomId, (fetchedMessages) => {
+      setMessages(fetchedMessages);
+  
+      // Scroll after messages are set and DOM updates
+      setTimeout(() => {
+        scrollToBottom();
+      }, 100); // Delay to ensure DOM is updated
+    }, setLoading);
+  
+    // Join the chat room
+    socket.emit('join_room', `chat_${chatRoomId}`);
+  
+    // Listen for new messages
+    socket.on('new_message', (message) => {
+      // Check if the message belongs to the current chat room
 
-    fetchMessages(chatRoomId, setMessages, setLoading);
-
-    const socket = io(SOCKET_SERVER_URL, {
-      withCredentials: true,
-      extraHeaders: {
-        Authorization: `Bearer ${localStorage.getItem('token')}`
+      if (message.chatRoom.id === chatRoomId) {
+        setMessages((prevMessages) => [...prevMessages, message]);
       }
     });
-
-    socket.on('connect', () => {
-      console.log('Connected to WebSocket server');
-    });
-
-    socket.on('newMessage', (message) => {
-      setMessages((prevMessages) => [...prevMessages, message]);
-    });
-
-    socket.on('disconnect', () => {
-      console.log('Disconnected from WebSocket server');
-    });
-
+  
     return () => {
-      socket.disconnect();
+      socket.off('new_message');
     };
   }, [chatRoomId]);
+  
+
+  // Scroll to the bottom when messages change
+  useEffect(() => {
+    if (messages.length > 0) {
+      scrollToBottom();
+    }
+  }, [messages]);
 
   return (
     <Box p={3}>
@@ -73,7 +92,7 @@ function ChatContent() {
           </Typography>
         </Box>
       ) : (
-        <>
+        <div>
           {messages.reduce((acc, message, index) => {
             const dateDivider = formatDateDivider(message.sentAt);
 
@@ -140,8 +159,8 @@ function ChatContent() {
                 </Box>
                 {isSender && (
                   <AvatarWithInitials
-                    firstName={firstName}
-                    lastName={lastName}
+                    firstName={message.sender?.firstName}
+                    lastName={message.sender?.lastName}
                   />
                 )}
               </Box>
@@ -149,7 +168,7 @@ function ChatContent() {
 
             return acc;
           }, [])}
-        </>
+        </div>
       )}
     </Box>
   );

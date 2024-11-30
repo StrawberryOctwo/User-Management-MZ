@@ -15,7 +15,8 @@ interface Message {
 export const fetchMessages = async (
   chatRoomId: number,
   setMessages: React.Dispatch<React.SetStateAction<Message[]>>,
-  setLoading: React.Dispatch<React.SetStateAction<boolean>>
+  setLoading: React.Dispatch<React.SetStateAction<boolean>>,
+  onMessagesLoaded?: () => void // Add an optional callback parameter
 ) => {
   setLoading(true);
   try {
@@ -25,6 +26,11 @@ export const fetchMessages = async (
       return;
     }
     setMessages(response.messages);
+
+    // Invoke the callback after messages are loaded
+    if (onMessagesLoaded) {
+      onMessagesLoaded();
+    }
   } catch (error) {
     console.error('Error fetching messages:', error);
     setMessages([]);
@@ -32,6 +38,7 @@ export const fetchMessages = async (
     setLoading(false);
   }
 };
+
 
 export const formatDateDivider = (date: string) => {
   const today = new Date();

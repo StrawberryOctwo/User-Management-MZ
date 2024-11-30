@@ -24,7 +24,17 @@ export const sendMessage = async (chatRoomId: number, content: string) => {
     throw new Error('Could not fetch send message.');
   }
 };
-
+export const resetUnreadCount = async (chatRoomId: number) => {
+  try {
+    const response = await api.post(`/chat-room/reset-unread`, {
+      chatRoomId: chatRoomId
+    });
+    return response.data;
+  } catch (error) {
+    console.error('Error resetting unread count:', error);
+    throw new Error('Could not reset unread count.');
+  }
+};
 export const joinChatRoom = async (chatRoomId: number, userId: number) => {
   try {
     const response = await api.post(`/chat-room/join`, {
