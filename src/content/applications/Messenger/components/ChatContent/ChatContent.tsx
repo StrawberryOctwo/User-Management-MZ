@@ -34,23 +34,22 @@ function ChatContent({ scrollbarRef }: ChatContentProps) {
   useEffect(() => {
     if (!chatRoomId) return;
   
-    // Fetch messages for the chat room
+
     setLoading(true);
     fetchMessages(chatRoomId, (fetchedMessages) => {
       setMessages(fetchedMessages);
   
-      // Scroll after messages are set and DOM updates
+    
       setTimeout(() => {
         scrollToBottom();
-      }, 100); // Delay to ensure DOM is updated
+      }, 100); 
     }, setLoading);
   
-    // Join the chat room
+
     socket.emit('join_room', `chat_${chatRoomId}`);
   
-    // Listen for new messages
     socket.on('new_message', (message) => {
-      // Check if the message belongs to the current chat room
+  
 
       if (message.chatRoom.id === chatRoomId) {
         setMessages((prevMessages) => [...prevMessages, message]);
@@ -63,7 +62,7 @@ function ChatContent({ scrollbarRef }: ChatContentProps) {
   }, [chatRoomId]);
   
 
-  // Scroll to the bottom when messages change
+
   useEffect(() => {
     if (messages.length > 0) {
       scrollToBottom();
