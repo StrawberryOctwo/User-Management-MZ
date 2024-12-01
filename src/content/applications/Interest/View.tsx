@@ -6,6 +6,7 @@ import { format } from 'date-fns';
 import { fetchInterestById, toggleAcceptedStatus } from 'src/services/interestService';
 import ReusableDetails from 'src/components/View';
 import { de } from 'date-fns/locale';
+import { base64ToBlob } from 'src/utils/utils';
 
 const ViewInterest: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -65,6 +66,61 @@ const ViewInterest: React.FC = () => {
         ? format(new Date(interest.data.createdAt), 'PPpp', { locale: de })
         : t('not_available');
 
+    // Create document fields using 'component' instead of 'value'
+    const documentFields = {
+        name: 'documents',
+        label: t('documents'),
+        section: t('documents'),
+        isArray: true,
+        isTable: true,
+        columns: [
+            { field: 'name', headerName: t('name'), flex: 1 },
+            {
+                field: 'actions',
+                headerName: t('actions'),
+                renderCell: (params: any) => {
+                    const { row } = params;
+                    const { base64, name } = row;
+
+                    if (!base64) {
+                        return <Typography variant="body2">N/A</Typography>;
+                    }
+
+                    const mimeType = base64.split(';')[0].split(':')[1];
+                    const blob = base64ToBlob(base64, mimeType);
+                    const url = URL.createObjectURL(blob);
+
+                    const handleView = () => {
+                        window.open(url, '_blank', 'noopener,noreferrer');
+                        // Note: Do not revoke the URL here if the user is viewing it in a new tab
+                    };
+
+                    const handleDownload = () => {
+                        const link = document.createElement('a');
+                        link.href = url;
+                        link.download = name;
+                        document.body.appendChild(link);
+                        link.click();
+                        document.body.removeChild(link);
+                        URL.revokeObjectURL(url); // Revoke after download
+                    };
+
+                    return (
+                        <Box>
+                            <Button onClick={handleView} variant="contained" size="small" sx={{ mr: 1 }}>
+                                {t('view')}
+                            </Button>
+                            <Button onClick={handleDownload} variant="outlined" size="small">
+                                {t('download')}
+                            </Button>
+                        </Box>
+                    );
+                },
+                sortable: false,
+                width: 200,
+            }
+        ]}
+
     const Fields = [
         { name: 'firstName', label: t('first_name'), section: t('interest_details') },
         { name: 'lastName', label: t('last_name'), section: t('interest_details') },
@@ -75,7 +131,7 @@ const ViewInterest: React.FC = () => {
             name: 'accepted',
             label: t('accepted'),
             section: t('interest_details'),
-            value: (
+            component: (
                 <Chip
                     label={interest?.data.accepted === 'yes' ? t('accepted') : t('not_accepted')}
                     color={interest?.data.accepted === 'yes' ? 'success' : 'default'}
@@ -88,6 +144,7 @@ const ViewInterest: React.FC = () => {
         { name: 'appointment', label: t('appointment'), section: t('interest_details') },
         { name: 'createdAt', label: t('created_date'), section: t('interest_details') },
         { name: 'location', label: t('location'), section: t('location_details') },
+        documentFields, // Spread documentFields here
     ];
 
     const transformedData = {
