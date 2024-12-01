@@ -6,11 +6,15 @@ export const createOrGetChatRoom = async (user2Id: number) => {
       user2Id: user2Id
     });
     return response.data;
-  } catch (error) {
-    console.error('Error creating or fetching chat room:', error);
-    throw new Error('Could not fetch chat room.');
+  } catch (error: any) {
+    const errorMessage =
+      error.response?.data?.error ||
+      error.message ||
+      'Could not fetch chat room.';
+    throw new Error(errorMessage);
   }
 };
+
 
 export const sendMessage = async (chatRoomId: number, content: string) => {
   try {

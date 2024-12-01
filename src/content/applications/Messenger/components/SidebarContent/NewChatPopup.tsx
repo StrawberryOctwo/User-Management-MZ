@@ -18,59 +18,68 @@ import {
   Alert
 } from '@mui/material';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
+import { fetchFranchiseAdmins } from 'src/services/franchiseAdminService';
+import { fetchLocationAdmins } from 'src/services/locationAdminService';
+import { fetchTeachers } from 'src/services/teacherService';
+import { createOrGetChatRoom } from 'src/services/chatService';
+import ConfirmationDialog from 'src/components/Calendar/Components/Modals/ConfirmationDialog';
+
+
+interface User {
+  id: number;
+  name: string;
+  email: string;
+}
 
 interface NewChatPopupProps {
   open: boolean;
   onClose: () => void;
-  onSelectUser: (user: any) => void;
+  onSelectUser: (user: User, roomId: string) => void;
 }
 
 const userTypes = [
   { id: 'franchiseAdmin', label: 'Franchise Admin', icon: '🏢' },
   { id: 'locationAdmin', label: 'Location Admin', icon: '📍' },
-  { id: 'teacher', label: 'Teacher', icon: '👩‍🏫' },
-  { id: 'parent', label: 'Parent', icon: '👨‍👩‍👧' },
-  { id: 'student', label: 'Student', icon: '🎓' }
+  { id: 'teacher', label: 'Teacher', icon: '👩‍🏫' }
 ];
 
-// Mock fetch functions for different user types
-const fetchUsersByType = (type: string, query: string) => {
-  // Replace this with actual API calls based on user type
-  return new Promise<{ data: any[] }>((resolve, reject) => {
-    setTimeout(() => {
-      // Simulate error for demonstration
-      if (Math.random() < 0.1) {
-        reject(new Error('Failed to fetch users.'));
-      } else {
-        const allUsers = {
-          franchiseAdmin: [
-            { id: 1, name: 'John Doe', email: 'john@franchise.com' },
-            { id: 2, name: 'Jane Smith', email: 'jane@franchise.com' }
-          ],
-          locationAdmin: [
-            { id: 3, name: 'Alice Johnson', email: 'alice@location.com' },
-            { id: 4, name: 'Bob Brown', email: 'bob@location.com' }
-          ],
-          teacher: [
-            { id: 5, name: 'Charlie Davis', email: 'charlie@school.com' },
-            { id: 6, name: 'Dana Lee', email: 'dana@school.com' }
-          ],
-          parent: [
-            { id: 7, name: 'Evan Green', email: 'evan@parent.com' },
-            { id: 8, name: 'Fiona White', email: 'fiona@parent.com' }
-          ],
-          student: [
-            { id: 9, name: 'George King', email: 'george@student.com' },
-            { id: 10, name: 'Hannah Scott', email: 'hannah@student.com' }
-          ]
-        };
-        const filtered = allUsers[type].filter(user =>
-          user.name.toLowerCase().includes(query.toLowerCase())
-        );
-        resolve({ data: filtered });
-      }
-    }, 1000);
-  });
+const fetchUsersByType = async (type: string, query: string) => {
+  const page = 1;
+  const limit = 10;
+
+  try {
+    let response;
+    switch (type) {
+      case 'franchiseAdmin':
+        response = await fetchFranchiseAdmins(page, limit, query);
+        break;
+      case 'locationAdmin':
+        response = await fetchLocationAdmins(page, limit, query);
+        break;
+      case 'teacher':
+        response = await fetchTeachers(page, limit, query);
+        break;
+      default:
+        throw new Error('Invalid user type');
+    }
+
+    // Transform the response data to match expected format
+    const transformedData = response.data.map(item => ({
+      id: type === 'teacher' ? item.userId : item.id,
+      name: `${item.firstName} ${item.lastName}`,
+      email: item.email,
+      postalCode: item.postalCode,
+      phoneNumber: item.phoneNumber
+    }));
+
+    return {
+      data: transformedData,
+      total: response.total || 0
+    };
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    throw error;
+  }
 };
 
 const steps = ['Select User Type', 'Select User'];
@@ -82,14 +91,18 @@ const NewChatPopup: React.FC<NewChatPopupProps> = ({
 }) => {
   const [activeStep, setActiveStep] = useState<number>(0);
   const [selectedUserType, setSelectedUserType] = useState<string | null>(null);
-  const [selectedUser, setSelectedUser] = useState<any>(null);
+  const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [userOptions, setUserOptions] = useState<any[]>([]);
-
+  const [userOptions, setUserOptions] = useState<User[]>([]);
+  const [creatingRoom, setCreatingRoom] = useState<boolean>(false);
+  const [confirmOpen, setConfirmOpen] = useState<boolean>(false);
+  const [pendingUser, setPendingUser] = useState<User | null>(null);
   useEffect(() => {
     if (activeStep === 1 && selectedUserType) {
-      // Optionally prefetch users or handle side effects here
+      // Reset state when changing steps
+      setUserOptions([]);
+      setError(null);
     }
   }, [activeStep, selectedUserType]);
 
@@ -99,11 +112,39 @@ const NewChatPopup: React.FC<NewChatPopupProps> = ({
     setError(null);
   };
 
-  const handleUserSelect = (user: any) => {
-    setSelectedUser(user);
-    onSelectUser(user);
-    handleClose();
+  const handleUserSelect = async (user: User) => {
+    setPendingUser(user);
+    setConfirmOpen(true);
   };
+
+  const handleCloseConfirm = () => {
+    setConfirmOpen(false);
+    setPendingUser(null);
+  };
+
+  const handleConfirmCreateRoom = async () => {
+    if (!pendingUser) return;
+
+    setConfirmOpen(false);
+    setSelectedUser(pendingUser);
+    setCreatingRoom(true);
+    setError(null);
+
+    try {
+      const chatRoom = await createOrGetChatRoom(pendingUser.id);
+      onSelectUser(pendingUser, chatRoom.id);
+      handleClose();
+    } catch (err: any) {
+      console.error("Error creating or fetching chat room:", err);
+
+      setError(err.message);
+      setCreatingRoom(false);
+      setSelectedUser(null);
+    } finally {
+      setPendingUser(null);
+    }
+  };
+
 
   const handleBack = () => {
     setActiveStep(prev => prev - 1);
@@ -124,13 +165,15 @@ const NewChatPopup: React.FC<NewChatPopupProps> = ({
     if (!selectedUserType) return [];
     setLoading(true);
     setError(null);
+
     try {
       const response = await fetchUsersByType(selectedUserType, query);
       setUserOptions(response.data);
       setLoading(false);
       return response.data;
     } catch (err: any) {
-      setError(err.message || 'An error occurred while fetching users.');
+      const errorMessage = err.response?.data?.message || err.message || 'An error occurred while fetching users.';
+      setError(errorMessage);
       setLoading(false);
       return [];
     }
@@ -147,83 +190,93 @@ const NewChatPopup: React.FC<NewChatPopupProps> = ({
   };
 
   return (
-    <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm">
-      <DialogTitle>
-        <Stepper activeStep={activeStep} alternativeLabel>
-          {steps.map(label => (
-            <Step key={label}>
-              <StepLabel>{label}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
-      </DialogTitle>
-      <DialogContent dividers>
-        {activeStep === 0 && (
-          <>
-            <Typography variant="h6" gutterBottom>
-              Select User Type to Chat
-            </Typography>
-            <List>
-              {userTypes.map((type) => (
-                <ListItem
-                  button
-                  key={type.id}
-                  onClick={() => handleUserTypeSelect(type.id)}
-                >
-                  <ListItemAvatar>
-                    <Avatar>
-                      {type.icon}
-                    </Avatar>
-                  </ListItemAvatar>
-                  <ListItemText primary={type.label} />
-                </ListItem>
-              ))}
-            </List>
-            <Box display="flex" justifyContent="flex-end" mt={2}>
-              <Button onClick={handleClose} color="primary" variant="outlined">
-                Cancel
-              </Button>
-            </Box>
-          </>
-        )}
-        {activeStep === 1 && (
-          <>
-            <Box display="flex" alignItems="center" mb={2}>
-              <Button onClick={handleBack} color="secondary" variant="text">
-                &larr; Back
-              </Button>
-              <Typography variant="h6" component="div" ml={2}>
-                Select a {getUserTypeLabel()}
+    <>
+      <Dialog open={open} onClose={handleClose} fullWidth maxWidth="sm" onBackdropClick={() => !creatingRoom && handleClose()}>
+        <DialogTitle>
+          <Stepper activeStep={activeStep} alternativeLabel>
+            {steps.map(label => (
+              <Step key={label}>
+                <StepLabel>{label}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
+        </DialogTitle>
+        <DialogContent dividers>
+          {activeStep === 0 && (
+            <>
+              <Typography variant="h6" gutterBottom>
+                Select User Type to Chat
               </Typography>
-            </Box>
-            {error && (
-              <Alert severity="error" sx={{ mb: 2 }}>
-                {error}
-              </Alert>
-            )}
-            <SingleSelectWithAutocomplete
-              ref={null} // Replace with actual ref if needed
-              label={`Search and assign ${getUserTypeLabel()}`}
-              fetchData={handleFetchUsers}
-              onSelect={handleUserSelect}
-              displayProperty="name"
-              placeholder={`Type to search ${getUserTypeLabel().toLowerCase()}s`}
-
-            />
-            <Box display="flex" justifyContent="flex-end" mt={2}>
-              <Button onClick={handleClose} color="primary" variant="outlined">
-                Cancel
-              </Button>
-            </Box>
-          </>
+              <List>
+                {userTypes.map((type) => (
+                  <ListItem
+                    button
+                    key={type.id}
+                    onClick={() => handleUserTypeSelect(type.id)}
+                  >
+                    <ListItemAvatar>
+                      <Avatar>
+                        {type.icon}
+                      </Avatar>
+                    </ListItemAvatar>
+                    <ListItemText primary={type.label} />
+                  </ListItem>
+                ))}
+              </List>
+              <Box display="flex" justifyContent="flex-end" mt={2}>
+                <Button onClick={handleClose} color="primary" variant="outlined">
+                  Cancel
+                </Button>
+              </Box>
+            </>
+          )}
+          {activeStep === 1 && (
+            <>
+              <Box display="flex" alignItems="center" mb={2}>
+                <Button onClick={handleBack} color="secondary" variant="text">
+                  &larr; Back
+                </Button>
+                <Typography variant="h6" component="div" ml={2}>
+                  Select a {getUserTypeLabel()}
+                </Typography>
+              </Box>
+              {error && (
+                <Alert severity="error" sx={{ mb: 2 }}>
+                  {error}
+                </Alert>
+              )}
+              <SingleSelectWithAutocomplete
+                ref={null}
+                label={`Search ${getUserTypeLabel()}`}
+                fetchData={handleFetchUsers}
+                onSelect={handleUserSelect}
+                displayProperty="name"
+                placeholder={`Type to search ${getUserTypeLabel().toLowerCase()}s`}
+              />
+              <Box display="flex" justifyContent="flex-end" mt={2}>
+                <Button onClick={handleClose} color="primary" variant="outlined">
+                  Cancel
+                </Button>
+              </Box>
+            </>
+          )}
+        </DialogContent>
+        {loading && (
+          <Box display="flex" justifyContent="center" p={2}>
+            <CircularProgress />
+          </Box>
         )}
-      </DialogContent>
-      {loading && (
-        <Box display="flex" justifyContent="center" p={2}>
-          <CircularProgress />
-        </Box>
-      )}
-    </Dialog>
+      </Dialog>
+      <ConfirmationDialog
+        open={confirmOpen}
+        onClose={handleCloseConfirm}
+        onConfirm={handleConfirmCreateRoom}
+        title="Create Chat Room"
+        content={`Are you sure you want to create a chat room with ${pendingUser?.name}?`}
+        confirmButtonText="Create"
+        confirmButtonColor="primary"
+      />
+    </>
   );
 };
 

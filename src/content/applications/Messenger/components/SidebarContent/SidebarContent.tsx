@@ -43,17 +43,17 @@ function SidebarContent() {
   useEffect(() => {
     // Join user-specific room for receiving updates
     socket.emit("join_room", `user_${userId}`);
-  
+
     socket.on("chat_updated", (updatedChat) => {
       console.log("Received chat_updated:", updatedChat); // Log the event
-  
+
       setChats((prevChats) => {
         const chatIndex = prevChats.findIndex(
           (chat) => chat.id === updatedChat.id
         );
-  
+
         let updatedChats;
-  
+
         if (chatIndex !== -1) {
           // Update the existing chat
           updatedChats = [...prevChats];
@@ -65,28 +65,28 @@ function SidebarContent() {
           // Add the new chat if it doesn't already exist
           updatedChats = [...prevChats, updatedChat];
         }
-  
+
         // Sort chats by lastMessage.sentAt in descending order
         return updatedChats.sort((a, b) => {
           const dateA = new Date(a.lastMessage?.sentAt || 0).getTime();
           const dateB = new Date(b.lastMessage?.sentAt || 0).getTime();
           return dateB - dateA; // Descending order
         });
-        
+
       });
     });
-  
+
     return () => {
       socket.off("chat_updated");
     };
   }, [userId]);
-  
+
 
   // Handle chat click
   const handleChatClick = async (chat) => {
     setChatRoomId(chat.id);
     setParticipants(chat.participants || []);
-  
+
     // Check if the last message sender is not the current user
     if (chat.lastMessage?.sender?.id !== userId && !chat.lastMessage?.isRead) {
       try {
@@ -97,30 +97,58 @@ function SidebarContent() {
         console.error("Failed to reset unread messages:", error);
       }
     }
-  
+
     // Update the lastMessage.isRead in the chat state
     setChats((prevChats) =>
       prevChats.map((c) =>
         c.id === chat.id
           ? {
-              ...c,
-              lastMessage: {
-                ...c.lastMessage,
-                isRead: true,
-              },
-            }
+            ...c,
+            lastMessage: {
+              ...c.lastMessage,
+              isRead: true,
+            },
+          }
           : c
       )
     );
   };
-  
+
 
   const handleNewChatClick = () => {
     setIsPopupOpen(true);
   };
 
-  const handleSelectUser = (user) => {
-    console.log("Selected user:", user);
+  const handleSelectUser = async (user, roomId) => {
+    try {
+      // Create new participant object
+      const participant = {
+        id: user.id,
+        firstName: user.name.split(' ')[0],
+        lastName: user.name.split(' ')[1] || '',
+      };
+
+      // Create new chat object
+      const newChat = {
+        id: roomId,
+        participants: [participant],
+        lastMessage: null,
+        isGroup: false,
+      };
+
+      // Add the new chat to the beginning of the list
+      setChats(prevChats => [newChat, ...prevChats]);
+
+      // Set the active chat
+      setChatRoomId(roomId);
+      setParticipants([participant]);
+
+      // Close the popup
+      setIsPopupOpen(false);
+    } catch (error) {
+      console.error('Error handling user selection:', error);
+      // You might want to show an error message to the user here
+    }
   };
 
   return (
@@ -202,15 +230,15 @@ function SidebarContent() {
         ) : (
           <List disablePadding component="div">
             {chats.map((chat) => {
-  
+
               const isGroup = chat.isGroup;
               const participant =
                 !isGroup && chat.participants?.find((p) => p.id !== userId);
               const displayName = isGroup
                 ? chat.name || "Group Chat"
                 : participant
-                ? `${participant.firstName} ${participant.lastName}`
-                : "Unknown";
+                  ? `${participant.firstName} ${participant.lastName}`
+                  : "Unknown";
 
               return (
                 <ListItemWrapper
@@ -247,17 +275,17 @@ function SidebarContent() {
                   />
                   {chat.lastMessage && !chat.lastMessage?.isRead &&
                     chat.lastMessage?.sender?.id !== userId && (
-                    <Box
-                      sx={{
-                        width: 12, // Diameter of the circle
-                        height: 12, // Diameter of the circle
-                        backgroundColor: "primary.main", // Use theme primary color
-                        borderRadius: "50%", // Makes it a circle
-                        ml: 2, // Margin-left for spacing
-                        display: "inline-block", // Keeps it inline with other elements
-                      }}
-                      title="Unread" // Tooltip text for accessibility
-                    />
+                      <Box
+                        sx={{
+                          width: 12, // Diameter of the circle
+                          height: 12, // Diameter of the circle
+                          backgroundColor: "primary.main", // Use theme primary color
+                          borderRadius: "50%", // Makes it a circle
+                          ml: 2, // Margin-left for spacing
+                          display: "inline-block", // Keeps it inline with other elements
+                        }}
+                        title="Unread" // Tooltip text for accessibility
+                      />
 
                     )}
                 </ListItemWrapper>
@@ -269,7 +297,7 @@ function SidebarContent() {
       <NewChatPopup
         open={isPopupOpen}
         onClose={() => setIsPopupOpen(false)}
-        onSelectUser={handleSelectUser}
+        onSelectUser={(user, roomId) => handleSelectUser(user, roomId)}
       />
     </RootWrapper>
   );
