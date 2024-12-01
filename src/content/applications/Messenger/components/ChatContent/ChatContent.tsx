@@ -24,44 +24,40 @@ function ChatContent({ scrollbarRef }: ChatContentProps) {
   const { chatRoomId } = useChat();
   const socket = useWebSocket();
 
-
   const scrollToBottom = () => {
     if (scrollbarRef.current) {
-      scrollbarRef.current.scrollToBottom(); 
+      scrollbarRef.current.scrollToBottom();
     }
   };
 
   useEffect(() => {
     if (!chatRoomId) return;
-  
 
     setLoading(true);
-    fetchMessages(chatRoomId, (fetchedMessages) => {
-      setMessages(fetchedMessages);
-  
-    
-      setTimeout(() => {
-        scrollToBottom();
-      }, 100); 
-    }, setLoading);
-  
+    fetchMessages(
+      chatRoomId,
+      (fetchedMessages) => {
+        setMessages(fetchedMessages);
+
+        setTimeout(() => {
+          scrollToBottom();
+        }, 100);
+      },
+      setLoading
+    );
 
     socket.emit('join_room', `chat_${chatRoomId}`);
-  
-    socket.on('new_message', (message) => {
-  
 
+    socket.on('new_message', (message) => {
       if (message.chatRoom.id === chatRoomId) {
         setMessages((prevMessages) => [...prevMessages, message]);
       }
     });
-  
+
     return () => {
       socket.off('new_message');
     };
   }, [chatRoomId]);
-  
-
 
   useEffect(() => {
     if (messages.length > 0) {

@@ -8,7 +8,7 @@ import {
   Typography,
   Paper,
   Alert,
-  CircularProgress,
+  CircularProgress
 } from '@mui/material';
 import { login } from 'src/services/authService';
 import { isAuthenticated } from 'src/services/authService'; // Check token logic
@@ -63,7 +63,7 @@ const Login: React.FC = () => {
         height: '100vh',
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'center'
       }}
     >
       <Paper variant="outlined" sx={{ padding: 4, width: '100%' }}>
