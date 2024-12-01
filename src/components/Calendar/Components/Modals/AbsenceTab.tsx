@@ -23,6 +23,8 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
     const [status, setStatus] = useState<boolean | null>(null);
     const [loading, setLoading] = useState(false);
     const [absenceId, setAbsenceId] = useState<number | null>(null);
+    const [sessionDate, setSessionDate] = useState<number | null>(null);
+
     const [isStatusEditable, setIsStatusEditable] = useState(true);
     const [confirmStatusChange, setConfirmStatusChange] = useState(false);
     const [originalStatus, setOriginalStatus] = useState<boolean | null>(null);
@@ -39,6 +41,8 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
                         setStatus(absence.status ?? null);
                         setOriginalStatus(absence.status ?? null);
                         setAbsenceId(absence.absenceId);
+                        setSessionDate(absence.sessionInstanceDate);
+
                         setFiles(absence.files || []);
                         setIsStatusEditable(!(absence.status !== null || !absence.reason));
                     } else {
@@ -57,6 +61,7 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
         setStatus(null);
         setOriginalStatus(null);
         setAbsenceId(null);
+        setSessionDate(null);
         setIsStatusEditable(true);
         setFiles([]);
     };
@@ -78,6 +83,7 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
                             setStatus(absence.status ?? null);
                             setOriginalStatus(absence.status ?? null);
                             setAbsenceId(absence.absenceId);
+                            setSessionDate(absence.sessionInstanceDate);
                             setFiles(absence.files || []);
                             setIsStatusEditable(!(absence.status !== null || !absence.reason));
                         }
@@ -128,7 +134,16 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
         setConfirmStatusChange(false);
         setIsStatusEditable(true);
     };
-
+    const isDateOlderThan3Days = (date: string | number | Date): boolean => {
+        const targetDate = new Date(date); 
+        const today = new Date(); 
+    
+        const differenceInDays = Math.floor(
+            (today.getTime() - targetDate.getTime()) / (1000 * 60 * 60 * 24)
+        ); // Calculate the difference in days
+        return differenceInDays > 3;
+    };
+    
     return (
         <Dialog
             open={isOpen}
@@ -207,7 +222,7 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
                         </Box>
 
                         {absenceId ? (
-                            reason !== "" ? (
+                            (reason !== "" || isDateOlderThan3Days(sessionDate))? (
                                 <>
                                     <TextField
                                         label="Reason for Absence"
@@ -228,7 +243,11 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
                                                         : 'false'
                                             }
                                             onChange={handleStatusChange}
-                                            disabled={!isStatusEditable}
+                                            disabled={
+                                                isDateOlderThan3Days(sessionDate)
+                                                    ? false // Ignore isStatusEditable if sessionDate is older than 3 days
+                                                    : !isStatusEditable
+                                            }
                                         >
                                             <MenuItem value="true">Accepted</MenuItem>
                                             <MenuItem value="false">Rejected</MenuItem>
@@ -299,7 +318,7 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
                                     color="textSecondary"
                                     sx={{ mt: 2 }}
                                 >
-                                    Awaiting reasoning from student...
+                                    Awaiting reason from student...
                                 </Typography>
                             )
                         ) : null}
