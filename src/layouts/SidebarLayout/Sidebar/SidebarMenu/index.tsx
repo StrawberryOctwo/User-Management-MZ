@@ -246,7 +246,9 @@ function SidebarMenu() {
                   'SuperAdmin',
                   'FranchiseAdmin',
                   'LocationAdmin',
-                  'Teacher'
+                  'Teacher',
+                  'Parent',
+                  'Student',
                 ]}
               >
                 <ListItem component="div">

@@ -15,13 +15,13 @@ import { isAuthenticated } from 'src/services/authService'; // Check token logic
 import { useWebSocket } from 'src/utils/webSocketProvider';
 
 const Login: React.FC = () => {
+  const socket = useWebSocket()
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const isMounted = useRef(true); // Track if component is mounted
-  const socket = useWebSocket();
 
   useEffect(() => {
     isMounted.current = true; // Mark as mounted when the component is mounted
@@ -45,7 +45,7 @@ const Login: React.FC = () => {
       const response = await login(email, password);
       if (isMounted.current) {
         if (response?.status === 200) {
-          socket.connect(); // Connect to WebSocket server
+          socket.connect()
           navigate('/dashboard'); // Only navigate if login is successful
         }
       }

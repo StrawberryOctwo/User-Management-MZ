@@ -18,7 +18,7 @@ import { useAuth } from "src/hooks/useAuth";
 import { useChat } from "../../context/ChatContext";
 import AddIcon from "@mui/icons-material/Add";
 import NewChatPopup from "./NewChatPopup";
-import { socket } from "src/utils/webSocketProvider";
+import {  useWebSocket } from "src/utils/webSocketProvider";
 import { resetUnreadCount } from "src/services/chatService";
 
 function SidebarContent() {
@@ -30,7 +30,7 @@ function SidebarContent() {
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(10);
   const [isPopupOpen, setIsPopupOpen] = useState(false);
-
+  const socket = useWebSocket()
   // Fetch chats
   useEffect(() => {
     const debounceFetch = setTimeout(() => {

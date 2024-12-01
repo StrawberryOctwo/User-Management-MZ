@@ -16,12 +16,11 @@ interface WebSocketProviderProps {
 const SOCKET_SERVER_URL =
   process.env.REACT_APP_SOCKET_SERVER_URL || "http://localhost:3003";
 
-export const socket: Socket = io(SOCKET_SERVER_URL, {
-  withCredentials: true,
-  extraHeaders: {
-    Authorization: `Bearer ${localStorage.getItem("token")}`,
-  },
-});
+  const socket = io(SOCKET_SERVER_URL, {
+    withCredentials: true,
+  
+  });
+  
 
 // WebSocketProvider Component
 export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }) => {
