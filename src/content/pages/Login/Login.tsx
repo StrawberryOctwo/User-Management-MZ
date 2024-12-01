@@ -12,8 +12,10 @@ import {
 } from '@mui/material';
 import { login } from 'src/services/authService';
 import { isAuthenticated } from 'src/services/authService'; // Check token logic
+import { useWebSocket } from 'src/utils/webSocketProvider';
 
 const Login: React.FC = () => {
+  const socket = useWebSocket()
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -43,6 +45,7 @@ const Login: React.FC = () => {
       const response = await login(email, password);
       if (isMounted.current) {
         if (response?.status === 200) {
+          socket.connect()
           navigate('/dashboard'); // Only navigate if login is successful
         }
       }
