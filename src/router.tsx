@@ -343,7 +343,9 @@ const routes: RouteObject[] = [
                   ROLES.SUPER_ADMIN,
                   ROLES.FRANCHISE_ADMIN,
                   ROLES.LOCATION_ADMIN,
-                  ROLES.TEACHER
+                  ROLES.TEACHER,
+                  ROLES.STUDENT,
+                  ROLES.PARENT
                 ]}
               >
                 <ApplicationsMessenger />
