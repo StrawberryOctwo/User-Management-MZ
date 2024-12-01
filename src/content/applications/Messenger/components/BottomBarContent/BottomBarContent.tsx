@@ -1,24 +1,33 @@
 import { Box, Button, useTheme } from '@mui/material';
 import SendTwoToneIcon from '@mui/icons-material/SendTwoTone';
-import { user, MessageInputWrapper } from './styles';
+import { MessageInputWrapper } from './styles';
 import { sendMessage } from 'src/services/chatService';
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import AvatarWithInitials from '../../utils/Avatar';
 import { useChat } from '../../context/ChatContext';
 
 function BottomBarContent() {
   const theme = useTheme();
-
   const { chatRoomId, firstName, lastName } = useChat();
   const [message, setMessage] = useState('');
+  const inputRef = useRef<HTMLInputElement>(null);
 
   const handleSendMessage = async (content: string) => {
     try {
       if (!content) return;
       await sendMessage(chatRoomId, content);
       setMessage('');
+      if (inputRef.current) {
+        inputRef.current.focus();
+      }
     } catch (error) {
       console.error('Error sending message:', error);
+    }
+  };
+
+  const handleKeyPress = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === 'Enter') {
+      handleSendMessage(message);
     }
   };
 
@@ -39,6 +48,8 @@ function BottomBarContent() {
           fullWidth
           value={message}
           onChange={(e) => setMessage(e.target.value)}
+          onKeyDown={handleKeyPress}
+          inputRef={inputRef}
         />
       </Box>
       <Box>
