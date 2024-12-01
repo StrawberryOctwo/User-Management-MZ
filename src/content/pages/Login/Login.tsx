@@ -8,10 +8,11 @@ import {
   Typography,
   Paper,
   Alert,
-  CircularProgress,
+  CircularProgress
 } from '@mui/material';
 import { login } from 'src/services/authService';
 import { isAuthenticated } from 'src/services/authService'; // Check token logic
+import { useWebSocket } from 'src/utils/webSocketProvider';
 
 const Login: React.FC = () => {
   const [email, setEmail] = useState('');
@@ -20,6 +21,7 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
   const isMounted = useRef(true); // Track if component is mounted
+  const socket = useWebSocket();
 
   useEffect(() => {
     isMounted.current = true; // Mark as mounted when the component is mounted
@@ -43,6 +45,7 @@ const Login: React.FC = () => {
       const response = await login(email, password);
       if (isMounted.current) {
         if (response?.status === 200) {
+          socket.connect(); // Connect to WebSocket server
           navigate('/dashboard'); // Only navigate if login is successful
         }
       }
@@ -60,7 +63,7 @@ const Login: React.FC = () => {
         height: '100vh',
         display: 'flex',
         justifyContent: 'center',
-        alignItems: 'center',
+        alignItems: 'center'
       }}
     >
       <Paper variant="outlined" sx={{ padding: 4, width: '100%' }}>

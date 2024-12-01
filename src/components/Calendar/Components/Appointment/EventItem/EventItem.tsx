@@ -1,12 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import moment from 'moment';
 import './EventItem.css';
-import { ReactComponent as OnlineIcon } from '../../../assets/icons/OnlineIcon.svg';
 import { ReactComponent as GroupIcon } from '../../../assets/icons/GroupIcon.svg';
 import { ReactComponent as UserIcon } from '../../../assets/icons/UserIcon.svg';
 import { Warning as WarningIcon } from '@mui/icons-material'; // Warning icon
-import { Button, Menu, MenuItem } from '@mui/material';
+import { Button, Menu, MenuItem, Typography } from '@mui/material';
 import TvIcon from '@mui/icons-material/Tv';
+
 const EventItem = ({ eventInfo }) => {
   const {
     topicName,
@@ -16,10 +16,16 @@ const EventItem = ({ eventInfo }) => {
     students,
     hasOverlap,
     status,
-    reportStatus
+    reportStatus,
+    isHolidayCourse,
+    holidays,
+    closingDays
   } = eventInfo.event.extendedProps;
   const startTime = moment(eventInfo.event.start).format('HH:mm');
   const endTime = moment(eventInfo.event.end).format('HH:mm');
+  const eventDate = moment(eventInfo.event.start).format('YYYY-MM-DD');
+  const [isCancelled, setIsCancelled] = useState(false);
+  const [cancelReason, setCancelReason] = useState('');
   const sessionTypeName = sessionType?.name;
   const [visibleStudents, setVisibleStudents] = useState([]);
   const [extraStudents, setExtraStudents] = useState([]);
@@ -101,16 +107,93 @@ const EventItem = ({ eventInfo }) => {
     }
   }, [students]);
 
+  useEffect(() => {
+    let cancelReason = '';
+
+    const isInClosingDay = closingDays.some((day) => {
+      const isInDay =
+        moment(eventDate).isSameOrAfter(day.start_date) &&
+        moment(eventDate).isSameOrBefore(day.end_date);
+      if (isInDay) {
+        cancelReason = `Closing Day: ${day.name}`; // Set closing day name
+      }
+      return isInDay;
+    });
+
+    const isInHoliday = holidays.some((holiday) => {
+      const isInHolidayPeriod =
+        moment(eventDate).isSameOrAfter(holiday.start_date) &&
+        moment(eventDate).isSameOrBefore(holiday.end_date);
+      if (isInHolidayPeriod && !isHolidayCourse) {
+        cancelReason = `Holiday: ${holiday.name}`; // Set holiday name
+      }
+      return isInHolidayPeriod;
+    });
+
+    if (isInClosingDay || (isInHoliday && !isHolidayCourse)) {
+      setIsCancelled(true);
+      setCancelReason(cancelReason); // Update cancel reason
+    } else {
+      setIsCancelled(false);
+      setCancelReason(''); // Reset reason if not cancelled
+    }
+  }, [eventDate, closingDays, holidays, isHolidayCourse]);
+
   return (
     <div
       className={`custom-event ${!status ? 'inactive-event' : ''}`}
       style={{
-        border: `2px solid ${borderColor}`,
-        backgroundColor: '#f5f5f5',
+        border: `2px solid ${isCancelled ? '#FF0000' : borderColor}`,
+        backgroundColor: isCancelled ? 'rgba(255, 0, 0, 0.1)' : '#f5f5f5',
         height: `${eventHeight}px`,
         position: 'relative'
       }}
     >
+      {isCancelled && (
+        <div
+          style={{
+            position: 'absolute',
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: 'rgba(255, 255, 255, 0.8)',
+            display: 'flex',
+            flexDirection: 'column',
+            alignItems: 'center',
+            justifyContent: 'center',
+            zIndex: 10,
+            padding: '10px'
+          }}
+        >
+          {/* Cancelled text */}
+          <Typography
+            variant="h6"
+            style={{
+              color: '#FF0000',
+              fontWeight: 'bold',
+              textTransform: 'uppercase',
+              marginBottom: '5px' // Add spacing between the text
+            }}
+          >
+            Cancelled
+          </Typography>
+
+          {/* Cancel reason */}
+          {cancelReason && (
+            <Typography
+              variant="body2"
+              style={{
+                color: '#FF0000',
+                fontSize: '0.85rem', // Smaller font size for the reason
+                textAlign: 'center'
+              }}
+            >
+              {cancelReason}
+            </Typography>
+          )}
+        </div>
+      )}
       <div>
         <div className="event-header">
           {renderIcon()}

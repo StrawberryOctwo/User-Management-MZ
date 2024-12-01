@@ -96,12 +96,13 @@ export default function CustomizedCalendar({
   const isHandlingClick = useRef(false);
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
   const resources = useMemo(() => {
-    const maxRooms = strongestRoles[0] === 'Parent'
-      ? parentNumberOfRooms
-      : selectedLocations.reduce(
-        (max, location) => Math.max(max, location.numberOfRooms || 0),
-        0
-      );
+    const maxRooms =
+      strongestRoles[0] === 'Parent'
+        ? parentNumberOfRooms
+        : selectedLocations.reduce(
+            (max, location) => Math.max(max, location.numberOfRooms || 0),
+            0
+          );
 
     const unsortedResources = Array.from({ length: maxRooms }, (_, index) => ({
       id: `R${index + 1}`,
@@ -122,10 +123,14 @@ export default function CustomizedCalendar({
         id: session.data.appointment.id,
         sessionId: session.data.appointment.sessionId,
         resourceId: session.resourceId,
+        isHolidayCourse: session.data.appointment.isHolidayCourse,
+        holidays: holidays,
+        closingDays: closingDays,
         title: session.data.appointment.topic,
         start: `${session.data.appointment.date}T${session.data.appointment.startTime}`,
         end: `${session.data.appointment.date}T${session.data.appointment.endTime}`,
         status: session.data.appointment.status,
+        isHoliday: session.data.appointment.isHoliday,
         extendedProps: {
           topicName: session.data.appointment.topic || 'No Topic',
           teacher: formattedTeacher,
@@ -141,29 +146,34 @@ export default function CustomizedCalendar({
     setEvents(mappedEvents);
   }, [classSessionEvents]);
 
+  // useEffect(() => {
+  //   console.log('holidays', holidays);
+  //   console.log('closingDays', closingDays);
+  // }, [holidays, closingDays]);
+
   const getDateStatus = (date: Date) => {
     const dateStr = moment(date).format('YYYY-MM-DD');
 
     const holidayMatch = holidays?.length
       ? holidays.find((holiday) =>
-        moment(dateStr).isBetween(
-          holiday.start_date,
-          holiday.end_date,
-          'day',
-          '[]'
+          moment(dateStr).isBetween(
+            holiday.start_date,
+            holiday.end_date,
+            'day',
+            '[]'
+          )
         )
-      )
       : null;
 
     const closingDayMatch = closingDays?.length
       ? closingDays.find((closingDay) =>
-        moment(dateStr).isBetween(
-          closingDay.start_date,
-          closingDay.end_date,
-          'day',
-          '[]'
+          moment(dateStr).isBetween(
+            closingDay.start_date,
+            closingDay.end_date,
+            'day',
+            '[]'
+          )
         )
-      )
       : null;
 
     return {
@@ -173,6 +183,10 @@ export default function CustomizedCalendar({
       closingDayName: closingDayMatch?.name
     };
   };
+
+  // useEffect(() => {
+  //   console.log('date status', getDateStatus(selectedDate));
+  // }, [selectedDate]);
 
   const handleSpecialDaySuccess = () => {
     loadClassSessions();

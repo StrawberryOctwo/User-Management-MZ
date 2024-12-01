@@ -46,16 +46,16 @@ const CalendarContent: React.FC = () => {
       const role = roles.includes('SuperAdmin')
         ? 'SuperAdmin'
         : roles.includes('FranchiseAdmin')
-          ? 'FranchiseAdmin'
-          : roles.includes('LocationAdmin')
-            ? 'LocationAdmin'
-            : roles.includes('Teacher')
-              ? 'Teacher'
-              : roles.includes('Parent')
-                ? 'Parent'
-                : roles.includes('Student')
-                  ? 'Student'
-                  : null;
+        ? 'FranchiseAdmin'
+        : roles.includes('LocationAdmin')
+        ? 'LocationAdmin'
+        : roles.includes('Teacher')
+        ? 'Teacher'
+        : roles.includes('Parent')
+        ? 'Parent'
+        : roles.includes('Student')
+        ? 'Student'
+        : null;
       setStrongestRole(role);
     }
   }, [userRoles]);
@@ -94,7 +94,7 @@ const CalendarContent: React.FC = () => {
   }, []);
 
   const transformClassSessionsToEvents = (
-    classSessions: any[],
+    classSessions: any[]
   ): EventItem[] => {
     // console.log('classSessions:', classSessions);
     if (classSessions === undefined) return [];
@@ -118,6 +118,7 @@ const CalendarContent: React.FC = () => {
           appointment: {
             id: session.id,
             sessionId: session.sessionId,
+            isHolidayCourse: session.isHolidayCourse,
             status: session.status,
             location: session.location?.name || 'Unknown Location',
             topic: session.topic?.name || 'Unknown Topic',
@@ -134,7 +135,7 @@ const CalendarContent: React.FC = () => {
             date: session.date
           }
         },
-        resourceId: resource,
+        resourceId: resource
       };
     });
   };
@@ -162,7 +163,9 @@ const CalendarContent: React.FC = () => {
           ) {
             setSelectedLocations(response.userLocations);
           }
-          const teacherEvents = transformClassSessionsToEvents(response.sessionInstances);
+          const teacherEvents = transformClassSessionsToEvents(
+            response.sessionInstances
+          );
           setClassSessionEvents(teacherEvents);
           break;
         case 'Parent':
@@ -171,7 +174,9 @@ const CalendarContent: React.FC = () => {
             date,
             date
           );
-          const parentEvents = transformClassSessionsToEvents(response.sessionInstances,);
+          const parentEvents = transformClassSessionsToEvents(
+            response.sessionInstances
+          );
           setParentNbOfRooms(response.numberOfRooms);
           setClassSessionEvents(parentEvents);
           break;
@@ -182,7 +187,9 @@ const CalendarContent: React.FC = () => {
             return;
           }
           response = await fetchClassSessions(date, date, locationIds);
-          const adminEvents = transformClassSessionsToEvents(response.sessionInstances);
+          const adminEvents = transformClassSessionsToEvents(
+            response.sessionInstances
+          );
           setClassSessionEvents(adminEvents);
           break;
         default:
@@ -262,18 +269,23 @@ const CalendarContent: React.FC = () => {
     }
   }, [date, selectedFranchise, selectedLocations, strongestRole]);
 
+  // useEffect(() => {
+  //   console.log('holiday', holidays);
+  //   console.log('closingDays', closingDays);
+  // }, [holidays, closingDays]);
+
   return (
     <Box sx={{ position: 'relative', height: '74vh' }}>
       {['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin'].includes(
         strongestRole || ''
       ) && (
-          <FilterToolbar
-            onFranchiseChange={handleFranchiseChange}
-            onLocationsChange={handleLocationsChange}
-            selectedFranchise={selectedFranchise}
-            selectedLocations={selectedLocations}
-          />
-        )}
+        <FilterToolbar
+          onFranchiseChange={handleFranchiseChange}
+          onLocationsChange={handleLocationsChange}
+          selectedFranchise={selectedFranchise}
+          selectedLocations={selectedLocations}
+        />
+      )}
 
       <Box sx={{ position: 'relative', height: '100%', overflow: 'hidden' }}>
         <CustomizedCalendar

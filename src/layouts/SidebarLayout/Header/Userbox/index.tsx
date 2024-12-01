@@ -20,6 +20,7 @@ import LockOpenTwoToneIcon from '@mui/icons-material/LockOpenTwoTone';
 import { useAuth } from '../../../../hooks/useAuth';
 import { PersonOffOutlined, Settings } from '@mui/icons-material';
 import HeaderLocalization from '../Buttons/Localization';
+import { useWebSocket } from 'src/utils/webSocketProvider';
 
 const UserBoxButton = styled(Button)(
   ({ theme }) => `
@@ -58,6 +59,7 @@ const UserBoxDescription = styled(Typography)(
 
 function HeaderUserbox() {
   const { username, userRoles } = useAuth(); // Use the hook inside the component
+  const socket = useWebSocket();
   const user = {
     name: username || 'Guest', // Fallback to 'Guest' if no username is available
     jobtitle: userRoles?.join(', ') || 'No Role Assigned' // Fallback if no roles
@@ -84,8 +86,13 @@ function HeaderUserbox() {
   };
 
   const handleLogout = (): void => {
-    navigate('/logout'); // Redirect to /logout route
+    // Disconnect WebSocket on logout
+    socket.disconnect();
+
+    // Navigate to the logout route
+    navigate('/logout');
   };
+
   const handleProfile = (): void => {
     handleClose();
     navigate('/management/profile/settings'); // Redirect to /logout route
