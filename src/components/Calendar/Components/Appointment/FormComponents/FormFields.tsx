@@ -232,7 +232,7 @@ export default function FormFields({
                 length:
                   selectedLocation?.numberOfRooms ||
                   passedLocations?.[0]?.numberOfRooms ||
-                  7
+                  0
               },
               (_, index) => (
                 <MenuItem key={index} value={`R${index + 1}`}>

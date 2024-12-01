@@ -29,7 +29,7 @@ const HeaderWrapper = styled(Box)(
         background-color: ${alpha(theme.header.background, 0.95)};
         backdrop-filter: blur(3px);
         position: fixed;
-        justify-content: space-between;
+    
         width: 100%;
         @media (min-width: ${theme.breakpoints.values.lg}px) {
             left: ${theme.sidebar.width};
@@ -62,14 +62,9 @@ function Header() {
               )}`
       }}
     >
-      <Stack
-        direction="row"
-        divider={<Divider orientation="vertical" flexItem />}
-        alignItems="center"
-        spacing={2}
-      >
+      <Box display="flex" alignItems="center" flexGrow={1}>
         <HeaderMenu />
-      </Stack>
+      </Box>
       <Box display="flex" alignItems="center">
         <HeaderButtons />
         <HeaderUserbox />

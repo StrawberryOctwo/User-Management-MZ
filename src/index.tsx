@@ -7,16 +7,19 @@ import App from 'src/App';
 import { SidebarProvider } from 'src/contexts/SidebarContext';
 import * as serviceWorker from 'src/serviceWorker';
 import { WebSocketProvider } from './utils/webSocketProvider';
+import { HeaderMenuProvider } from './components/Calendar/Components/CustomizedCalendar/HeaderMenuContext';
 
 ReactDOM.render(
   <WebSocketProvider>
-  <HelmetProvider>
-    <SidebarProvider>
-      <BrowserRouter>
-        <App />
-      </BrowserRouter>
-    </SidebarProvider>
-  </HelmetProvider>
+    <HelmetProvider>
+      <HeaderMenuProvider>
+        <SidebarProvider>
+          <BrowserRouter>
+            <App />
+          </BrowserRouter>
+        </SidebarProvider>
+      </HeaderMenuProvider>
+    </HelmetProvider>
   </WebSocketProvider>,
   document.getElementById('root')
 );

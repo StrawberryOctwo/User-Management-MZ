@@ -30,6 +30,7 @@ import {
   calendarHelpers
 } from '../../utils/calendarHelpers';
 import SpecialDayModal from '../Modals/SpecialDayModal';
+import CalendarLegend from '../CalendarLegend';
 
 export enum TimeSlotMinutes {
   Five = 5,
@@ -405,18 +406,12 @@ export default function CustomizedCalendar({
   };
 
   return (
-    <Box
-      display="flex"
-      flexDirection="column"
-      height="100%"
-      width="100%"
-      gap={2}
-      p={2}
-    >
+    <Box display="flex" flexDirection="column" height="100%" width="100%">
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <ClickAwayListener
           onClickAway={handleClickAway}
           mouseEvent="onMouseDown"
+          borderRadius
         >
           <div>
             <Popper
@@ -436,51 +431,56 @@ export default function CustomizedCalendar({
         </ClickAwayListener>
       </LocalizationProvider>
 
-      <FullCalendar
-        ref={calendarRef}
-        plugins={[resourceTimelinePlugin, interactionPlugin]}
-        schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
-        initialView="resourceTimelineDay"
-        initialDate={selectedDate}
-        headerToolbar={calendarHelpers.getHeaderToolbar()}
-        customButtons={calendarHelpers.getCustomButtons(
-          handleDatePickerClick,
-          handleOpenEventTypeModal,
-          selectedDate
-        )}
-        resources={resources}
-        resourceOrder="sortOrder"
-        events={events}
-        eventContent={renderEventContent}
-        slotMinTime="12:00:00"
-        slotMaxTime="19:00:00"
-        resourceAreaWidth="120px"
-        selectable={true}
-        slotLabelFormat={calendarHelpers.getTimeFormats().slotLabelFormat}
-        titleFormat={calendarHelpers.getTimeFormats().titleFormat}
-        datesSet={(info) => {
-          const currentDate = info.view.currentStart;
-          setSelectedDate(currentDate);
-          onDateChange(moment(currentDate).format('YYYY-MM-DD'));
-        }}
-        eventClick={(info) => handleEventClick(info.event)}
-        select={(info) =>
-          calendarEventHandlers.handleSelect(
-            info,
-            getDateStatus,
-            showMessage,
-            handleOpenAddModal
-          )
-        }
-        views={calendarHelpers.getViewSettings()}
-        slotLabelDidMount={(arg) =>
-          calendarEventHandlers.handleSlotLabel(arg, getDateStatus)
-        }
-        selectConstraint={calendarHelpers.getSelectConstraint()}
-        selectOverlap={(event) =>
-          calendarEventHandlers.handleSelectOverlap(event, getDateStatus)
-        }
-      />
+      <div style={{ position: 'relative' }}>
+        <FullCalendar
+          ref={calendarRef}
+          plugins={[resourceTimelinePlugin, interactionPlugin]}
+          schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
+          initialView="resourceTimelineDay"
+          initialDate={selectedDate}
+          headerToolbar={calendarHelpers.getHeaderToolbar()}
+          customButtons={calendarHelpers.getCustomButtons(
+            handleDatePickerClick,
+            handleOpenEventTypeModal,
+            selectedDate
+          )}
+          resources={resources}
+          resourceOrder="sortOrder"
+          events={events}
+          eventContent={renderEventContent}
+          slotMinTime="12:00:00"
+          slotMaxTime="19:00:00"
+          resourceAreaWidth="120px"
+          selectable={true}
+          slotLabelFormat={calendarHelpers.getTimeFormats().slotLabelFormat}
+          titleFormat={calendarHelpers.getTimeFormats().titleFormat}
+          datesSet={(info) => {
+            const currentDate = info.view.currentStart;
+            setSelectedDate(currentDate);
+            onDateChange(moment(currentDate).format('YYYY-MM-DD'));
+          }}
+          eventClick={(info) => handleEventClick(info.event)}
+          select={(info) =>
+            calendarEventHandlers.handleSelect(
+              info,
+              getDateStatus,
+              showMessage,
+              handleOpenAddModal
+            )
+          }
+          views={calendarHelpers.getViewSettings()}
+          slotLabelDidMount={(arg) =>
+            calendarEventHandlers.handleSlotLabel(arg, getDateStatus)
+          }
+          selectConstraint={calendarHelpers.getSelectConstraint()}
+          selectOverlap={(event) =>
+            calendarEventHandlers.handleSelectOverlap(event, getDateStatus)
+          }
+        />
+        <div style={{ position: 'absolute', bottom: 5, width: '100%' }}>
+          <CalendarLegend />
+        </div>
+      </div>
 
       <EventTypeSelectionModal
         isOpen={isEventTypeModalOpen}

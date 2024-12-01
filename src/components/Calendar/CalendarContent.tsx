@@ -19,6 +19,7 @@ import {
   fetchUserClassSessions
 } from 'src/services/classSessionService';
 import { calendarsharedService } from './CalendarSharedService';
+import { useHeaderMenu } from './Components/CustomizedCalendar/HeaderMenuContext';
 
 const CalendarContent: React.FC = () => {
   const [classSessionEvents, setClassSessionEvents] = useState<any[]>([]);
@@ -33,12 +34,15 @@ const CalendarContent: React.FC = () => {
     moment().endOf('month').format('YYYY-MM-DD')
   );
   const [date, setDate] = useState<string>(() => moment().format('YYYY-MM-DD'));
-  const [selectedFranchise, setSelectedFranchise] = useState<any | null>(null);
-  const [selectedLocations, setSelectedLocations] = useState<any[]>([]); // Updated to array
   const [strongestRole, setStrongestRole] = useState<string | null>(null);
   const [parentNbOfRooms, setParentNbOfRooms] = useState<number>(0);
   const { userId, userRoles } = useAuth();
-  // const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
+  const {
+    selectedFranchise,
+    setSelectedFranchise,
+    selectedLocations,
+    setSelectedLocations
+  } = useHeaderMenu();
 
   useEffect(() => {
     if (userRoles) {
@@ -269,25 +273,9 @@ const CalendarContent: React.FC = () => {
     }
   }, [date, selectedFranchise, selectedLocations, strongestRole]);
 
-  // useEffect(() => {
-  //   console.log('holiday', holidays);
-  //   console.log('closingDays', closingDays);
-  // }, [holidays, closingDays]);
-
   return (
-    <Box sx={{ position: 'relative', height: '74vh' }}>
-      {['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin'].includes(
-        strongestRole || ''
-      ) && (
-        <FilterToolbar
-          onFranchiseChange={handleFranchiseChange}
-          onLocationsChange={handleLocationsChange}
-          selectedFranchise={selectedFranchise}
-          selectedLocations={selectedLocations}
-        />
-      )}
-
-      <Box sx={{ position: 'relative', height: '100%', overflow: 'hidden' }}>
+    <Box sx={{ position: 'relative', height: '100%' }}>
+      <Box sx={{ position: 'relative', overflow: 'hidden' }}>
         <CustomizedCalendar
           classSessionEvents={classSessionEvents}
           onDateChange={setDate}
@@ -307,7 +295,6 @@ const CalendarContent: React.FC = () => {
                 top: 0,
                 left: 0,
                 width: '100%',
-                height: '100%',
                 backgroundColor: 'rgba(0, 0, 0, 0.5)',
                 display: 'flex',
                 alignItems: 'center',
@@ -322,8 +309,6 @@ const CalendarContent: React.FC = () => {
             </Box>
           )}
       </Box>
-
-      <CalendarLegend />
     </Box>
   );
 };
