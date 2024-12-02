@@ -49,21 +49,26 @@ const HeaderMenu: React.FC = () => {
     }
     if (franchise) {
       localStorage.setItem('selectedFranchise', JSON.stringify(franchise));
+      setSelectedFranchise(franchise);
+
     } else {
+      setSelectedFranchise([]);
+
       localStorage.removeItem('selectedFranchise');
       localStorage.removeItem('selectedLocations');
     }
-    setSelectedFranchise(franchise);
   };
 
   const handleLocationsChange = (locations: any[]) => {
     if (locations.length > 0) {
       localStorage.setItem('selectedLocations', JSON.stringify(locations));
+      console.log("these locations ",locations)
+      setSelectedLocations(locations);
     }else {
+      setSelectedLocations([]);
       localStorage.removeItem('selectedLocations');
     }
-
-    setSelectedLocations(locations);
+ 
   };
 
   if (

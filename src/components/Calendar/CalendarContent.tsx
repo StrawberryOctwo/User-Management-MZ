@@ -152,7 +152,7 @@ const CalendarContent: React.FC = () => {
         localStorage.getItem('selectedLocations') || '[]'
       );
       let response;
-      const validLocations = locations
+      const validLocations = storedLocations
       const locationIds = validLocations.map((location) => location.id);
 
       switch (strongestRole) {
