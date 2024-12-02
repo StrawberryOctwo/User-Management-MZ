@@ -142,7 +142,7 @@ const SingleSelectWithAutocomplete = forwardRef(
           // Only update query if not selecting an option
           if (reason !== 'reset' && !isSelecting) {
             setQuery(newInputValue);
-            if (newInputValue.length >= 2) {
+            if (newInputValue.length >= 0) {
               setShouldFetch(true);
             }
           }

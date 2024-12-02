@@ -95,20 +95,7 @@ const CalendarContent: React.FC = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (selectedFranchise) {
-      fetchLocationsByFranchise(selectedFranchise.id)
-        .then((locations) => {
-          setSelectedLocations(locations);
-        })
-        .catch((error) => {
-          console.error('Error fetching locations:', error);
-          setErrorMessage('Failed to fetch locations');
-        });
-    } else {
-      setSelectedLocations([]);
-    }
-  }, [selectedFranchise, setSelectedLocations]);
+
 
   const transformClassSessionsToEvents = (
     classSessions: any[]
@@ -160,10 +147,12 @@ const CalendarContent: React.FC = () => {
   const loadClassSessions = async (locations = selectedLocations) => {
     setLoading(true);
     setErrorMessage(null);
-
     try {
+      const storedLocations = JSON.parse(
+        localStorage.getItem('selectedLocations') || '[]'
+      );
       let response;
-      const validLocations = Array.isArray(locations) ? locations : [];
+      const validLocations = locations
       const locationIds = validLocations.map((location) => location.id);
 
       switch (strongestRole) {

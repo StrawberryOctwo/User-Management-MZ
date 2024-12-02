@@ -76,15 +76,17 @@ const MultiSelectWithCheckboxes = forwardRef(
         // 1. Component is focused AND query has 2+ chars, OR
         // 2. Options are empty (initial load)
         // AND not currently selecting an item
+        
         if (!shouldFetch || isSelecting) return;
 
-        if ((focused && inputValue.length >= 2) || options.length === 0) {
+        if ((focused && inputValue.length >= 0) || options.length === 0) {
           setLoading(true);
           try {
             const data = await fetchData(inputValue);
             if (active) {
+              console.log(data)
               const newOptions = Array.isArray(data) ? data : [];
-
+              console.log(newOptions)
               // Ensure all selected items remain in options
               selectedItems.forEach((selectedItem) => {
                 if (
@@ -103,6 +105,7 @@ const MultiSelectWithCheckboxes = forwardRef(
             }
           } catch (error) {
             console.error('Error fetching options:', error);
+            setOptions([]);
           } finally {
             if (active) {
               setLoading(false);
@@ -179,7 +182,7 @@ const MultiSelectWithCheckboxes = forwardRef(
           // Only update input value if not selecting an option
           if (reason !== 'reset' && !isSelecting) {
             setInputValue(newInputValue);
-            if (newInputValue.length >= 2) {
+            if (newInputValue.length >= 0) {
               setShouldFetch(true);
             }
           }

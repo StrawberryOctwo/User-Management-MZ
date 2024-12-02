@@ -24,9 +24,8 @@ const HeaderMenu: React.FC = () => {
     selectedFranchise?.id || null
   );
   const [isLocationEnabled, setIsLocationEnabled] = useState(
-    !!selectedFranchise
+    selectedFranchise
   );
-  const [locationOptions, setLocationOptions] = useState<any[]>([]); // Options for locations dropdown
 
   const { userRoles } = useAuth();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
@@ -37,25 +36,8 @@ const HeaderMenu: React.FC = () => {
   const locationRef = useRef<any>(null);
 
   useEffect(() => {
-    setIsLocationEnabled(!!selectedFranchise || isLocationAdmin);
-
-    // Fetch locations whenever the franchise changes
-    const fetchLocationsForFranchise = async () => {
-      if (franchiseId) {
-        try {
-          const locations = await fetchLocationsByFranchise(franchiseId, '');
-          setLocationOptions(locations);
-        } catch (error) {
-          console.error('Error fetching locations:', error);
-          setLocationOptions([]);
-        }
-      } else {
-        setLocationOptions([]);
-      }
-    };
-
-    fetchLocationsForFranchise();
-  }, [franchiseId, isLocationAdmin, selectedFranchise]);
+    setIsLocationEnabled(selectedFranchise || isLocationAdmin);
+  }, [selectedFranchise, isLocationAdmin]);
 
   const handleFranchiseChange = (franchise: any) => {
     setFranchiseId(franchise?.id || null);
@@ -65,11 +47,22 @@ const HeaderMenu: React.FC = () => {
     if (locationRef.current) {
       locationRef.current.reset();
     }
-
+    if (franchise) {
+      localStorage.setItem('selectedFranchise', JSON.stringify(franchise));
+    } else {
+      localStorage.removeItem('selectedFranchise');
+      localStorage.removeItem('selectedLocations');
+    }
     setSelectedFranchise(franchise);
   };
 
   const handleLocationsChange = (locations: any[]) => {
+    if (locations.length > 0) {
+      localStorage.setItem('selectedLocations', JSON.stringify(locations));
+    }else {
+      localStorage.removeItem('selectedLocations');
+    }
+
     setSelectedLocations(locations);
   };
 
@@ -107,13 +100,20 @@ const HeaderMenu: React.FC = () => {
         <MultiSelectWithCheckboxes
           ref={locationRef}
           label={t('Search_and_assign_locations')}
-          options={locationOptions}
           fetchData={(query) => {
-            if (franchiseId) {
+            if (hasFranchiseAccess && franchiseId) {
               return fetchLocationsByFranchise(franchiseId, query).then(
-                (data) => data
+                (data) => {
+                  if (data?.length>0)
+                  {
+                    console.log(data)
+                    return data
+                  }
+                  return []
+                 
+                }
               );
-            } else {
+            } else if (!hasFranchiseAccess) {
               return fetchLocations(1, 5, query).then(
                 (response) => response.data
               );
@@ -122,7 +122,7 @@ const HeaderMenu: React.FC = () => {
           onSelect={handleLocationsChange}
           displayProperty="name"
           placeholder="Type to search locations"
-          initialValue={[]}
+          initialValue={selectedLocations}
           width="100%"
           disabled={!isLocationEnabled}
         />
