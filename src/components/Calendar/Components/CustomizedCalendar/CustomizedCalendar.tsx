@@ -93,6 +93,10 @@ export default function CustomizedCalendar({
   const { showMessage } = useSnackbar();
   const { userRoles } = useAuth();
 
+  const calendarKey = useMemo(() =>
+    `calendar-${holidays.length}-${closingDays.length}-${selectedDate.toISOString()}-${selectedLocations.length}`,
+    [holidays.length, closingDays.length, selectedDate, selectedLocations.length]
+  );
   const calendarRef = useRef<any>(null);
   const isHandlingClick = useRef(false);
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
@@ -101,9 +105,9 @@ export default function CustomizedCalendar({
       strongestRoles[0] === 'Parent'
         ? parentNumberOfRooms
         : selectedLocations.reduce(
-            (max, location) => Math.max(max, location.numberOfRooms || 0),
-            0
-          );
+          (max, location) => Math.max(max, location.numberOfRooms || 0),
+          0
+        );
 
     const unsortedResources = Array.from({ length: maxRooms }, (_, index) => ({
       id: `R${index + 1}`,
@@ -155,26 +159,36 @@ export default function CustomizedCalendar({
   const getDateStatus = (date: Date) => {
     const dateStr = moment(date).format('YYYY-MM-DD');
 
+    // Return no holidays/closing days if no locations are selected
+    if (selectedLocations.length === 0) {
+      return {
+        isHoliday: false,
+        isClosingDay: false,
+        holidayName: null,
+        closingDayName: null
+      };
+    }
+
     const holidayMatch = holidays?.length
       ? holidays.find((holiday) =>
-          moment(dateStr).isBetween(
-            holiday.start_date,
-            holiday.end_date,
-            'day',
-            '[]'
-          )
+        moment(dateStr).isBetween(
+          holiday.start_date,
+          holiday.end_date,
+          'day',
+          '[]'
         )
+      )
       : null;
 
     const closingDayMatch = closingDays?.length
       ? closingDays.find((closingDay) =>
-          moment(dateStr).isBetween(
-            closingDay.start_date,
-            closingDay.end_date,
-            'day',
-            '[]'
-          )
+        moment(dateStr).isBetween(
+          closingDay.start_date,
+          closingDay.end_date,
+          'day',
+          '[]'
         )
+      )
       : null;
 
     return {
@@ -433,6 +447,7 @@ export default function CustomizedCalendar({
 
       <div style={{ position: 'relative' }}>
         <FullCalendar
+          key={calendarKey}
           ref={calendarRef}
           plugins={[resourceTimelinePlugin, interactionPlugin]}
           schedulerLicenseKey="GPL-My-Project-Is-Open-Source"

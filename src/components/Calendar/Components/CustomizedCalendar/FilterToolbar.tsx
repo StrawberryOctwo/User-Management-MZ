@@ -38,24 +38,28 @@ const FilterToolbar: React.FC<FilterToolbarProps> = ({
     if (selectedFranchise) {
       setFranchiseId(selectedFranchise.id);
     }
-    // Update `isLocationEnabled` whenever `selectedFranchise` changes
     setIsLocationEnabled(!!selectedFranchise || isLocationAdmin);
   }, [selectedFranchise, isLocationAdmin]);
 
   const handleFranchiseChange = (franchise: any) => {
     setFranchiseId(franchise?.id || null);
     setIsLocationEnabled(!!franchise?.id || isLocationAdmin);
+    localStorage.setItem('selectedFranchise', JSON.stringify(franchise));
 
     onLocationsChange([]);
     if (locationRef.current) {
-      locationRef.current.reset(); // Reset the MultiSelectWithCheckboxes input
+      locationRef.current.reset();
     }
+    localStorage.setItem('selectedLocations', JSON.stringify([]));
 
     onFranchiseChange(franchise);
   };
 
   const handleLocationsChange = (locations: any[]) => {
-    onLocationsChange(locations); // Passes selected locations array to the parent
+    console.log("djfhdjf")
+    console.log(locations)
+    localStorage.setItem('selectedLocations', JSON.stringify(locations));
+    onLocationsChange(locations);
   };
 
   if (userRole === 'Teacher' || userRole === 'Student' || userRole === 'Parent') {

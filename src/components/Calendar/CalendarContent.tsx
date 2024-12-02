@@ -5,9 +5,6 @@ import CustomizedCalendar from './Components/CustomizedCalendar/CustomizedCalend
 import moment from 'moment';
 import { EventItem } from './types';
 import 'react-big-calendar/lib/css/react-big-calendar.css';
-import { t, use } from 'i18next';
-import FilterToolbar from './Components/CustomizedCalendar/FilterToolbar';
-import CalendarLegend from './Components/CalendarLegend';
 import { useAuth } from 'src/hooks/useAuth';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import {
@@ -20,6 +17,7 @@ import {
 } from 'src/services/classSessionService';
 import { calendarsharedService } from './CalendarSharedService';
 import { useHeaderMenu } from './Components/CustomizedCalendar/HeaderMenuContext';
+import { fetchLocationsByFranchise } from 'src/services/locationService';
 
 const CalendarContent: React.FC = () => {
   const [classSessionEvents, setClassSessionEvents] = useState<any[]>([]);
@@ -50,16 +48,16 @@ const CalendarContent: React.FC = () => {
       const role = roles.includes('SuperAdmin')
         ? 'SuperAdmin'
         : roles.includes('FranchiseAdmin')
-        ? 'FranchiseAdmin'
-        : roles.includes('LocationAdmin')
-        ? 'LocationAdmin'
-        : roles.includes('Teacher')
-        ? 'Teacher'
-        : roles.includes('Parent')
-        ? 'Parent'
-        : roles.includes('Student')
-        ? 'Student'
-        : null;
+          ? 'FranchiseAdmin'
+          : roles.includes('LocationAdmin')
+            ? 'LocationAdmin'
+            : roles.includes('Teacher')
+              ? 'Teacher'
+              : roles.includes('Parent')
+                ? 'Parent'
+                : roles.includes('Student')
+                  ? 'Student'
+                  : null;
       setStrongestRole(role);
     }
   }, [userRoles]);
@@ -96,6 +94,21 @@ const CalendarContent: React.FC = () => {
       calendarsharedService.off('absenceUpdated', onAbsenceUpdated);
     };
   }, []);
+
+  useEffect(() => {
+    if (selectedFranchise) {
+      fetchLocationsByFranchise(selectedFranchise.id)
+        .then((locations) => {
+          setSelectedLocations(locations);
+        })
+        .catch((error) => {
+          console.error('Error fetching locations:', error);
+          setErrorMessage('Failed to fetch locations');
+        });
+    } else {
+      setSelectedLocations([]);
+    }
+  }, [selectedFranchise, setSelectedLocations]);
 
   const transformClassSessionsToEvents = (
     classSessions: any[]
