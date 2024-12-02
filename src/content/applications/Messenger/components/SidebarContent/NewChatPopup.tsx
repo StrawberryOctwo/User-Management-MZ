@@ -23,7 +23,10 @@ import { fetchLocationAdmins } from 'src/services/locationAdminService';
 import { fetchTeachers } from 'src/services/teacherService';
 import { createOrGetChatRoom } from 'src/services/chatService';
 import ConfirmationDialog from 'src/components/Calendar/Components/Modals/ConfirmationDialog';
+import { fetchStudents } from 'src/services/studentService';
+import { fetchParents } from 'src/services/parentService';
 
+import { useAuth } from 'src/hooks/useAuth';
 
 interface User {
   id: number;
@@ -38,9 +41,11 @@ interface NewChatPopupProps {
 }
 
 const userTypes = [
-  { id: 'franchiseAdmin', label: 'Franchise Admin', icon: '🏢' },
-  { id: 'locationAdmin', label: 'Location Admin', icon: '📍' },
-  { id: 'teacher', label: 'Teacher', icon: '👩‍🏫' }
+  { id: 'FranchiseAdmin', label: 'Franchise Admin', icon: '🏢' },
+  { id: 'LocationAdmin', label: 'Location Admin', icon: '📍' },
+  { id: 'Teacher', label: 'Teacher', icon: '👩‍🏫' },
+  { id: 'Student', label: 'Student', icon: '👩‍🏫' },
+  { id: 'Parent', label: 'Parent', icon: '👩‍🏫' }
 ];
 
 const fetchUsersByType = async (type: string, query: string) => {
@@ -50,14 +55,20 @@ const fetchUsersByType = async (type: string, query: string) => {
   try {
     let response;
     switch (type) {
-      case 'franchiseAdmin':
+      case 'FranchiseAdmin':
         response = await fetchFranchiseAdmins(page, limit, query);
         break;
-      case 'locationAdmin':
+      case 'LocationAdmin':
         response = await fetchLocationAdmins(page, limit, query);
         break;
-      case 'teacher':
+      case 'Teacher':
         response = await fetchTeachers(page, limit, query);
+        break;
+      case 'Student':
+        response = await fetchStudents(page, limit, query);
+        break;
+      case 'Parent':
+        response = await fetchParents(page, limit, query);
         break;
       default:
         throw new Error('Invalid user type');
@@ -65,7 +76,7 @@ const fetchUsersByType = async (type: string, query: string) => {
 
     // Transform the response data to match expected format
     const transformedData = response.data.map(item => ({
-      id: type === 'teacher' ? item.userId : item.id,
+      id: type === 'Teacher' ? item.userId : item.id,
       name: `${item.firstName} ${item.lastName}`,
       email: item.email,
       postalCode: item.postalCode,
@@ -89,6 +100,13 @@ const NewChatPopup: React.FC<NewChatPopupProps> = ({
   onClose,
   onSelectUser
 }) => {
+  const { userId, userRoles } = useAuth();
+  const filteredUserTypes = userTypes.filter((type) => {
+    if (userRoles.includes('Student') || userRoles.includes('Parent')) {
+      return !['Student', 'Parent'].includes(type.id);
+    }
+    return true;
+  });
   const [activeStep, setActiveStep] = useState<number>(0);
   const [selectedUserType, setSelectedUserType] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
@@ -180,14 +198,11 @@ const NewChatPopup: React.FC<NewChatPopupProps> = ({
   };
 
   const getUserTypeLabel = () => {
-    const type = userTypes.find(type => type.id === selectedUserType);
+    const type = filteredUserTypes.find(type => type.id === selectedUserType);
     return type ? type.label : '';
   };
 
-  const getUserTypeIcon = () => {
-    const type = userTypes.find(type => type.id === selectedUserType);
-    return type ? type.icon : '👤';
-  };
+
 
   return (
     <>
@@ -208,7 +223,7 @@ const NewChatPopup: React.FC<NewChatPopupProps> = ({
                 Select User Type to Chat
               </Typography>
               <List>
-                {userTypes.map((type) => (
+                {filteredUserTypes.map((type) => (
                   <ListItem
                     button
                     key={type.id}
