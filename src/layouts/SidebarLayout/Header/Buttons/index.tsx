@@ -17,7 +17,6 @@ function HeaderButtons() {
   return (
     <Box sx={{ mr: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
       {/* <HeaderSearch /> */}
-      <RemoteAlert />
       <HeaderNotifications />
 
       {/* <HeaderLocalization /> */}
