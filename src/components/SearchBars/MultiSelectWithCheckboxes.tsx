@@ -22,6 +22,7 @@ interface MultiSelectWithCheckboxesProps {
   initialValue?: any[];
   width?: string | number;
   disabled?: boolean;
+  options?: any[];
 }
 
 const MultiSelectWithCheckboxes = forwardRef(
@@ -34,18 +35,29 @@ const MultiSelectWithCheckboxes = forwardRef(
       placeholder = 'Select...',
       initialValue = [],
       width = '95%',
-      disabled = false
+      disabled = false,
+      options: externalOptions = []
     }: MultiSelectWithCheckboxesProps,
     ref
   ) => {
     const [options, setOptions] = useState<any[]>([]);
     const [initialOptions, setInitialOptions] = useState<any[]>([]);
-    const [selectedItems, setSelectedItems] = useState<any[]>(initialValue || []);
+    const [selectedItems, setSelectedItems] = useState<any[]>(
+      initialValue || []
+    );
     const [loading, setLoading] = useState(false);
     const [focused, setFocused] = useState(false);
     const [inputValue, setInputValue] = useState('');
     const [shouldFetch, setShouldFetch] = useState(true);
     const [isSelecting, setIsSelecting] = useState(false);
+
+    // Update options if externalOptions changes
+    useEffect(() => {
+      if (externalOptions.length > 0) {
+        setOptions(externalOptions);
+        setInitialOptions(externalOptions);
+      }
+    }, [externalOptions]);
 
     useImperativeHandle(ref, () => ({
       reset: () => {
@@ -74,8 +86,10 @@ const MultiSelectWithCheckboxes = forwardRef(
               const newOptions = Array.isArray(data) ? data : [];
 
               // Ensure all selected items remain in options
-              selectedItems.forEach(selectedItem => {
-                if (!newOptions.some(option => option.id === selectedItem.id)) {
+              selectedItems.forEach((selectedItem) => {
+                if (
+                  !newOptions.some((option) => option.id === selectedItem.id)
+                ) {
                   newOptions.push(selectedItem);
                 }
               });
@@ -105,16 +119,24 @@ const MultiSelectWithCheckboxes = forwardRef(
         active = false;
         clearTimeout(timeoutId);
       };
-    }, [focused, inputValue, fetchData, disabled, selectedItems, shouldFetch, isSelecting]);
+    }, [
+      focused,
+      inputValue,
+      fetchData,
+      disabled,
+      selectedItems,
+      shouldFetch,
+      isSelecting
+    ]);
 
     // Handle initial value changes
     useEffect(() => {
       if (initialValue?.length > 0) {
         setSelectedItems(initialValue);
-        setOptions(prevOptions => {
+        setOptions((prevOptions) => {
           const newOptions = [...prevOptions];
-          initialValue.forEach(selectedItem => {
-            if (!newOptions.some(option => option.id === selectedItem.id)) {
+          initialValue.forEach((selectedItem) => {
+            if (!newOptions.some((option) => option.id === selectedItem.id)) {
               newOptions.push(selectedItem);
             }
           });

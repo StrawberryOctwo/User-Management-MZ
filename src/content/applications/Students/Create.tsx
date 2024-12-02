@@ -33,7 +33,9 @@ export default function CreateStudent() {
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
   const [selectedTopics, setSelectedTopics] = useState<any[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
-  const [selectedGradeLevel, setSelectedGradeLevel] = useState<number | null>(null);
+  const [selectedGradeLevel, setSelectedGradeLevel] = useState<number | null>(
+    null
+  );
   const [selectedSchoolTypeId, setSelectedSchoolTypeId] = useState<
     number | null
   >(null);
@@ -212,7 +214,7 @@ export default function CreateStudent() {
   const statusOptions = [
     { label: t('active'), value: 'active' },
     { label: t('inactive'), value: 'inactive' },
-    { label: t('interested'), value: 'interested' },
+    { label: t('interested'), value: 'interested' }
   ];
 
   const userFields: FieldConfig[] = [
@@ -313,7 +315,7 @@ export default function CreateStudent() {
       name: 'contractEndDate',
       label: t('contract_end_date'),
       type: 'date',
-      required: true,
+      required: false,
       section: 'Student Information'
     },
     {
