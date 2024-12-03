@@ -31,6 +31,7 @@ import {
 } from '../../utils/calendarHelpers';
 import SpecialDayModal from '../Modals/SpecialDayModal';
 import CalendarLegend from '../CalendarLegend';
+import listPlugin from '@fullcalendar/list';
 
 export enum TimeSlotMinutes {
   Five = 5,
@@ -49,6 +50,7 @@ type DemoProps = {
   holidays: Holiday[];
   closingDays: Holiday[];
   parentNumberOfRooms: Number;
+  onDateRangeChange: (startDate: string, endDate: string) => void;
 };
 
 export default function CustomizedCalendar({
@@ -58,7 +60,8 @@ export default function CustomizedCalendar({
   selectedLocations,
   holidays,
   closingDays,
-  parentNumberOfRooms
+  parentNumberOfRooms,
+  onDateRangeChange
 }: DemoProps) {
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
   const [selectedClassSessionId, setSelectedClassSession] = useState<any>(null);
@@ -419,6 +422,48 @@ export default function CustomizedCalendar({
     return <EventItem eventInfo={eventInfo} />;
   };
 
+  const getAvailableViews = () => {
+    const baseViews = {
+      resourceTimelineDay: {
+        type: 'resourceTimeline',
+        duration: { days: 1 },
+        buttonText: 'day'
+      }
+    };
+
+    // Only add list view if single location is selected
+    if (selectedLocations.length === 1) {
+      return {
+        ...baseViews,
+        listWeek: {
+          type: 'list',
+          duration: { weeks: 1 },
+          buttonText: 'list'
+        }
+      };
+    }
+
+    return baseViews;
+  };
+
+  useEffect(() => {
+    const calendarApi = calendarRef.current?.getApi();
+    if (calendarApi && calendarApi.view.type === 'listWeek' && selectedLocations.length > 1) {
+      calendarApi.changeView('resourceTimelineDay');
+    }
+  }, [selectedLocations]);
+
+  const handleViewChange = (viewInfo: any) => {
+    const currentDate = viewInfo.view.currentStart;
+    if (viewInfo.view.type === 'listWeek') {
+      const startDate = moment(currentDate).startOf('week').format('YYYY-MM-DD');
+      const endDate = moment(currentDate).endOf('week').format('YYYY-MM-DD');
+      onDateRangeChange(startDate, endDate);
+    } else {
+      onDateChange(moment(currentDate).format('YYYY-MM-DD'));
+    }
+  };
+
   return (
     <Box display="flex" flexDirection="column" height="100%" width="100%">
       <LocalizationProvider dateAdapter={AdapterDayjs}>
@@ -449,9 +494,11 @@ export default function CustomizedCalendar({
         <FullCalendar
           key={calendarKey}
           ref={calendarRef}
-          plugins={[resourceTimelinePlugin, interactionPlugin]}
+          plugins={[resourceTimelinePlugin, interactionPlugin, listPlugin]}
           schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
           initialView="resourceTimelineDay"
+          views={getAvailableViews()}
+          datesSet={handleViewChange}
           initialDate={selectedDate}
           headerToolbar={calendarHelpers.getHeaderToolbar()}
           customButtons={calendarHelpers.getCustomButtons(
@@ -459,6 +506,15 @@ export default function CustomizedCalendar({
             handleOpenEventTypeModal,
             selectedDate
           )}
+          eventDidMount={(info) => {
+            if (info.view.type === 'listWeek') {
+              // Customize list view event rendering if needed
+              const eventEl = info.el;
+              if (info.event.extendedProps.hasOverlap) {
+                eventEl.style.borderLeft = '3px solid red';
+              }
+            }
+          }}
           resources={resources}
           resourceOrder="sortOrder"
           events={events}
@@ -469,11 +525,11 @@ export default function CustomizedCalendar({
           selectable={true}
           slotLabelFormat={calendarHelpers.getTimeFormats().slotLabelFormat}
           titleFormat={calendarHelpers.getTimeFormats().titleFormat}
-          datesSet={(info) => {
-            const currentDate = info.view.currentStart;
-            setSelectedDate(currentDate);
-            onDateChange(moment(currentDate).format('YYYY-MM-DD'));
-          }}
+          // datesSet={(info) => {
+          //   const currentDate = info.view.currentStart;
+          //   setSelectedDate(currentDate);
+          //   onDateChange(moment(currentDate).format('YYYY-MM-DD'));
+          // }}
           eventClick={(info) => handleEventClick(info.event)}
           select={(info) =>
             calendarEventHandlers.handleSelect(
@@ -483,7 +539,7 @@ export default function CustomizedCalendar({
               handleOpenAddModal
             )
           }
-          views={calendarHelpers.getViewSettings()}
+          // views={calendarHelpers.getViewSettings()}
           slotLabelDidMount={(arg) =>
             calendarEventHandlers.handleSlotLabel(arg, getDateStatus)
           }

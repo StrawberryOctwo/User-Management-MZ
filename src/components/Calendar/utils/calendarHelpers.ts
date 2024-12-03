@@ -7,7 +7,7 @@ import { FormatterInput } from '@fullcalendar/core';
 
 export const calendarHelpers: CalendarHelpers = {
   getHeaderToolbar: () => ({
-    left: 'today',
+    left: 'today, listWeek, resourceTimelineDay',
     center: 'prev datePickerButton next',
     right: 'eventButton'
   }),

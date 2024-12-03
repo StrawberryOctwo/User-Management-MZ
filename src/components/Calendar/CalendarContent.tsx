@@ -275,6 +275,39 @@ const CalendarContent: React.FC = () => {
     }
   }, [date, selectedFranchise, selectedLocations, strongestRole]);
 
+  const handleDateRangeChange = async (startDate: string, endDate: string) => {
+    setLoading(true);
+    setErrorMessage(null);
+    try {
+      const locationIds = selectedLocations.map(location => location.id);
+      let response;
+
+      switch (strongestRole) {
+        case 'Teacher':
+        case 'Student':
+          response = await fetchUserClassSessions(userId?.toString() || '', startDate, endDate);
+          setClassSessionEvents(transformClassSessionsToEvents(response.sessionInstances));
+          break;
+        case 'Parent':
+          response = await fetchParentClassSessions(userId?.toString() || '', startDate, endDate);
+          setClassSessionEvents(transformClassSessionsToEvents(response.sessionInstances));
+          break;
+        case 'SuperAdmin':
+        case 'FranchiseAdmin':
+        case 'LocationAdmin':
+          if (locationIds.length === 0) return;
+          response = await fetchClassSessions(startDate, endDate, locationIds);
+          setClassSessionEvents(transformClassSessionsToEvents(response.sessionInstances));
+          break;
+      }
+    } catch (error) {
+      console.error('Failed to load class sessions', error);
+      setErrorMessage('Failed to load class sessions. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <Box sx={{ position: 'relative', height: '100%' }}>
       <Box sx={{ position: 'relative', overflow: 'hidden' }}>
@@ -286,6 +319,7 @@ const CalendarContent: React.FC = () => {
           holidays={holidays}
           closingDays={closingDays}
           parentNumberOfRooms={parentNbOfRooms}
+          onDateRangeChange={handleDateRangeChange}
         />
         {selectedLocations.length === 0 &&
           strongestRole !== 'Teacher' &&
