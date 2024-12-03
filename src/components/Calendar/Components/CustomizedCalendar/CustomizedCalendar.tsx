@@ -510,9 +510,23 @@ export default function CustomizedCalendar({
       handleOpenEventTypeModal,
       selectedDate
     ),
-    listButton: {
-      text: 'list',
-      click: handleListViewClick
+    view: {
+      text: 'day',
+      click: () => {
+        const calendarApi = calendarRef.current?.getApi();
+        if (!calendarApi) return;
+
+        const currentView = calendarApi.view.type;
+        const newView = currentView === 'resourceTimelineDay' ? 'listWeek' : 'resourceTimelineDay';
+        saveViewPreference(newView);
+        calendarApi.changeView(newView);
+
+        // Update button text
+        const viewButton = document.querySelector('.fc-view-button');
+        if (viewButton) {
+          viewButton.textContent = newView === 'resourceTimelineDay' ? 'list' : 'day';
+        }
+      }
     }
   };
 
