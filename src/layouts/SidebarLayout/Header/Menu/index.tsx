@@ -42,18 +42,17 @@ const HeaderMenu: React.FC = () => {
   const handleFranchiseChange = (franchise: any) => {
     setFranchiseId(franchise?.id || null);
     setIsLocationEnabled(!!franchise?.id || isLocationAdmin);
-
     setSelectedLocations([]);
+
     if (locationRef.current) {
       locationRef.current.reset();
     }
+
     if (franchise) {
       localStorage.setItem('selectedFranchise', JSON.stringify(franchise));
       setSelectedFranchise(franchise);
-
     } else {
-      setSelectedFranchise([]);
-
+      setSelectedFranchise(null); // Change from [] to null
       localStorage.removeItem('selectedFranchise');
       localStorage.removeItem('selectedLocations');
     }
@@ -62,13 +61,13 @@ const HeaderMenu: React.FC = () => {
   const handleLocationsChange = (locations: any[]) => {
     if (locations.length > 0) {
       localStorage.setItem('selectedLocations', JSON.stringify(locations));
-      console.log("these locations ",locations)
+      console.log("these locations ", locations)
       setSelectedLocations(locations);
-    }else {
+    } else {
       setSelectedLocations([]);
       localStorage.removeItem('selectedLocations');
     }
- 
+
   };
 
   if (
@@ -109,13 +108,12 @@ const HeaderMenu: React.FC = () => {
             if (hasFranchiseAccess && franchiseId) {
               return fetchLocationsByFranchise(franchiseId, query).then(
                 (data) => {
-                  if (data?.length>0)
-                  {
+                  if (data?.length > 0) {
                     console.log(data)
                     return data
                   }
                   return []
-                 
+
                 }
               );
             } else if (!hasFranchiseAccess) {
