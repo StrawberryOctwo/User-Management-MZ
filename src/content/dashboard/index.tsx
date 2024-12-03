@@ -10,7 +10,7 @@ import TrafficSources from './components/TrafficSources';
 import TotalFranchises from './components/total/TotalFranchises';
 import TotalLocations from './components/total/TotalLocations';
 import TotalTeachers from './components/total/TotalTeachers';
-import TurnOverPieChart from './components/TurnOverPieChart';
+import TurnOverPieChart from './components/SessionsByCountry';
 import Conversions from './components/Conversions';
 
 function DashboardAnalytics() {
