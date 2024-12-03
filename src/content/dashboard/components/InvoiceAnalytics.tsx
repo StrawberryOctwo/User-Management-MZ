@@ -113,7 +113,7 @@ function InvoiceAnalytics() {
   const totalIncome = chartData.income.reduce((acc, curr) => acc + curr, 0);
   const totalExpense = chartData.expense.reduce((acc, curr) => acc + curr, 0);
   const netIncome = totalIncome - totalExpense;
-  const totalInvoices = chartData.income.length * 10; // Example calculation
+  const totalInvoices = chartData.totalInvoices; // Example calculation
   const netIncomePercentage = totalIncome ? (netIncome / totalIncome) * 100 : 0;
 
   return (
