@@ -12,15 +12,15 @@ import {
 } from '@mui/material';
 
 import { useTranslation } from 'react-i18next';
-import BusinessTwoToneIcon from '@mui/icons-material/BusinessTwoTone';
+import AssessmentTwoToneIcon from '@mui/icons-material/AssessmentTwoTone';
 
-const AvatarError = styled(Avatar)(
+const AvatarSuccess = styled(Avatar)(
   ({ theme }) => `
-      background-color: ${theme.colors.error.main};
-      color: ${theme.palette.getContrastText(theme.colors.error.main)};
+      background-color: ${theme.colors.success.main};
+      color: ${theme.palette.primary.contrastText};
       width: ${theme.spacing(8)};
       height: ${theme.spacing(8)};
-      box-shadow: ${theme.colors.shadows.error};
+      box-shadow: ${theme.colors.shadows.success};
 `
 );
 
@@ -34,14 +34,14 @@ const CardContentWrapper = styled(CardContent)(
 `
 );
 
-function PendingInvitations() {
+function TotalLocations() {
   const { t } = useTranslation();
 
   return (
     <Card>
       <CardContentWrapper>
         <Typography variant="overline" color="text.primary">
-          {t('Pending Invitations')}
+          {t('Locations')}
         </Typography>
 
         <ListItem
@@ -52,13 +52,13 @@ function PendingInvitations() {
           component="div"
         >
           <ListItemAvatar>
-            <AvatarError variant="rounded">
-              <BusinessTwoToneIcon fontSize="large" />
-            </AvatarError>
+            <AvatarSuccess variant="rounded">
+              <AssessmentTwoToneIcon fontSize="large" />
+            </AvatarSuccess>
           </ListItemAvatar>
 
           <ListItemText
-            primary="19"
+            primary="275"
             primaryTypographyProps={{
               variant: 'h1',
               sx: {
@@ -80,7 +80,7 @@ function PendingInvitations() {
             primary={
               <>
                 <Link fontWeight="bold" href="#">
-                  {t('See all invitations')}
+                  {t('See referring domains')}
                 </Link>
                 <Box
                   component="span"
@@ -88,7 +88,7 @@ function PendingInvitations() {
                     pl: 0.5
                   }}
                 >
-                  {t('not opened yet.')}
+                  {t('which sent most traffic')}.
                 </Box>
               </>
             }
@@ -100,4 +100,4 @@ function PendingInvitations() {
   );
 }
 
-export default PendingInvitations;
+export default TotalLocations;

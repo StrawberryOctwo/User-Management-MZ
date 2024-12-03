@@ -12,15 +12,15 @@ import {
 } from '@mui/material';
 
 import { useTranslation } from 'react-i18next';
-import SportsBasketballTwoToneIcon from '@mui/icons-material/SportsBasketballTwoTone';
+import LocalConvenienceStoreTwoToneIcon from '@mui/icons-material/LocalConvenienceStoreTwoTone';
 
-const AvatarPrimary = styled(Avatar)(
+const AvatarWarning = styled(Avatar)(
   ({ theme }) => `
-      background-color: ${theme.colors.primary.main};
-      color: ${theme.palette.getContrastText(theme.colors.primary.main)};
+      background-color: ${theme.colors.warning.main};
+      color:  ${theme.palette.primary.contrastText};
       width: ${theme.spacing(8)};
       height: ${theme.spacing(8)};
-      box-shadow: ${theme.colors.shadows.primary};
+      box-shadow: ${theme.colors.shadows.warning};
 `
 );
 
@@ -34,14 +34,14 @@ const CardContentWrapper = styled(CardContent)(
 `
 );
 
-function ActiveReferrals() {
+function TotalStudents() {
   const { t } = useTranslation();
 
   return (
     <Card>
       <CardContentWrapper>
         <Typography variant="overline" color="text.primary">
-          {t('Bounce Rate')}
+          {t('Students')}
         </Typography>
 
         <ListItem
@@ -52,13 +52,13 @@ function ActiveReferrals() {
           component="div"
         >
           <ListItemAvatar>
-            <AvatarPrimary variant="rounded">
-              <SportsBasketballTwoToneIcon fontSize="large" />
-            </AvatarPrimary>
+            <AvatarWarning variant="rounded">
+              <LocalConvenienceStoreTwoToneIcon fontSize="large" />
+            </AvatarWarning>
           </ListItemAvatar>
 
           <ListItemText
-            primary="49.3%"
+            primary="55.2%"
             primaryTypographyProps={{
               variant: 'h1',
               sx: {
@@ -80,7 +80,7 @@ function ActiveReferrals() {
             primary={
               <>
                 <Link fontWeight="bold" href="#">
-                  {t('See all links')}
+                  {t('See products')}
                 </Link>
                 <Box
                   component="span"
@@ -88,7 +88,7 @@ function ActiveReferrals() {
                     pl: 0.5
                   }}
                 >
-                  {t('with high bounce rate.')}
+                  {t('with the best conversion rates.')}
                 </Box>
               </>
             }
@@ -100,4 +100,4 @@ function ActiveReferrals() {
   );
 }
 
-export default ActiveReferrals;
+export default TotalStudents;

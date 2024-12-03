@@ -12,15 +12,15 @@ import {
 } from '@mui/material';
 
 import { useTranslation } from 'react-i18next';
-import LocalConvenienceStoreTwoToneIcon from '@mui/icons-material/LocalConvenienceStoreTwoTone';
+import BusinessTwoToneIcon from '@mui/icons-material/BusinessTwoTone';
 
-const AvatarWarning = styled(Avatar)(
+const AvatarError = styled(Avatar)(
   ({ theme }) => `
-      background-color: ${theme.colors.warning.main};
-      color:  ${theme.palette.primary.contrastText};
+      background-color: ${theme.colors.error.main};
+      color: ${theme.palette.getContrastText(theme.colors.error.main)};
       width: ${theme.spacing(8)};
       height: ${theme.spacing(8)};
-      box-shadow: ${theme.colors.shadows.warning};
+      box-shadow: ${theme.colors.shadows.error};
 `
 );
 
@@ -34,14 +34,14 @@ const CardContentWrapper = styled(CardContent)(
 `
 );
 
-function ConversionsAlt() {
+function TotalFranchises() {
   const { t } = useTranslation();
 
   return (
     <Card>
       <CardContentWrapper>
         <Typography variant="overline" color="text.primary">
-          {t('Conversion')}
+          {t('Franchises')}
         </Typography>
 
         <ListItem
@@ -52,13 +52,13 @@ function ConversionsAlt() {
           component="div"
         >
           <ListItemAvatar>
-            <AvatarWarning variant="rounded">
-              <LocalConvenienceStoreTwoToneIcon fontSize="large" />
-            </AvatarWarning>
+            <AvatarError variant="rounded">
+              <BusinessTwoToneIcon fontSize="large" />
+            </AvatarError>
           </ListItemAvatar>
 
           <ListItemText
-            primary="55.2%"
+            primary="19"
             primaryTypographyProps={{
               variant: 'h1',
               sx: {
@@ -80,7 +80,7 @@ function ConversionsAlt() {
             primary={
               <>
                 <Link fontWeight="bold" href="#">
-                  {t('See products')}
+                  {t('See all invitations')}
                 </Link>
                 <Box
                   component="span"
@@ -88,7 +88,7 @@ function ConversionsAlt() {
                     pl: 0.5
                   }}
                 >
-                  {t('with the best conversion rates.')}
+                  {t('not opened yet.')}
                 </Box>
               </>
             }
@@ -100,4 +100,4 @@ function ConversionsAlt() {
   );
 }
 
-export default ConversionsAlt;
+export default TotalFranchises;

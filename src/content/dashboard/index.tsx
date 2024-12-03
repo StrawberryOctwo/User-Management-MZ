@@ -2,16 +2,16 @@ import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 import { Helmet } from 'react-helmet-async';
 import { Grid } from '@mui/material';
-import ActiveReferrals from './components/ActiveReferrals';
 import AudienceOverview from './components/AudienceOverview';
-import BounceRate from './components/BounceRate';
-import Conversions from './components/Conversions';
-import ConversionsAlt from './components/ConversionsAlt';
+import ConversionsAlt from './components/total/TotalStudents';
 import PageHeader from './components/PageHeader';
-import PendingInvitations from './components/PendingInvitations';
-import SessionsByCountry from './components/SessionsByCountry';
 import TopLandingPages from './components/TopLandingPages';
 import TrafficSources from './components/TrafficSources';
+import TotalFranchises from './components/total/TotalFranchises';
+import TotalLocations from './components/total/TotalLocations';
+import TotalTeachers from './components/total/TotalTeachers';
+import TurnOverPieChart from './components/TurnOverPieChart';
+import Conversions from './components/Conversions';
 
 function DashboardAnalytics() {
   return (
@@ -41,13 +41,14 @@ function DashboardAnalytics() {
             alignItems="stretch"
           >
             <Grid item sm={6} xs={12}>
-              <ActiveReferrals />
+              <TotalFranchises />
             </Grid>
             <Grid item sm={6} xs={12}>
-              <PendingInvitations />
+              <TotalLocations />
             </Grid>
+
             <Grid item sm={6} xs={12}>
-              <BounceRate />
+              <TotalTeachers />
             </Grid>
             <Grid item sm={6} xs={12}>
               <ConversionsAlt />
@@ -55,7 +56,10 @@ function DashboardAnalytics() {
           </Grid>
         </Grid>
         <Grid item lg={4} md={6} xs={12}>
-          <SessionsByCountry />
+          <TurnOverPieChart />
+        </Grid>
+        <Grid item xs={12}>
+          <TrafficSources />
         </Grid>
         <Grid item xs={12}>
           <AudienceOverview />
@@ -65,9 +69,6 @@ function DashboardAnalytics() {
         </Grid>
         <Grid item md={7} xs={12}>
           <TopLandingPages />
-        </Grid>
-        <Grid item xs={12}>
-          <TrafficSources />
         </Grid>
       </Grid>
       <Footer />

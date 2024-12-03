@@ -50,7 +50,6 @@ function Conversions() {
       <CardHeader title={t('Conversions')} />
       <Divider />
       <CardContent>
-       
         <List disablePadding dense>
           <ListItem>
             <ListItemText
