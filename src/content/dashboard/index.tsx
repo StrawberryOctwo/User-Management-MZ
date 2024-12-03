@@ -6,12 +6,12 @@ import AudienceOverview from './components/AudienceOverview';
 import ConversionsAlt from './components/total/TotalStudents';
 import PageHeader from './components/PageHeader';
 import TopLandingPages from './components/TopLandingPages';
-import TrafficSources from './components/TrafficSources';
 import TotalFranchises from './components/total/TotalFranchises';
 import TotalLocations from './components/total/TotalLocations';
 import TotalTeachers from './components/total/TotalTeachers';
 import TurnOverPieChart from './components/SessionsByCountry';
 import Conversions from './components/Conversions';
+import InvoiceAnalytics from './components/InvoiceAnalytics';
 
 function DashboardAnalytics() {
   return (
@@ -59,7 +59,7 @@ function DashboardAnalytics() {
           <TurnOverPieChart />
         </Grid>
         <Grid item xs={12}>
-          <TrafficSources />
+          <InvoiceAnalytics />
         </Grid>
         <Grid item xs={12}>
           <AudienceOverview />
