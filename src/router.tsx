@@ -10,6 +10,7 @@ import ProtectedRoute from './protectedRoute';
 import Login from './content/pages/Login/Login';
 import Logout from './components/Logout';
 import ApplicationsMessenger from 'src/content/applications/Messenger';
+import DashboardCrypto from 'src/content/dashboard';
 
 const Loader = (Component) => (props) =>
   (
@@ -33,7 +34,7 @@ const Overview = Loader(lazy(() => import('src/content/overview')));
 
 // Dashboards
 
-const Crypto = Loader(lazy(() => import('src/content/dashboards/Crypto')));
+const Crypto = Loader(lazy(() => import('src/content/dashboard')));
 const Calendar = Loader(
   lazy(() => import('src/components/Calendar/CalendarContent'))
 );
@@ -304,6 +305,16 @@ const routes: RouteObject[] = [
           {
             path: '',
             element: <Navigate to="calendar" replace />
+          },
+          {
+            path: 'charts',
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN]}
+              >
+                <DashboardCrypto />
+              </ProtectedRoute>
+            )
           },
           {
             path: 'interests',

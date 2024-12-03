@@ -10,12 +10,14 @@ import {
   ListItem
 } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
+import InsertChartIcon from '@mui/icons-material/InsertChart';
 
 import { NavLink as RouterLink } from 'react-router-dom';
 import { SidebarContext } from 'src/contexts/SidebarContext';
 import EditCalendarIcon from '@mui/icons-material/CalendarMonth';
 import {
   AttachMoney,
+  BarChart,
   BusinessOutlined,
   ChatBubble,
   FileUploadSharp,
@@ -215,6 +217,21 @@ function SidebarMenu() {
                   </Button>
                 </ListItem>
               </ProtectedListItem>
+              <ProtectedListItem
+                allowedRoles={['SuperAdmin', 'FranchiseAdmin']}
+              >
+                <ListItem component="div">
+                  <Button
+                    disableRipple
+                    component={RouterLink}
+                    onClick={closeSidebar}
+                    to="/dashboard/charts"
+                    startIcon={<InsertChartIcon />}
+                  >
+                    Dashboard
+                  </Button>
+                </ListItem>
+              </ProtectedListItem>
               <ProtectedListItem allowedRoles={['SuperAdmin']}>
                 <ListItem component="div">
                   <Button
@@ -248,7 +265,7 @@ function SidebarMenu() {
                   'LocationAdmin',
                   'Teacher',
                   'Parent',
-                  'Student',
+                  'Student'
                 ]}
               >
                 <ListItem component="div">
