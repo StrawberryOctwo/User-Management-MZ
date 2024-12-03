@@ -95,6 +95,21 @@ export default function CustomizedCalendar({
 
   const { showMessage } = useSnackbar();
   const { userRoles } = useAuth();
+  const mounted = useRef(false);
+
+  const VIEW_STORAGE_KEY = 'calendarViewPreference';
+  const getStoredView = () => localStorage.getItem(VIEW_STORAGE_KEY) || 'resourceTimelineDay';
+
+  const saveViewPreference = (view: string) => {
+    localStorage.setItem(VIEW_STORAGE_KEY, view);
+  };
+
+  useEffect(() => {
+    mounted.current = true;
+    return () => {
+      mounted.current = false;
+    };
+  }, []);
 
   const calendarKey = useMemo(() =>
     `calendar-${holidays.length}-${closingDays.length}-${selectedDate.toISOString()}-${selectedLocations.length}`,
@@ -425,18 +440,17 @@ export default function CustomizedCalendar({
   const getAvailableViews = () => {
     const baseViews = {
       resourceTimelineDay: {
-        type: 'resourceTimeline',
+        type: 'resourceTimeline' as const,
         duration: { days: 1 },
         buttonText: 'day'
       }
     };
 
-    // Only add list view if single location is selected
     if (selectedLocations.length === 1) {
       return {
         ...baseViews,
         listWeek: {
-          type: 'list',
+          type: 'list' as const,
           duration: { weeks: 1 },
           buttonText: 'list'
         }
@@ -454,13 +468,51 @@ export default function CustomizedCalendar({
   }, [selectedLocations]);
 
   const handleViewChange = (viewInfo: any) => {
-    const currentDate = viewInfo.view.currentStart;
-    if (viewInfo.view.type === 'listWeek') {
-      const startDate = moment(currentDate).startOf('week').format('YYYY-MM-DD');
-      const endDate = moment(currentDate).endOf('week').format('YYYY-MM-DD');
-      onDateRangeChange(startDate, endDate);
+    if (!mounted.current) return;
+
+    const currentView = viewInfo.view.type;
+    saveViewPreference(currentView);
+    const targetDate = viewInfo.view.currentStart;
+
+    setSelectedDate(targetDate);
+
+    if (currentView === 'listWeek') {
+      const weekStart = moment(targetDate).startOf('week');
+      onDateRangeChange(
+        weekStart.format('YYYY-MM-DD'),
+        weekStart.clone().endOf('week').format('YYYY-MM-DD')
+      );
     } else {
-      onDateChange(moment(currentDate).format('YYYY-MM-DD'));
+      onDateChange(moment(targetDate).format('YYYY-MM-DD'));
+    }
+  };
+
+  const handleListViewClick = () => {
+    if (!mounted.current) return;
+
+    const calendarApi = calendarRef.current?.getApi();
+    if (calendarApi) {
+      const currentDate = calendarApi.getDate();
+      calendarApi.changeView('listWeek');
+      calendarApi.gotoDate(currentDate);
+
+      const weekStart = moment(currentDate).startOf('week');
+      onDateRangeChange(
+        weekStart.format('YYYY-MM-DD'),
+        weekStart.clone().endOf('week').format('YYYY-MM-DD')
+      );
+    }
+  };
+
+  const customButtons = {
+    ...calendarHelpers.getCustomButtons(
+      handleDatePickerClick,
+      handleOpenEventTypeModal,
+      selectedDate
+    ),
+    listButton: {
+      text: 'list',
+      click: handleListViewClick
     }
   };
 
@@ -496,16 +548,12 @@ export default function CustomizedCalendar({
           ref={calendarRef}
           plugins={[resourceTimelinePlugin, interactionPlugin, listPlugin]}
           schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
-          initialView="resourceTimelineDay"
           views={getAvailableViews()}
           datesSet={handleViewChange}
           initialDate={selectedDate}
+          initialView={getStoredView()}
           headerToolbar={calendarHelpers.getHeaderToolbar()}
-          customButtons={calendarHelpers.getCustomButtons(
-            handleDatePickerClick,
-            handleOpenEventTypeModal,
-            selectedDate
-          )}
+          customButtons={customButtons}
           eventDidMount={(info) => {
             if (info.view.type === 'listWeek') {
               // Customize list view event rendering if needed
