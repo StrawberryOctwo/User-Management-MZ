@@ -2,7 +2,7 @@ import Footer from 'src/components/Footer';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 import { Helmet } from 'react-helmet-async';
 import { Grid } from '@mui/material';
-import AudienceOverview from './components/AudienceOverview';
+import AudienceOverview from './components/TeacherStudentStatistics/AudienceOverview';
 import ConversionsAlt from './components/total/TotalStudents';
 import PageHeader from './components/PageHeader';
 import TopLandingPages from './components/TopLandingPages';

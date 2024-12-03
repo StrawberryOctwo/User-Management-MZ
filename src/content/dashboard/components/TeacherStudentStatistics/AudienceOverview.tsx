@@ -1,7 +1,6 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import ExpandMoreTwoToneIcon from '@mui/icons-material/ExpandMoreTwoTone';
-
 import {
   Button,
   Card,
@@ -17,8 +16,14 @@ import {
   styled,
   useTheme
 } from '@mui/material';
-
 import Chart from 'react-apexcharts';
+import {
+  getDataForPeriod,
+  periods,
+  allTimeNumbers,
+  userData,
+  userTypes
+} from './data';
 
 const CardActionsWrapper = styled(CardActions)(
   ({ theme }) => `
@@ -30,58 +35,12 @@ const CardActionsWrapper = styled(CardActions)(
 
 function AudienceOverview() {
   const { t } = useTranslation();
-
-  const periods = [
-    {
-      value: 'today',
-      text: t('Today')
-    },
-    {
-      value: 'yesterday',
-      text: t('Yesterday')
-    },
-    {
-      value: 'last_month',
-      text: t('Last month')
-    },
-    {
-      value: 'last_year',
-      text: t('Last year')
-    }
-  ];
-  const audiences = [
-    {
-      value: 'users',
-      text: t('Users')
-    },
-    {
-      value: 'new_users',
-      text: t('New users')
-    },
-    {
-      value: 'page_views',
-      text: t('Page views')
-    },
-    {
-      value: 'avg_session_duration',
-      text: t('Avg. session duration')
-    },
-    {
-      value: 'bounce_rate',
-      text: t('Bounce rate')
-    },
-    {
-      value: 'sessions',
-      text: t('Sessions')
-    }
-  ];
-
   const actionRef1 = useRef(null);
   const actionRef2 = useRef(null);
   const [openPeriod, setOpenMenuPeriod] = useState(false);
   const [openAudience, setOpenMenuAudience] = useState(false);
-  const [period, setPeriod] = useState(periods[3].text);
-  const [audience, setAudience] = useState(audiences[1].text);
+  const [period, setPeriod] = useState(periods[2].text);
+  const [userType, setUserType] = useState(userTypes[1].text);
   const theme = useTheme();
 
   const ChartSparklineOptions = {
@@ -166,20 +125,6 @@ function AudienceOverview() {
       }
     },
     colors: [theme.colors.primary.main],
-    labels: [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ],
     dataLabels: {
       enabled: false
     },
@@ -250,14 +195,23 @@ function AudienceOverview() {
     }
   };
 
-  const data = {
-    users: 14.586,
-    newUsers: 12.847,
-    pageViews: 67.492,
-    avgSessionDuration: '00:05:21',
-    bounceRate: '65.37%',
-    sessions: 25.694
-  };
+  const { data, labels } = getDataForPeriod(period);
+
+  const differences = data.map((value, index) => {
+    if (index === 0) return 0;
+    return value - data[index - 1];
+  });
+
+  const annotations = differences.map((difference, index) => ({
+    x: labels[index],
+    y: data[index],
+    label: {
+      text: `${difference >= 0 ? '+' : ''}${difference}`,
+      style: {
+        color: difference >= 0 ? 'green' : 'red'
+      }
+    }
+  }));
 
   return (
     <Card>
@@ -301,7 +255,7 @@ function AudienceOverview() {
             </Menu>
           </>
         }
-        title={t('Audience Overview')}
+        title={t('User Overview')}
       />
       <Divider />
       <CardContent>
@@ -312,7 +266,7 @@ function AudienceOverview() {
           onClick={() => setOpenMenuAudience(true)}
           endIcon={<ExpandMoreTwoToneIcon fontSize="small" />}
         >
-          {audience}
+          {userType}
         </Button>
         <Menu
           disableScrollLock
@@ -328,11 +282,11 @@ function AudienceOverview() {
             horizontal: 'left'
           }}
         >
-          {audiences.map((_audience) => (
+          {userTypes.map((_audience) => (
             <MenuItem
               key={_audience.value}
               onClick={() => {
-                setAudience(_audience.text);
+                setUserType(_audience.text);
                 setOpenMenuAudience(false);
               }}
             >
@@ -342,13 +296,17 @@ function AudienceOverview() {
         </Menu>
         <Box mt={2}>
           <Chart
-            options={ChartAudienceOptions}
+            options={{
+              ...ChartAudienceOptions,
+              xaxis: { ...ChartAudienceOptions.xaxis, categories: labels },
+              annotations: {
+                points: annotations
+              }
+            }}
             series={[
               {
-                name: 'New Users',
-                data: [
-                  324, 315, 578, 576, 227, 459, 473, 282, 214, 623, 477, 401
-                ]
+                name: `Total ${userType}`,
+                data: data
               }
             ]}
             type="line"
@@ -384,9 +342,11 @@ function AudienceOverview() {
               >
                 <Box>
                   <Typography variant="subtitle2" gutterBottom>
-                    {t('Users')}
+                    {t('Students')}
                   </Typography>
-                  <Typography variant="h3">{data.users}</Typography>
+                  <Typography variant="h3">
+                    {allTimeNumbers.Students}
+                  </Typography>
                 </Box>
 
                 <Chart
@@ -430,9 +390,11 @@ function AudienceOverview() {
               >
                 <Box>
                   <Typography variant="subtitle2" gutterBottom>
-                    {t('New Users')}
+                    {t('Teachers')}
                   </Typography>
-                  <Typography variant="h3">{data.newUsers}</Typography>
+                  <Typography variant="h3">
+                    {allTimeNumbers.Teachers}
+                  </Typography>
                 </Box>
                 <Chart
                   options={ChartSparklineOptions}
@@ -475,9 +437,9 @@ function AudienceOverview() {
               >
                 <Box>
                   <Typography variant="subtitle2" gutterBottom>
-                    {t('Page Views')}
+                    {t('Parents')}
                   </Typography>
-                  <Typography variant="h3">{data.pageViews}</Typography>
+                  <Typography variant="h3">{allTimeNumbers.Parents}</Typography>
                 </Box>
 
                 <Chart
@@ -488,146 +450,6 @@ function AudienceOverview() {
                       data: [
                         353, 380, 325, 246, 682, 605, 672, 271, 386, 630, 577,
                         511
-                      ]
-                    }
-                  ]}
-                  type="line"
-                  height={55}
-                />
-              </Box>
-              <Divider />
-            </Grid>
-            <Grid
-              xs={12}
-              sm={6}
-              md={4}
-              item
-              sx={{
-                position: 'relative'
-              }}
-            >
-              <Box
-                component="span"
-                sx={{
-                  display: { xs: 'none', sm: 'inline-block' }
-                }}
-              >
-                <Divider orientation="vertical" flexItem absolute />
-              </Box>
-              <Box
-                sx={{
-                  p: 3
-                }}
-              >
-                <Box>
-                  <Typography variant="subtitle2" gutterBottom>
-                    {t('Avg. Session Duration')}
-                  </Typography>
-                  <Typography variant="h3">
-                    {data.avgSessionDuration}
-                  </Typography>
-                </Box>
-
-                <Chart
-                  options={ChartSparklineOptions}
-                  series={[
-                    {
-                      name: 'Avg. Session Duration',
-                      data: [
-                        508, 420, 336, 278, 627, 475, 575, 307, 441, 249, 413,
-                        574
-                      ]
-                    }
-                  ]}
-                  type="line"
-                  height={55}
-                />
-              </Box>
-              <Divider />
-            </Grid>
-            <Grid
-              xs={12}
-              sm={6}
-              md={4}
-              item
-              sx={{
-                position: 'relative'
-              }}
-            >
-              <Box
-                component="span"
-                sx={{
-                  display: { xs: 'none', sm: 'inline-block' }
-                }}
-              >
-                <Divider orientation="vertical" flexItem absolute />
-              </Box>
-              <Box
-                sx={{
-                  p: 3
-                }}
-              >
-                <Box>
-                  <Typography variant="subtitle2" gutterBottom>
-                    {t('Bounce Rate')}
-                  </Typography>
-                  <Typography variant="h3">{data.bounceRate}</Typography>
-                </Box>
-
-                <Chart
-                  options={ChartSparklineOptions}
-                  series={[
-                    {
-                      name: 'Bounce Rate',
-                      data: [
-                        534, 345, 622, 332, 567, 250, 494, 270, 313, 470, 329,
-                        287
-                      ]
-                    }
-                  ]}
-                  type="line"
-                  height={55}
-                />
-              </Box>
-              <Divider />
-            </Grid>
-            <Grid
-              xs={12}
-              sm={6}
-              md={4}
-              item
-              sx={{
-                position: 'relative'
-              }}
-            >
-              <Box
-                component="span"
-                sx={{
-                  display: { xs: 'none', sm: 'inline-block' }
-                }}
-              >
-                <Divider orientation="vertical" flexItem absolute />
-              </Box>
-              <Box
-                sx={{
-                  p: 3
-                }}
-              >
-                <Box>
-                  <Typography variant="subtitle2" gutterBottom>
-                    {t('Sessions')}
-                  </Typography>
-                  <Typography variant="h3">{data.sessions}</Typography>
-                </Box>
-
-                <Chart
-                  options={ChartSparklineOptions}
-                  series={[
-                    {
-                      name: 'Sessions',
-                      data: [
-                        610, 234, 374, 423, 207, 507, 699, 304, 285, 257, 350,
-                        227
                       ]
                     }
                   ]}

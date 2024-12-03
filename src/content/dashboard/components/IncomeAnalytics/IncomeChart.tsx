@@ -11,60 +11,65 @@ type IncomeChartProps = {
   primaryColor: string;
 };
 
-const IncomeChart: React.FC<IncomeChartProps> = ({ data, categories, themeMode, primaryColor }) => {
+const IncomeChart: React.FC<IncomeChartProps> = ({
+  data,
+  categories,
+  themeMode,
+  primaryColor
+}) => {
   const options: ApexOptions = {
     chart: {
       type: 'bar',
       background: 'transparent',
       toolbar: {
-        show: false,
-      },
+        show: false
+      }
     },
     colors: [primaryColor],
     plotOptions: {
       bar: {
         borderRadius: 8,
-        columnWidth: '50%',
-      },
+        columnWidth: '50%'
+      }
     },
     dataLabels: {
-      enabled: false,
+      enabled: false
     },
     xaxis: {
       categories,
       labels: {
         style: {
-          colors: themeMode === 'light' ? '#000' : '#fff',
-        },
-      },
+          colors: themeMode === 'light' ? '#000' : '#fff'
+        }
+      }
     },
     yaxis: {
       labels: {
         style: {
-          colors: themeMode === 'light' ? '#000' : '#fff',
-        },
+          colors: themeMode === 'light' ? '#000' : '#fff'
+        }
       },
       title: {
-        text: '€',
-      },
+        text: '€'
+      }
     },
     tooltip: {
       theme: themeMode,
       y: {
-        formatter: (val: number) => `€${val.toLocaleString()}`,
-      },
+        formatter: (val: number) => `€${val.toLocaleString()}`
+      }
     },
     grid: {
       borderColor: themeMode === 'light' ? '#e0e0e0' : '#444',
-      strokeDashArray: 5,
-    },
+      strokeDashArray: 5
+    }
   };
 
   const series = [
     {
       name: 'Income',
-      data,
-    },
+      data
+    }
   ];
 
   return <Chart options={options} series={series} type="bar" height={350} />;
