@@ -9,9 +9,9 @@ import TopLandingPages from './components/TopLandingPages';
 import TotalFranchises from './components/total/TotalFranchises';
 import TotalLocations from './components/total/TotalLocations';
 import TotalTeachers from './components/total/TotalTeachers';
-import TurnOverPieChart from './components/SessionsByCountry';
 import Conversions from './components/Conversions';
 import InvoiceAnalytics from './components/InvoiceAnalytics';
+import SessionsByCountry from './components/SessionsByCountry';
 
 function DashboardAnalytics() {
   return (
@@ -56,7 +56,7 @@ function DashboardAnalytics() {
           </Grid>
         </Grid>
         <Grid item lg={4} md={6} xs={12}>
-          <TurnOverPieChart />
+          <SessionsByCountry />
         </Grid>
         <Grid item xs={12}>
           <InvoiceAnalytics />
