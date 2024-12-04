@@ -8,11 +8,16 @@ import {
   Card,
   ListItemText,
   ListItem,
-  styled
+  styled,
+  FormControl,
+  InputLabel,
+  MenuItem,
+  Select
 } from '@mui/material';
-
 import { useTranslation } from 'react-i18next';
 import BusinessTwoToneIcon from '@mui/icons-material/BusinessTwoTone';
+import { useEffect, useState } from 'react';
+import { fetchFranchises } from 'src/services/franchiseService';
 
 const AvatarError = styled(Avatar)(
   ({ theme }) => `
@@ -36,13 +41,48 @@ const CardContentWrapper = styled(CardContent)(
 
 function TotalFranchises() {
   const { t } = useTranslation();
+  const [selectedFranchise, setSelectedFranchise] = useState('All Franchises');
+  const [totalFranchises, setTotalFranchises] = useState(0);
+  const [franchises, setFranchises] = useState([]);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(10);
+
+  const handleFranchiseChange = (event) => {
+    setSelectedFranchise(event.target.value);
+  };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      // Fetch all franchises
+      const data = await fetchFranchises(page, limit);
+      console.log(data);
+      // Set totalFranchises to the length of the data
+      setFranchises(data.data);
+      setTotalFranchises(data.total);
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <Card>
       <CardContentWrapper>
-        <Typography variant="overline" color="text.primary">
+        {/* <Typography variant="overline" color="text.primary">
           {t('Franchises')}
-        </Typography>
+        </Typography> */}
+        <FormControl
+          variant="outlined"
+          sx={{ minWidth: '150px', maxHeight: '50px' }}
+        >
+          <Select value={selectedFranchise} onChange={handleFranchiseChange}>
+            <MenuItem value="All Franchises">All Franchises</MenuItem>
+            {franchises.map((franchise) => (
+              <MenuItem key={franchise.id} value={franchise.name}>
+                {franchise.name}
+              </MenuItem>
+            ))}
+          </Select>
+        </FormControl>
 
         <ListItem
           disableGutters
@@ -57,16 +97,18 @@ function TotalFranchises() {
             </AvatarError>
           </ListItemAvatar>
 
-          <ListItemText
-            primary="19"
-            primaryTypographyProps={{
-              variant: 'h1',
-              sx: {
-                ml: 2
-              },
-              noWrap: true
-            }}
-          />
+          <Box display="flex" alignItems="center">
+            <ListItemText
+              primary={totalFranchises}
+              primaryTypographyProps={{
+                variant: 'h1',
+                sx: {
+                  ml: 2
+                },
+                noWrap: true
+              }}
+            />
+          </Box>
         </ListItem>
         <ListItem
           disableGutters
@@ -79,17 +121,9 @@ function TotalFranchises() {
           <ListItemText
             primary={
               <>
-                <Link fontWeight="bold" href="#">
-                  {t('See all invitations')}
+                <Link fontWeight="bold" href="/management/franchises">
+                  {t('See all franchises')}
                 </Link>
-                <Box
-                  component="span"
-                  sx={{
-                    pl: 0.5
-                  }}
-                >
-                  {t('not opened yet.')}
-                </Box>
               </>
             }
             primaryTypographyProps={{ variant: 'body2', noWrap: true }}
