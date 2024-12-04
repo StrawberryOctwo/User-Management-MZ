@@ -149,7 +149,14 @@ export default function CustomizedCalendar({
   }, [selectedLocations, strongestRoles, classSessionEvents]);
 
   useEffect(() => {
+    const HOLIDAYS_STORAGE_KEY = 'calendarHolidays';
+    const CLOSING_DAYS_STORAGE_KEY = 'calendarClosingDays';
+
     const mappedEvents = classSessionEvents.map((session) => {
+      // Get fresh data from localStorage for each event mapping
+      const storedHolidays = JSON.parse(localStorage.getItem(HOLIDAYS_STORAGE_KEY) || '[]');
+      const storedClosingDays = JSON.parse(localStorage.getItem(CLOSING_DAYS_STORAGE_KEY) || '[]');
+
       const [firstName, lastName] = session.data.appointment.teacher.split(' ');
       const formattedTeacher = `${firstName[0]}. ${lastName}`;
       const hasOverlap = checkOverlap(session, classSessionEvents);
@@ -159,13 +166,11 @@ export default function CustomizedCalendar({
         sessionId: session.data.appointment.sessionId,
         resourceId: session.resourceId,
         isHolidayCourse: session.data.appointment.isHolidayCourse,
-        holidays: holidays,
-        closingDays: closingDays,
+        isHoliday: session.data.appointment.isHoliday,
         title: session.data.appointment.topic,
         start: `${session.data.appointment.date}T${session.data.appointment.startTime}`,
         end: `${session.data.appointment.date}T${session.data.appointment.endTime}`,
         status: session.data.appointment.status,
-        isHoliday: session.data.appointment.isHoliday,
         extendedProps: {
           topicName: session.data.appointment.topic || 'No Topic',
           teacher: formattedTeacher,
@@ -173,13 +178,16 @@ export default function CustomizedCalendar({
           sessionType: session.data.appointment.sessionType,
           students: session.data.appointment.students,
           reportStatus: session.data.appointment.reportStatus,
-          hasOverlap
+          hasOverlap,
+          isHolidayCourse: session.data.appointment.isHolidayCourse,
+          holidays: storedHolidays,
+          closingDays: storedClosingDays
         }
       };
     });
 
     setEvents(mappedEvents);
-  }, [classSessionEvents]);
+  }, [classSessionEvents, localStorage.getItem('calendarHolidays'), localStorage.getItem('calendarClosingDays')]);
 
   const getDateStatus = (date: Date) => {
     const dateStr = moment(date).format('YYYY-MM-DD');
@@ -668,6 +676,7 @@ export default function CustomizedCalendar({
         type="Holiday"
         initialData={selectedSpecialDay}
         onSuccess={handleSpecialDaySuccess}
+        selectedLocations={selectedLocations}
       />
 
       <SpecialDayModal
@@ -679,6 +688,7 @@ export default function CustomizedCalendar({
         type="Closing Day"
         initialData={selectedSpecialDay}
         onSuccess={handleSpecialDaySuccess}
+        selectedLocations={selectedLocations}
       />
     </Box>
   );
