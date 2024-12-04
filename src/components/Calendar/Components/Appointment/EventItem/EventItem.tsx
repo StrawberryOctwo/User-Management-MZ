@@ -116,9 +116,9 @@ const EventItem = ({ eventInfo }) => {
       setCancelReason('');
       return;
     }
-
+  
     let cancelReason = '';
-
+  
     const isInClosingDay = closingDays.some((day) => {
       const isInDay =
         moment(eventDate).isSameOrAfter(day.start_date) &&
@@ -128,7 +128,7 @@ const EventItem = ({ eventInfo }) => {
       }
       return isInDay;
     });
-
+  
     const isInHoliday = holidays.some((holiday) => {
       const isInHolidayPeriod =
         moment(eventDate).isSameOrAfter(holiday.start_date) &&
@@ -138,7 +138,7 @@ const EventItem = ({ eventInfo }) => {
       }
       return isInHolidayPeriod;
     });
-
+  
     if (isInClosingDay || (isInHoliday && !isHolidayCourse)) {
       setIsCancelled(true);
       setCancelReason(cancelReason);

@@ -77,8 +77,15 @@ export default function EditClosingDay() {
             };
 
             const response = await updateClosingDay(Number(id), payload);
-            // navigate(-1);
-            fetchClosingDay()
+
+            const CLOSING_DAYS_STORAGE_KEY = 'calendarClosingDays';
+            const storedClosingDays = JSON.parse(localStorage.getItem(CLOSING_DAYS_STORAGE_KEY) || '[]');
+            const updatedClosingDays = storedClosingDays.map((closingDay: any) =>
+                closingDay.id === Number(id) ? { ...closingDay, ...payload } : closingDay
+            );
+            localStorage.setItem(CLOSING_DAYS_STORAGE_KEY, JSON.stringify(updatedClosingDays));
+
+            fetchClosingDay();
             return response;
         } catch (error: any) {
             console.error('Error updating closing day:', error);

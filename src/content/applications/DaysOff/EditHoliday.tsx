@@ -76,7 +76,14 @@ export default function EditHoliday() {
             };
 
             const response = await updateHoliday(Number(id), payload);
-            // navigate(-1);
+
+            const HOLIDAYS_STORAGE_KEY = 'calendarHolidays';
+            const storedHolidays = JSON.parse(localStorage.getItem(HOLIDAYS_STORAGE_KEY) || '[]');
+            const updatedHolidays = storedHolidays.map((holiday: any) =>
+                holiday.id === Number(id) ? { ...holiday, ...payload } : holiday
+            );
+            localStorage.setItem(HOLIDAYS_STORAGE_KEY, JSON.stringify(updatedHolidays));
+
             fetchHoliday();
             return response;
         } catch (error: any) {
