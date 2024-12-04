@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 
 import { useTranslation } from 'react-i18next';
-import LocalConvenienceStoreTwoToneIcon from '@mui/icons-material/LocalConvenienceStoreTwoTone';
+import SchoolTwoToneIcon from '@mui/icons-material/SchoolTwoTone';
 
 const AvatarWarning = styled(Avatar)(
   ({ theme }) => `
@@ -53,7 +53,7 @@ function TotalStudents() {
         >
           <ListItemAvatar>
             <AvatarWarning variant="rounded">
-              <LocalConvenienceStoreTwoToneIcon fontSize="large" />
+              <SchoolTwoToneIcon fontSize="large" />
             </AvatarWarning>
           </ListItemAvatar>
 
@@ -79,17 +79,9 @@ function TotalStudents() {
           <ListItemText
             primary={
               <>
-                <Link fontWeight="bold" href="#">
-                  {t('See products')}
+                <Link fontWeight="bold" href="/management/students">
+                  {t('See all students')}
                 </Link>
-                <Box
-                  component="span"
-                  sx={{
-                    pl: 0.5
-                  }}
-                >
-                  {t('with the best conversion rates.')}
-                </Box>
               </>
             }
             primaryTypographyProps={{ variant: 'body2', noWrap: true }}

@@ -10,7 +10,7 @@ import { getStrongestRoles } from 'src/hooks/roleUtils';
 import { useAuth } from 'src/hooks/useAuth';
 import {
   deleteClassSession,
-  toggleClassSessionActivation,
+  toggleClassSessionActivation
 } from 'src/services/classSessionService';
 import FullCalendar from '@fullcalendar/react';
 import resourceTimelinePlugin from '@fullcalendar/resource-timeline';
@@ -101,7 +101,8 @@ export default function CustomizedCalendar({
   const mounted = useRef(false);
 
   const VIEW_STORAGE_KEY = 'calendarViewPreference';
-  const getStoredView = () => localStorage.getItem(VIEW_STORAGE_KEY) || 'resourceTimelineDay';
+  const getStoredView = () =>
+    localStorage.getItem(VIEW_STORAGE_KEY) || 'resourceTimelineDay';
 
   const saveViewPreference = (view: string) => {
     localStorage.setItem(VIEW_STORAGE_KEY, view);
@@ -114,9 +115,17 @@ export default function CustomizedCalendar({
     };
   }, []);
 
-  const calendarKey = useMemo(() =>
-    `calendar-${holidays.length}-${closingDays.length}-${selectedDate.toISOString()}-${selectedLocations.length}`,
-    [holidays.length, closingDays.length, selectedDate, selectedLocations.length]
+  const calendarKey = useMemo(
+    () =>
+      `calendar-${holidays.length}-${
+        closingDays.length
+      }-${selectedDate.toISOString()}-${selectedLocations.length}`,
+    [
+      holidays.length,
+      closingDays.length,
+      selectedDate,
+      selectedLocations.length
+    ]
   );
   const calendarRef = useRef<any>(null);
   const isHandlingClick = useRef(false);
@@ -126,9 +135,9 @@ export default function CustomizedCalendar({
       strongestRoles[0] === 'Parent'
         ? parentNumberOfRooms
         : selectedLocations.reduce(
-          (max, location) => Math.max(max, location.numberOfRooms || 0),
-          0
-        );
+            (max, location) => Math.max(max, location.numberOfRooms || 0),
+            0
+          );
 
     const unsortedResources = Array.from({ length: maxRooms }, (_, index) => ({
       id: `R${index + 1}`,
@@ -184,8 +193,12 @@ export default function CustomizedCalendar({
       };
     }
 
-    const storedHolidays = JSON.parse(localStorage.getItem(HOLIDAYS_STORAGE_KEY) || '[]');
-    const storedClosingDays = JSON.parse(localStorage.getItem(CLOSING_DAYS_STORAGE_KEY) || '[]');
+    const storedHolidays = JSON.parse(
+      localStorage.getItem(HOLIDAYS_STORAGE_KEY) || '[]'
+    );
+    const storedClosingDays = JSON.parse(
+      localStorage.getItem(CLOSING_DAYS_STORAGE_KEY) || '[]'
+    );
 
     const holidayMatch = storedHolidays.find((holiday: Holiday) =>
       moment(dateStr).isBetween(
@@ -454,7 +467,11 @@ export default function CustomizedCalendar({
 
   useEffect(() => {
     const calendarApi = calendarRef.current?.getApi();
-    if (calendarApi && calendarApi.view.type === 'listWeek' && selectedLocations.length > 1) {
+    if (
+      calendarApi &&
+      calendarApi.view.type === 'listWeek' &&
+      selectedLocations.length > 1
+    ) {
       calendarApi.changeView('resourceTimelineDay');
     }
   }, [selectedLocations]);
@@ -471,7 +488,8 @@ export default function CustomizedCalendar({
       const weekEnd = weekStart.clone().endOf('week');
 
       if (
-        weekStart.format('YYYY-MM-DD') !== moment(selectedDate).startOf('week').format('YYYY-MM-DD')
+        weekStart.format('YYYY-MM-DD') !==
+        moment(selectedDate).startOf('week').format('YYYY-MM-DD')
       ) {
         onDateRangeChange(
           weekStart.format('YYYY-MM-DD'),
@@ -501,14 +519,18 @@ export default function CustomizedCalendar({
         if (!calendarApi) return;
 
         const currentView = calendarApi.view.type;
-        const newView = currentView === 'resourceTimelineDay' ? 'listWeek' : 'resourceTimelineDay';
+        const newView =
+          currentView === 'resourceTimelineDay'
+            ? 'listWeek'
+            : 'resourceTimelineDay';
         saveViewPreference(newView);
         calendarApi.changeView(newView);
 
         // Update button text
         const viewButton = document.querySelector('.fc-view-button');
         if (viewButton) {
-          viewButton.textContent = newView === 'resourceTimelineDay' ? 'list' : 'day';
+          viewButton.textContent =
+            newView === 'resourceTimelineDay' ? 'list' : 'day';
         }
       }
     }

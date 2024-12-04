@@ -16,15 +16,10 @@ import SessionsByCountry from './components/SessionsByCountry';
 function DashboardAnalytics() {
   return (
     <>
-      <Helmet>
-        <title>Analytics Dashboard</title>
-      </Helmet>
-      <PageTitleWrapper>
-        <PageHeader />
-      </PageTitleWrapper>
       <Grid
         sx={{
-          px: 4
+          px: 4,
+          mt: 3
         }}
         container
         direction="row"
