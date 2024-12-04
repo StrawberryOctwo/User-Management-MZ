@@ -3,7 +3,7 @@ import moment from 'moment';
 import './EventItem.css';
 import { ReactComponent as GroupIcon } from '../../../assets/icons/GroupIcon.svg';
 import { ReactComponent as UserIcon } from '../../../assets/icons/UserIcon.svg';
-import { Warning as WarningIcon } from '@mui/icons-material'; // Warning icon
+import { Warning as WarningIcon } from '@mui/icons-material';
 import { Button, Menu, MenuItem, Typography } from '@mui/material';
 import TvIcon from '@mui/icons-material/Tv';
 
@@ -21,6 +21,7 @@ const EventItem = ({ eventInfo }) => {
     holidays,
     closingDays
   } = eventInfo.event.extendedProps;
+
   const startTime = moment(eventInfo.event.start).format('HH:mm');
   const endTime = moment(eventInfo.event.end).format('HH:mm');
   const eventDate = moment(eventInfo.event.start).format('YYYY-MM-DD');
@@ -79,6 +80,7 @@ const EventItem = ({ eventInfo }) => {
         return 'rgba(189, 189, 189, 0.6)';
     }
   };
+
   const lighterBorderColor = getLighterBorderColor();
   const borderColor = getBorderColor();
 
@@ -108,6 +110,13 @@ const EventItem = ({ eventInfo }) => {
   }, [students]);
 
   useEffect(() => {
+    // Early return if event is marked as isHoliday in original data
+    if (eventInfo.event.isHoliday) {
+      setIsCancelled(false);
+      setCancelReason('');
+      return;
+    }
+
     let cancelReason = '';
 
     const isInClosingDay = closingDays.some((day) => {
@@ -115,7 +124,7 @@ const EventItem = ({ eventInfo }) => {
         moment(eventDate).isSameOrAfter(day.start_date) &&
         moment(eventDate).isSameOrBefore(day.end_date);
       if (isInDay) {
-        cancelReason = `Closing Day: ${day.name}`; // Set closing day name
+        cancelReason = `Closing Day: ${day.name}`;
       }
       return isInDay;
     });
@@ -125,19 +134,19 @@ const EventItem = ({ eventInfo }) => {
         moment(eventDate).isSameOrAfter(holiday.start_date) &&
         moment(eventDate).isSameOrBefore(holiday.end_date);
       if (isInHolidayPeriod && !isHolidayCourse) {
-        cancelReason = `Holiday: ${holiday.name}`; // Set holiday name
+        cancelReason = `Holiday: ${holiday.name}`;
       }
       return isInHolidayPeriod;
     });
 
     if (isInClosingDay || (isInHoliday && !isHolidayCourse)) {
       setIsCancelled(true);
-      setCancelReason(cancelReason); // Update cancel reason
+      setCancelReason(cancelReason);
     } else {
       setIsCancelled(false);
-      setCancelReason(''); // Reset reason if not cancelled
+      setCancelReason('');
     }
-  }, [eventDate, closingDays, holidays, isHolidayCourse]);
+  }, [eventDate, closingDays, holidays, isHolidayCourse, eventInfo.event.isHoliday]);
 
   return (
     <div
@@ -166,26 +175,24 @@ const EventItem = ({ eventInfo }) => {
             padding: '10px'
           }}
         >
-          {/* Cancelled text */}
           <Typography
             variant="h6"
             style={{
               color: '#FF0000',
               fontWeight: 'bold',
               textTransform: 'uppercase',
-              marginBottom: '5px' // Add spacing between the text
+              marginBottom: '5px'
             }}
           >
             Cancelled
           </Typography>
 
-          {/* Cancel reason */}
           {cancelReason && (
             <Typography
               variant="body2"
               style={{
                 color: '#FF0000',
-                fontSize: '0.85rem', // Smaller font size for the reason
+                fontSize: '0.85rem',
                 textAlign: 'center'
               }}
             >
@@ -256,7 +263,6 @@ const EventItem = ({ eventInfo }) => {
         )}
       </div>
 
-      {/* Display report status in the bottom-right corner with conditional background color */}
       {reportStatus && (
         <div
           className="report-status"
@@ -265,12 +271,12 @@ const EventItem = ({ eventInfo }) => {
             bottom: 4,
             right: 4,
             fontSize: '0.7rem',
-            padding: '2px 12px', // Adjust padding for pill shape
-            borderRadius: '20px', // Rounded for pill shape
+            padding: '2px 12px',
+            borderRadius: '20px',
             backgroundColor: reportStatus.allReportsCompleted
               ? '#d4edda'
-              : '#f8d7da', // Green if completed, red if not
-            color: reportStatus.allReportsCompleted ? '#155724' : '#721c24', // Dark green text for complete, dark red for incomplete
+              : '#f8d7da',
+            color: reportStatus.allReportsCompleted ? '#155724' : '#721c24',
             display: 'inline-block',
             marginBottom: '3px'
           }}

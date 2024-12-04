@@ -145,6 +145,8 @@ export default function CustomizedCalendar({
       const formattedTeacher = `${firstName[0]}. ${lastName}`;
       const hasOverlap = checkOverlap(session, classSessionEvents);
 
+      console.log(session)
+
       return {
         id: session.data.appointment.id,
         sessionId: session.data.appointment.sessionId,
@@ -156,7 +158,6 @@ export default function CustomizedCalendar({
         start: `${session.data.appointment.date}T${session.data.appointment.startTime}`,
         end: `${session.data.appointment.date}T${session.data.appointment.endTime}`,
         status: session.data.appointment.status,
-        isHoliday: session.data.appointment.isHoliday,
         extendedProps: {
           topicName: session.data.appointment.topic || 'No Topic',
           teacher: formattedTeacher,
@@ -168,6 +169,7 @@ export default function CustomizedCalendar({
         }
       };
     });
+
 
     setEvents(mappedEvents);
   }, [classSessionEvents]);

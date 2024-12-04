@@ -123,7 +123,7 @@ const CalendarContent: React.FC = () => {
           appointment: {
             id: session.id,
             sessionId: session.sessionId,
-            isHolidayCourse: session.isHolidayCourse,
+            isHolidayCourse: session.isHoliday,
             status: session.status,
             location: session.location?.name || 'Unknown Location',
             topic: session.topic?.name || 'Unknown Topic',
