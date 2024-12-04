@@ -11,7 +11,6 @@ import { useAuth } from 'src/hooks/useAuth';
 import {
   deleteClassSession,
   toggleClassSessionActivation,
-  Holiday
 } from 'src/services/classSessionService';
 import FullCalendar from '@fullcalendar/react';
 import resourceTimelinePlugin from '@fullcalendar/resource-timeline';
@@ -32,6 +31,7 @@ import {
 import SpecialDayModal from '../Modals/SpecialDayModal';
 import CalendarLegend from '../CalendarLegend';
 import listPlugin from '@fullcalendar/list';
+import { Holiday } from 'src/services/specialDaysService';
 
 export enum TimeSlotMinutes {
   Five = 5,
@@ -63,6 +63,9 @@ export default function CustomizedCalendar({
   parentNumberOfRooms,
   onDateRangeChange
 }: DemoProps) {
+  const HOLIDAYS_STORAGE_KEY = 'calendarHolidays';
+  const CLOSING_DAYS_STORAGE_KEY = 'calendarClosingDays';
+
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
   const [selectedClassSessionId, setSelectedClassSession] = useState<any>(null);
   const [isModalOpen, setModalOpen] = useState(false);
@@ -169,15 +172,9 @@ export default function CustomizedCalendar({
     setEvents(mappedEvents);
   }, [classSessionEvents]);
 
-  // useEffect(() => {
-  //   console.log('holidays', holidays);
-  //   console.log('closingDays', closingDays);
-  // }, [holidays, closingDays]);
-
   const getDateStatus = (date: Date) => {
     const dateStr = moment(date).format('YYYY-MM-DD');
 
-    // Return no holidays/closing days if no locations are selected
     if (selectedLocations.length === 0) {
       return {
         isHoliday: false,
@@ -187,27 +184,26 @@ export default function CustomizedCalendar({
       };
     }
 
-    const holidayMatch = holidays?.length
-      ? holidays.find((holiday) =>
-        moment(dateStr).isBetween(
-          holiday.start_date,
-          holiday.end_date,
-          'day',
-          '[]'
-        )
-      )
-      : null;
+    const storedHolidays = JSON.parse(localStorage.getItem(HOLIDAYS_STORAGE_KEY) || '[]');
+    const storedClosingDays = JSON.parse(localStorage.getItem(CLOSING_DAYS_STORAGE_KEY) || '[]');
 
-    const closingDayMatch = closingDays?.length
-      ? closingDays.find((closingDay) =>
-        moment(dateStr).isBetween(
-          closingDay.start_date,
-          closingDay.end_date,
-          'day',
-          '[]'
-        )
+    const holidayMatch = storedHolidays.find((holiday: Holiday) =>
+      moment(dateStr).isBetween(
+        holiday.start_date,
+        holiday.end_date,
+        'day',
+        '[]'
       )
-      : null;
+    );
+
+    const closingDayMatch = storedClosingDays.find((closingDay: Holiday) =>
+      moment(dateStr).isBetween(
+        closingDay.start_date,
+        closingDay.end_date,
+        'day',
+        '[]'
+      )
+    );
 
     return {
       isHoliday: !!holidayMatch,
@@ -216,10 +212,6 @@ export default function CustomizedCalendar({
       closingDayName: closingDayMatch?.name
     };
   };
-
-  // useEffect(() => {
-  //   console.log('date status', getDateStatus(selectedDate));
-  // }, [selectedDate]);
 
   const handleSpecialDaySuccess = () => {
     loadClassSessions();
@@ -474,34 +466,26 @@ export default function CustomizedCalendar({
     saveViewPreference(currentView);
     const targetDate = viewInfo.view.currentStart;
 
-    setSelectedDate(targetDate);
-
     if (currentView === 'listWeek') {
       const weekStart = moment(targetDate).startOf('week');
-      onDateRangeChange(
-        weekStart.format('YYYY-MM-DD'),
-        weekStart.clone().endOf('week').format('YYYY-MM-DD')
-      );
+      const weekEnd = weekStart.clone().endOf('week');
+
+      if (
+        weekStart.format('YYYY-MM-DD') !== moment(selectedDate).startOf('week').format('YYYY-MM-DD')
+      ) {
+        onDateRangeChange(
+          weekStart.format('YYYY-MM-DD'),
+          weekEnd.format('YYYY-MM-DD')
+        );
+      }
     } else {
-      onDateChange(moment(targetDate).format('YYYY-MM-DD'));
+      const formattedDate = moment(targetDate).format('YYYY-MM-DD');
+      if (formattedDate !== moment(selectedDate).format('YYYY-MM-DD')) {
+        onDateChange(formattedDate);
+      }
     }
-  };
 
-  const handleListViewClick = () => {
-    if (!mounted.current) return;
-
-    const calendarApi = calendarRef.current?.getApi();
-    if (calendarApi) {
-      const currentDate = calendarApi.getDate();
-      calendarApi.changeView('listWeek');
-      calendarApi.gotoDate(currentDate);
-
-      const weekStart = moment(currentDate).startOf('week');
-      onDateRangeChange(
-        weekStart.format('YYYY-MM-DD'),
-        weekStart.clone().endOf('week').format('YYYY-MM-DD')
-      );
-    }
+    setSelectedDate(targetDate);
   };
 
   const customButtons = {
@@ -570,7 +554,6 @@ export default function CustomizedCalendar({
           customButtons={customButtons}
           eventDidMount={(info) => {
             if (info.view.type === 'listWeek') {
-              // Customize list view event rendering if needed
               const eventEl = info.el;
               if (info.event.extendedProps.hasOverlap) {
                 eventEl.style.borderLeft = '3px solid red';
@@ -587,11 +570,6 @@ export default function CustomizedCalendar({
           selectable={true}
           slotLabelFormat={calendarHelpers.getTimeFormats().slotLabelFormat}
           titleFormat={calendarHelpers.getTimeFormats().titleFormat}
-          // datesSet={(info) => {
-          //   const currentDate = info.view.currentStart;
-          //   setSelectedDate(currentDate);
-          //   onDateChange(moment(currentDate).format('YYYY-MM-DD'));
-          // }}
           eventClick={(info) => handleEventClick(info.event)}
           select={(info) =>
             calendarEventHandlers.handleSelect(
@@ -601,7 +579,6 @@ export default function CustomizedCalendar({
               handleOpenAddModal
             )
           }
-          // views={calendarHelpers.getViewSettings()}
           slotLabelDidMount={(arg) =>
             calendarEventHandlers.handleSlotLabel(arg, getDateStatus)
           }

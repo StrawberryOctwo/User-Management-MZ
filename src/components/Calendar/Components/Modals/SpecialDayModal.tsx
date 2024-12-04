@@ -22,7 +22,7 @@ import {
   addHoliday,
   updateClosingDay,
   addClosingDay
-} from 'src/services/classSessionService';
+} from 'src/services/specialDaysService';
 import { SpecialDayData } from '../../types/calendarHelpers';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
 import { fetchLocations } from 'src/services/locationService';
@@ -189,7 +189,7 @@ export default function SpecialDayModal({
             displayProperty="name"
             placeholder="Search Location"
             initialValue={initialData?.locationId}
-            // disabled={!strongestRoles.includes('Teacher')}
+          // disabled={!strongestRoles.includes('Teacher')}
           />
           <FormControlLabel
             control={

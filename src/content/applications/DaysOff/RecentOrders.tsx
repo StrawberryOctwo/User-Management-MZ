@@ -4,7 +4,7 @@ import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { deleteClosingDay, deleteHoliday, fetchClosingDaysByLocationIds, fetchHolidayById, fetchHolidaysByLocationIds } from 'src/services/classSessionService';
+import { deleteClosingDay, deleteHoliday, fetchClosingDaysByLocationIds, fetchHolidaysByLocationIds } from 'src/services/specialDaysService';
 
 interface TabPanelProps {
   children?: React.ReactNode;

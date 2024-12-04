@@ -10,7 +10,7 @@ import {
 } from '@mui/material';
 import ReusableForm from 'src/components/Table/tableRowCreate';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
-import { fetchClosingDayById, updateClosingDay } from 'src/services/classSessionService';
+import { fetchClosingDayById, updateClosingDay } from 'src/services/specialDaysService';
 import { fetchLocations } from 'src/services/locationService';
 import dayjs from 'dayjs';
 import { DatePicker } from '@mui/x-date-pickers';

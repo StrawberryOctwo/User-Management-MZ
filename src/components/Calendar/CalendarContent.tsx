@@ -8,18 +8,19 @@ import 'react-big-calendar/lib/css/react-big-calendar.css';
 import { useAuth } from 'src/hooks/useAuth';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import {
-  Holiday,
   fetchClassSessions,
-  fetchClosingDaysByLocationIds,
-  fetchHolidaysByLocationIds,
   fetchParentClassSessions,
   fetchUserClassSessions
 } from 'src/services/classSessionService';
 import { calendarsharedService } from './CalendarSharedService';
 import { useHeaderMenu } from './Components/CustomizedCalendar/HeaderMenuContext';
 import { fetchLocationsByFranchise } from 'src/services/locationService';
+import { Holiday, fetchClosingDaysByLocationIds, fetchHolidaysByLocationIds } from 'src/services/specialDaysService';
 
 const CalendarContent: React.FC = () => {
+  const HOLIDAYS_STORAGE_KEY = 'calendarHolidays';
+  const CLOSING_DAYS_STORAGE_KEY = 'calendarClosingDays';
+
   const [classSessionEvents, setClassSessionEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -212,19 +213,54 @@ const CalendarContent: React.FC = () => {
 
   const fetchSpecialDays = async (locations: any[]) => {
     try {
-      if (locations.length === 0) return;
+      if (locations.length === 0) {
+        // Clear localStorage when no locations are selected
+        localStorage.removeItem(HOLIDAYS_STORAGE_KEY);
+        localStorage.removeItem(CLOSING_DAYS_STORAGE_KEY);
+        setHolidays([]);
+        setClosingDays([]);
+        return;
+      }
 
       const locationIds = locations.map((loc) => loc.id);
+      const currentYear = new Date().getFullYear();
 
-      const [holidaysResponse, closingDaysResponse] = await Promise.all([
-        fetchHolidaysByLocationIds(locationIds),
-        fetchClosingDaysByLocationIds(locationIds)
-      ]);
+      // Check localStorage first
+      const storedHolidays = localStorage.getItem(HOLIDAYS_STORAGE_KEY);
+      const storedClosingDays = localStorage.getItem(CLOSING_DAYS_STORAGE_KEY);
 
-      setHolidays(holidaysResponse.data);
-      setClosingDays(closingDaysResponse.data);
+      // Function to check if stored data is valid for current locations
+      const isValidStoredData = (storedData: string | null, locationIds: number[]) => {
+        if (!storedData) return false;
+        try {
+          const parsed = JSON.parse(storedData);
+          const storedLocationIds = [...new Set(parsed.map((day: Holiday) => day.locationId))];
+          const requestedLocationIds = [...new Set(locationIds)];
+          return JSON.stringify(storedLocationIds.sort()) === JSON.stringify(requestedLocationIds.sort());
+        } catch {
+          return false;
+        }
+      };
+
+      if (!isValidStoredData(storedHolidays, locationIds) || !isValidStoredData(storedClosingDays, locationIds)) {
+        const [holidaysResponse, closingDaysResponse] = await Promise.all([
+          fetchHolidaysByLocationIds(locationIds, currentYear),
+          fetchClosingDaysByLocationIds(locationIds, currentYear)
+        ]);
+
+        localStorage.setItem(HOLIDAYS_STORAGE_KEY, JSON.stringify(holidaysResponse.data));
+        localStorage.setItem(CLOSING_DAYS_STORAGE_KEY, JSON.stringify(closingDaysResponse.data));
+
+        setHolidays(holidaysResponse.data);
+        setClosingDays(closingDaysResponse.data);
+      } else {
+        setHolidays(JSON.parse(storedHolidays!));
+        setClosingDays(JSON.parse(storedClosingDays!));
+      }
     } catch (error) {
       console.error('Error fetching special days:', error);
+      localStorage.removeItem(HOLIDAYS_STORAGE_KEY);
+      localStorage.removeItem(CLOSING_DAYS_STORAGE_KEY);
     }
   };
 
@@ -240,30 +276,14 @@ const CalendarContent: React.FC = () => {
     };
   }, []);
 
-  const handleFranchiseChange = (franchise: any) => {
-    setSelectedFranchise(franchise);
-    setSelectedLocations([]);
-    setClassSessionEvents([]);
-    if (franchise) {
-      localStorage.setItem('selectedFranchise', JSON.stringify(franchise));
-    } else {
-      localStorage.removeItem('selectedFranchise');
-      localStorage.removeItem('selectedLocations');
+  useEffect(() => {
+    if (
+      strongestRole &&
+      (strongestRole !== 'SuperAdmin' || selectedLocations.length > 0)
+    ) {
+      loadClassSessions();
     }
-  };
-
-  const handleLocationsChange = (locations: any[]) => {
-    setSelectedLocations(locations);
-    setClassSessionEvents([]);
-    if (locations.length > 0) {
-      localStorage.setItem('selectedLocations', JSON.stringify(locations));
-      fetchSpecialDays(locations);
-    } else {
-      localStorage.removeItem('selectedLocations');
-      setHolidays([]);
-      setClosingDays([]);
-    }
-  };
+  }, [date, selectedFranchise, selectedLocations, strongestRole]);
 
   useEffect(() => {
     if (
@@ -271,9 +291,8 @@ const CalendarContent: React.FC = () => {
       (strongestRole !== 'SuperAdmin' || selectedLocations.length > 0)
     ) {
       fetchSpecialDays(selectedLocations);
-      loadClassSessions();
     }
-  }, [date, selectedFranchise, selectedLocations, strongestRole]);
+  }, [selectedFranchise, selectedLocations, strongestRole]);
 
   const handleDateRangeChange = async (startDate: string, endDate: string) => {
     setLoading(true);
