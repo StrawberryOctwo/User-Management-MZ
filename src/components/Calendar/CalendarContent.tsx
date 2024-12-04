@@ -14,13 +14,13 @@ import {
 } from 'src/services/classSessionService';
 import { calendarsharedService } from './CalendarSharedService';
 import { useHeaderMenu } from './Components/CustomizedCalendar/HeaderMenuContext';
-import { fetchLocationsByFranchise } from 'src/services/locationService';
 import { Holiday, fetchClosingDaysByLocationIds, fetchHolidaysByLocationIds } from 'src/services/specialDaysService';
 
 const CalendarContent: React.FC = () => {
   const HOLIDAYS_STORAGE_KEY = 'calendarHolidays';
   const CLOSING_DAYS_STORAGE_KEY = 'calendarClosingDays';
 
+  const [currentViewYear, setCurrentViewYear] = useState<number>(new Date().getFullYear());
   const [classSessionEvents, setClassSessionEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -146,6 +146,7 @@ const CalendarContent: React.FC = () => {
   };
 
   const loadClassSessions = async (locations = selectedLocations) => {
+    console.log('Loading class sessions for date:', date);
     setLoading(true);
     setErrorMessage(null);
     try {
@@ -153,12 +154,13 @@ const CalendarContent: React.FC = () => {
         localStorage.getItem('selectedLocations') || '[]'
       );
       let response;
-      const validLocations = storedLocations
+      const validLocations = storedLocations;
       const locationIds = validLocations.map((location) => location.id);
 
       switch (strongestRole) {
         case 'Teacher':
         case 'Student':
+          console.log('Fetching teacher/student sessions');
           response = await fetchUserClassSessions(
             userId?.toString() || '',
             date,
@@ -211,10 +213,9 @@ const CalendarContent: React.FC = () => {
     }
   };
 
-  const fetchSpecialDays = async (locations: any[]) => {
+  const fetchSpecialDays = async (locations: any[], year?: number) => {
     try {
       if (locations.length === 0) {
-        // Clear localStorage when no locations are selected
         localStorage.removeItem(HOLIDAYS_STORAGE_KEY);
         localStorage.removeItem(CLOSING_DAYS_STORAGE_KEY);
         setHolidays([]);
@@ -223,29 +224,38 @@ const CalendarContent: React.FC = () => {
       }
 
       const locationIds = locations.map((loc) => loc.id);
-      const currentYear = new Date().getFullYear();
+      const targetYear = year || new Date().getFullYear();
 
-      // Check localStorage first
-      const storedHolidays = localStorage.getItem(HOLIDAYS_STORAGE_KEY);
-      const storedClosingDays = localStorage.getItem(CLOSING_DAYS_STORAGE_KEY);
-
-      // Function to check if stored data is valid for current locations
-      const isValidStoredData = (storedData: string | null, locationIds: number[]) => {
+      // Function to check if stored data is valid and for the correct year
+      const isValidStoredData = (storedData: string | null, locationIds: number[], year: number) => {
         if (!storedData) return false;
         try {
           const parsed = JSON.parse(storedData);
           const storedLocationIds = [...new Set(parsed.map((day: Holiday) => day.locationId))];
           const requestedLocationIds = [...new Set(locationIds)];
-          return JSON.stringify(storedLocationIds.sort()) === JSON.stringify(requestedLocationIds.sort());
+          const hasCorrectLocations = JSON.stringify(storedLocationIds.sort()) === JSON.stringify(requestedLocationIds.sort());
+
+          // Check if data contains dates from the target year
+          const hasYearData = parsed.some((day: Holiday) => {
+            const startYear = new Date(day.start_date).getFullYear();
+            const endYear = new Date(day.end_date).getFullYear();
+            return startYear === year || endYear === year;
+          });
+
+          return hasCorrectLocations && hasYearData;
         } catch {
           return false;
         }
       };
 
-      if (!isValidStoredData(storedHolidays, locationIds) || !isValidStoredData(storedClosingDays, locationIds)) {
+      const storedHolidays = localStorage.getItem(HOLIDAYS_STORAGE_KEY);
+      const storedClosingDays = localStorage.getItem(CLOSING_DAYS_STORAGE_KEY);
+
+      if (!isValidStoredData(storedHolidays, locationIds, targetYear) ||
+        !isValidStoredData(storedClosingDays, locationIds, targetYear)) {
         const [holidaysResponse, closingDaysResponse] = await Promise.all([
-          fetchHolidaysByLocationIds(locationIds, currentYear),
-          fetchClosingDaysByLocationIds(locationIds, currentYear)
+          fetchHolidaysByLocationIds(locationIds, targetYear),
+          fetchClosingDaysByLocationIds(locationIds, targetYear)
         ]);
 
         localStorage.setItem(HOLIDAYS_STORAGE_KEY, JSON.stringify(holidaysResponse.data));
@@ -281,6 +291,7 @@ const CalendarContent: React.FC = () => {
       strongestRole &&
       (strongestRole !== 'SuperAdmin' || selectedLocations.length > 0)
     ) {
+      console.log(date)
       loadClassSessions();
     }
   }, [date, selectedFranchise, selectedLocations, strongestRole]);
@@ -297,6 +308,10 @@ const CalendarContent: React.FC = () => {
   const handleDateRangeChange = async (startDate: string, endDate: string) => {
     setLoading(true);
     setErrorMessage(null);
+
+    checkAndUpdateYear(startDate);
+    checkAndUpdateYear(endDate);
+    
     try {
       const locationIds = selectedLocations.map(location => location.id);
       let response;
@@ -327,12 +342,27 @@ const CalendarContent: React.FC = () => {
     }
   };
 
+  const handleDateChange = (newDate: string) => {
+    console.log('Date changed:', date, '->', newDate);
+    setDate(newDate);
+    checkAndUpdateYear(newDate);
+  };
+
+  const checkAndUpdateYear = (dateStr: string) => {
+    const newYear = moment(dateStr).year();
+    if (newYear !== currentViewYear) {
+      console.log('Year changed:', currentViewYear, '->', newYear);
+      setCurrentViewYear(newYear);
+      fetchSpecialDays(selectedLocations, newYear);
+    }
+  };
+
   return (
     <Box sx={{ position: 'relative', height: '100%' }}>
       <Box sx={{ position: 'relative', overflow: 'hidden' }}>
         <CustomizedCalendar
           classSessionEvents={classSessionEvents}
-          onDateChange={setDate}
+          onDateChange={handleDateChange} // Use the new handler instead of setDate directly
           loadClassSessions={loadClassSessions}
           selectedLocations={selectedLocations}
           holidays={holidays}
