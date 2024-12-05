@@ -1,173 +1,191 @@
 // src/contexts/DashboardContext.tsx
 
-import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
-import {
-  fetchFranchiseCount,
-  fetchSessionAnalytics,
-  fetchInvoiceAnalytics,
-} from 'src/services/dashboardService';
-import { fetchFranchises } from 'src/services/franchiseService';
-
-interface InvoiceAnalyticsData {
-  periods: string[];
-  income: number[];
-  expense: number[];
-  netIncome: number[];
-  totalIncome: number;
-  totalExpense: number;
-  netIncomePercentage: string;
-  totalInvoices: number;
-}
-
-interface DashboardContextProps {
-  counts: {
-    franchises: number;
-    locations: number;
-    teachers: number;
-    students: number;
-  };
-  sessionAnalytics: any[];
-  invoiceAnalytics: InvoiceAnalyticsData;
-  selectedFranchise: string;
-  setSelectedFranchise: (franchise: string) => void;
-  analyticsFilter: string;
-  setAnalyticsFilter: (filter: string) => void;
-  invoiceFilter: string;
-  setInvoiceFilter: (filter: string) => void;
-  franchises: any[];
-  loadingCounts: boolean;
-  loadingAnalytics: boolean;
-  loadingInvoices: boolean;
-  error: any;
-  filterParams: any; // To store additional filter parameters for invoice analytics
-  setFilterParams: (params: any) => void;
-}
-
-const DashboardContext = createContext<DashboardContextProps | null>(null);
-
-export const DashboardProvider: React.FC = ({ children }) => {
-  // State Definitions
-  const [counts, setCounts] = useState({
-    franchises: 0,
-    locations: 0,
-    teachers: 0,
-    students: 0,
-  });
-  const [selectedFranchise, setSelectedFranchise] = useState('All Franchises');
-  const [franchises, setFranchises] = useState([]);
-  const [sessionAnalytics, setSessionAnalytics] = useState([]);
-  const [invoiceAnalytics, setInvoiceAnalytics] = useState<InvoiceAnalyticsData>({
-    periods: [],
-    income: [],
-    expense: [],
-    netIncome: [],
-    totalIncome: 0,
-    totalExpense: 0,
-    netIncomePercentage: '0.00',
-    totalInvoices: 0,
-  });
+import React, {
+    createContext,
+    useContext,
+    useEffect,
+    useState,
+    useCallback,
+    useMemo,
+  } from 'react';
+  import {
+    fetchFranchiseCount,
+    fetchSessionAnalytics,
+    fetchInvoiceAnalytics,
+  } from 'src/services/dashboardService';
+  import { fetchFranchises } from 'src/services/franchiseService';
+  import isEqual from 'lodash.isequal'; // Import lodash.isequal for deep comparison
   
-  // Separate Filters for Analytics and Invoices
-  const [analyticsFilter, setAnalyticsFilter] = useState('month'); // Default filter for session analytics
-  const [invoiceFilter, setInvoiceFilter] = useState('month'); // Default filter for invoice analytics
+  interface InvoiceAnalyticsData {
+    periods: string[];
+    income: number[];
+    expense: number[];
+    netIncome: number[];
+    totalIncome: number;
+    totalExpense: number;
+    netIncomePercentage: string;
+    totalInvoices: number;
+  }
   
-  // Additional Filter Parameters for Invoice Analytics
-  const [filterParams, setFilterParams] = useState<any>({});
+  interface DashboardContextProps {
+    counts: {
+      franchises: number;
+      locations: number;
+      teachers: number;
+      students: number;
+    };
+    sessionAnalytics: any[];
+    invoiceAnalytics: InvoiceAnalyticsData;
+    selectedFranchise: string;
+    setSelectedFranchise: (franchise: string) => void;
+    analyticsFilter: string;
+    setAnalyticsFilter: (filter: string) => void;
+    invoiceFilter: string;
+    setInvoiceFilter: (filter: string) => void;
+    franchises: any[];
+    loadingCounts: boolean;
+    loadingAnalytics: boolean;
+    loadingInvoices: boolean;
+    error: any;
+    filterParams: any; // To store additional filter parameters for invoice analytics
+    setFilterParams: (params: any) => void;
+  }
   
-  // Loading States
-  const [loadingCounts, setLoadingCounts] = useState(false);
-  const [loadingAnalytics, setLoadingAnalytics] = useState(false);
-  const [loadingInvoices, setLoadingInvoices] = useState(false);
+  const DashboardContext = createContext<DashboardContextProps | null>(null);
   
-  // Error State
-  const [error, setError] = useState(null);
+  export const DashboardProvider: React.FC = ({ children }) => {
+    // State Definitions
+    const [counts, setCounts] = useState({
+      franchises: 0,
+      locations: 0,
+      teachers: 0,
+      students: 0,
+    });
+    const [selectedFranchise, setSelectedFranchise] = useState('All Franchises');
+    const [franchises, setFranchises] = useState([]);
+    const [sessionAnalytics, setSessionAnalytics] = useState([]);
+    const [invoiceAnalytics, setInvoiceAnalytics] = useState<InvoiceAnalyticsData>({
+      periods: [],
+      income: [],
+      expense: [],
+      netIncome: [],
+      totalIncome: 0,
+      totalExpense: 0,
+      netIncomePercentage: '0.00',
+      totalInvoices: 0,
+    });
   
-  // Pagination States for Franchises
-  const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(15);
-
-  // Fetch List of Franchises
-  const fetchFranchiseList = useCallback(async () => {
-    setLoadingCounts(true);
-    try {
-      const data = await fetchFranchises(page, limit);
-      setFranchises(data.data);
-    } catch (err) {
-      console.error('Error fetching franchises:', err);
-      setError(err);
-    } finally {
-      setLoadingCounts(false);
-    }
-  }, [page, limit]);
-
-  // Fetch Counts Based on Selected Franchise
-  const fetchCounts = useCallback(async () => {
-    setLoadingCounts(true);
-    try {
-      const franchiseId = selectedFranchise === 'All Franchises' ? undefined : selectedFranchise;
-      const data = await fetchFranchiseCount(franchiseId);
-      setCounts(data);
-    } catch (err) {
-      setError(err);
-      console.error('Error fetching counts:', err);
-    } finally {
-      setLoadingCounts(false);
-    }
-  }, [selectedFranchise]);
-
-  // Fetch Session Analytics Based on Analytics Filter and Selected Franchise
-  const fetchSessionAnalyticsData = useCallback(async () => {
-    setLoadingAnalytics(true);
-    try {
-      const franchiseId = selectedFranchise === 'All Franchises' ? undefined : selectedFranchise;
-      const data = await fetchSessionAnalytics(analyticsFilter, franchiseId);
-      setSessionAnalytics(data.analytics);
-    } catch (err) {
-      console.error('Error fetching session analytics:', err);
-      setError(err);
-    } finally {
-      setLoadingAnalytics(false);
-    }
-  }, [analyticsFilter, selectedFranchise]);
-
-  // Fetch Invoice Analytics Based on Invoice Filter, Selected Franchise, and Filter Params
-  const fetchInvoiceAnalyticsData = useCallback(async () => {
-    setLoadingInvoices(true);
-    try {
-      const franchiseId = selectedFranchise === 'All Franchises' ? undefined : selectedFranchise;
-      const data = await fetchInvoiceAnalytics(franchiseId, invoiceFilter, filterParams);
-      setInvoiceAnalytics(data);
-    } catch (err) {
-      console.error('Error fetching invoice analytics:', err);
-      setError(err);
-    } finally {
-      setLoadingInvoices(false);
-    }
-  }, [invoiceFilter, selectedFranchise, filterParams]);
-
-  // Initial Fetch for Franchise List on Component Mount
-  useEffect(() => {
-    fetchFranchiseList();
-  }, [fetchFranchiseList]);
-
-  // Fetch Counts When Selected Franchise Changes
-  useEffect(() => {
-    fetchCounts();
-  }, [fetchCounts]);
-
-  // Fetch Session Analytics When Analytics Filter or Selected Franchise Changes
-  useEffect(() => {
-    fetchSessionAnalyticsData();
-  }, [fetchSessionAnalyticsData]);
-
-  // Fetch Invoice Analytics When Invoice Filter, Selected Franchise, or Filter Params Change
-  useEffect(() => {
-    fetchInvoiceAnalyticsData();
-  }, [fetchInvoiceAnalyticsData]);
-
-  return (
-    <DashboardContext.Provider
-      value={{
+    // Separate Filters for Analytics and Invoices
+    const [analyticsFilter, setAnalyticsFilter] = useState('month'); // Default filter for session analytics
+    const [invoiceFilter, setInvoiceFilter] = useState('month'); // Default filter for invoice analytics
+  
+    // Additional Filter Parameters for Invoice Analytics
+    const [filterParams, setFilterParams] = useState<any>({});
+  
+    // Loading States
+    const [loadingCounts, setLoadingCounts] = useState(false);
+    const [loadingAnalytics, setLoadingAnalytics] = useState(false);
+    const [loadingInvoices, setLoadingInvoices] = useState(false);
+  
+    // Error State
+    const [error, setError] = useState(null);
+  
+    // Pagination States for Franchises
+    const [page, setPage] = useState(1);
+    const [limit, setLimit] = useState(15);
+  
+    // Fetch List of Franchises
+    const fetchFranchiseList = useCallback(async () => {
+      setLoadingCounts(true);
+      try {
+        const data = await fetchFranchises(page, limit);
+        setFranchises(data.data);
+      } catch (err) {
+        console.error('Error fetching franchises:', err);
+        setError(err);
+      } finally {
+        setLoadingCounts(false);
+      }
+    }, [page, limit]);
+  
+    // Fetch Counts Based on Selected Franchise
+    const fetchCounts = useCallback(async () => {
+      setLoadingCounts(true);
+      try {
+        const franchiseId =
+          selectedFranchise === 'All Franchises' ? undefined : selectedFranchise;
+        const data = await fetchFranchiseCount(franchiseId);
+        setCounts(data);
+      } catch (err) {
+        setError(err);
+        console.error('Error fetching counts:', err);
+      } finally {
+        setLoadingCounts(false);
+      }
+    }, [selectedFranchise]);
+  
+    // Fetch Session Analytics Based on Analytics Filter and Selected Franchise
+    const fetchSessionAnalyticsData = useCallback(async () => {
+      setLoadingAnalytics(true);
+      try {
+        const franchiseId =
+          selectedFranchise === 'All Franchises' ? undefined : selectedFranchise;
+        const data = await fetchSessionAnalytics(analyticsFilter, franchiseId);
+        setSessionAnalytics(data.analytics);
+      } catch (err) {
+        console.error('Error fetching session analytics:', err);
+        setError(err);
+      } finally {
+        setLoadingAnalytics(false);
+      }
+    }, [analyticsFilter, selectedFranchise]);
+  
+    // Fetch Invoice Analytics Based on Invoice Filter, Selected Franchise, and Filter Params
+    const fetchInvoiceAnalyticsData = useCallback(async () => {
+      setLoadingInvoices(true);
+      try {
+        const franchiseId =
+          selectedFranchise === 'All Franchises' ? undefined : selectedFranchise;
+        console.log(
+          'Fetching invoice analytics with params:',
+          { franchiseId, invoiceFilter, filterParams }
+        );
+        const data = await fetchInvoiceAnalytics(franchiseId, invoiceFilter, filterParams);
+        setInvoiceAnalytics(data);
+      } catch (err) {
+        console.error('Error fetching invoice analytics:', err);
+        setError(err);
+      } finally {
+        setLoadingInvoices(false);
+      }
+    }, [invoiceFilter, selectedFranchise, filterParams]);
+  
+    // Initial Fetch for Franchise List on Component Mount
+    useEffect(() => {
+      fetchFranchiseList();
+    }, [fetchFranchiseList]);
+  
+    // Fetch Counts When Selected Franchise Changes
+    useEffect(() => {
+      fetchCounts();
+    }, [fetchCounts]);
+  
+    // Fetch Session Analytics When Analytics Filter or Selected Franchise Changes
+    useEffect(() => {
+      fetchSessionAnalyticsData();
+    }, [fetchSessionAnalyticsData]);
+  
+    // Fetch Invoice Analytics When Invoice Filter, Selected Franchise, or Filter Params Change
+    useEffect(() => {
+      // Only fetch if filterParams are not empty
+      if (Object.keys(filterParams).length > 0) {
+        fetchInvoiceAnalyticsData();
+      }
+    }, [fetchInvoiceAnalyticsData, filterParams]);
+  
+    // Memoize context value to prevent unnecessary re-renders
+    const contextValue = useMemo(
+      () => ({
         counts,
         sessionAnalytics,
         invoiceAnalytics,
@@ -184,17 +202,39 @@ export const DashboardProvider: React.FC = ({ children }) => {
         error,
         filterParams,
         setFilterParams,
-      }}
-    >
-      {children}
-    </DashboardContext.Provider>
-  );
-};
-
-export const useDashboard = () => {
-  const context = useContext(DashboardContext);
-  if (!context) {
-    throw new Error('useDashboard must be used within a DashboardProvider');
-  }
-  return context;
-};
+      }),
+      [
+        counts,
+        sessionAnalytics,
+        invoiceAnalytics,
+        selectedFranchise,
+        setSelectedFranchise,
+        analyticsFilter,
+        setAnalyticsFilter,
+        invoiceFilter,
+        setInvoiceFilter,
+        franchises,
+        loadingCounts,
+        loadingAnalytics,
+        loadingInvoices,
+        error,
+        filterParams,
+        setFilterParams,
+      ]
+    );
+  
+    return (
+      <DashboardContext.Provider value={contextValue}>
+        {children}
+      </DashboardContext.Provider>
+    );
+  };
+  
+  export const useDashboard = () => {
+    const context = useContext(DashboardContext);
+    if (!context) {
+      throw new Error('useDashboard must be used within a DashboardProvider');
+    }
+    return context;
+  };
+  
