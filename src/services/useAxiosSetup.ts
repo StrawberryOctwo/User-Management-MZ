@@ -9,45 +9,42 @@ export const AxiosInterceptorSetup = () => {
 
   useEffect(() => {
     const requestInterceptor = api.interceptors.request.use(
-      (config) => {
-        return config;
-      },
+      (config) => config,
       (error) => Promise.reject(error)
     );
 
     const responseInterceptor = api.interceptors.response.use(
       (response) => {
         if (response.data?.message) {
-          showMessage(response.data.message, 'success');
+          showMessage(response.data.message, 'success', 4000); // Default duration
         }
         return response;
       },
       (error) => {
         const errorMessage = error.response?.data?.message || 'An error occurred';
-      
-        if (errorMessage.includes('JsonWebTokenError: invalid token') || errorMessage.includes('Invalid Token')) {
-          // Handle invalid token
-          showMessage('Invalid Token', 'error');
-          navigate('/logout'); // Redirect to logout
+
+        if (
+          errorMessage.includes('JsonWebTokenError: invalid token') ||
+          errorMessage.includes('Invalid Token')
+        ) {
+          showMessage('Invalid Token', 'error', 4000); // Default duration
+          navigate('/logout');
         } else if (errorMessage.includes('TokenExpiredError')) {
-          // Handle expired token
-          showMessage('Token has expired', 'error');
-          navigate('/logout'); // Redirect to logout
+          showMessage('Token has expired', 'error', 4000); // Default duration
+          navigate('/logout');
         } else {
-          // Handle generic error
-          showMessage(errorMessage, 'error');
+          showMessage(errorMessage, 'error', 4000); // Default duration
         }
-      
+
         return Promise.reject(error);
       }
-      
     );
 
     return () => {
       api.interceptors.request.eject(requestInterceptor);
       api.interceptors.response.eject(responseInterceptor);
     };
-  }, [showMessage]);
+  }, [showMessage, navigate]);
 
   return null;
 };

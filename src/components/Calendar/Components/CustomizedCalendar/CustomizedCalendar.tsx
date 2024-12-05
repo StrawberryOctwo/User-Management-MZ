@@ -390,7 +390,7 @@ export default function CustomizedCalendar({
       if (selectedLocations.length > 1) {
         showMessage(
           'Please select a single location to add a class session.',
-          'error'
+          'warning'
         );
         return;
       }

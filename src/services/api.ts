@@ -1,5 +1,4 @@
 import axios from 'axios';
-import { useSnackbar } from '../contexts/SnackbarContext'; // Import Snackbar context
 import { Cookies } from 'react-cookie';
 
 // Create an Axios instance

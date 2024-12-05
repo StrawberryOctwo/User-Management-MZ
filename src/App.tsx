@@ -3,7 +3,7 @@ import router from 'src/router';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import { CssBaseline } from '@mui/material';
-import ThemeProvider from './theme/ThemeProvider';
+import ThemeProviderWrapper from './theme/ThemeProvider'; // Use the correct ThemeProviderWrapper
 import { SessionExpirationProvider } from './contexts/SessionExpirationContext';
 import { SnackbarProvider } from './contexts/SnackbarContext'; // Import SnackbarProvider
 import { I18nextProvider } from 'react-i18next';
@@ -16,21 +16,19 @@ function App() {
 
   return (
     <I18nextProvider i18n={i18n}>
-      <SnackbarProvider>
-        {' '}
-        {/* Wrap app with SnackbarProvider */}
-        <SessionProvider>
-          <SessionExpirationProvider>
-            <ThemeProvider>
+      <ThemeProviderWrapper> 
+        <SnackbarProvider> 
+          <SessionProvider>
+            <SessionExpirationProvider>
               <LocalizationProvider dateAdapter={AdapterDateFns}>
                 <CssBaseline />
                 {content}
-                <AxiosInterceptorSetup /> {/* Setup Axios Interceptors */}
+                <AxiosInterceptorSetup />
               </LocalizationProvider>
-            </ThemeProvider>
-          </SessionExpirationProvider>
-        </SessionProvider>
-      </SnackbarProvider>
+            </SessionExpirationProvider>
+          </SessionProvider>
+        </SnackbarProvider>
+      </ThemeProviderWrapper>
     </I18nextProvider>
   );
 }
