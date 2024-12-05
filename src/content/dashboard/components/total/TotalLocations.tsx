@@ -8,11 +8,13 @@ import {
   Card,
   ListItemText,
   ListItem,
-  styled
+  styled,
+  CircularProgress
 } from '@mui/material';
 
 import { useTranslation } from 'react-i18next';
 import LocationOnTwoToneIcon from '@mui/icons-material/LocationOnTwoTone';
+import { useDashboard } from 'src/contexts/DashboardContext';
 
 const AvatarSuccess = styled(Avatar)(
   ({ theme }) => `
@@ -36,7 +38,8 @@ const CardContentWrapper = styled(CardContent)(
 
 function TotalLocations() {
   const { t } = useTranslation();
-
+  const { counts, loading } = useDashboard();
+  
   return (
     <Card>
       <CardContentWrapper>
@@ -58,7 +61,7 @@ function TotalLocations() {
           </ListItemAvatar>
 
           <ListItemText
-            primary="275"
+              primary={loading ? <CircularProgress size={24} /> : counts.locations}
             primaryTypographyProps={{
               variant: 'h1',
               sx: {

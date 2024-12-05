@@ -8,11 +8,13 @@ import {
   Card,
   ListItemText,
   ListItem,
-  styled
+  styled,
+  CircularProgress
 } from '@mui/material';
 
 import { useTranslation } from 'react-i18next';
 import SchoolTwoToneIcon from '@mui/icons-material/SchoolTwoTone';
+import { useDashboard } from 'src/contexts/DashboardContext';
 
 const AvatarWarning = styled(Avatar)(
   ({ theme }) => `
@@ -36,7 +38,7 @@ const CardContentWrapper = styled(CardContent)(
 
 function TotalStudents() {
   const { t } = useTranslation();
-
+  const { counts, loading } = useDashboard();
   return (
     <Card>
       <CardContentWrapper>
@@ -58,7 +60,8 @@ function TotalStudents() {
           </ListItemAvatar>
 
           <ListItemText
-            primary="55.2%"
+              primary={loading ? <CircularProgress size={24} /> : counts.students}
+
             primaryTypographyProps={{
               variant: 'h1',
               sx: {

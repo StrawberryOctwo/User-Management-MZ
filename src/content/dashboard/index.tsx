@@ -12,14 +12,17 @@ import TotalTeachers from './components/total/TotalTeachers';
 import Conversions from './components/Conversions';
 import InvoiceAnalytics from './components/InvoiceAnalytics';
 import SessionsByCountry from './components/SessionsByCountry';
+import TotalStudents from './components/total/TotalStudents';
+
+import { DashboardProvider } from 'src/contexts/DashboardContext';
 
 function DashboardAnalytics() {
   return (
-    <>
+    <DashboardProvider>
       <Grid
         sx={{
           px: 4,
-          mt: 3
+          mt: 3,
         }}
         container
         direction="row"
@@ -46,7 +49,7 @@ function DashboardAnalytics() {
               <TotalTeachers />
             </Grid>
             <Grid item sm={6} xs={12}>
-              <ConversionsAlt />
+              <TotalStudents />
             </Grid>
           </Grid>
         </Grid>
@@ -67,7 +70,7 @@ function DashboardAnalytics() {
         </Grid>
       </Grid>
       <Footer />
-    </>
+    </DashboardProvider>
   );
 }
 
