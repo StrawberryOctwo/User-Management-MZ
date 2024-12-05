@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import ScheduleTwoToneIcon from '@mui/icons-material/ScheduleTwoTone';
-import { format } from 'date-fns'; // Import the format function
+import { formatDistance } from 'date-fns';
 import { fetchMessages, formatDateDivider } from '../../utils/chat';
 import AvatarWithInitials from '../../utils/Avatar';
 import { useAuth } from 'src/hooks/useAuth';
@@ -162,8 +162,9 @@ function ChatContent({ scrollbarRef }: ChatContentProps) {
                         fontSize: '1rem', // Smaller icon
                       }}
                     />
-                    {/* Display formatted time */}
-                    {format(new Date(message.sentAt), 'hh:mm a')}
+                    {formatDistance(new Date(message.sentAt), new Date(), {
+                      addSuffix: true,
+                    })}
                   </Typography>
                 </Box>
                 {isSender && (
