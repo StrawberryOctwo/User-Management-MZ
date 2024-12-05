@@ -22,3 +22,15 @@ export const fetchSessionAnalytics = async (filter = 'month', franchiseId = null
         throw error;
     }
 };
+export const fetchInvoiceAnalytics = async (franchiseId, filter = 'month', filterParams = {}) => {
+    try {
+        const params = { franchiseId, filter, ...filterParams };
+
+        const response = await api.get('/dashboard/invoice-analytics', { params });
+        return response.data;
+    } catch (error) {
+        console.error('Error fetching invoice analytics:', error);
+        throw error;
+    }
+};
+

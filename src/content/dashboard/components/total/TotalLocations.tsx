@@ -38,7 +38,7 @@ const CardContentWrapper = styled(CardContent)(
 
 function TotalLocations() {
   const { t } = useTranslation();
-  const { counts, loading } = useDashboard();
+  const { counts, loadingCounts } = useDashboard();
   
   return (
     <Card>
@@ -61,7 +61,7 @@ function TotalLocations() {
           </ListItemAvatar>
 
           <ListItemText
-              primary={loading ? <CircularProgress size={24} /> : counts.locations}
+              primary={loadingCounts ? <CircularProgress size={24} /> : counts.locations}
             primaryTypographyProps={{
               variant: 'h1',
               sx: {

@@ -38,7 +38,7 @@ const CardContentWrapper = styled(CardContent)(
 
 function TotalStudents() {
   const { t } = useTranslation();
-  const { counts, loading } = useDashboard();
+  const { counts, loadingCounts } = useDashboard();
   return (
     <Card>
       <CardContentWrapper>
@@ -60,7 +60,7 @@ function TotalStudents() {
           </ListItemAvatar>
 
           <ListItemText
-              primary={loading ? <CircularProgress size={24} /> : counts.students}
+              primary={loadingCounts ? <CircularProgress size={24} /> : counts.students}
 
             primaryTypographyProps={{
               variant: 'h1',

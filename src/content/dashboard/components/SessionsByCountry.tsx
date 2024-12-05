@@ -64,7 +64,7 @@ const FilterContainer = styled(Box)(
 
 function SessionsByCity() {
   const { t } = useTranslation();
-  const { sessionAnalytics, filter, setFilter, loading } = useDashboard();
+  const { sessionAnalytics, analyticsFilter, setAnalyticsFilter, loadingAnalytics  } = useDashboard();
 
   // Function to get medal icon based on rank
   const getMedalIcon = (rank) => {
@@ -107,8 +107,8 @@ function SessionsByCity() {
               <Select
                 labelId="filter-label"
                 id="filter-select"
-                value={filter}
-                onChange={(event) => setFilter(event.target.value)} // Update filter in context
+                value={analyticsFilter}
+                onChange={(event) => setAnalyticsFilter(event.target.value)} // Update filter in context
                 label="Filter"
               >
                 <MenuItem value="day">Day</MenuItem>
@@ -121,7 +121,7 @@ function SessionsByCity() {
         }
       />
       <Divider />
-      {loading ? (
+      {loadingAnalytics ? (
         <Box display="flex" justifyContent="center" alignItems="center" p={4}>
           <CircularProgress />
         </Box>

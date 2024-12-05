@@ -1,10 +1,52 @@
-import React, { createContext, useContext, useEffect, useState } from 'react';
-import { fetchFranchiseCount, fetchSessionAnalytics } from 'src/services/dashboardService';
+// src/contexts/DashboardContext.tsx
+
+import React, { createContext, useContext, useEffect, useState, useCallback } from 'react';
+import {
+  fetchFranchiseCount,
+  fetchSessionAnalytics,
+  fetchInvoiceAnalytics,
+} from 'src/services/dashboardService';
 import { fetchFranchises } from 'src/services/franchiseService';
 
-const DashboardContext = createContext(null);
+interface InvoiceAnalyticsData {
+  periods: string[];
+  income: number[];
+  expense: number[];
+  netIncome: number[];
+  totalIncome: number;
+  totalExpense: number;
+  netIncomePercentage: string;
+  totalInvoices: number;
+}
 
-export const DashboardProvider = ({ children }) => {
+interface DashboardContextProps {
+  counts: {
+    franchises: number;
+    locations: number;
+    teachers: number;
+    students: number;
+  };
+  sessionAnalytics: any[];
+  invoiceAnalytics: InvoiceAnalyticsData;
+  selectedFranchise: string;
+  setSelectedFranchise: (franchise: string) => void;
+  analyticsFilter: string;
+  setAnalyticsFilter: (filter: string) => void;
+  invoiceFilter: string;
+  setInvoiceFilter: (filter: string) => void;
+  franchises: any[];
+  loadingCounts: boolean;
+  loadingAnalytics: boolean;
+  loadingInvoices: boolean;
+  error: any;
+  filterParams: any; // To store additional filter parameters for invoice analytics
+  setFilterParams: (params: any) => void;
+}
+
+const DashboardContext = createContext<DashboardContextProps | null>(null);
+
+export const DashboardProvider: React.FC = ({ children }) => {
+  // State Definitions
   const [counts, setCounts] = useState({
     franchises: 0,
     locations: 0,
@@ -14,28 +56,52 @@ export const DashboardProvider = ({ children }) => {
   const [selectedFranchise, setSelectedFranchise] = useState('All Franchises');
   const [franchises, setFranchises] = useState([]);
   const [sessionAnalytics, setSessionAnalytics] = useState([]);
-  const [filter, setFilter] = useState('month'); // Default filter
-  const [loadingCounts, setLoadingCounts] = useState(false); // Separate loading for counts
-  const [loadingAnalytics, setLoadingAnalytics] = useState(false); // Separate loading for analytics
+  const [invoiceAnalytics, setInvoiceAnalytics] = useState<InvoiceAnalyticsData>({
+    periods: [],
+    income: [],
+    expense: [],
+    netIncome: [],
+    totalIncome: 0,
+    totalExpense: 0,
+    netIncomePercentage: '0.00',
+    totalInvoices: 0,
+  });
+  
+  // Separate Filters for Analytics and Invoices
+  const [analyticsFilter, setAnalyticsFilter] = useState('month'); // Default filter for session analytics
+  const [invoiceFilter, setInvoiceFilter] = useState('month'); // Default filter for invoice analytics
+  
+  // Additional Filter Parameters for Invoice Analytics
+  const [filterParams, setFilterParams] = useState<any>({});
+  
+  // Loading States
+  const [loadingCounts, setLoadingCounts] = useState(false);
+  const [loadingAnalytics, setLoadingAnalytics] = useState(false);
+  const [loadingInvoices, setLoadingInvoices] = useState(false);
+  
+  // Error State
   const [error, setError] = useState(null);
+  
+  // Pagination States for Franchises
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(15);
 
-  // Fetch list of franchises for dropdown
-  const fetchFranchiseList = async () => {
+  // Fetch List of Franchises
+  const fetchFranchiseList = useCallback(async () => {
     setLoadingCounts(true);
     try {
       const data = await fetchFranchises(page, limit);
       setFranchises(data.data);
     } catch (err) {
       console.error('Error fetching franchises:', err);
+      setError(err);
     } finally {
       setLoadingCounts(false);
     }
-  };
+  }, [page, limit]);
 
-  // Fetch counts for selected franchise
-  const fetchCounts = async () => {
+  // Fetch Counts Based on Selected Franchise
+  const fetchCounts = useCallback(async () => {
     setLoadingCounts(true);
     try {
       const franchiseId = selectedFranchise === 'All Franchises' ? undefined : selectedFranchise;
@@ -43,17 +109,18 @@ export const DashboardProvider = ({ children }) => {
       setCounts(data);
     } catch (err) {
       setError(err);
+      console.error('Error fetching counts:', err);
     } finally {
       setLoadingCounts(false);
     }
-  };
+  }, [selectedFranchise]);
 
-  // Fetch session analytics
-  const fetchAnalytics = async () => {
+  // Fetch Session Analytics Based on Analytics Filter and Selected Franchise
+  const fetchSessionAnalyticsData = useCallback(async () => {
     setLoadingAnalytics(true);
     try {
       const franchiseId = selectedFranchise === 'All Franchises' ? undefined : selectedFranchise;
-      const data = await fetchSessionAnalytics(filter, franchiseId); // Pass filter and franchiseId
+      const data = await fetchSessionAnalytics(analyticsFilter, franchiseId);
       setSessionAnalytics(data.analytics);
     } catch (err) {
       console.error('Error fetching session analytics:', err);
@@ -61,33 +128,62 @@ export const DashboardProvider = ({ children }) => {
     } finally {
       setLoadingAnalytics(false);
     }
-  };
+  }, [analyticsFilter, selectedFranchise]);
 
-  useEffect(() => {
-    fetchFranchiseList(); // Fetch franchise list once on mount
-  }, []);
+  // Fetch Invoice Analytics Based on Invoice Filter, Selected Franchise, and Filter Params
+  const fetchInvoiceAnalyticsData = useCallback(async () => {
+    setLoadingInvoices(true);
+    try {
+      const franchiseId = selectedFranchise === 'All Franchises' ? undefined : selectedFranchise;
+      const data = await fetchInvoiceAnalytics(franchiseId, invoiceFilter, filterParams);
+      setInvoiceAnalytics(data);
+    } catch (err) {
+      console.error('Error fetching invoice analytics:', err);
+      setError(err);
+    } finally {
+      setLoadingInvoices(false);
+    }
+  }, [invoiceFilter, selectedFranchise, filterParams]);
 
+  // Initial Fetch for Franchise List on Component Mount
   useEffect(() => {
-    fetchCounts(); // Refetch counts whenever selectedFranchise changes
-  }, [selectedFranchise]);
+    fetchFranchiseList();
+  }, [fetchFranchiseList]);
 
+  // Fetch Counts When Selected Franchise Changes
   useEffect(() => {
-    fetchAnalytics(); // Refetch analytics whenever filter or selectedFranchise changes
-  }, [filter, selectedFranchise]);
+    fetchCounts();
+  }, [fetchCounts]);
+
+  // Fetch Session Analytics When Analytics Filter or Selected Franchise Changes
+  useEffect(() => {
+    fetchSessionAnalyticsData();
+  }, [fetchSessionAnalyticsData]);
+
+  // Fetch Invoice Analytics When Invoice Filter, Selected Franchise, or Filter Params Change
+  useEffect(() => {
+    fetchInvoiceAnalyticsData();
+  }, [fetchInvoiceAnalyticsData]);
 
   return (
     <DashboardContext.Provider
       value={{
         counts,
         sessionAnalytics,
+        invoiceAnalytics,
         selectedFranchise,
         setSelectedFranchise,
-        filter,
-        setFilter,
+        analyticsFilter,
+        setAnalyticsFilter,
+        invoiceFilter,
+        setInvoiceFilter,
         franchises,
         loadingCounts,
         loadingAnalytics,
+        loadingInvoices,
         error,
+        filterParams,
+        setFilterParams,
       }}
     >
       {children}
@@ -95,4 +191,10 @@ export const DashboardProvider = ({ children }) => {
   );
 };
 
-export const useDashboard = () => useContext(DashboardContext);
+export const useDashboard = () => {
+  const context = useContext(DashboardContext);
+  if (!context) {
+    throw new Error('useDashboard must be used within a DashboardProvider');
+  }
+  return context;
+};

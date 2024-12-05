@@ -38,7 +38,7 @@ const CardContentWrapper = styled(CardContent)(
 );
 
 function TotalFranchises() {
-  const { counts, selectedFranchise, setSelectedFranchise, franchises, loading } = useDashboard();
+  const { counts, selectedFranchise, setSelectedFranchise, franchises, loadingCounts } = useDashboard();
 
   const handleFranchiseChange = (event) => {
     setSelectedFranchise(event.target.value);
@@ -88,7 +88,7 @@ function TotalFranchises() {
           </ListItemAvatar>
           <Box display="flex" alignItems="center">
             <ListItemText
-              primary={loading ? <CircularProgress size={24} /> : counts.franchises}
+              primary={loadingCounts ? <CircularProgress size={24} /> : counts.franchises}
               primaryTypographyProps={{
                 variant: 'h1',
                 sx: { ml: 2 },
