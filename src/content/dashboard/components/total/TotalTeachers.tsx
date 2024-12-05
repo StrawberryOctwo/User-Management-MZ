@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 
 import { useTranslation } from 'react-i18next';
-import SportsBasketballTwoToneIcon from '@mui/icons-material/SportsBasketballTwoTone';
+import PersonTwoToneIcon from '@mui/icons-material/PersonTwoTone';
 
 const AvatarPrimary = styled(Avatar)(
   ({ theme }) => `
@@ -53,7 +53,7 @@ function TotalTeachers() {
         >
           <ListItemAvatar>
             <AvatarPrimary variant="rounded">
-              <SportsBasketballTwoToneIcon fontSize="large" />
+              <PersonTwoToneIcon fontSize="large" />
             </AvatarPrimary>
           </ListItemAvatar>
 
@@ -79,17 +79,9 @@ function TotalTeachers() {
           <ListItemText
             primary={
               <>
-                <Link fontWeight="bold" href="#">
-                  {t('See all links')}
+                <Link fontWeight="bold" href="/management/teachers">
+                  {t('See all teachers')}
                 </Link>
-                <Box
-                  component="span"
-                  sx={{
-                    pl: 0.5
-                  }}
-                >
-                  {t('with high bounce rate.')}
-                </Box>
               </>
             }
             primaryTypographyProps={{ variant: 'body2', noWrap: true }}

@@ -25,21 +25,36 @@ interface HolidayInput {
   end_date: string;
 }
 
+const getYearDateRange = (year?: number) => {
+  const targetYear = year || new Date().getFullYear();
+  return {
+    startDate: `${targetYear}-01-01`,
+    endDate: `${targetYear}-12-31`
+  };
+};
+
 export const fetchHolidaysByLocationIds = async (
   locationIds?: number[],
+  year?: number,
   page?: number,
   limit?: number,
   search?: string
 ) => {
-  // Build the payload dynamically, excluding undefined values
+  const { startDate, endDate } = getYearDateRange(year);
   const payload: Record<string, any> = {};
+
   if (locationIds) payload.locationIds = locationIds;
   if (page) payload.page = page;
   if (limit) payload.limit = limit;
   if (search) payload.search = search;
 
   try {
-    const response = await api.post('/holidays', payload);
+    const response = await api.post('/holidays', payload, {
+      params: {
+        startDate,
+        endDate
+      }
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching holidays by location:', error);
@@ -165,21 +180,55 @@ export const fetchClosingDays = async (
 
 export const fetchClosingDaysByLocationIds = async (
   locationIds?: number[],
+  year?: number,
   page?: number,
   limit?: number,
   search?: string
 ) => {
+  const { startDate, endDate } = getYearDateRange(year);
   const payload: Record<string, any> = {};
+
   if (locationIds) payload.locationIds = locationIds;
   if (page) payload.page = page;
   if (limit) payload.limit = limit;
   if (search) payload.search = search;
 
   try {
-    const response = await api.post('/closing-days', payload);
+    const response = await api.post('/closing-days', payload, {
+      params: {
+        startDate,
+        endDate
+      }
+    });
     return response.data;
   } catch (error) {
     console.error('Error fetching closing days by location:', error);
+    throw error;
+  }
+};
+
+
+export const updateSpecialDaysStorage = async (locationIds: number[], year: number) => {
+  const HOLIDAYS_STORAGE_KEY = 'calendarHolidays';
+  const CLOSING_DAYS_STORAGE_KEY = 'calendarClosingDays';
+
+  try {
+    // Fetch both holidays and closing days for the specified year
+    const [holidaysResponse, closingDaysResponse] = await Promise.all([
+      fetchHolidaysByLocationIds(locationIds, year),
+      fetchClosingDaysByLocationIds(locationIds, year)
+    ]);
+
+    // Update localStorage with the year-specific data
+    localStorage.setItem(HOLIDAYS_STORAGE_KEY, JSON.stringify(holidaysResponse.data));
+    localStorage.setItem(CLOSING_DAYS_STORAGE_KEY, JSON.stringify(closingDaysResponse.data));
+
+    return {
+      holidays: holidaysResponse.data,
+      closingDays: closingDaysResponse.data
+    };
+  } catch (error) {
+    console.error('Error updating special days storage:', error);
     throw error;
   }
 };

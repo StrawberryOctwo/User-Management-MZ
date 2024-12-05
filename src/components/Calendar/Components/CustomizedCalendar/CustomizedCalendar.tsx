@@ -10,7 +10,7 @@ import { getStrongestRoles } from 'src/hooks/roleUtils';
 import { useAuth } from 'src/hooks/useAuth';
 import {
   deleteClassSession,
-  toggleClassSessionActivation,
+  toggleClassSessionActivation
 } from 'src/services/classSessionService';
 import FullCalendar from '@fullcalendar/react';
 import resourceTimelinePlugin from '@fullcalendar/resource-timeline';
@@ -101,7 +101,8 @@ export default function CustomizedCalendar({
   const mounted = useRef(false);
 
   const VIEW_STORAGE_KEY = 'calendarViewPreference';
-  const getStoredView = () => localStorage.getItem(VIEW_STORAGE_KEY) || 'resourceTimelineDay';
+  const getStoredView = () =>
+    localStorage.getItem(VIEW_STORAGE_KEY) || 'resourceTimelineDay';
 
   const saveViewPreference = (view: string) => {
     localStorage.setItem(VIEW_STORAGE_KEY, view);
@@ -114,9 +115,17 @@ export default function CustomizedCalendar({
     };
   }, []);
 
-  const calendarKey = useMemo(() =>
-    `calendar-${holidays.length}-${closingDays.length}-${selectedDate.toISOString()}-${selectedLocations.length}`,
-    [holidays.length, closingDays.length, selectedDate, selectedLocations.length]
+  const calendarKey = useMemo(
+    () =>
+      `calendar-${holidays.length}-${
+        closingDays.length
+      }-${selectedDate.toISOString()}-${selectedLocations.length}`,
+    [
+      holidays.length,
+      closingDays.length,
+      selectedDate,
+      selectedLocations.length
+    ]
   );
   const calendarRef = useRef<any>(null);
   const isHandlingClick = useRef(false);
@@ -126,9 +135,9 @@ export default function CustomizedCalendar({
       strongestRoles[0] === 'Parent'
         ? parentNumberOfRooms
         : selectedLocations.reduce(
-          (max, location) => Math.max(max, location.numberOfRooms || 0),
-          0
-        );
+            (max, location) => Math.max(max, location.numberOfRooms || 0),
+            0
+          );
 
     const unsortedResources = Array.from({ length: maxRooms }, (_, index) => ({
       id: `R${index + 1}`,
@@ -140,20 +149,24 @@ export default function CustomizedCalendar({
   }, [selectedLocations, strongestRoles, classSessionEvents]);
 
   useEffect(() => {
+    const HOLIDAYS_STORAGE_KEY = 'calendarHolidays';
+    const CLOSING_DAYS_STORAGE_KEY = 'calendarClosingDays';
+
     const mappedEvents = classSessionEvents.map((session) => {
+      // Get fresh data from localStorage for each event mapping
+      const storedHolidays = JSON.parse(localStorage.getItem(HOLIDAYS_STORAGE_KEY) || '[]');
+      const storedClosingDays = JSON.parse(localStorage.getItem(CLOSING_DAYS_STORAGE_KEY) || '[]');
+
       const [firstName, lastName] = session.data.appointment.teacher.split(' ');
       const formattedTeacher = `${firstName[0]}. ${lastName}`;
       const hasOverlap = checkOverlap(session, classSessionEvents);
-
-      console.log(session)
 
       return {
         id: session.data.appointment.id,
         sessionId: session.data.appointment.sessionId,
         resourceId: session.resourceId,
         isHolidayCourse: session.data.appointment.isHolidayCourse,
-        holidays: holidays,
-        closingDays: closingDays,
+        isHoliday: session.data.appointment.isHoliday,
         title: session.data.appointment.topic,
         start: `${session.data.appointment.date}T${session.data.appointment.startTime}`,
         end: `${session.data.appointment.date}T${session.data.appointment.endTime}`,
@@ -165,14 +178,16 @@ export default function CustomizedCalendar({
           sessionType: session.data.appointment.sessionType,
           students: session.data.appointment.students,
           reportStatus: session.data.appointment.reportStatus,
-          hasOverlap
+          hasOverlap,
+          isHolidayCourse: session.data.appointment.isHolidayCourse,
+          holidays: storedHolidays,
+          closingDays: storedClosingDays
         }
       };
     });
 
-
     setEvents(mappedEvents);
-  }, [classSessionEvents]);
+  }, [classSessionEvents, localStorage.getItem('calendarHolidays'), localStorage.getItem('calendarClosingDays')]);
 
   const getDateStatus = (date: Date) => {
     const dateStr = moment(date).format('YYYY-MM-DD');
@@ -186,8 +201,12 @@ export default function CustomizedCalendar({
       };
     }
 
-    const storedHolidays = JSON.parse(localStorage.getItem(HOLIDAYS_STORAGE_KEY) || '[]');
-    const storedClosingDays = JSON.parse(localStorage.getItem(CLOSING_DAYS_STORAGE_KEY) || '[]');
+    const storedHolidays = JSON.parse(
+      localStorage.getItem(HOLIDAYS_STORAGE_KEY) || '[]'
+    );
+    const storedClosingDays = JSON.parse(
+      localStorage.getItem(CLOSING_DAYS_STORAGE_KEY) || '[]'
+    );
 
     const holidayMatch = storedHolidays.find((holiday: Holiday) =>
       moment(dateStr).isBetween(
@@ -456,7 +475,11 @@ export default function CustomizedCalendar({
 
   useEffect(() => {
     const calendarApi = calendarRef.current?.getApi();
-    if (calendarApi && calendarApi.view.type === 'listWeek' && selectedLocations.length > 1) {
+    if (
+      calendarApi &&
+      calendarApi.view.type === 'listWeek' &&
+      selectedLocations.length > 1
+    ) {
       calendarApi.changeView('resourceTimelineDay');
     }
   }, [selectedLocations]);
@@ -473,7 +496,8 @@ export default function CustomizedCalendar({
       const weekEnd = weekStart.clone().endOf('week');
 
       if (
-        weekStart.format('YYYY-MM-DD') !== moment(selectedDate).startOf('week').format('YYYY-MM-DD')
+        weekStart.format('YYYY-MM-DD') !==
+        moment(selectedDate).startOf('week').format('YYYY-MM-DD')
       ) {
         onDateRangeChange(
           weekStart.format('YYYY-MM-DD'),
@@ -503,14 +527,18 @@ export default function CustomizedCalendar({
         if (!calendarApi) return;
 
         const currentView = calendarApi.view.type;
-        const newView = currentView === 'resourceTimelineDay' ? 'listWeek' : 'resourceTimelineDay';
+        const newView =
+          currentView === 'resourceTimelineDay'
+            ? 'listWeek'
+            : 'resourceTimelineDay';
         saveViewPreference(newView);
         calendarApi.changeView(newView);
 
         // Update button text
         const viewButton = document.querySelector('.fc-view-button');
         if (viewButton) {
-          viewButton.textContent = newView === 'resourceTimelineDay' ? 'list' : 'day';
+          viewButton.textContent =
+            newView === 'resourceTimelineDay' ? 'list' : 'day';
         }
       }
     }
@@ -648,6 +676,7 @@ export default function CustomizedCalendar({
         type="Holiday"
         initialData={selectedSpecialDay}
         onSuccess={handleSpecialDaySuccess}
+        selectedLocations={selectedLocations}
       />
 
       <SpecialDayModal
@@ -659,6 +688,7 @@ export default function CustomizedCalendar({
         type="Closing Day"
         initialData={selectedSpecialDay}
         onSuccess={handleSpecialDaySuccess}
+        selectedLocations={selectedLocations}
       />
     </Box>
   );

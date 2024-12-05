@@ -12,7 +12,7 @@ import {
 } from '@mui/material';
 
 import { useTranslation } from 'react-i18next';
-import AssessmentTwoToneIcon from '@mui/icons-material/AssessmentTwoTone';
+import LocationOnTwoToneIcon from '@mui/icons-material/LocationOnTwoTone';
 
 const AvatarSuccess = styled(Avatar)(
   ({ theme }) => `
@@ -53,7 +53,7 @@ function TotalLocations() {
         >
           <ListItemAvatar>
             <AvatarSuccess variant="rounded">
-              <AssessmentTwoToneIcon fontSize="large" />
+              <LocationOnTwoToneIcon fontSize="large" />
             </AvatarSuccess>
           </ListItemAvatar>
 
@@ -79,17 +79,9 @@ function TotalLocations() {
           <ListItemText
             primary={
               <>
-                <Link fontWeight="bold" href="#">
-                  {t('See referring domains')}
+                <Link fontWeight="bold" href="/management/locations">
+                  {t('See All Locations')}
                 </Link>
-                <Box
-                  component="span"
-                  sx={{
-                    pl: 0.5
-                  }}
-                >
-                  {t('which sent most traffic')}.
-                </Box>
               </>
             }
             primaryTypographyProps={{ variant: 'body2', noWrap: true }}

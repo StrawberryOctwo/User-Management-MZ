@@ -21,7 +21,9 @@ import {
   updateHoliday,
   addHoliday,
   updateClosingDay,
-  addClosingDay
+  addClosingDay,
+  fetchClosingDaysByLocationIds,
+  fetchHolidaysByLocationIds
 } from 'src/services/specialDaysService';
 import { SpecialDayData } from '../../types/calendarHelpers';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
@@ -35,6 +37,7 @@ interface SpecialDayModalProps {
   type: 'Holiday' | 'Closing Day';
   initialData?: SpecialDayData;
   onSuccess: () => void;
+  selectedLocations: any[];
 }
 
 export default function SpecialDayModal({
@@ -42,8 +45,12 @@ export default function SpecialDayModal({
   onClose,
   type,
   initialData,
-  onSuccess
+  onSuccess,
+  selectedLocations
 }: SpecialDayModalProps) {
+  const HOLIDAYS_STORAGE_KEY = 'calendarHolidays';
+  const CLOSING_DAYS_STORAGE_KEY = 'calendarClosingDays';
+
   const [name, setName] = useState('');
   const [startDate, setStartDate] = useState<Dayjs | null>(null);
   const [endDate, setEndDate] = useState<Dayjs | null>(null);
@@ -99,6 +106,23 @@ export default function SpecialDayModal({
     return true;
   };
 
+  const refreshSpecialDays = async () => {
+    try {
+      const locationIds = selectedLocations.map(loc => loc.id);
+      const currentYear = new Date().getFullYear();
+
+      if (type === 'Holiday') {
+        const holidaysResponse = await fetchHolidaysByLocationIds(locationIds, currentYear);
+        localStorage.setItem(HOLIDAYS_STORAGE_KEY, JSON.stringify(holidaysResponse.data));
+      } else {
+        const closingDaysResponse = await fetchClosingDaysByLocationIds(locationIds, currentYear);
+        localStorage.setItem(CLOSING_DAYS_STORAGE_KEY, JSON.stringify(closingDaysResponse.data));
+      }
+    } catch (error) {
+      console.error('Error refreshing special days:', error);
+    }
+  };
+
   const handleSubmit = async () => {
     if (!validateForm()) return;
 
@@ -116,19 +140,24 @@ export default function SpecialDayModal({
         locationId: locationId!
       };
 
+      let response;
+
       if (type === 'Holiday') {
         if (initialData?.id) {
-          await updateHoliday(initialData.id, data);
+          response = await updateHoliday(initialData.id, data);
         } else {
-          await addHoliday(data);
+          response = await addHoliday(data);
         }
       } else {
         if (initialData?.id) {
-          await updateClosingDay(initialData.id, data);
+          response = await updateClosingDay(initialData.id, data);
         } else {
-          await addClosingDay(data);
+          response = await addClosingDay(data);
         }
       }
+
+      // Refresh the special days data in localStorage
+      await refreshSpecialDays();
 
       onSuccess();
       handleClose();

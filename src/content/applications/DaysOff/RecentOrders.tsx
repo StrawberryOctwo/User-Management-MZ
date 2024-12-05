@@ -52,7 +52,7 @@ export default function DaysOffContent() {
   const loadHolidays = async (searchQuery = '') => {
     setLoading(true);
     try {
-      const result = await fetchHolidaysByLocationIds(undefined, holidayPage + 1, holidayLimit, searchQuery);
+      const result = await fetchHolidaysByLocationIds(undefined, holidayPage + 1, holidayLimit);
       const formattedData = result.data.map((holiday: any) => ({
         ...holiday,
         start_date: format(new Date(holiday.start_date), 'yyyy-MM-dd'),
@@ -70,7 +70,7 @@ export default function DaysOffContent() {
   const loadClosingDays = async (searchQuery = '') => {
     setLoading(true);
     try {
-      const result = await fetchClosingDaysByLocationIds(undefined, closingDayPage + 1, closingDayLimit, searchQuery);
+      const result = await fetchClosingDaysByLocationIds(undefined, closingDayPage + 1, closingDayLimit);
       const formattedData = result.data.map((day: any) => ({
         ...day,
         start_date: format(new Date(day.start_date), 'yyyy-MM-dd'),
