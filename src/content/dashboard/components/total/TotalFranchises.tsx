@@ -13,6 +13,7 @@ import {
   MenuItem,
   Select,
   CircularProgress,
+  InputLabel,
 } from '@mui/material';
 import { useDashboard } from 'src/contexts/DashboardContext';
 import BusinessTwoToneIcon from '@mui/icons-material/BusinessTwoTone';
@@ -43,29 +44,27 @@ function TotalFranchises() {
   const handleFranchiseChange = (event) => {
     setSelectedFranchise(event.target.value);
   };
+const FilterContainer = styled(Box)(
+  ({ theme }) => `
+    display: flex;
+    justify-content: flex-end;
+    padding: ${theme.spacing(2)};
+  `
+);
 
   return (
     <Card>
       <CardContentWrapper>
-        <FormControl variant="outlined" sx={{ minWidth: 120 }}>
+      <FilterContainer>
+        <FormControl variant="outlined" size="small">
+        <InputLabel id="filter-label">Franchise</InputLabel>
+
           <Select
+            labelId="filter-label"
+            id="filter-select"
             value={selectedFranchise}
             onChange={handleFranchiseChange}
-            MenuProps={{
-              PaperProps: {
-                sx: {
-                  maxHeight: 500,
-                  '&::-webkit-scrollbar': { width: '8px' },
-                  '&::-webkit-scrollbar-thumb': {
-                    backgroundColor: '#888',
-                    borderRadius: '4px',
-                  },
-                  '&::-webkit-scrollbar-thumb:hover': {
-                    backgroundColor: '#555',
-                  },
-                },
-              },
-            }}
+            label="Franchise"
           >
             <MenuItem value="All Franchises">All Franchises</MenuItem>
             {franchises.map((franchise) => (
@@ -75,7 +74,7 @@ function TotalFranchises() {
             ))}
           </Select>
         </FormControl>
-
+        </FilterContainer>
         <ListItem
           disableGutters
           sx={{ my: 1 }}
