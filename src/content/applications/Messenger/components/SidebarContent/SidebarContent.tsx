@@ -250,6 +250,7 @@ function SidebarContent() {
                   }}
                 >
                   <ListItemAvatar>
+                    
                     <AvatarWithInitials
                       firstName={isGroup ? chat.name : participant?.firstName}
                       lastName={isGroup ? "" : participant?.lastName}

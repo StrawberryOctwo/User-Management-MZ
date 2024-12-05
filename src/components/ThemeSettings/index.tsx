@@ -9,7 +9,9 @@ import {
   Stack,
   Divider,
   Box,
-  Tooltip
+  Tooltip,
+  alpha,
+  Badge
 } from '@mui/material';
 import { ThemeContext } from 'src/theme/ThemeProvider';
 import CheckTwoToneIcon from '@mui/icons-material/CheckTwoTone';
@@ -18,32 +20,28 @@ import Fab from '@mui/material/Fab';
 import { useTranslation } from 'react-i18next';
 import UnfoldMoreTwoToneIcon from '@mui/icons-material/UnfoldMoreTwoTone';
 import { NavLink } from 'react-router-dom';
+import ContrastIcon from '@mui/icons-material/Contrast';
 
-const ThemeSettingsButton = styled(Box)(
+const ThemeSettingsButton = styled(Badge)(
   ({ theme }) => `
-          position: fixed;
-          z-index: 9999;
-          right: ${theme.spacing(4)};
-          bottom: ${theme.spacing(4)};
-          
-          &::before {
-              width: 30px;
-              height: 30px;
-              content: ' ';
-              position: absolute;
-              border-radius: 100px;
-              left: 13px;
-              top: 13px;
-              background: ${theme.colors.primary.main};
-              animation: ripple 1s infinite;
-              transition: ${theme.transitions.create(['all'])};
-          }
-
-          .MuiSvgIcon-root {
-            animation: pulse 1s infinite;
-            transition: ${theme.transitions.create(['all'])};
-          }
-  `
+  .MuiBadge-badge {
+      background-color: ${alpha(theme.palette.error.main, 0.1)};
+      color: ${theme.palette.error.main};
+      min-width: 16px; 
+      height: 16px;
+      padding: 0;
+      &::after {
+          position: absolute;
+          top: 0;
+          left: 0;
+          width: 100%;
+          height: 100%;
+          border-radius: 50%;
+          box-shadow: 0 0 0 1px ${alpha(theme.palette.error.main, 0.3)};
+          content: "";
+      }
+  }
+`
 );
 
 const ThemeToggleWrapper = styled(Box)(
@@ -252,7 +250,7 @@ const ThemeSettings = () => {
       <ThemeSettingsButton>
         <Tooltip arrow title={t('Theme Settings')}>
           <Fab ref={ref} onClick={handleOpen} color="primary" aria-label="add">
-            <SettingsTwoToneIcon />
+            <ContrastIcon />
           </Fab>
         </Tooltip>
         <Popover
@@ -425,7 +423,7 @@ const ThemeSettings = () => {
                   </ColorSchemeWrapper>
                 </ButtonWrapper>
               </Tooltip>
-              <Tooltip placement="left" title="Nebula Fighter" arrow>
+              <Tooltip placement="left" title="Eclipse Shadow" arrow>
                 <ButtonWrapper
                   className={theme === 'EclipseShadowTheme' ? 'active' : ''}
                   onClick={() => {

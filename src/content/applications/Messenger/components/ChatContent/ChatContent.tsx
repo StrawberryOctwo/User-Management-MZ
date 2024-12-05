@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Box, Typography, CircularProgress } from '@mui/material';
 import ScheduleTwoToneIcon from '@mui/icons-material/ScheduleTwoTone';
-import { formatDistance } from 'date-fns';
+import { format } from 'date-fns'; // Import the format function
 import { fetchMessages, formatDateDivider } from '../../utils/chat';
 import AvatarWithInitials from '../../utils/Avatar';
 import { useAuth } from 'src/hooks/useAuth';
@@ -66,7 +66,7 @@ function ChatContent({ scrollbarRef }: ChatContentProps) {
   }, [messages]);
 
   return (
-    <Box p={3}>
+    <Box p={2}>
       {loading ? (
         <Box display="flex" justifyContent="center" mt={2}>
           <CircularProgress />
@@ -110,12 +110,13 @@ function ChatContent({ scrollbarRef }: ChatContentProps) {
                 display="flex"
                 alignItems="flex-start"
                 justifyContent={isSender ? 'flex-end' : 'flex-start'}
-                py={3}
+                py={1.5} // Reduced padding
               >
                 {!isSender && (
                   <AvatarWithInitials
                     firstName={message.sender?.firstName}
                     lastName={message.sender?.lastName}
+                    sx={{ width: 32, height: 32 }} // Smaller avatar
                   />
                 )}
                 <Box
@@ -123,39 +124,53 @@ function ChatContent({ scrollbarRef }: ChatContentProps) {
                   alignItems={isSender ? 'flex-end' : 'flex-start'}
                   flexDirection="column"
                   justifyContent={isSender ? 'flex-end' : 'flex-start'}
-                  ml={isSender ? 0 : 2}
-                  mr={isSender ? 2 : 0}
+                  ml={isSender ? 0 : 1.5} // Adjusted margin
+                  mr={isSender ? 1.5 : 0}
                 >
                   <Box
-                    component={
-                      isSender ? CardWrapperPrimary : CardWrapperSecondary
-                    }
+                    component={isSender ? CardWrapperPrimary : CardWrapperSecondary}
+                    sx={{
+                      borderRadius: 2,
+                      px: 2,
+                      py: 1,
+                      maxWidth: '70%', // Constrain the width
+                      fontSize: '0.875rem',
+                      backgroundColor: (theme) =>
+                        isSender
+                          ? theme.palette.primary.dark // Darker primary for sender
+                          : theme.palette.background.paper,
+                      color: (theme) =>
+                        isSender
+                          ? theme.palette.primary.contrastText
+                          : theme.palette.text.primary,
+                    }}
                   >
                     {message.content}
                   </Box>
                   <Typography
-                    variant="subtitle1"
+                    variant="caption" // Smaller timestamp
                     sx={{
-                      pt: 1,
+                      pt: 0.5,
                       display: 'flex',
-                      alignItems: 'center'
+                      alignItems: 'center',
+                      color: (theme) => theme.palette.text.secondary,
                     }}
                   >
                     <ScheduleTwoToneIcon
                       sx={{
-                        mr: 0.5
+                        mr: 0.5,
+                        fontSize: '1rem', // Smaller icon
                       }}
-                      fontSize="small"
                     />
-                    {formatDistance(new Date(message.sentAt), new Date(), {
-                      addSuffix: true
-                    })}
+                    {/* Display formatted time */}
+                    {format(new Date(message.sentAt), 'hh:mm a')}
                   </Typography>
                 </Box>
                 {isSender && (
                   <AvatarWithInitials
                     firstName={message.sender?.firstName}
                     lastName={message.sender?.lastName}
+                    sx={{ width: 32, height: 32 }} // Smaller avatar
                   />
                 )}
               </Box>
