@@ -46,14 +46,15 @@ const UserBoxText = styled(Box)(
 const UserBoxLabel = styled(Typography)(
   ({ theme }) => `
         font-weight: ${theme.typography.fontWeightBold};
-        color: ${theme.palette.secondary.main};
+        color: ${theme.palette.primary.main};
         display: block;
 `
 );
 
+
 const UserBoxDescription = styled(Typography)(
   ({ theme }) => `
-        color: ${lighten(theme.palette.secondary.main, 0.5)}
+        color: ${lighten(theme.palette.primary.main, 0.5)}
 `
 );
 
@@ -101,9 +102,15 @@ function HeaderUserbox() {
   return (
     <>
       <UserBoxButton color="secondary" ref={ref} onClick={handleOpen}>
-        <Avatar variant="rounded">
-          {getInitials(user.name)} {/* Display the initials */}
-        </Avatar>
+      <Avatar
+        variant="rounded"
+        sx={{
+          bgcolor: (theme) => theme.palette.primary.main,
+          color: (theme) => theme.palette.primary.contrastText,
+        }}
+      >
+        {getInitials(user.name)}
+      </Avatar>
         <Hidden mdDown>
           <UserBoxText>
             <UserBoxLabel variant="body1">{user.name}</UserBoxLabel>
