@@ -57,9 +57,26 @@ const EmptyResultsWrapper = styled('img')(
 
 type TimeFrame = 'week' | 'month' | 'year' | 'custom';
 
+// Helper function to format dates in dd.MM.yyyy
+const formatDateGerman = (date: Date): string => {
+  const day = String(date.getDate()).padStart(2, '0');
+  const month = String(date.getMonth() + 1).padStart(2, '0'); // Months are zero-based
+  const year = date.getFullYear();
+  return `${day}.${month}.${year}`;
+};
+
 function InvoiceAnalytics() {
   const { t } = useTranslation();
   const theme = useTheme();
+
+  // Define the months with an additional "All Months" option
+  const months = [
+    { value: 0, label: t('All Months') }, // All Months option
+    ...Array.from({ length: 12 }, (_, i) => ({
+      value: i + 1,
+      label: new Date(0, i).toLocaleString('default', { month: 'long' }),
+    })),
+  ];
 
   const periods = [
     { value: 'week', text: t('Week') },
@@ -85,7 +102,7 @@ function InvoiceAnalytics() {
   const [periodLabel, setPeriodLabel] = useState<string>(t('Month'));
 
   // Additional states for invoiceFilter parameters
-  const [selectedMonth, setSelectedMonth] = useState<number | null>(null);
+  const [selectedMonth, setSelectedMonth] = useState<number | null>(0); // Initialize to 0 for "All Months"
   const [selectedYear, setSelectedYear] = useState<number | null>(null);
   const [startYear, setStartYear] = useState<number | null>(null);
   const [endYear, setEndYear] = useState<number | null>(null);
@@ -102,7 +119,7 @@ function InvoiceAnalytics() {
         setSelectedYear(firstDayOfWeek.getFullYear());
         break;
       case 'month':
-        setSelectedMonth(now.getMonth() + 1);
+        setSelectedMonth(0); // Default to "All Months"
         setSelectedYear(now.getFullYear());
         break;
       case 'year':
@@ -139,7 +156,7 @@ function InvoiceAnalytics() {
 
     // Reset invoiceFilter parameters when changing invoiceFilter
     setFilterParams({});
-    setSelectedMonth(null);
+    setSelectedMonth(selectedPeriod.value === 'month' ? 0 : null); // Reset to "All Months" if period is 'month'
     setSelectedYear(null);
     setStartYear(null);
     setEndYear(null);
@@ -159,9 +176,12 @@ function InvoiceAnalytics() {
         }
         break;
       case 'month':
-        if (selectedMonth && selectedYear) {
-          params.month = selectedMonth;
+        if (selectedYear) {
           params.year = selectedYear;
+          if (selectedMonth && selectedMonth !== 0) {
+            params.month = selectedMonth;
+          }
+          // If selectedMonth is 0, omit the month filter
         }
         break;
       case 'year':
@@ -172,8 +192,8 @@ function InvoiceAnalytics() {
         break;
       case 'custom':
         if (startDate && endDate) {
-          params.startDate = startDate.toISOString().split('T')[0];
-          params.endDate = endDate.toISOString().split('T')[0];
+          params.startDate = formatDateGerman(startDate);
+          params.endDate = formatDateGerman(endDate);
         }
         break;
       default:
@@ -265,52 +285,20 @@ function InvoiceAnalytics() {
       <CardContent>
         {/* Additional invoiceFilter Parameters */}
         <Box mb={3}>
-          {timeFrame === 'week' && (
+          {(timeFrame === 'week' || timeFrame === 'month') && (
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6} md={3}>
                 <FormControl fullWidth>
                   <InputLabel id="month-select-label">{t('Month')}</InputLabel>
                   <Select
                     labelId="month-select-label"
-                    value={selectedMonth || ''}
+                    value={selectedMonth !== null ? selectedMonth : 0}
                     label={t('Month')}
                     onChange={(e) => setSelectedMonth(Number(e.target.value))}
                   >
-                    {Array.from({ length: 12 }, (_, i) => (
-                      <MuiMenuItem key={i + 1} value={i + 1}>
-                        {new Date(0, i).toLocaleString('default', { month: 'short' })}
-                      </MuiMenuItem>
-                    ))}
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={12} sm={6} md={3}>
-                <TextField
-                  label={t('Year')}
-                  type="number"
-                  fullWidth
-                  value={selectedYear || ''}
-                  onChange={(e) => setSelectedYear(Number(e.target.value))}
-                  InputProps={{ inputProps: { min: 2000, max: 2100 } }}
-                />
-              </Grid>
-            </Grid>
-          )}
-
-          {timeFrame === 'month' && (
-            <Grid container spacing={2}>
-              <Grid item xs={12} sm={6} md={3}>
-                <FormControl fullWidth>
-                  <InputLabel id="month-select-label">{t('Month')}</InputLabel>
-                  <Select
-                    labelId="month-select-label"
-                    value={selectedMonth || ''}
-                    label={t('Month')}
-                    onChange={(e) => setSelectedMonth(Number(e.target.value))}
-                  >
-                    {Array.from({ length: 12 }, (_, i) => (
-                      <MuiMenuItem key={i + 1} value={i + 1}>
-                        {new Date(0, i).toLocaleString('default', { month: 'short' })}
+                    {months.map((month) => (
+                      <MuiMenuItem key={month.value} value={month.value}>
+                        {month.label}
                       </MuiMenuItem>
                     ))}
                   </Select>
@@ -362,6 +350,7 @@ function InvoiceAnalytics() {
                   value={startDate}
                   onChange={(newValue) => setStartDate(newValue)}
                   maxDate={endDate || undefined}
+                  inputFormat="dd.MM.yyyy" // Set input format to German
                   renderInput={(params) => <TextField {...params} fullWidth />}
                 />
               </Grid>
@@ -371,6 +360,7 @@ function InvoiceAnalytics() {
                   value={endDate}
                   onChange={(newValue) => setEndDate(newValue)}
                   minDate={startDate || undefined}
+                  inputFormat="dd.MM.yyyy" // Set input format to German
                   renderInput={(params) => <TextField {...params} fullWidth />}
                 />
               </Grid>
