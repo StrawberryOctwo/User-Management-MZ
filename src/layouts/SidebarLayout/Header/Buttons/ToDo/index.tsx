@@ -206,16 +206,8 @@ const ToDoHeader: React.FC = () => {
   return (
     <Box sx={{ position: 'relative' }}>
       <Tooltip arrow title="Manage ToDos">
-        <IconButton
-          color="primary"
-          onClick={handleOpenDialog}
-          sx={{
-            backgroundColor: alpha(theme.palette.primary.main, 0.1),
-            '&:hover': {
-              backgroundColor: alpha(theme.palette.primary.main, 0.2),
-            },
-          }}
-        >
+      <IconButton color="primary"  onClick={handleOpenDialog}>
+
           <SpatialAudioOffIcon color="primary" />
         </IconButton>
       </Tooltip>

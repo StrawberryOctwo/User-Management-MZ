@@ -11,7 +11,8 @@ import {
   Box,
   Tooltip,
   alpha,
-  Badge
+  Badge,
+  IconButton
 } from '@mui/material';
 import { ThemeContext } from 'src/theme/ThemeProvider';
 import CheckTwoToneIcon from '@mui/icons-material/CheckTwoTone';
@@ -249,9 +250,9 @@ const ThemeSettings = () => {
     <>
       <ThemeSettingsButton>
         <Tooltip arrow title={t('Theme Settings')}>
-          <Fab ref={ref} onClick={handleOpen} color="primary" aria-label="add">
+        <IconButton color="primary" ref={ref} onClick={handleOpen}>
             <ContrastIcon />
-          </Fab>
+          </IconButton>
         </Tooltip>
         <Popover
           disableScrollLock

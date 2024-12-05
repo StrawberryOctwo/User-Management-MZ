@@ -19,7 +19,6 @@ function HeaderButtons() {
     <Box sx={{ mr: 1, display: 'flex', alignItems: 'center', gap: 2 }}>
       {/* <HeaderSearch /> */}
       <HeaderNotifications />
-      <ThemeSettings/>
       {/* <HeaderLocalization /> */}
       <SurveyNotifications />
       <ProtectedBox allowedRoles={[ 'FranchiseAdmin', 'LocationAdmin', 'Teacher', 'Student']}>
@@ -43,6 +42,8 @@ function HeaderButtons() {
       <ProtectedBox allowedRoles={['Student']}>
         <AbsenceNotifications />
       </ProtectedBox>
+      <ThemeSettings/>
+
     </Box>
   );
 }
