@@ -1,7 +1,36 @@
+import { fetchUserAnalytics } from 'src/services/dashboardService';
+
+export const fetchData = async (
+  selectedFranchise: string,
+  period: string,
+  userType: string,
+  setData: any,
+  setLabels: any,
+  setLoading: any
+) => {
+  setLoading(true);
+  try {
+    const response = await fetchUserAnalytics(
+      selectedFranchise,
+      userType,
+      period
+    );
+    const { data: apiData, labels: apiLabels } = response;
+    setData(apiData);
+    setLabels(apiLabels);
+  } catch (error) {
+    console.error('Error fetching data:', error);
+    setData([]);
+    setLabels([]);
+  } finally {
+    setLoading(false);
+  }
+};
+
 export const periods = [
   {
-    value: 'Day',
-    text: 'Day'
+    value: 'Week',
+    text: 'Week'
   },
   {
     value: 'Month',
@@ -23,14 +52,6 @@ export const userTypes = [
     text: 'Students'
   }
 ];
-
-export const allTimeNumbers: {
-  [key: string]: number;
-} = {
-  Teachers: 100,
-  Students: 200,
-  Parents: 300
-};
 
 export type UserData = {
   day: {
@@ -104,4 +125,3 @@ export const getDataForPeriod = (period: string) => {
       };
   }
 };
-

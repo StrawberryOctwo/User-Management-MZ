@@ -26,11 +26,11 @@ function DashboardAnalytics() {
         }}
         container
         direction="row"
-        justifyContent="center"
+        justifyContent="space-between"
         alignItems="stretch"
         spacing={4}
       >
-        <Grid item lg={8} md={6} xs={12}>
+        <Grid item lg={4} md={6} xs={12}>
           <Grid
             container
             spacing={4}

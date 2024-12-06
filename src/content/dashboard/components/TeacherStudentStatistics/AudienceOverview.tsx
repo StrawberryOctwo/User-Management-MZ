@@ -9,29 +9,14 @@ import {
   CardHeader,
   Menu,
   MenuItem,
-  CardActions,
-  Grid,
-  Typography,
   Divider,
   styled,
-  useTheme
+  useTheme,
+  CircularProgress
 } from '@mui/material';
 import Chart from 'react-apexcharts';
-import {
-  getDataForPeriod,
-  periods,
-  allTimeNumbers,
-  userData,
-  userTypes
-} from './data';
-
-const CardActionsWrapper = styled(CardActions)(
-  ({ theme }) => `
-      background-color: ${theme.colors.alpha.black[5]};
-      padding: 0;
-      display: block;
-`
-);
+import { fetchData, periods, userTypes } from './data';
+import { useDashboard } from 'src/contexts/DashboardContext';
 
 function AudienceOverview() {
   const { t } = useTranslation();
@@ -39,80 +24,13 @@ function AudienceOverview() {
   const actionRef2 = useRef(null);
   const [openPeriod, setOpenMenuPeriod] = useState(false);
   const [openAudience, setOpenMenuAudience] = useState(false);
-  const [period, setPeriod] = useState(periods[2].text);
-  const [userType, setUserType] = useState(userTypes[1].text);
+  const [period, setPeriod] = useState(periods[2].text); // Default to Year
+  const [userType, setUserType] = useState(userTypes[1].text); // Default to Students
+  const [labels, setLabels] = useState<string[]>([]);
+  const [data, setData] = useState<number[]>([]);
+  const [loading, setLoading] = useState(false);
   const theme = useTheme();
-
-  const ChartSparklineOptions = {
-    chart: {
-      background: 'transparent',
-      toolbar: {
-        show: false
-      },
-      sparkline: {
-        enabled: true
-      },
-      zoom: {
-        enabled: false
-      }
-    },
-    colors: [theme.colors.primary.main],
-    dataLabels: {
-      enabled: false
-    },
-    theme: {
-      mode: theme.palette.mode
-    },
-    fill: {
-      opacity: 1,
-      colors: [theme.colors.primary.main],
-      type: 'solid'
-    },
-    grid: {
-      padding: {
-        top: 2
-      }
-    },
-    stroke: {
-      show: true,
-      colors: [theme.colors.primary.main],
-      width: 2
-    },
-    legend: {
-      show: false
-    },
-    labels: [
-      'Jan',
-      'Feb',
-      'Mar',
-      'Apr',
-      'May',
-      'Jun',
-      'Jul',
-      'Aug',
-      'Sep',
-      'Oct',
-      'Nov',
-      'Dec'
-    ],
-    tooltip: {
-      enabled: false
-    },
-    xaxis: {
-      labels: {
-        show: false
-      },
-      axisBorder: {
-        show: false
-      },
-      axisTicks: {
-        show: false
-      }
-    },
-    yaxis: {
-      show: false
-    }
-  };
+  const { selectedFranchise } = useDashboard();
 
   const ChartAudienceOptions = {
     chart: {
@@ -152,7 +70,7 @@ function AudienceOverview() {
       hover: {
         sizeOffset: 2
       },
-      shape: 'circle' as const, // Corrected typing here
+      shape: 'circle' as const,
       size: 6,
       strokeWidth: 3,
       strokeOpacity: 1,
@@ -160,7 +78,7 @@ function AudienceOverview() {
       colors: [theme.colors.alpha.white[100]]
     },
     stroke: {
-      curve: 'smooth' as const, // Corrected typing here
+      curve: 'smooth' as const,
       width: 2
     },
     theme: {
@@ -195,7 +113,16 @@ function AudienceOverview() {
     }
   };
 
-  const { data, labels } = getDataForPeriod(period);
+  useEffect(() => {
+    fetchData(
+      selectedFranchise,
+      period,
+      userType,
+      setData,
+      setLabels,
+      setLoading
+    );
+  }, [period, userType]);
 
   const differences = data.map((value, index) => {
     if (index === 0) return 0;
@@ -295,173 +222,29 @@ function AudienceOverview() {
           ))}
         </Menu>
         <Box mt={2}>
-          <Chart
-            options={{
-              ...ChartAudienceOptions,
-              xaxis: { ...ChartAudienceOptions.xaxis, categories: labels },
-              annotations: {
-                points: annotations
-              }
-            }}
-            series={[
-              {
-                name: `Total ${userType}`,
-                data: data
-              }
-            ]}
-            type="line"
-            height={230}
-          />
+          {loading ? (
+            <CircularProgress />
+          ) : (
+            <Chart
+              options={{
+                ...ChartAudienceOptions,
+                xaxis: { ...ChartAudienceOptions.xaxis, categories: labels },
+                annotations: {
+                  points: annotations
+                }
+              }}
+              series={[
+                {
+                  name: `Total ${userType}`,
+                  data: data
+                }
+              ]}
+              type="line"
+              height={230}
+            />
+          )}
         </Box>
       </CardContent>
-      <Divider />
-      <CardActionsWrapper>
-        <Box>
-          <Grid container alignItems="center">
-            <Grid
-              xs={12}
-              sm={6}
-              md={4}
-              item
-              sx={{
-                position: 'relative'
-              }}
-            >
-              <Box
-                component="span"
-                sx={{
-                  display: { xs: 'none', sm: 'inline-block' }
-                }}
-              >
-                <Divider orientation="vertical" flexItem absolute />
-              </Box>
-              <Box
-                sx={{
-                  p: 3
-                }}
-              >
-                <Box>
-                  <Typography variant="subtitle2" gutterBottom>
-                    {t('Students')}
-                  </Typography>
-                  <Typography variant="h3">
-                    {allTimeNumbers.Students}
-                  </Typography>
-                </Box>
-
-                <Chart
-                  options={ChartSparklineOptions}
-                  series={[
-                    {
-                      name: 'Users',
-                      data: [
-                        467, 696, 495, 477, 422, 585, 691, 294, 508, 304, 499,
-                        390
-                      ]
-                    }
-                  ]}
-                  type="line"
-                  height={55}
-                />
-              </Box>
-              <Divider />
-            </Grid>
-            <Grid
-              xs={12}
-              sm={6}
-              md={4}
-              item
-              sx={{
-                position: 'relative'
-              }}
-            >
-              <Box
-                component="span"
-                sx={{
-                  display: { xs: 'none', sm: 'inline-block' }
-                }}
-              >
-                <Divider orientation="vertical" flexItem absolute />
-              </Box>
-              <Box
-                sx={{
-                  p: 3
-                }}
-              >
-                <Box>
-                  <Typography variant="subtitle2" gutterBottom>
-                    {t('Teachers')}
-                  </Typography>
-                  <Typography variant="h3">
-                    {allTimeNumbers.Teachers}
-                  </Typography>
-                </Box>
-                <Chart
-                  options={ChartSparklineOptions}
-                  series={[
-                    {
-                      name: 'New Users',
-                      data: [
-                        581, 203, 462, 518, 329, 395, 375, 447, 303, 423, 405,
-                        589
-                      ]
-                    }
-                  ]}
-                  type="line"
-                  height={55}
-                />
-              </Box>
-              <Divider />
-            </Grid>
-            <Grid
-              xs={12}
-              sm={6}
-              md={4}
-              item
-              sx={{
-                position: 'relative'
-              }}
-            >
-              <Box
-                component="span"
-                sx={{
-                  display: { xs: 'none', sm: 'inline-block' }
-                }}
-              >
-                <Divider orientation="vertical" flexItem absolute />
-              </Box>
-              <Box
-                sx={{
-                  p: 3
-                }}
-              >
-                <Box>
-                  <Typography variant="subtitle2" gutterBottom>
-                    {t('Parents')}
-                  </Typography>
-                  <Typography variant="h3">{allTimeNumbers.Parents}</Typography>
-                </Box>
-
-                <Chart
-                  options={ChartSparklineOptions}
-                  series={[
-                    {
-                      name: 'Page Views',
-                      data: [
-                        353, 380, 325, 246, 682, 605, 672, 271, 386, 630, 577,
-                        511
-                      ]
-                    }
-                  ]}
-                  type="line"
-                  height={55}
-                />
-              </Box>
-              <Divider />
-            </Grid>
-          </Grid>
-        </Box>
-      </CardActionsWrapper>
     </Card>
   );
 }
