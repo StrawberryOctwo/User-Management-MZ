@@ -54,7 +54,22 @@ export const fetchUserAnalytics = async (
     const response = await api.get('/dashboard/user-analytics', { params });
     return response.data;
   } catch (error) {
-    console.error('Error fetching invoice analytics:', error);
+    console.error('Error fetching user analytics:', error);
+    throw error;
+  }
+};
+
+export const fetchStudentAnalytics = async (
+  franchiseId: string,
+  filterType: string
+) => {
+  try {
+    const params = { franchiseId, filterType };
+
+    const response = await api.get('/dashboard/student-analytics', { params });
+    return response.data;
+  } catch (error) {
+    console.error('Error fetching student analytics:', error);
     throw error;
   }
 };

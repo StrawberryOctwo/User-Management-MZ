@@ -1,4 +1,3 @@
-import React from 'react';
 import {
   CardHeader,
   Divider,
@@ -19,7 +18,8 @@ import {
   Grow
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
-import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
+import SchoolIcon from '@mui/icons-material/School';
+import ClassIcon from '@mui/icons-material/Class';
 import LocationCityIcon from '@mui/icons-material/LocationCity';
 import { useDashboard } from 'src/contexts/DashboardContext';
 
@@ -62,49 +62,60 @@ const FilterContainer = styled(Box)(
   `
 );
 
-function SessionsByCity() {
+function StudentsByFilters() {
   const { t } = useTranslation();
   const {
-    sessionAnalytics,
-    analyticsFilter,
-    setAnalyticsFilter,
+    studentAnalytics,
+    studentFilter,
+    setStudentFilter,
     loadingAnalytics
   } = useDashboard();
 
-  // Function to get medal icon based on rank
-  const getMedalIcon = (rank) => {
-    switch (rank) {
-      case 1:
-        return (
-          <Tooltip title="1st Place" arrow>
-            <EmojiEventsIcon sx={{ color: '#FFD700', fontSize: 30 }} />
-          </Tooltip>
-        );
-      case 2:
-        return (
-          <Tooltip title="2nd Place" arrow>
-            <EmojiEventsIcon sx={{ color: '#C0C0C0', fontSize: 28 }} />
-          </Tooltip>
-        );
-      case 3:
-        return (
-          <Tooltip title="3rd Place" arrow>
-            <EmojiEventsIcon sx={{ color: '#CD7F32', fontSize: 26 }} />
-          </Tooltip>
-        );
+  //   const studentAnalytics = [
+  //     {
+  //       id: 1,
+  //       name: 'Location 1',
+  //       count: 100,
+  //       percentage: 25
+  //     },
+  //     {
+  //       id: 2,
+  //       name: 'Location 2',
+  //       count: 200,
+  //       percentage: 50
+  //     },
+  //     {
+  //       id: 3,
+  //       name: 'Location 3',
+  //       count: 300,
+  //       percentage: 75
+  //     },
+  //     {
+  //       id: 4,
+  //       name: 'Location 4',
+  //       count: 400,
+  //       percentage: 100
+  //     }
+  //   ];
+
+  // Function to get filter-specific icons
+  const getFilterIcon = (filterType) => {
+    switch (filterType) {
+      case 'location':
+        return <LocationCityIcon />;
+      case 'class':
+        return <ClassIcon />;
+      case 'school':
+        return <SchoolIcon />;
       default:
-        return (
-          <Tooltip title={`Rank ${rank}`} arrow>
-            <LocationCityIcon color="disabled" />
-          </Tooltip>
-        );
+        return <LocationCityIcon />;
     }
   };
 
   return (
     <Card>
       <CardHeader
-        title={t('Sessions by City')}
+        title={t('Students by Filters')}
         action={
           <FilterContainer>
             <FormControl variant="outlined" size="small">
@@ -112,14 +123,13 @@ function SessionsByCity() {
               <Select
                 labelId="filter-label"
                 id="filter-select"
-                value={analyticsFilter}
-                onChange={(event) => setAnalyticsFilter(event.target.value)} // Update filter in context
+                value={studentFilter}
+                onChange={(event) => setStudentFilter(event.target.value)} // Update filter in context
                 label="Filter"
               >
-                <MenuItem value="day">Day</MenuItem>
-                <MenuItem value="week">Week</MenuItem>
-                <MenuItem value="month">Month</MenuItem>
-                <MenuItem value="year">Year</MenuItem>
+                <MenuItem value="location">Location</MenuItem>
+                <MenuItem value="class">Class</MenuItem>
+                <MenuItem value="school">School</MenuItem>
               </Select>
             </FormControl>
           </FilterContainer>
@@ -132,18 +142,19 @@ function SessionsByCity() {
         </Box>
       ) : (
         <List disablePadding component="nav">
-          {sessionAnalytics.map((item, index) => (
-            <Grow in key={item.locationId} timeout={(index + 1) * 300}>
+          {studentAnalytics.map((item, index) => (
+            <Grow in key={item.id} timeout={(index + 1) * 300}>
               <Box>
                 <ListItemWrapper>
                   <Box display="flex" alignItems="center" width="100%">
-                    {/* Ranking Icon */}
-                    <Box mr={2}>{getMedalIcon(index + 1)}</Box>
+                    {/* Filter Icon */}
+                    <Box mr={2}>
+                      <ImageWrapper>
+                        {getFilterIcon(studentFilter)}
+                      </ImageWrapper>
+                    </Box>
 
-                    {/* City Icon and Name */}
-                    <ImageWrapper>
-                      <LocationCityIcon />
-                    </ImageWrapper>
+                    {/* Filter-specific Name */}
                     <Box>
                       <Typography
                         variant="h6"
@@ -151,13 +162,10 @@ function SessionsByCity() {
                         noWrap
                         sx={{ minWidth: 100 }}
                       >
-                        {item.locationName}
+                        {item.name}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        Total Sessions: {item.totalSessions}
-                      </Typography>
-                      <Typography variant="body2" color="text.secondary">
-                        Avg Duration: {item.avgSessionDuration}
+                        Count: {item.count}
                       </Typography>
                     </Box>
 
@@ -178,7 +186,7 @@ function SessionsByCity() {
                     </Box>
                   </Box>
                 </ListItemWrapper>
-                {index < sessionAnalytics.length - 1 && <Divider />}
+                {index < studentAnalytics.length - 1 && <Divider />}
               </Box>
             </Grow>
           ))}
@@ -188,4 +196,4 @@ function SessionsByCity() {
   );
 }
 
-export default SessionsByCity;
+export default StudentsByFilters;

@@ -9,7 +9,8 @@ import React, {
 import {
   fetchFranchiseCount,
   fetchSessionAnalytics,
-  fetchInvoiceAnalytics
+  fetchInvoiceAnalytics,
+  fetchStudentAnalytics
 } from 'src/services/dashboardService';
 import { fetchFranchises } from 'src/services/franchiseService';
 
@@ -46,6 +47,12 @@ interface DashboardContextProps {
   error: any;
   filterParams: any; // To store additional filter parameters for invoice analytics
   setFilterParams: (params: any) => void;
+  studentAnalytics: any[];
+  setStudentAnalytics: (data: any[]) => void;
+  studentFilter: string;
+  setStudentFilter: (filter: string) => void;
+  studentAnalyticsLoading: boolean;
+  setStudentAnalyticsLoading: (loading: boolean) => void;
 }
 
 const DashboardContext = createContext<DashboardContextProps | null>(null);
@@ -76,6 +83,10 @@ export const DashboardProvider: React.FC = ({ children }) => {
   // Separate Filters for Analytics and Invoices
   const [analyticsFilter, setAnalyticsFilter] = useState('month'); // Default filter for session analytics
   const [invoiceFilter, setInvoiceFilter] = useState('month'); // Default filter for invoice analytics
+
+  const [studentFilter, setStudentFilter] = useState('location'); // Default filter for student analytics
+  const [studentAnalytics, setStudentAnalytics] = useState([]);
+  const [studentAnalyticsLoading, setStudentAnalyticsLoading] = useState(false);
 
   // Additional Filter Parameters for Invoice Analytics
   const [filterParams, setFilterParams] = useState<any>({});
@@ -163,6 +174,21 @@ export const DashboardProvider: React.FC = ({ children }) => {
     }
   }, [invoiceFilter, selectedFranchise, filterParams]);
 
+  const fetchStudentAnalyticsData = useCallback(async () => {
+    setStudentAnalyticsLoading(true);
+    try {
+      const franchiseId =
+        selectedFranchise === 'All Franchises' ? undefined : selectedFranchise;
+      const data = await fetchStudentAnalytics(franchiseId, studentFilter);
+      setStudentAnalytics(data);
+    } catch (err) {
+      console.error('Error fetching student analytics:', err);
+      setError(err);
+    } finally {
+      setStudentAnalyticsLoading(false);
+    }
+  }, [studentFilter]);
+
   // Initial Fetch for Franchise List on Component Mount
   useEffect(() => {
     fetchFranchiseList();
@@ -186,9 +212,19 @@ export const DashboardProvider: React.FC = ({ children }) => {
     }
   }, [fetchInvoiceAnalyticsData, filterParams]);
 
+  useEffect(() => {
+    fetchStudentAnalyticsData();
+  }, [fetchStudentAnalyticsData]);
+
   // Memoize context value to prevent unnecessary re-renders
   const contextValue = useMemo(
     () => ({
+      studentAnalytics,
+      setStudentAnalytics,
+      studentFilter,
+      setStudentFilter,
+      studentAnalyticsLoading,
+      setStudentAnalyticsLoading,
       counts,
       sessionAnalytics,
       invoiceAnalytics,
@@ -222,7 +258,13 @@ export const DashboardProvider: React.FC = ({ children }) => {
       loadingInvoices,
       error,
       filterParams,
-      setFilterParams
+      setFilterParams,
+      studentAnalytics,
+      setStudentAnalytics,
+      studentFilter,
+      setStudentFilter,
+      studentAnalyticsLoading,
+      setStudentAnalyticsLoading
     ]
   );
 

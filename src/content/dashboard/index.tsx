@@ -15,6 +15,7 @@ import SessionsByCountry from './components/SessionsByCountry';
 import TotalStudents from './components/total/TotalStudents';
 
 import { DashboardProvider } from 'src/contexts/DashboardContext';
+import StudentsByFilters from './components/StudentsByFilters';
 
 function DashboardAnalytics() {
   return (
@@ -22,7 +23,7 @@ function DashboardAnalytics() {
       <Grid
         sx={{
           px: 4,
-          mt: 3,
+          mt: 3
         }}
         container
         direction="row"
@@ -63,7 +64,7 @@ function DashboardAnalytics() {
           <AudienceOverview />
         </Grid>
         <Grid item md={5} xs={12}>
-          <Conversions />
+          <StudentsByFilters />
         </Grid>
         <Grid item md={7} xs={12}>
           <TopLandingPages />
