@@ -117,8 +117,7 @@ export default function CustomizedCalendar({
 
   const calendarKey = useMemo(
     () =>
-      `calendar-${holidays.length}-${
-        closingDays.length
+      `calendar-${holidays.length}-${closingDays.length
       }-${selectedDate.toISOString()}-${selectedLocations.length}`,
     [
       holidays.length,
@@ -135,9 +134,9 @@ export default function CustomizedCalendar({
       strongestRoles[0] === 'Parent'
         ? parentNumberOfRooms
         : selectedLocations.reduce(
-            (max, location) => Math.max(max, location.numberOfRooms || 0),
-            0
-          );
+          (max, location) => Math.max(max, location.numberOfRooms || 0),
+          0
+        );
 
     const unsortedResources = Array.from({ length: maxRooms }, (_, index) => ({
       id: `R${index + 1}`,
@@ -361,24 +360,31 @@ export default function CustomizedCalendar({
 
   const checkOverlap = (currentSession: any, allSessions: any[]) => {
     const currentTeacher = currentSession.data.appointment.teacher;
-    const currentStart = new Date(currentSession.start);
-    const currentEnd = new Date(currentSession.end);
+    const currentDate = currentSession.data.appointment.date;
+    const currentStart = new Date(`${currentDate}T${currentSession.data.appointment.startTime}`);
+    const currentEnd = new Date(`${currentDate}T${currentSession.data.appointment.endTime}`);
 
     return allSessions.some((otherSession) => {
-      if (
-        otherSession.data.appointment.id === currentSession.data.appointment.id
-      )
+      // Skip comparing with itself
+      if (otherSession.data.appointment.id === currentSession.data.appointment.id) {
         return false;
-      const otherTeacher = otherSession.data.appointment.teacher;
-      const otherStart = new Date(otherSession.start);
-      const otherEnd = new Date(otherSession.end);
+      }
 
-      return (
-        currentTeacher === otherTeacher &&
-        ((currentStart >= otherStart && currentStart < otherEnd) ||
-          (currentEnd > otherStart && currentEnd <= otherEnd) ||
-          (currentStart <= otherStart && currentEnd >= otherEnd))
-      );
+      const otherTeacher = otherSession.data.appointment.teacher;
+      const otherDate = otherSession.data.appointment.date;
+
+      // First check if same teacher and same day
+      if (currentTeacher === otherTeacher && currentDate === otherDate) {
+        const otherStart = new Date(`${otherDate}T${otherSession.data.appointment.startTime}`);
+        const otherEnd = new Date(`${otherDate}T${otherSession.data.appointment.endTime}`);
+
+        // Then check for time overlap
+        return (
+          (currentStart < otherEnd && currentEnd > otherStart) // General overlap check
+        );
+      }
+
+      return false;
     });
   };
 
@@ -585,6 +591,7 @@ export default function CustomizedCalendar({
           eventDidMount={(info) => {
             if (info.view.type === 'listWeek') {
               const eventEl = info.el;
+              console.log(info.event.extendedProps)
               if (info.event.extendedProps.hasOverlap) {
                 eventEl.style.borderLeft = '3px solid red';
               }
