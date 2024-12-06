@@ -13,7 +13,7 @@ import {
   MenuItem,
   Select,
   CircularProgress,
-  InputLabel,
+  InputLabel
 } from '@mui/material';
 import { useDashboard } from 'src/contexts/DashboardContext';
 import BusinessTwoToneIcon from '@mui/icons-material/BusinessTwoTone';
@@ -39,47 +39,46 @@ const CardContentWrapper = styled(CardContent)(
 );
 
 function TotalFranchises() {
-  const { counts, selectedFranchise, setSelectedFranchise, franchises, loadingCounts } = useDashboard();
+  const {
+    counts,
+    selectedFranchise,
+    setSelectedFranchise,
+    franchises,
+    loadingCounts
+  } = useDashboard();
 
   const handleFranchiseChange = (event) => {
     setSelectedFranchise(event.target.value);
   };
-const FilterContainer = styled(Box)(
-  ({ theme }) => `
+  const FilterContainer = styled(Box)(
+    ({ theme }) => `
     display: flex;
     justify-content: flex-end;
     padding: ${theme.spacing(2)};
   `
-);
+  );
 
   return (
     <Card>
       <CardContentWrapper>
-      <FilterContainer>
-        <FormControl variant="outlined" size="small">
-        <InputLabel id="filter-label">Franchise</InputLabel>
-
-          <Select
-            labelId="filter-label"
-            id="filter-select"
-            value={selectedFranchise}
-            onChange={handleFranchiseChange}
-            label="Franchise"
-          >
-            <MenuItem value="All Franchises">All Franchises</MenuItem>
-            {franchises.map((franchise) => (
-              <MenuItem key={franchise.id} value={franchise.id}>
-                {franchise.name}
-              </MenuItem>
-            ))}
-          </Select>
-        </FormControl>
-        </FilterContainer>
-        <ListItem
-          disableGutters
-          sx={{ my: 1 }}
-          component="div"
+        <Select
+          labelId="filter-label"
+          id="filter-select"
+          value={selectedFranchise}
+          onChange={handleFranchiseChange}
+          label="Franchise"
+          sx={{
+            maxHeight: 35
+          }}
         >
+          <MenuItem value="All Franchises">All Franchises</MenuItem>
+          {franchises.map((franchise) => (
+            <MenuItem key={franchise.id} value={franchise.id}>
+              {franchise.name}
+            </MenuItem>
+          ))}
+        </Select>
+        <ListItem disableGutters sx={{ my: 1 }} component="div">
           <ListItemAvatar>
             <AvatarError variant="rounded">
               <BusinessTwoToneIcon fontSize="large" />
@@ -87,20 +86,22 @@ const FilterContainer = styled(Box)(
           </ListItemAvatar>
           <Box display="flex" alignItems="center">
             <ListItemText
-              primary={loadingCounts ? <CircularProgress size={24} /> : counts.franchises}
+              primary={
+                loadingCounts ? (
+                  <CircularProgress size={24} />
+                ) : (
+                  counts.franchises
+                )
+              }
               primaryTypographyProps={{
                 variant: 'h1',
                 sx: { ml: 2 },
-                noWrap: true,
+                noWrap: true
               }}
             />
           </Box>
         </ListItem>
-        <ListItem
-          disableGutters
-          sx={{ mt: 0.5, mb: 1.5 }}
-          component="div"
-        >
+        <ListItem disableGutters sx={{ mt: 0.5, mb: 1.5 }} component="div">
           <ListItemText
             primary={
               <Link fontWeight="bold" href="/management/franchises">
