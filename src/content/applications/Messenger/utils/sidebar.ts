@@ -1,9 +1,12 @@
 import { getAllChats } from 'src/services/chatService';
 
 export const fetchChats = async (
-  setChats: (chats: any[]) => void,
-  setLoading: (loading: boolean) => void,
-  searchTerm: string = '',
+  setChats,
+  setLoading,
+  setHasMore,
+  setTotalChats,
+  append = false,
+  searchTerm = '',
   page = 1,
   limit = 10
 ) => {
@@ -11,16 +14,25 @@ export const fetchChats = async (
   try {
     const response = await getAllChats(searchTerm, page, limit);
     const data = response.chats;
+    setTotalChats(response.totalChats);
+
     if (!data || data.length === 0) {
-      setChats([]);
+      if (!append) {
+        setChats([]);
+      }
+      setHasMore(false);
     } else {
-      setChats(data);
+      setChats(prevChats => append ? [...prevChats, ...data] : data);
+      setHasMore(response.totalChats > (page * limit));
     }
   } catch (err) {
     console.error('Error fetching chats:', err);
-    setChats([]);
+    if (!append) {
+      setChats([]);
+    }
+    setHasMore(false);
   } finally {
-    console.log('Chats fetched');
     setLoading(false);
   }
 };
+

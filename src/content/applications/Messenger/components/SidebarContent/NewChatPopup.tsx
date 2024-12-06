@@ -76,7 +76,7 @@ const fetchUsersByType = async (type: string, query: string) => {
 
     // Transform the response data to match expected format
     const transformedData = response.data.map(item => ({
-      id: type === 'Teacher' ? item.userId : item.id,
+      id: type === 'Teacher' || type === 'Student' ? item.userId : (type === 'Parent' ? item.user.id : item.id),
       name: `${item.firstName} ${item.lastName}`,
       email: item.email,
       postalCode: item.postalCode,

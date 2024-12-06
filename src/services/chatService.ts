@@ -52,9 +52,13 @@ export const joinChatRoom = async (chatRoomId: number, userId: number) => {
   }
 };
 
-export const getAllMessages = async (chatRoomId: number) => {
+export const getAllMessages = async (
+  chatRoomId: number,
+  page: number,
+  limit: number
+) => {
   try {
-    const response = await api.get(`/chat-room/${chatRoomId}/messages`);
+    const response = await api.get(`/chat-room/${chatRoomId}/messages?page=${page}&limit=${limit}`);
     return response.data;
   } catch (error) {
     console.error('Error fetching messages:', error);
