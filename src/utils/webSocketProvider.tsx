@@ -14,9 +14,10 @@ interface WebSocketProviderProps {
 
 // Initialize the shared WebSocket instance
 const SOCKET_SERVER_URL =
-  process.env.REACT_APP_SOCKET_SERVER_URL || "http://localhost:3003";
+  process.env.REACT_APP_SOCKET_SERVER_URL;
 
   const socket = io(SOCKET_SERVER_URL, {
+
     withCredentials: true,
   
   });
@@ -33,7 +34,13 @@ export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }
     socket.on("disconnect", () => {
       console.log("Disconnected from WebSocket server");
     });
-
+    socket.on("connect_error", (err) => {
+      console.error("Connection Error:", err.message);
+    });
+    
+    socket.on("error", (err) => {
+      console.error("WebSocket Error:", err);
+    });
     // Cleanup on unmount
     return () => {
       socket.disconnect();
