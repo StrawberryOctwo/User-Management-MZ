@@ -22,7 +22,7 @@ function PageHeader() {
           Teachers
         </Typography>
         <Typography variant="subtitle2">
-          {user.name}, these are your recent teachers
+          {user.name}These are your recent teachers
         </Typography>
       </Grid>
       <Grid item>

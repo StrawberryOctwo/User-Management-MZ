@@ -22,7 +22,7 @@ function PageHeader() {
           Location Admins
         </Typography>
         <Typography variant="subtitle2">
-          {user.name}, these are your recent locations
+          {user.name}These are your recent locations
         </Typography>
       </Grid>
       <Grid item>

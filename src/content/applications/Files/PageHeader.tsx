@@ -20,7 +20,7 @@ function PageHeader() {
           Files
         </Typography>
         <Typography variant="subtitle2">
-          {user.name}, these are your recent files
+          {user.name}These are your recent files
         </Typography>
       </Grid>
       <Grid item>

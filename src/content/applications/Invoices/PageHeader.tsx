@@ -22,7 +22,7 @@ function PageHeader() {
           Invoices
         </Typography>
         <Typography variant="subtitle2">
-          {user.name}, these are your invoices
+          {user.name}These are your invoices
         </Typography>
       </Grid>
     </Grid>

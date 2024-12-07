@@ -22,7 +22,7 @@ function PageHeader() {
           Parents
         </Typography>
         <Typography variant="subtitle2">
-          {user.name}, these are your recent parents
+          {user.name}These are your recent parents
         </Typography>
       </Grid>
       <Grid item>

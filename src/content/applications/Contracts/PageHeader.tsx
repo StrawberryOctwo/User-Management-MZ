@@ -22,7 +22,7 @@ function PageHeader() {
           Contracts
         </Typography>
         <Typography variant="subtitle2">
-          {user.name}, these are your recent conracts
+          {user.name}These are your recent conracts
         </Typography>
       </Grid>
       <Grid item>

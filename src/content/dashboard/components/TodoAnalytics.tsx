@@ -48,7 +48,7 @@ function RecentTodos() {
   };
 
   const handleRowsPerPageChange = (event) => {
-    setTodoLimit(parseInt(event.target.value, 10));
+    setTodoLimit(parseInt(event.target.value, 5));
     setTodoPage(1); // Reset to the first page when changing rows per page
   };
 

@@ -22,7 +22,7 @@ function PageHeader() {
           Days Off
         </Typography>
         <Typography variant="subtitle2">
-          {user.name}, these are your recent days off
+          {user.name}These are your recent days off
         </Typography>
       </Grid>
       <Grid item>

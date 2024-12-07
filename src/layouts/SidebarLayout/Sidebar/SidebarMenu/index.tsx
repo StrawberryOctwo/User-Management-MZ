@@ -180,353 +180,385 @@ function SidebarMenu() {
   const { closeSidebar } = useContext(SidebarContext);
 
   return (
-    <>
-      <MenuWrapper>
-        <List component="div">
-          <SubMenuWrapper></SubMenuWrapper>
-        </List>
+    <MenuWrapper>
+      {/* Dashboards Section */}
+      <List
+        component="div"
+        subheader={
+          <ListSubheader component="div" disableSticky>
+            Dashboards
+          </ListSubheader>
+        }
+      >
+        <SubMenuWrapper>
+          <List component="div">
+            <ProtectedListItem
+              allowedRoles={[
+                'SuperAdmin',
+                'FranchiseAdmin',
+                'Teacher',
+                'Student',
+                'Parent',
+                'LocationAdmin'
+              ]}
+            >
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={RouterLink}
+                  onClick={closeSidebar}
+                  to="/dashboard/calendar"
+                  startIcon={<EditCalendarIcon />}
+                >
+                  Calendar
+                </Button>
+              </ListItem>
+            </ProtectedListItem>
+            <ProtectedListItem
+              allowedRoles={['SuperAdmin', 'FranchiseAdmin']}
+            >
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={RouterLink}
+                  onClick={closeSidebar}
+                  to="/dashboard/charts"
+                  startIcon={<InsertChartIcon />}
+                >
+                  Dashboard
+                </Button>
+              </ListItem>
+            </ProtectedListItem>
+            <ProtectedListItem allowedRoles={['SuperAdmin']}>
+              <ListItem component="div">
+                <Button
+                  disableRipple
+                  component={RouterLink}
+                  onClick={closeSidebar}
+                  to="/dashboard/interests"
+                  startIcon={<Interests />}
+                >
+                  Interests
+                </Button>
+              </ListItem>
+            </ProtectedListItem>
+          </List>
+        </SubMenuWrapper>
+      </List>
+
+      {/* Management Section */}
+      <SubMenuWrapper>
+        {/* User Management Subsection */}
         <List
           component="div"
           subheader={
             <ListSubheader component="div" disableSticky>
-              Dashboards
+              User Management
             </ListSubheader>
           }
         >
-          <SubMenuWrapper>
-            <List component="div">
-              <ProtectedListItem
-                allowedRoles={[
-                  'SuperAdmin',
-                  'FranchiseAdmin',
-                  'Teacher',
-                  'Student',
-                  'Parent',
-                  'LocationAdmin'
-                ]}
+          <ProtectedListItem
+            allowedRoles={[
+              'SuperAdmin',
+              'FranchiseAdmin',
+              'LocationAdmin',
+              'Teacher',
+              'Parent',
+              'Student'
+            ]}
+          >
+            {/* Intentionally left empty as in your final code */}
+          </ProtectedListItem>
+          <ProtectedListItem allowedRoles={['SuperAdmin', 'FranchiseAdmin']}>
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to="/management/franchises"
+                startIcon={<BusinessOutlined />}
               >
-                <ListItem component="div">
-                  <Button
-                    disableRipple
-                    component={RouterLink}
-                    onClick={closeSidebar}
-                    to="/dashboard/calendar"
-                    startIcon={<EditCalendarIcon />}
-                  >
-                    Calendar
-                  </Button>
-                </ListItem>
-              </ProtectedListItem>
-              <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin']}
+                Franchises
+              </Button>
+            </ListItem>
+          </ProtectedListItem>
+
+          <ProtectedListItem
+            allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin']}
+          >
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to="/management/locations"
+                startIcon={<LocationOnIcon />}
               >
-                <ListItem component="div">
-                  <Button
-                    disableRipple
-                    component={RouterLink}
-                    onClick={closeSidebar}
-                    to="/dashboard/charts"
-                    startIcon={<InsertChartIcon />}
-                  >
-                    Dashboard
-                  </Button>
-                </ListItem>
-              </ProtectedListItem>
-              <ProtectedListItem allowedRoles={['SuperAdmin']}>
-                <ListItem component="div">
-                  <Button
-                    disableRipple
-                    component={RouterLink}
-                    onClick={closeSidebar}
-                    to="/dashboard/interests"
-                    startIcon={<Interests />}
-                  >
-                    Interests
-                  </Button>
-                </ListItem>
-              </ProtectedListItem>
-            </List>
-          </SubMenuWrapper>
+                Locations
+              </Button>
+            </ListItem>
+          </ProtectedListItem>
+          <ProtectedListItem allowedRoles={['SuperAdmin']}>
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to="/management/franchise-admins"
+                startIcon={<LocationSearchingTwoTone />}
+              >
+                Franchise Admins
+              </Button>
+            </ListItem>
+          </ProtectedListItem>
+          <ProtectedListItem allowedRoles={['SuperAdmin', 'FranchiseAdmin']}>
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to="/management/location-admins"
+                startIcon={<LocationSearching />}
+              >
+                Location Admins
+              </Button>
+            </ListItem>
+          </ProtectedListItem>
+          <ProtectedListItem
+            allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin']}
+          >
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to="/management/teachers"
+                startIcon={<Person />}
+              >
+                Teachers
+              </Button>
+            </ListItem>
+          </ProtectedListItem>
+          <ProtectedListItem
+            allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin']}
+          >
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to="/management/parents"
+                startIcon={<PersonAddAlt1Sharp />}
+              >
+                Parents
+              </Button>
+            </ListItem>
+          </ProtectedListItem>
+          <ProtectedListItem
+            allowedRoles={[
+              'SuperAdmin',
+              'FranchiseAdmin',
+              'LocationAdmin',
+              'Teacher',
+              'Parent'
+            ]}
+          >
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to="/management/students"
+                startIcon={<PersonAddAlt1Sharp />}
+              >
+                Students
+              </Button>
+            </ListItem>
+          </ProtectedListItem>
         </List>
+
+        {/* NEW Chat Subsection */}
         <List
           component="div"
           subheader={
             <ListSubheader component="div" disableSticky>
-              Management
+              Chat
             </ListSubheader>
           }
         >
-          <SubMenuWrapper>
-            <List component="div">
-              <ProtectedListItem
-                allowedRoles={[
-                  'SuperAdmin',
-                  'FranchiseAdmin',
-                  'LocationAdmin',
-                  'Teacher',
-                  'Parent',
-                  'Student'
-                ]}
+          <ProtectedListItem
+            allowedRoles={[
+              'SuperAdmin',
+              'FranchiseAdmin',
+              'LocationAdmin',
+              'Teacher',
+              'Parent',
+              'Student'
+            ]}
+          >
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to="/management/chat"
+                startIcon={<ChatBubble />}
               >
-                <ListItem component="div">
-                  <Button
-                    disableRipple
-                    component={RouterLink}
-                    onClick={closeSidebar}
-                    to="/management/chat"
-                    startIcon={<ChatBubble />}
-                  >
-                    Chat Room
-                  </Button>
-                </ListItem>
-              </ProtectedListItem>
-              <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin']}
-              >
-                <ListItem component="div">
-                  <Button
-                    disableRipple
-                    component={RouterLink}
-                    onClick={closeSidebar}
-                    to="/management/franchises"
-                    startIcon={<BusinessOutlined />}
-                  >
-                    Franchises
-                  </Button>
-                </ListItem>
-              </ProtectedListItem>
-
-              <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin']}
-              >
-                <ListItem component="div">
-                  <Button
-                    disableRipple
-                    component={RouterLink}
-                    onClick={closeSidebar}
-                    to="/management/billings"
-                    startIcon={<MoneyRounded />}
-                  >
-                    Billings
-                  </Button>
-                </ListItem>
-              </ProtectedListItem>
-
-              <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin']}
-              >
-                <ListItem component="div">
-                  <Button
-                    disableRipple
-                    component={RouterLink}
-                    onClick={closeSidebar}
-                    to="/management/locations"
-                    startIcon={<LocationOnIcon />}
-                  >
-                    Locations
-                  </Button>
-                </ListItem>
-              </ProtectedListItem>
-
-              <ProtectedListItem allowedRoles={['SuperAdmin']}>
-                <ListItem component="div">
-                  <Button
-                    disableRipple
-                    component={RouterLink}
-                    onClick={closeSidebar}
-                    to="/management/franchise-admins"
-                    startIcon={<LocationSearchingTwoTone />}
-                  >
-                    Franchise Admins
-                  </Button>
-                </ListItem>
-              </ProtectedListItem>
-
-              <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin']}
-              >
-                <ListItem component="div">
-                  <Button
-                    disableRipple
-                    component={RouterLink}
-                    onClick={closeSidebar}
-                    to="/management/location-admins"
-                    startIcon={<LocationSearching />}
-                  >
-                    Location Admins
-                  </Button>
-                </ListItem>
-              </ProtectedListItem>
-
-              <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin']}
-              >
-                <ListItem component="div">
-                  <Button
-                    disableRipple
-                    component={RouterLink}
-                    onClick={closeSidebar}
-                    to="/management/teachers"
-                    startIcon={<Person />}
-                  >
-                    Teachers
-                  </Button>
-                </ListItem>
-              </ProtectedListItem>
-
-              <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin']}
-              >
-                <ListItem component="div">
-                  <Button
-                    disableRipple
-                    component={RouterLink}
-                    onClick={closeSidebar}
-                    to="/management/parents"
-                    startIcon={<PersonAddAlt1Sharp />}
-                  >
-                    Parents
-                  </Button>
-                </ListItem>
-              </ProtectedListItem>
-
-              <ProtectedListItem
-                allowedRoles={[
-                  'SuperAdmin',
-                  'FranchiseAdmin',
-                  'LocationAdmin',
-                  'Teacher',
-                  'Parent'
-                ]}
-              >
-                <ListItem component="div">
-                  <Button
-                    disableRipple
-                    component={RouterLink}
-                    onClick={closeSidebar}
-                    to="/management/students"
-                    startIcon={<PersonAddAlt1Sharp />}
-                  >
-                    Students
-                  </Button>
-                </ListItem>
-              </ProtectedListItem>
-
-              <ProtectedListItem
-                allowedRoles={[
-                  'SuperAdmin',
-                  'FranchiseAdmin',
-                  'Parent',
-                  'Student',
-                  'LocationAdmin',
-                  'Teacher'
-                ]}
-              >
-                <ListItem component="div">
-                  <Button
-                    disableRipple
-                    component={RouterLink}
-                    onClick={closeSidebar}
-                    to="/management/files"
-                    startIcon={<FileUploadSharp />}
-                  >
-                    Files
-                  </Button>
-                </ListItem>
-              </ProtectedListItem>
-
-              <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin']}
-              >
-                <ListItem component="div">
-                  <Button
-                    disableRipple
-                    component={RouterLink}
-                    onClick={closeSidebar}
-                    to="/management/topics"
-                    startIcon={<Topic />}
-                  >
-                    Topics
-                  </Button>
-                </ListItem>
-              </ProtectedListItem>
-              <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin']}
-              >
-                <ListItem component="div">
-                  <Button
-                    disableRipple
-                    component={RouterLink}
-                    onClick={closeSidebar}
-                    to="/management/contracts"
-                    startIcon={<Topic />}
-                  >
-                    Contracts
-                  </Button>
-                </ListItem>
-              </ProtectedListItem>
-              <ProtectedListItem allowedRoles={['Parent', 'Student']}>
-                <ListItem component="div">
-                  <Button
-                    disableRipple
-                    component={RouterLink}
-                    onClick={closeSidebar}
-                    to="/management/session-reports"
-                    startIcon={<DescriptionOutlinedIcon />}
-                  >
-                    Session Reports
-                  </Button>
-                </ListItem>
-              </ProtectedListItem>
-              <ProtectedListItem allowedRoles={['']}>
-                <ListItem component="div">
-                  <Button
-                    disableRipple
-                    component={RouterLink}
-                    onClick={closeSidebar}
-                    to="/management/payments"
-                    startIcon={<AttachMoney />}
-                  >
-                    Session Payments
-                  </Button>
-                </ListItem>
-              </ProtectedListItem>
-              <ProtectedListItem
-                allowedRoles={['FranchiseAdmin', 'Teacher', 'Parent']}
-              >
-                <ListItem component="div">
-                  <Button
-                    disableRipple
-                    component={RouterLink}
-                    onClick={closeSidebar}
-                    to="/management/invoices"
-                    startIcon={<ReceiptIcon />}
-                  >
-                    Monthly Invoices
-                  </Button>
-                </ListItem>
-              </ProtectedListItem>
-
-              <ProtectedListItem
-                allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin']}
-              >
-                <ListItem component="div">
-                  <Button
-                    disableRipple
-                    component={RouterLink}
-                    onClick={closeSidebar}
-                    to="/management/daysoff"
-                    startIcon={<EventBusyIcon />}
-                  >
-                    Days Off
-                  </Button>
-                </ListItem>
-              </ProtectedListItem>
-            </List>
-          </SubMenuWrapper>
+                Chat Room
+              </Button>
+            </ListItem>
+          </ProtectedListItem>
         </List>
-      </MenuWrapper>
-    </>
+
+        {/* Content Management Subsection */}
+        <List
+          component="div"
+          subheader={
+            <ListSubheader component="div" disableSticky>
+              Content Management
+            </ListSubheader>
+          }
+        >
+          <ProtectedListItem allowedRoles={['SuperAdmin', 'FranchiseAdmin']}>
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to="/management/files"
+                startIcon={<FileUploadSharp />}
+              >
+                Files
+              </Button>
+            </ListItem>
+          </ProtectedListItem>
+          <ProtectedListItem allowedRoles={['SuperAdmin', 'FranchiseAdmin']}>
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to="/management/topics"
+                startIcon={<Topic />}
+              >
+                Topics
+              </Button>
+            </ListItem>
+          </ProtectedListItem>
+          <ProtectedListItem allowedRoles={['SuperAdmin', 'FranchiseAdmin']}>
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to="/management/contracts"
+                startIcon={<Topic />}
+              >
+                Contracts
+              </Button>
+            </ListItem>
+          </ProtectedListItem>
+        </List>
+
+        {/* Reports Subsection */}
+        <List
+          component="div"
+          subheader={
+            <ListSubheader component="div" disableSticky>
+              Reports
+            </ListSubheader>
+          }
+        >
+          <ProtectedListItem allowedRoles={['Parent', 'Student']}>
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to="/management/session-reports"
+                startIcon={<DescriptionOutlinedIcon />}
+              >
+                Session Reports
+              </Button>
+            </ListItem>
+          </ProtectedListItem>
+          <ProtectedListItem allowedRoles={['']}>
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to="/management/payments"
+                startIcon={<AttachMoney />}
+              >
+                Session Payments
+              </Button>
+            </ListItem>
+          </ProtectedListItem>
+        </List>
+
+        {/* Finance Subsection */}
+        <List
+          component="div"
+          subheader={
+            <ListSubheader component="div" disableSticky>
+              Finance
+            </ListSubheader>
+          }
+        >
+          <ProtectedListItem allowedRoles={['FranchiseAdmin', 'Teacher', 'Parent']}>
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to="/management/invoices"
+                startIcon={<ReceiptIcon />}
+              >
+                Monthly Invoices
+              </Button>
+            </ListItem>
+          </ProtectedListItem>
+          <ProtectedListItem allowedRoles={['SuperAdmin', 'FranchiseAdmin']}>
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to="/management/billings"
+                startIcon={<MoneyRounded />}
+              >
+                Franchise Bills
+              </Button>
+            </ListItem>
+          </ProtectedListItem>
+        </List>
+
+        {/* HR Subsection */}
+        <List
+          component="div"
+          subheader={
+            <ListSubheader component="div" disableSticky>
+              HR
+            </ListSubheader>
+          }
+        >
+          <ProtectedListItem allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin']}>
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to="/management/daysoff"
+                startIcon={<EventBusyIcon />}
+              >
+                Days Off
+              </Button>
+            </ListItem>
+          </ProtectedListItem>
+        </List>
+      </SubMenuWrapper>
+    </MenuWrapper>
   );
 }
 

@@ -14,7 +14,7 @@ function PageHeader() {
           Transactions
         </Typography>
         <Typography variant="subtitle2">
-          {user.name}, these are your recent transactions
+          {user.name}These are your recent transactions
         </Typography>
       </Grid>
       <Grid item>

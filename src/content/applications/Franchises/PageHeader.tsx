@@ -22,7 +22,7 @@ function PageHeader() {
           Franchises
         </Typography>
         <Typography variant="subtitle2">
-          {user.name}, these are your recent franchises
+          {user.name}These are your recent franchises
         </Typography>
       </Grid>
       <Grid item>

@@ -22,7 +22,7 @@ function PageHeader() {
           Bills
         </Typography>
         <Typography variant="subtitle2">
-          {user.name}, these are your recent bills
+          {user.name}These are your recent bills
         </Typography>
       </Grid>
       <Grid item>

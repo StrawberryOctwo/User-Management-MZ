@@ -22,7 +22,7 @@ function PageHeader() {
           Interests Bookings
         </Typography>
         <Typography variant="subtitle2">
-          {user.name}, these are your interests bookings
+          {user.name}These are your interests bookings
         </Typography>
       </Grid>
     </Grid>

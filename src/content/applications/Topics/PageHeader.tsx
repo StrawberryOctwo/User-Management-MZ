@@ -22,7 +22,7 @@ function PageHeader() {
           Topics
         </Typography>
         <Typography variant="subtitle2">
-          {user.name}, these are your recent topics
+          {user.name}These are your recent topics
         </Typography>
       </Grid>
       <Grid item>
