@@ -101,6 +101,10 @@ export default function StudentsContent() {
     setPage(0);
   };
 
+  const hasAdminPrivileges = userRoles.some(role =>
+    ['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin'].includes(role)
+  );
+
   if (errorMessage) return <div>{errorMessage}</div>;
 
   return (
@@ -114,9 +118,9 @@ export default function StudentsContent() {
           { field: 'status', headerName: 'Status' },
         ]}
         title="Student List"
-        onEdit={handleEdit}
+        onEdit={hasAdminPrivileges ? handleEdit : undefined}
         onView={handleView}
-        onDelete={confirmDelete}
+        onDelete={hasAdminPrivileges ? confirmDelete : undefined}
         onSearchChange={loadStudents}
         loading={loading}
         page={page}

@@ -1,6 +1,7 @@
 import { Typography, Button, Grid } from '@mui/material';
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import RoleBasedComponent from 'src/components/ProtectedComponent';
 
 function PageHeader() {
   const navigate = useNavigate(); // Initialize useNavigate
@@ -26,14 +27,16 @@ function PageHeader() {
         </Typography>
       </Grid>
       <Grid item>
-        <Button
-          sx={{ mt: { xs: 2, md: 0 } }}
-          variant="contained"
-          startIcon={<AddTwoToneIcon fontSize="small" />}
-          onClick={handleCreateFranchise} // Add onClick handler
-        >
-          Create student
-        </Button>
+        <RoleBasedComponent allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin']}>
+          <Button
+            sx={{ mt: { xs: 2, md: 0 } }}
+            variant="contained"
+            startIcon={<AddTwoToneIcon fontSize="small" />}
+            onClick={handleCreateFranchise} // Add onClick handler
+          >
+            Create student
+          </Button>
+        </RoleBasedComponent>
       </Grid>
     </Grid>
   );

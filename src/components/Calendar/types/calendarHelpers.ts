@@ -75,3 +75,10 @@ export interface DemoProps {
   loadClassSessions: () => void;
   selectedLocations: any[];
 }
+
+export const CALENDAR_TIME_CONSTANTS = {
+  START_TIME: '12:00:00',
+  END_TIME: '21:00:00',
+  DEFAULT_VIEW: 'resourceTimelineDay',
+  MINUTES_PER_SLOT: 15
+};

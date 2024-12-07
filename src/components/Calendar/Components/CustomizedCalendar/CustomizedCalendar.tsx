@@ -32,6 +32,7 @@ import SpecialDayModal from '../Modals/SpecialDayModal';
 import CalendarLegend from '../CalendarLegend';
 import listPlugin from '@fullcalendar/list';
 import { Holiday } from 'src/services/specialDaysService';
+import { CALENDAR_TIME_CONSTANTS } from '../../types/calendarHelpers';
 
 export enum TimeSlotMinutes {
   Five = 5,
@@ -585,7 +586,8 @@ export default function CustomizedCalendar({
           views={getAvailableViews()}
           datesSet={handleViewChange}
           initialDate={selectedDate}
-          initialView={getStoredView()}
+          // initialView={getStoredView()}
+          initialView={CALENDAR_TIME_CONSTANTS.DEFAULT_VIEW}
           headerToolbar={calendarHelpers.getHeaderToolbar()}
           customButtons={customButtons}
           eventDidMount={(info) => {
@@ -601,8 +603,8 @@ export default function CustomizedCalendar({
           resourceOrder="sortOrder"
           events={events}
           eventContent={renderEventContent}
-          slotMinTime="12:00:00"
-          slotMaxTime="19:00:00"
+          slotMinTime={CALENDAR_TIME_CONSTANTS.START_TIME}
+          slotMaxTime={CALENDAR_TIME_CONSTANTS.END_TIME}
           resourceAreaWidth="120px"
           selectable={true}
           slotLabelFormat={calendarHelpers.getTimeFormats().slotLabelFormat}
