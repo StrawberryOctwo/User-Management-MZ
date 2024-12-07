@@ -16,13 +16,12 @@ interface WebSocketProviderProps {
 const SOCKET_SERVER_URL =
   process.env.REACT_APP_SOCKET_SERVER_URL;
 
-  const socket = io(SOCKET_SERVER_URL, {
+const socket = io(SOCKET_SERVER_URL, {
 
-    withCredentials: true,
+  transports: ["polling"],
+});
   
-  });
-  
-
+console.log(socket)
 // WebSocketProvider Component
 export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }) => {
   useEffect(() => {
