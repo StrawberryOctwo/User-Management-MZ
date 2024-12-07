@@ -12,22 +12,16 @@ export const fetchUserProfile = async () => {
 };
 
 // Update the user's password
-export const updateUserPassword = async (passwordData: any) => {
+export const updateUserPassword = async (oldPassword: string, newPassword: string) => {
+  const body = {
+    oldPassword,
+    newPassword
+  }
   try {
-    const response = await api.put('/user/password', passwordData);
+    const response = await api.post('/user/change-password', body);
     return response.data;
   } catch (error) {
     console.error('Error updating user password:', error);
-    throw error;
-  }
-};
-
-export const getUserProfile = async () => {
-  try {
-    const response = await api.get(`/user/profile`);
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching user profile:', error);
     throw error;
   }
 };
