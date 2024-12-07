@@ -25,7 +25,7 @@
   "password": "Passwort",
   "dob": "Geburtsdatum",
   "postal_code": "Postleitzahl",
-  "phone_Number": "Telefonnummer",
+  "phone_number": "Telefonnummer",
   "account_holder": "Kontoinhaber",
   "available_dates": "Verfügbare Daten",
   "tax_number": "Steuernummer",
