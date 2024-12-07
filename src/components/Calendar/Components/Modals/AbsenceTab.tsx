@@ -244,8 +244,8 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
                                             }
                                             onChange={handleStatusChange}
                                             disabled={
-                                                isDateOlderThan3Days(sessionDate)
-                                                    ? false // Ignore isStatusEditable if sessionDate is older than 3 days
+                                                (isDateOlderThan3Days(sessionDate) && status === null)
+                                                    ? false
                                                     : !isStatusEditable
                                             }
                                         >
