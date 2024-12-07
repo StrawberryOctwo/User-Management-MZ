@@ -1,5 +1,5 @@
 .fc {
-  background-color: #ffffff;
+  background-color: var(--secondary-color);
   box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
   padding: 24px;
   padding-bottom: 50px;
@@ -40,7 +40,7 @@
 }
 
 .fc-button.fc-button-primary {
-  background-color: #4f6cff;
+  background-color: var(--swiper-theme-color) ;
   color: #ffffff;
   border-radius: 12px;
   padding: 10px 20px;
@@ -48,7 +48,7 @@
 }
 
 .fc-button.fc-button-primary:hover {
-  background-color: #3b57d1;
+  background-color: var(--swiper-theme-color) ;
   transform: scale(1.05);
 }
 
@@ -63,7 +63,7 @@
 }
 
 .fc-today-button:hover {
-  background-color: #5f74ff !important;
+  background-color: var(--swiper-theme-color) !important;
 }
 
 .fc .fc-button:disabled {
@@ -191,7 +191,7 @@
 .fc .fc-prev-button {
   background: transparent;
   border: none;
-  color: #4f6cff;
+  color: var(--swiper-theme-color);
   font-size: 1.2rem;
   padding: 6px 12px;
   cursor: pointer;

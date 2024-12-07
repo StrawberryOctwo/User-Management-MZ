@@ -401,6 +401,7 @@ export const EclipseShadowTheme = createTheme({
         },
         ':root': {
           '--swiper-theme-color': colors.primary.main,
+          '--secondary-color': themeColors.secondary,
           colorScheme: 'dark'
         },
         code: {
