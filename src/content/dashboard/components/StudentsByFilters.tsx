@@ -71,33 +71,6 @@ function StudentsByFilters() {
     loadingAnalytics
   } = useDashboard();
 
-  //   const studentAnalytics = [
-  //     {
-  //       id: 1,
-  //       name: 'Location 1',
-  //       count: 100,
-  //       percentage: 25
-  //     },
-  //     {
-  //       id: 2,
-  //       name: 'Location 2',
-  //       count: 200,
-  //       percentage: 50
-  //     },
-  //     {
-  //       id: 3,
-  //       name: 'Location 3',
-  //       count: 300,
-  //       percentage: 75
-  //     },
-  //     {
-  //       id: 4,
-  //       name: 'Location 4',
-  //       count: 400,
-  //       percentage: 100
-  //     }
-  //   ];
-
   // Function to get filter-specific icons
   const getFilterIcon = (filterType) => {
     switch (filterType) {

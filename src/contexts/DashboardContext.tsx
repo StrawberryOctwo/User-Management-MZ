@@ -10,7 +10,8 @@ import {
   fetchFranchiseCount,
   fetchSessionAnalytics,
   fetchInvoiceAnalytics,
-  fetchStudentAnalytics
+  fetchStudentAnalytics,
+  fetchDashboardTodos
 } from 'src/services/dashboardService';
 import { fetchFranchises } from 'src/services/franchiseService';
 
@@ -53,6 +54,11 @@ interface DashboardContextProps {
   setStudentFilter: (filter: string) => void;
   studentAnalyticsLoading: boolean;
   setStudentAnalyticsLoading: (loading: boolean) => void;
+  todos: any[];
+  todoPage: number;
+  setTodoPage: (page: number) => void;
+  todoLimit: number;
+  setTodoLimit: (limit: number) => void;
 }
 
 const DashboardContext = createContext<DashboardContextProps | null>(null);
@@ -87,6 +93,10 @@ export const DashboardProvider: React.FC = ({ children }) => {
   const [studentFilter, setStudentFilter] = useState('location'); // Default filter for student analytics
   const [studentAnalytics, setStudentAnalytics] = useState([]);
   const [studentAnalyticsLoading, setStudentAnalyticsLoading] = useState(false);
+
+  const [todos, setTodos] = useState([]);
+  const [todoPage, setTodoPage] = useState(1);
+  const [todoLimit, setTodoLimit] = useState(5);
 
   // Additional Filter Parameters for Invoice Analytics
   const [filterParams, setFilterParams] = useState<any>({});
@@ -189,6 +199,17 @@ export const DashboardProvider: React.FC = ({ children }) => {
     }
   }, [studentFilter]);
 
+  const fetchTodos = useCallback(async () => {
+    try {
+      const data = await fetchDashboardTodos(todoPage, todoLimit);
+      console.log('Fetched todos:', data);
+      setTodos(data.todos);
+    } catch (error) {
+      console.error('Error fetching todos:', error);
+      setError(error);
+    }
+  }, []);
+
   // Initial Fetch for Franchise List on Component Mount
   useEffect(() => {
     fetchFranchiseList();
@@ -216,6 +237,10 @@ export const DashboardProvider: React.FC = ({ children }) => {
     fetchStudentAnalyticsData();
   }, [fetchStudentAnalyticsData]);
 
+  useEffect(() => {
+    fetchTodos();
+  }, [fetchTodos]);
+
   // Memoize context value to prevent unnecessary re-renders
   const contextValue = useMemo(
     () => ({
@@ -240,7 +265,12 @@ export const DashboardProvider: React.FC = ({ children }) => {
       loadingInvoices,
       error,
       filterParams,
-      setFilterParams
+      setFilterParams,
+      todos,
+      todoPage,
+      setTodoPage,
+      todoLimit,
+      setTodoLimit
     }),
     [
       counts,
@@ -264,7 +294,12 @@ export const DashboardProvider: React.FC = ({ children }) => {
       studentFilter,
       setStudentFilter,
       studentAnalyticsLoading,
-      setStudentAnalyticsLoading
+      setStudentAnalyticsLoading,
+      todos,
+      todoPage,
+      setTodoPage,
+      todoLimit,
+      setTodoLimit
     ]
   );
 
