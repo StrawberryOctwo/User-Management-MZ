@@ -50,7 +50,7 @@ export default function FileUploadContent() {
     {
       field: 'createdAt',
       headerName: 'Created At',
-      render: (value) => new Date(value).toLocaleDateString()
+      render: (value) => new Date(value).toLocaleDateString('de')
     },
     {
       field: 'actions',

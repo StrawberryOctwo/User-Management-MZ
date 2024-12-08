@@ -7,8 +7,9 @@ interface FileActionsProps {
     fileId: any;
     fileName: string;
 }
-const { t } = useTranslation();
+
 const FileActions: React.FC<FileActionsProps> = ({ fileId, fileName }) => {
+    const { t } = useTranslation();
     const handleFileAction = async (action: 'view' | 'download') => {
         try {
             const { url, contentType } = await downloadFile(fileId);

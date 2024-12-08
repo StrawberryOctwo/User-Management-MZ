@@ -46,7 +46,7 @@ export default function ViewFranchisePage() {
     { field: 'ownerName', headerName: t('Owner Name')} ,
     { field: 'status', headerName: t('Status')} ,
     { field: 'totalEmployees', headerName: t('Total Employees')} ,
-    { field: 'createdAt', headerName: t('Created At'), render: (value: any) => new Date(value).toLocaleDateString() },
+    { field: 'createdAt', headerName: t('Created At'), render: (value: any) => new Date(value).toLocaleDateString('de') },
 
   ];
 

@@ -49,7 +49,7 @@ export default function ViewTopicPage() {
   const columns = [
     { field: 'name', headerName: 'Topic Name' },
     { field: 'franchiseName', headerName: 'Franchise' },
-    { field: 'createdAt', headerName: 'Created At', render: (value: any) => new Date(value).toLocaleDateString() },
+    { field: 'createdAt', headerName: 'Created At', render: (value: any) => new Date(value).toLocaleDateString('de') },
   ];
   // const handleEdit = (id: any) => {
   //   navigate(`edit/${id}`);

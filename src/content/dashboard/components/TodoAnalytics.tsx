@@ -116,7 +116,7 @@ function RecentTodos() {
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
                         {todo.dueDate
-                          ? new Date(todo.dueDate).toLocaleDateString()
+                          ? new Date(todo.dueDate).toLocaleDateString('de')
                           : 'No Due Date'}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">

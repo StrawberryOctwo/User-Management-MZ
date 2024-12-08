@@ -6,8 +6,9 @@ import { useTranslation } from 'react-i18next';
 interface FileViewProps {
     fileId: any;
 }
-const { t } = useTranslation();
 const FileView: React.FC<FileViewProps> = ({ fileId }) => {
+    const { t } = useTranslation();
+
     const handleViewFile = async () => {
         try {
             const { url, contentType } = await downloadFile(fileId);

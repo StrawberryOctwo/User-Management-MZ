@@ -104,7 +104,7 @@ const ToDoTable: React.FC<ToDoTableProps> = ({
                                     <Chip label={todo.priority} color={priorityColor(todo.priority)} size="small" />
                                 </TableCell>
                                 <TableCell>
-                                    {todo.dueDate ? new Date(todo.dueDate).toLocaleDateString() : 'No Due Date'}
+                                    {todo.dueDate ? new Date(todo.dueDate).toLocaleDateString('de') : 'No Due Date'}
                                 </TableCell>
                                 <TableCell>
                                     {todo.assignedRoles && (

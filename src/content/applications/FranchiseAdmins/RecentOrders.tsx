@@ -63,7 +63,7 @@ export default function FranchiseAdminsContent() {
     /* {
       field: 'dob',
       headerName: 'DOB',
-      render: (value: any) => new Date(value).toLocaleDateString()
+      render: (value: any) => new Date(value).toLocaleDateString('de')
     }, */
     { field: 'email', headerName: t('Email') },
     /* { field: 'address', headerName: 'Address' },

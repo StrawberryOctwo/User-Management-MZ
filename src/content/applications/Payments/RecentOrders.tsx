@@ -60,8 +60,8 @@ export default function ViewPaymentsPage() {
   const columns = [
     { field: 'amount', headerName: t('Amount') },
     { field: 'paymentStatus', headerName: t('Payment Status') },
-    { field: 'paymentDate', headerName: t('Payment Date'), render: (value: any) => new Date(value).toLocaleDateString() },
-    { field: 'lastUpdate', headerName: t('Last Update'), render: (value: any) => new Date(value).toLocaleDateString() },
+    { field: 'paymentDate', headerName: t('Payment Date'), render: (value: any) => new Date(value).toLocaleDateString('de') },
+    { field: 'lastUpdate', headerName: t('Last Update'), render: (value: any) => new Date(value).toLocaleDateString('de') },
   ];
 
   const handleEdit = (id: any) => {

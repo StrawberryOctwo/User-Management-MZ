@@ -19,8 +19,9 @@ interface UploadSectionProps {
     onUploadChange: (files: UploadedFile[]) => void;
     initialDocuments?: UploadedFile[];
 }
-const { t } = useTranslation();
+
 const UploadSection: React.FC<UploadSectionProps> = ({ onUploadChange, initialDocuments = [] }) => {
+    const { t } = useTranslation();
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [fileName, setFileName] = useState('');
     const [fileType, setFileType] = useState('');

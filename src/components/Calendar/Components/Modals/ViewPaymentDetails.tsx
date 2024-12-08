@@ -42,7 +42,7 @@ const ViewPaymentDetails: React.FC<ViewPaymentDetailsProps> = ({ isOpen, onClose
                     <Box>
                         <Typography><strong>Amount:</strong> ${payment.amount}</Typography>
                         <Typography><strong>Status:</strong> {payment.paymentStatus}</Typography>
-                        <Typography><strong>Date:</strong> {new Date(payment.paymentDate).toLocaleDateString()}</Typography>
+                        <Typography><strong>Date:</strong> {new Date(payment.paymentDate).toLocaleDateString('de')}</Typography>
                     </Box>
                 ) : (
                     <Typography>No payment found for this student.</Typography>

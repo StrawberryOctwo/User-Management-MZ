@@ -198,7 +198,7 @@ function SurveyNotifications() {
                         </Typography>
                       </Box>
                       <Typography variant="caption" color="textSecondary" sx={{ mt: 0.5 }}>
-                        Assigned: {new Date(survey.survey.createdAt).toLocaleDateString()}
+                        Assigned: {new Date(survey.survey.createdAt).toLocaleDateString('de')}
                       </Typography>
                     </Box>
                   </ListItem>

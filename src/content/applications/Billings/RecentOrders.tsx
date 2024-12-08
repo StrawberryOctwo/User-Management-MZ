@@ -42,7 +42,7 @@ export default function ViewBillingsPage() {
   const columns = [
     { field: 'revenue', headerName: 'Revenue' },
     { field: 'amountDue', headerName: 'Amount Due' },
-    { field: 'billingDate', headerName: 'Billing Date', render: (value: any) => new Date(value).toLocaleDateString() },
+    { field: 'billingDate', headerName: 'Billing Date', render: (value: any) => new Date(value).toLocaleDateString('de') },
     {
       field: 'franchiseName',
       headerName: 'Franchise Name',
