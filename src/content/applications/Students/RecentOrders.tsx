@@ -9,8 +9,8 @@ import {
 } from 'src/services/studentService';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from 'src/hooks/useAuth';
-import { t } from 'i18next';
 import { CompareSharp } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 
 export default function StudentsContent() {
   const [students, setStudents] = useState([]);
@@ -26,7 +26,7 @@ export default function StudentsContent() {
   const { userRoles: authUserRoles, loading: authLoading } = useAuth();
 
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   // First useEffect: Set userRoles from authUserRoles
   useEffect(() => {
     if (!authLoading && authUserRoles && userRoles.length === 0) {

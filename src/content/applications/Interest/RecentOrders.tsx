@@ -4,7 +4,7 @@ import ReusableTable from 'src/components/Table';
 import { fetchInterests } from 'src/services/interestService';
 import { useAuth } from 'src/hooks/useAuth';
 import { useNavigate } from 'react-router-dom';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 export default function ViewBookings() {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -23,7 +23,7 @@ export default function ViewBookings() {
       loadUserBookings();
     }
   }, [userId, page, limit, sortByAccepted, searchQuery]);
-
+  const { t } = useTranslation();
   const loadUserBookings = async () => {
     setLoading(true);
     setErrorMessage(null);
@@ -56,7 +56,7 @@ export default function ViewBookings() {
     {
       field: 'appointment',
       headerName: t('Appointment'),
-      render: (value: string) => value ? new Date(value).toLocaleString('de'): 'N/A',
+      render: (value: string) => value ? new Date(value).toLocaleString('de') : 'N/A',
     },
     { field: 'locationName', headerName: t('Location') },
     {
