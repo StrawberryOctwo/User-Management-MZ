@@ -10,6 +10,7 @@ import {
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from 'src/hooks/useAuth';
 import { t } from 'i18next';
+import { CompareSharp } from '@mui/icons-material';
 
 export default function StudentsContent() {
   const [students, setStudents] = useState([]);
@@ -125,6 +126,7 @@ export default function StudentsContent() {
           { field: 'fullName', headerName: t('Full Name') },
           { field: 'email', headerName: t('Email') },
           { field: 'gradeLevel', headerName: t('Grade Level') },
+          { field: 'contractName', headerName: t('Contract') },
           { field: 'status', headerName: t('Status') }
         ]}
         title="Student List"
