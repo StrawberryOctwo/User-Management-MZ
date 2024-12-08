@@ -4,26 +4,27 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
-  Box,
-  CircularProgress,
-  Divider,
-  Grid,
-  Typography,
-  IconButton,
   TextField,
   Button,
+  Box,
   FormControl,
-  InputLabel,
-  MenuItem,
-  Select
+  FormControlLabel,
+  Radio,
+  RadioGroup,
+  FormLabel,
+  Stepper,
+  Step,
+  StepLabel,
+  Typography,
+  CircularProgress
 } from '@mui/material';
-import CloseIcon from '@mui/icons-material/Close';
 import {
   getSessionReportById,
   updateSessionReport,
   deleteSessionReport
 } from 'src/services/sessionReportService';
 import { format } from 'date-fns';
+import { useTranslation } from 'react-i18next';
 
 interface ViewSessionReportFormProps {
   isOpen: boolean;
@@ -33,6 +34,207 @@ interface ViewSessionReportFormProps {
   isEditable?: boolean;
 }
 
+const steps = [
+  'Lesson Content',
+  'Progress & Learning',
+  'Attention',
+  'Homework & Notes'
+];
+
+const StepContent = ({ step, formData, handleChange, readOnly }) => {
+  switch (step) {
+    case 0:
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <FormLabel component="legend">1. Lesson Content</FormLabel>
+          <TextField
+            label="Topic of the Lesson"
+            value={formData.lessonTopic}
+            onChange={handleChange('lessonTopic')}
+            fullWidth
+            InputProps={{ readOnly }}
+          />
+          <TextField
+            label="Covered Topics/Exercises"
+            value={formData.coveredMaterials}
+            onChange={handleChange('coveredMaterials')}
+            fullWidth
+            InputProps={{ readOnly }}
+          />
+        </Box>
+      );
+
+    case 1:
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <FormLabel component="legend">2. Progress in this Lesson</FormLabel>
+          <FormControl component="fieldset">
+            <RadioGroup
+              value={formData.progress}
+              onChange={handleChange('progress')}
+              row
+            >
+              <FormControlLabel
+                value="very-good"
+                control={<Radio />}
+                label="Very Good"
+                disabled={readOnly}
+              />
+              <FormControlLabel
+                value="good"
+                control={<Radio />}
+                label="Good"
+                disabled={readOnly}
+              />
+              <FormControlLabel
+                value="needs-improvement"
+                control={<Radio />}
+                label="Needs Improvement"
+                disabled={readOnly}
+              />
+              <FormControlLabel
+                value="difficult"
+                control={<Radio />}
+                label="Difficult"
+                disabled={readOnly}
+              />
+            </RadioGroup>
+          </FormControl>
+          <TextField
+            label="Brief Explanation/Assessment of Learning Progress"
+            value={formData.learningAssessment}
+            onChange={handleChange('learningAssessment')}
+            multiline
+            rows={3}
+            fullWidth
+            InputProps={{ readOnly }}
+          />
+        </Box>
+      );
+
+    case 2:
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <FormLabel component="legend" sx={{ fontWeight: 'bold' }}>
+            Attention
+          </FormLabel>
+          {[
+            {
+              field: 'activeParticipation',
+              label: 'Regular and active participation in class',
+              inputField: 'participationNotes'
+            },
+            {
+              field: 'concentration',
+              label: 'Remains focused',
+              inputField: 'concentrationNotes'
+            },
+            {
+              field: 'worksIndependently',
+              label: 'Works independently',
+              inputField: 'independentWorkNotes'
+            },
+            {
+              field: 'cooperation',
+              label: 'Cooperative',
+              inputField: 'cooperationNotes'
+            }
+          ].map(({ field, label, inputField }) => (
+            <Box key={field} sx={{ mb: 2 }}>
+              <FormLabel>{label}</FormLabel>
+              <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1 }}>
+                <TextField
+                  label="Notes"
+                  value={formData[inputField]}
+                  onChange={handleChange(inputField)}
+                  size="small"
+                  fullWidth
+                  InputProps={{ readOnly }}
+                />
+                <RadioGroup
+                  value={formData[field] ? 'yes' : 'no'}
+                  onChange={handleChange(field)}
+                  row
+                  sx={{ minWidth: '150px' }}
+                >
+                  <FormControlLabel
+                    value="yes"
+                    control={<Radio size="small" />}
+                    label="Yes"
+                    disabled={readOnly}
+                  />
+                  <FormControlLabel
+                    value="no"
+                    control={<Radio size="small" />}
+                    label="No"
+                    disabled={readOnly}
+                  />
+                </RadioGroup>
+              </Box>
+            </Box>
+          ))}
+        </Box>
+      );
+
+    case 3:
+      return (
+        <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+          <Box>
+            <FormLabel component="legend">3. Homework</FormLabel>
+            <FormControl fullWidth sx={{ mt: 2 }}>
+              <FormLabel>Previous homework completed</FormLabel>
+              <RadioGroup
+                value={formData.previousHomeworkCompleted ? 'yes' : 'no'}
+                onChange={handleChange('previousHomeworkCompleted')}
+                row
+              >
+                <FormControlLabel
+                  value="yes"
+                  control={<Radio />}
+                  label="Yes"
+                  disabled={readOnly}
+                />
+                <FormControlLabel
+                  value="no"
+                  control={<Radio />}
+                  label="No"
+                  disabled={readOnly}
+                />
+              </RadioGroup>
+            </FormControl>
+            <FormControl fullWidth sx={{ mt: 2 }}>
+              <FormLabel>Homework for the next session</FormLabel>
+              <TextField
+                value={formData.nextHomework}
+                onChange={handleChange('nextHomework')}
+                fullWidth
+                multiline
+                rows={2}
+                InputProps={{ readOnly }}
+              />
+            </FormControl>
+          </Box>
+          <Box sx={{ mt: 2 }}>
+            <FormLabel component="legend">4. Notes from the Tutor</FormLabel>
+            <TextField
+              label="Additional comments"
+              value={formData.tutorRemarks}
+              onChange={handleChange('tutorRemarks')}
+              multiline
+              rows={4}
+              fullWidth
+              margin="normal"
+              InputProps={{ readOnly }}
+            />
+          </Box>
+        </Box>
+      );
+
+    default:
+      return null;
+  }
+};
+
 const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
   isOpen,
   onClose,
@@ -40,22 +242,28 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
   onDelete,
   isEditable = false
 }) => {
-  const [lessonTopic, setLessonTopic] = useState<string>('');
-  const [coveredMaterials, setCoveredMaterials] = useState<string>('');
-  const [progress, setProgress] = useState<string>('');
-  const [learningAssessment, setLearningAssessment] = useState<string>('');
-  const [activeParticipation, setActiveParticipation] =
-    useState<boolean>(false);
-  const [concentration, setConcentration] = useState<boolean>(false);
-  const [worksIndependently, setWorksIndependently] = useState<boolean>(false);
-  const [cooperation, setCooperation] = useState<boolean>(false);
-  const [previousHomeworkCompleted, setPreviousHomeworkCompleted] =
-    useState<boolean>(false);
-  const [nextHomework, setNextHomework] = useState<string>('');
-  const [tutorRemarks, setTutorRemarks] = useState<string>('');
-  const [sessionDate, setSessionDate] = useState<string>('');
-  const [studentName, setStudentName] = useState<string>('');
-  const [loading, setLoading] = useState<boolean>(true);
+  const { t } = useTranslation();
+  const [activeStep, setActiveStep] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [formData, setFormData] = useState({
+    lessonTopic: '',
+    coveredMaterials: '',
+    progress: 'good',
+    learningAssessment: '',
+    activeParticipation: false,
+    participationNotes: '',
+    concentration: false,
+    concentrationNotes: '',
+    worksIndependently: false,
+    independentWorkNotes: '',
+    cooperation: false,
+    cooperationNotes: '',
+    previousHomeworkCompleted: false,
+    nextHomework: '',
+    tutorRemarks: '',
+    sessionDate: '',
+    studentName: ''
+  });
 
   useEffect(() => {
     if (isOpen && reportId) {
@@ -63,26 +271,25 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
         setLoading(true);
         try {
           const report = await getSessionReportById(reportId);
-
-          setLessonTopic(report.data.lessonTopic || '');
-          setCoveredMaterials(report.data.coveredMaterials || '');
-          setProgress(report.data.progress || '');
-          setLearningAssessment(report.data.learningAssessment || '');
-          setActiveParticipation(report.data.activeParticipation || false);
-          setConcentration(report.data.concentration || false);
-          setWorksIndependently(report.data.worksIndependently || false);
-          setCooperation(report.data.cooperation || false);
-          setPreviousHomeworkCompleted(
-            report.data.previousHomeworkCompleted || false
-          );
-          setNextHomework(report.data.nextHomework || '');
-          setTutorRemarks(report.data.tutorRemarks || '');
-          setSessionDate(
-            format(new Date(report.data.session.date), 'yyyy-MM-dd')
-          );
-          setStudentName(
-            `${report.data.student.user.firstName} ${report.data.student.user.lastName}`
-          );
+          setFormData({
+            lessonTopic: report.data.lessonTopic || '',
+            coveredMaterials: report.data.coveredMaterials || '',
+            progress: report.data.progress || 'good',
+            learningAssessment: report.data.learningAssessment || '',
+            activeParticipation: report.data.activeParticipation || false,
+            participationNotes: report.data.participationNotes || '',
+            concentration: report.data.concentration || false,
+            concentrationNotes: report.data.concentrationNotes || '',
+            worksIndependently: report.data.worksIndependently || false,
+            independentWorkNotes: report.data.independentWorkNotes || '',
+            cooperation: report.data.cooperation || false,
+            cooperationNotes: report.data.cooperationNotes || '',
+            previousHomeworkCompleted: report.data.previousHomeworkCompleted || false,
+            nextHomework: report.data.nextHomework || '',
+            tutorRemarks: report.data.tutorRemarks || '',
+            sessionDate: format(new Date(report.data.session.date), 'yyyy-MM-dd'),
+            studentName: `${report.data.student.user.firstName} ${report.data.student.user.lastName}`
+          });
         } catch (error) {
           console.error('Error fetching session report:', error);
         } finally {
@@ -94,21 +301,34 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
     }
   }, [isOpen, reportId]);
 
+  const handleStepClick = (step: number) => {
+    setActiveStep(step);
+  };
+
+  const handleChange = (field: string) => (e: any) => {
+    let value = e.target.value;
+    if (e.target.type === 'radio') {
+      if (['activeParticipation', 'concentration', 'worksIndependently',
+        'cooperation', 'previousHomeworkCompleted'].includes(field)) {
+        value = e.target.value === 'yes';
+      } else {
+        value = e.target.value;
+      }
+    }
+    setFormData(prev => ({ ...prev, [field]: value }));
+  };
+
+  const handleNext = () => {
+    setActiveStep((prevStep) => prevStep + 1);
+  };
+
+  const handleBack = () => {
+    setActiveStep((prevStep) => prevStep - 1);
+  };
+
   const handleSave = async () => {
     try {
-      await updateSessionReport(reportId, {
-        lessonTopic,
-        coveredMaterials,
-        progress,
-        learningAssessment,
-        activeParticipation,
-        concentration,
-        worksIndependently,
-        cooperation,
-        previousHomeworkCompleted,
-        nextHomework,
-        tutorRemarks
-      });
+      await updateSessionReport(reportId, formData);
       onClose();
     } catch (error) {
       console.error('Error updating report:', error);
@@ -126,267 +346,68 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
   };
 
   return (
-    <Dialog
-      open={isOpen}
-      onClose={onClose}
-      maxWidth="md"
-      fullWidth
-      PaperProps={{
-        sx: {
-          maxHeight: '90vh',
-          display: 'flex',
-          flexDirection: 'column'
-        }
-      }}
-    >
+    <Dialog open={isOpen} onClose={onClose} maxWidth="md" fullWidth>
       <DialogTitle>
-        <Box display="flex" alignItems="center" justifyContent="space-between">
-          <Typography variant="h6">
-            Session Report for <strong>{studentName}</strong>
+        <Box sx={{ mb: 2 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="h6">{t('Lesson Protocol')}</Typography>
+            <Typography variant="body1">
+              <strong>{t('Session Date')}:</strong> {formData.sessionDate}
+            </Typography>
+          </Box>
+          <Typography variant="body1">
+            <strong>{t('Student')}:</strong> {formData.studentName}
           </Typography>
-          <IconButton onClick={onClose}>
-            <CloseIcon />
-          </IconButton>
         </Box>
       </DialogTitle>
-      <DialogContent
-        sx={{
-          flex: 1,
-          overflow: 'auto'
-        }}
-      >
+      <DialogContent>
         {loading ? (
           <Box display="flex" justifyContent="center" mt={2}>
             <CircularProgress />
           </Box>
-        ) : isEditable ? (
-          <Box display="flex" flexDirection="column" gap={3} mt={2}>
-            {/* Session Details */}
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <TextField
-                  label="Student Name"
-                  value={studentName}
-                  fullWidth
-                  InputProps={{ readOnly: true }}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label="Session Date"
-                  value={sessionDate}
-                  fullWidth
-                  InputProps={{ readOnly: true }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Lesson Topic"
-                  value={lessonTopic}
-                  onChange={(e) => setLessonTopic(e.target.value)}
-                  fullWidth
-                  InputProps={{ readOnly: !isEditable }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Covered Materials"
-                  value={coveredMaterials}
-                  onChange={(e) => setCoveredMaterials(e.target.value)}
-                  fullWidth
-                  InputProps={{ readOnly: !isEditable }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Progress"
-                  value={progress}
-                  onChange={(e) => setProgress(e.target.value)}
-                  fullWidth
-                  InputProps={{ readOnly: !isEditable }}
-                />
-              </Grid>
-            </Grid>
-
-            <Divider />
-
-            {/* Learning Assessment */}
-            <Typography variant="h6" gutterBottom>
-              Learning Assessment
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  label="Assessment"
-                  value={learningAssessment}
-                  onChange={(e) => setLearningAssessment(e.target.value)}
-                  fullWidth
-                  InputProps={{ readOnly: !isEditable }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Next Homework"
-                  value={nextHomework}
-                  onChange={(e) => setNextHomework(e.target.value)}
-                  fullWidth
-                  InputProps={{ readOnly: !isEditable }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Tutor Remarks"
-                  value={tutorRemarks}
-                  onChange={(e) => setTutorRemarks(e.target.value)}
-                  fullWidth
-                  InputProps={{ readOnly: !isEditable }}
-                />
-              </Grid>
-            </Grid>
-
-            <Divider />
-
-            {/* Behavioral Assessment */}
-            <Typography variant="h6" gutterBottom>
-              Behavioral Assessment
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Active Participation</InputLabel>
-                  <Select
-                    label="Active Participation"
-                    value={activeParticipation ? 'Yes' : 'No'}
-                    onChange={(e) =>
-                      setActiveParticipation(e.target.value === 'Yes')
-                    }
-                    inputProps={{ readOnly: !isEditable }}
-                  >
-                    <MenuItem value="Yes">Yes</MenuItem>
-                    <MenuItem value="No">No</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Concentration</InputLabel>
-                  <Select
-                    label="Concentration"
-                    value={concentration ? 'Yes' : 'No'}
-                    onChange={(e) => setConcentration(e.target.value === 'Yes')}
-                    inputProps={{ readOnly: !isEditable }}
-                  >
-                    <MenuItem value="Yes">Yes</MenuItem>
-                    <MenuItem value="No">No</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-            </Grid>
-          </Box>
         ) : (
-          <Box display="flex" flexDirection="column" gap={3} mt={2}>
-        
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <Typography variant="body1">
-                  <strong>Student Name:</strong> {studentName}
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body1">
-                  <strong>Session Date:</strong> {sessionDate}
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="body1">
-                  <strong>Lesson Topic:</strong> {lessonTopic}
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="body1">
-                  <strong>Covered Materials:</strong> {coveredMaterials}
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="body1">
-                  <strong>Progress:</strong> {progress}
-                </Typography>
-              </Grid>
-            </Grid>
-
-            <Divider />
-
-            {/* Learning Assessment */}
-            <Typography variant="h6" gutterBottom>
-              Learning Assessment
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <Typography variant="body1">
-                  <strong>Assessment:</strong> {learningAssessment}
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="body1">
-                  <strong>Next Homework:</strong> {nextHomework}
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="body1">
-                  <strong>Tutor Remarks:</strong> {tutorRemarks}
-                </Typography>
-              </Grid>
-            </Grid>
-
-            <Divider />
-
-            {/* Behavioral Assessment */}
-            <Typography variant="h6" gutterBottom>
-              Behavioral Assessment
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <Typography variant="body1">
-                  <strong>Active Participation:</strong>{' '}
-                  {activeParticipation ? 'Yes' : 'No'}
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body1">
-                  <strong>Concentration:</strong> {concentration ? 'Yes' : 'No'}
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body1">
-                  <strong>Works Independently:</strong>{' '}
-                  {worksIndependently ? 'Yes' : 'No'}
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body1">
-                  <strong>Cooperation:</strong> {cooperation ? 'Yes' : 'No'}
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body1">
-                  <strong>Previous Homework Completed:</strong>{' '}
-                  {previousHomeworkCompleted ? 'Yes' : 'No'}
-                </Typography>
-              </Grid>
-            </Grid>
+          <Box sx={{ width: '100%', mt: 2 }}>
+            <Stepper activeStep={activeStep} alternativeLabel>
+              {steps.map((label, index) => (
+                <Step key={label} sx={{ cursor: 'pointer' }} onClick={() => handleStepClick(index)}>
+                  <StepLabel>{label}</StepLabel>
+                </Step>
+              ))}
+            </Stepper>
+            <Box sx={{ mt: 4 }}>
+              <StepContent
+                step={activeStep}
+                formData={formData}
+                handleChange={handleChange}
+                readOnly={!isEditable}
+              />
+            </Box>
           </Box>
         )}
       </DialogContent>
-      {isEditable && (
-        <DialogActions>
-          <Button onClick={handleDelete} color="error">
-            Delete
+      <DialogActions>
+        {isEditable && (
+          <Button onClick={handleDelete} color="error" sx={{ mr: 1 }}>
+            {t('Delete')}
           </Button>
-          <Button onClick={handleSave} variant="contained" color="primary">
-            Save
-          </Button>
-        </DialogActions>
-      )}
+        )}
+        <Box sx={{ display: 'flex', gap: 1 }}>
+          {activeStep > 0 && (
+            <Button onClick={handleBack}>{t('Back')}</Button>
+          )}
+          {activeStep === steps.length - 1 ? (
+            isEditable && (
+              <Button onClick={handleSave} variant="contained" color="primary">
+                {t('Save')}
+              </Button>
+            )
+          ) : (
+            <Button onClick={handleNext} variant="contained" color="primary">
+              {t('Next')}
+            </Button>
+          )}
+        </Box>
+      </DialogActions>
     </Dialog>
   );
 };
