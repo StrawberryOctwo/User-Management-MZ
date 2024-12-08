@@ -3,6 +3,7 @@ import { initReactI18next } from 'react-i18next';
 import en from './locales/en.json';
 import de from './locales/de.json';
 
+const defLanguage = localStorage.getItem('appLanguage')
 i18n
   .use(initReactI18next) // Passes i18n down to react-i18next
   .init({
@@ -14,8 +15,8 @@ i18n
         translation: de
       }
     },
-    lng: 'en', // Default language
-    fallbackLng: 'en', // Fallback language
+    lng: defLanguage, // Default language
+    fallbackLng: defLanguage, // Fallback language
     interpolation: {
       escapeValue: false // React already escapes by default
     }

@@ -46,7 +46,7 @@ function HeaderLocalization() {
     await i18n.changeLanguage(selectedLanguage);
     setLanguage(selectedLanguage);
     localStorage.setItem('appLanguage', selectedLanguage);
-    window.location.reload();
+
     handleClose();
   };
 
