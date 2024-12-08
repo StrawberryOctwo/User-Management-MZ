@@ -5,7 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { fetchTeachers, deleteTeacher } from 'src/services/teacherService';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { t } from 'i18next'
+import { t } from 'i18next';
 
 export default function TeachersContent() {
   const [teachers, setTeachers] = useState([]);
@@ -38,13 +38,22 @@ export default function TeachersContent() {
         id: teacher.id,
         fullName: `${teacher.firstName} ${teacher.lastName}`.trim(), // Merged full name
         employeeNumber: teacher.employeeNumber,
-        contractStartDate: format(new Date(teacher.contractStartDate), 'dd/MM/yyyy'),
-        contractEndDate: format(new Date(teacher.contractEndDate), 'dd/MM/yyyy'),
-        contractPeriod: `${format(new Date(teacher.contractStartDate), 'dd/MM/yyyy')} - ${format(new Date(teacher.contractEndDate), 'dd/MM/yyyy')}`,
+        contractStartDate: format(
+          new Date(teacher.contractStartDate),
+          'dd/MM/yyyy'
+        ),
+        contractEndDate: format(
+          new Date(teacher.contractEndDate),
+          'dd/MM/yyyy'
+        ),
+        contractPeriod: `${format(
+          new Date(teacher.contractStartDate),
+          'dd/MM/yyyy'
+        )} - ${format(new Date(teacher.contractEndDate), 'dd/MM/yyyy')}`,
         hourlyRate: teacher.hourlyRate,
         email: teacher.email,
         status: teacher.status,
-        franchise: teacher.franchiseName,
+        franchise: teacher.franchiseName
       }));
 
       setTeachers(mappedTeachers);
@@ -56,8 +65,6 @@ export default function TeachersContent() {
     }
   };
 
-
-
   const columns = [
     { field: 'fullName', headerName: t('Full Name') },
     { field: 'franchise', headerName: t('Franchise Name') },
@@ -67,10 +74,10 @@ export default function TeachersContent() {
       field: 'contractPeriod',
       headerName: t('Contract Period'),
       render: (value: any, row: any) =>
-        `${row.contractStartDate} - ${row.contractEndDate}`,
+        `${row.contractStartDate} - ${row.contractEndDate}`
     },
     { field: 'status', headerName: t('Status') },
-    { field: 'hourlyRate', headerName: t('Hourly Rate') },
+    { field: 'hourlyRate', headerName: t('Hourly Rate') }
   ];
 
   const handleEdit = (id: any) => {
@@ -136,7 +143,11 @@ export default function TeachersContent() {
         onClose={() => setDialogOpen(false)}
         actions={
           <>
-            <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
+            <Button
+              onClick={() => setDialogOpen(false)}
+              color="inherit"
+              disabled={loading}
+            >
               Cancel
             </Button>
             <Button
