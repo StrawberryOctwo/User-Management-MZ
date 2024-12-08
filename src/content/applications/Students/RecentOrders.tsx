@@ -2,10 +2,14 @@ import { Box, Button, CircularProgress } from '@mui/material';
 import React, { useEffect, useState, useCallback } from 'react';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
-import { fetchStudents, deleteStudent, fetchParentStudents } from 'src/services/studentService';
+import {
+  fetchStudents,
+  deleteStudent,
+  fetchParentStudents
+} from 'src/services/studentService';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from 'src/hooks/useAuth';
-import { t } from "i18next"
+import { t } from 'i18next';
 
 export default function StudentsContent() {
   const [students, setStudents] = useState([]);
@@ -30,33 +34,38 @@ export default function StudentsContent() {
   }, [authLoading, authUserRoles, userRoles.length]);
 
   // Memoize loadStudents to prevent unnecessary re-creations
-  const loadStudents = useCallback(async (searchQuery = '') => {
-    setLoading(true);
-    setErrorMessage(null);
+  const loadStudents = useCallback(
+    async (searchQuery = '') => {
+      setLoading(true);
+      setErrorMessage(null);
 
-    try {
-      let result;
-      if (userRoles.length === 0) { return; }
-      if (userRoles.includes('Parent')) {
-        result = await fetchParentStudents(page + 1, limit, searchQuery);
-      } else {
-        result = await fetchStudents(page + 1, limit, searchQuery);
+      try {
+        let result;
+        if (userRoles.length === 0) {
+          return;
+        }
+        if (userRoles.includes('Parent')) {
+          result = await fetchParentStudents(page + 1, limit, searchQuery);
+        } else {
+          result = await fetchStudents(page + 1, limit, searchQuery);
+        }
+
+        const { data, total } = result;
+        const mergedData = data.map((student: any) => ({
+          ...student,
+          fullName: `${student.firstName} ${student.lastName}`.trim()
+        }));
+
+        setStudents(mergedData);
+        setTotalCount(total);
+      } catch (error: any) {
+        setErrorMessage('Failed to load students. Please try again.');
+      } finally {
+        setLoading(false);
       }
-
-      const { data, total } = result;
-      const mergedData = data.map((student: any) => ({
-        ...student,
-        fullName: `${student.firstName} ${student.lastName}`.trim(),
-      }));
-
-      setStudents(mergedData);
-      setTotalCount(total);
-    } catch (error: any) {
-      setErrorMessage('Failed to load students. Please try again.');
-    } finally {
-      setLoading(false);
-    }
-  }, [userRoles, page, limit]);
+    },
+    [userRoles, page, limit]
+  );
 
   // Second useEffect: Fetch students when userRoles, page, or limit change
   useEffect(() => {
@@ -102,7 +111,7 @@ export default function StudentsContent() {
     setPage(0);
   };
 
-  const hasAdminPrivileges = userRoles.some(role =>
+  const hasAdminPrivileges = userRoles.some((role) =>
     ['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin'].includes(role)
   );
 
@@ -116,7 +125,7 @@ export default function StudentsContent() {
           { field: 'fullName', headerName: t('Full Name') },
           { field: 'email', headerName: t('Email') },
           { field: 'gradeLevel', headerName: t('Grade Level') },
-          { field: 'status', headerName: t('Status') },
+          { field: 'status', headerName: t('Status') }
         ]}
         title="Student List"
         onEdit={hasAdminPrivileges ? handleEdit : undefined}
@@ -133,11 +142,15 @@ export default function StudentsContent() {
 
       <ReusableDialog
         open={dialogOpen}
-        title={t("Confirm Deletion")}
+        title={t('Confirm Deletion')}
         onClose={() => setDialogOpen(false)}
         actions={
           <>
-            <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
+            <Button
+              onClick={() => setDialogOpen(false)}
+              color="inherit"
+              disabled={loading}
+            >
               Cancel
             </Button>
             <Button
