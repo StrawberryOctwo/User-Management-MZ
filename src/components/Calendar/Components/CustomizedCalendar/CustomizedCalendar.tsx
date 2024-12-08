@@ -586,8 +586,7 @@ export default function CustomizedCalendar({
           views={getAvailableViews()}
           datesSet={handleViewChange}
           initialDate={selectedDate}
-          // initialView={getStoredView()}
-          initialView={CALENDAR_TIME_CONSTANTS.DEFAULT_VIEW}
+          initialView={getStoredView()}
           headerToolbar={calendarHelpers.getHeaderToolbar()}
           customButtons={customButtons}
           eventDidMount={(info) => {
