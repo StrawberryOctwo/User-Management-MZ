@@ -5,7 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { fetchTeachers, deleteTeacher } from 'src/services/teacherService';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 export default function TeachersContent() {
   const [teachers, setTeachers] = useState([]);
@@ -19,7 +19,7 @@ export default function TeachersContent() {
   const isMounted = useRef(false);
 
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   useEffect(() => {
     if (isMounted.current) {
       loadTeachers();
