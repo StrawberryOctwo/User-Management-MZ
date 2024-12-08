@@ -31,7 +31,7 @@ import VolumeDown from '@mui/icons-material/VolumeDown';
 import VolumeUp from '@mui/icons-material/VolumeUp';
 
 import Switch from '@mui/material/Switch';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 const label = { inputProps: { 'aria-label': 'Switch demo' } };
 
@@ -56,7 +56,7 @@ const currencies = [
 
 function Forms() {
   const [currency, setCurrency] = useState('EUR');
-
+  const { t } = useTranslation();
   const handleChange = (event) => {
     setCurrency(event.target.value);
   };

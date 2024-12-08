@@ -1,13 +1,13 @@
 import React from 'react';
 import { Button } from '@mui/material';
-import { t } from 'i18next';
 import { downloadFile } from 'src/services/fileUploadService';
+import { useTranslation } from 'react-i18next';
 
 interface FileActionsProps {
     fileId: any;
     fileName: string;
 }
-
+const { t } = useTranslation();
 const FileActions: React.FC<FileActionsProps> = ({ fileId, fileName }) => {
     const handleFileAction = async (action: 'view' | 'download') => {
         try {

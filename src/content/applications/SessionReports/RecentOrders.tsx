@@ -5,7 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { useAuth } from 'src/hooks/useAuth';
 import { fetchParentSessionReports } from 'src/services/parentService';
 import ViewSessionReportForm from 'src/components/Calendar/Components/Modals/ViewSessionReport';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 export default function ViewSessionReports() {
   const [payments, setPayments] = useState<any[]>([]);
@@ -22,7 +22,7 @@ export default function ViewSessionReports() {
   const isMounted = useRef(false);
 
   const { userId } = useAuth();
-
+  const { t } = useTranslation();
   useEffect(() => {
     if (userId) {
       loadSessionReports();
@@ -58,23 +58,23 @@ export default function ViewSessionReports() {
     { field: 'studentName', headerName: 'Name' },
     {
       field: 'sessionStartDate',
-      headerName: {t('Session Start Date')},
+      headerName: t('Session Start Date'),
       render: (value: any) => formatDateTime(value)
     },
     {
       field: 'sessionEndDate',
-      headerName: {t('Session End Date')},
+      headerName: t('Session End Date'),
       render: (value: any) => formatDateTime(value)
     },
     {
       field: 'reportDate',
-      headerName: {t('Report Date')},
+      headerName: t('Report Date'),
       render: (value: any) => formatDateTime(value)
     },
-    { field: 'lessonTopic', headerName: {t('Lesson Topic')} },
+    { field: 'lessonTopic', headerName: t('Lesson Topic')} ,
     {
       field: 'actions',
-      headerName: {t('Actions')},
+      headerName: t('Actions'),
       render: (value: any, row: any) => (
         <Button
           variant="outlined"

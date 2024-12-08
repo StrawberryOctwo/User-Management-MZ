@@ -2,7 +2,6 @@ import { Box, Grid } from '@mui/material';
 import { useEffect, useRef, useState } from 'react';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import { useAuth } from 'src/hooks/useAuth';
-import { t } from 'i18next';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
 import { fetchFranchises } from 'src/services/franchiseService';
@@ -11,6 +10,7 @@ import {
   fetchLocations
 } from 'src/services/locationService';
 import { useHeaderMenu } from 'src/components/Calendar/Components/CustomizedCalendar/HeaderMenuContext';
+import { useTranslation } from 'react-i18next';
 
 const HeaderMenu: React.FC = () => {
   const {
@@ -26,7 +26,7 @@ const HeaderMenu: React.FC = () => {
   const [isLocationEnabled, setIsLocationEnabled] = useState(
     selectedFranchise
   );
-
+  const { t } = useTranslation();
   const { userRoles } = useAuth();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
   const hasFranchiseAccess =

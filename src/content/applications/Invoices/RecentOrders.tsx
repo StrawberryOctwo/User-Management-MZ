@@ -8,7 +8,7 @@ import generateTeacherInvoicePDF from './teacherInvoice';
 import { fetchTeacherById, fetchTeacherByUserId, fetchTeacherInvoiceInfoByUserId } from 'src/services/teacherService';
 import generateParentInvoicePDF from './parentInvoice';
 import { Visibility, Download } from '@mui/icons-material';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 export default function ViewInvoices() {
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -22,7 +22,7 @@ export default function ViewInvoices() {
 
   const { userId, userRoles } = useAuth();
   const isMounted = useRef(false); // Check if component is mounted
-
+  const { t } = useTranslation();
   // Handle component mount and unmount
   useEffect(() => {
     isMounted.current = true;
@@ -101,28 +101,28 @@ export default function ViewInvoices() {
 
 
   const columns = [
-    { field: 'invoiceId', headerName: {t('Invoice ID')} },
+    { field: 'invoiceId', headerName: t('Invoice ID') },
     {
       field: 'firstName',
-      headerName: {t('First Name')},
+      headerName: t('First Name'),
       render: (value: any, row: any) => row.user.firstName,
     },
     {
       field: 'lastName',
-      headerName: {t('Last Name')},
+      headerName: t('Last Name'),
       render: (value: any, row: any) => row.user.lastName,
     },
 
-    { field: 'totalAmount', headerName: {t('Total Amount')} },
-    { field: 'status', headerName: {t('Status')} },
+    { field: 'totalAmount', headerName: t('Total Amount') },
+    { field: 'status', headerName: t('Status') },
     {
       field: 'createdAt',
-      headerName: {t('Created At')},
+      headerName: t('Created At'),
       render: (value: any) => new Date(value).toLocaleString(),
     },
     {
       field: 'actions',
-      headerName: {t('Actions')},
+      headerName: t('Actions'),
       render: (value: any, row: any) => (
         <div>
           {/* View PDF Icon Button */}

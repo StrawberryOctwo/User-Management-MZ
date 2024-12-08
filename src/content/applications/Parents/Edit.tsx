@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
-import { t } from 'i18next';
 import { useParams } from 'react-router-dom';
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
 import { fetchParentById, updateParent } from 'src/services/parentService';
@@ -8,6 +7,7 @@ import { useSnackbar } from 'src/contexts/SnackbarContext';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import { fetchStudents } from 'src/services/studentService';
+import { useTranslation } from 'react-i18next';
 
 const EditParent = () => {
     const { id } = useParams<{ id: string }>();
@@ -15,7 +15,7 @@ const EditParent = () => {
     const [loading, setLoading] = useState(true);
     const [selectedStudents, setSelectedStudents] = useState(null);
     const { showMessage } = useSnackbar();
-
+    const { t } = useTranslation();
     const fetchParent = async () => {
         setLoading(true);
         try {

@@ -42,11 +42,12 @@ export default function ViewFranchisePage() {
   };
 
   const columns = [
-    { field: 'name', headerName: {t('Franchise Name')} },
-    { field: 'ownerName', headerName: {t('Owner Name')} },
-    { field: 'status', headerName: {t('Status')} },
-    { field: 'totalEmployees', headerName: {t('Total Employees')} },
-    { field: 'createdAt', headerName: {t('Created At')}, render: (value: any) => new Date(value).toLocaleDateString() },
+    { field: 'name', headerName: t('Franchise Name')} ,
+    { field: 'ownerName', headerName: t('Owner Name')} ,
+    { field: 'status', headerName: t('Status')} ,
+    { field: 'totalEmployees', headerName: t('Total Employees')} ,
+    { field: 'createdAt', headerName: t('Created At'), render: (value: any) => new Date(value).toLocaleDateString() },
+
   ];
 
   const handleEdit = (id: any) => {

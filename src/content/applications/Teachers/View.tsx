@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, Button, Dialog, DialogActions, DialogContent, DialogTitle, MenuItem, Select, Typography } from '@mui/material';
-import { t } from 'i18next';
 import { format } from 'date-fns';
 import CheckIcon from '@mui/icons-material/Check';
 import CloseIcon from '@mui/icons-material/Close';
@@ -10,6 +9,7 @@ import ReusableDetails from 'src/components/View';
 import FileActions from 'src/components/Files/FileActions';
 import { getPaymentsForUser, updatePaymentStatus } from 'src/services/paymentService';
 import { processAvailabilities } from 'src/utils/teacherUtils';
+import { useTranslation } from 'react-i18next';
 
 const ViewTeacherPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -21,7 +21,7 @@ const ViewTeacherPage: React.FC = () => {
     const [selectedPaymentId, setSelectedPaymentId] = useState<number | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [newStatus, setNewStatus] = useState<string>('Pending');
-
+    const { t } = useTranslation();
     const loadTeacher = async () => {
         setLoading(true);
         setErrorMessage(null);

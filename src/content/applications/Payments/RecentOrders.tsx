@@ -8,7 +8,7 @@ import { getParentPayments, getPaymentsForUser } from 'src/services/paymentServi
 import PaymentPDF from './PaymentPDF';
 import { jsPDF } from 'jspdf';
 import generatePDF from './PaymentPDF';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 export default function ViewPaymentsPage() {
   const [payments, setPayments] = useState<any[]>([]);
@@ -20,7 +20,7 @@ export default function ViewPaymentsPage() {
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(25);
   const isMounted = useRef(false);
-
+  const { t } = useTranslation();
 
   const navigate = useNavigate();
   const { userId,userRoles } = useAuth();
@@ -58,10 +58,10 @@ export default function ViewPaymentsPage() {
 
 
   const columns = [
-    { field: 'amount', headerName: {t('Amount')} },
-    { field: 'paymentStatus', headerName: {t('Payment Status')} },
-    { field: 'paymentDate', headerName: {t('Payment Date')}, render: (value: any) => new Date(value).toLocaleDateString() },
-    { field: 'lastUpdate', headerName: {t('Last Update')}, render: (value: any) => new Date(value).toLocaleDateString() },
+    { field: 'amount', headerName: t('Amount') },
+    { field: 'paymentStatus', headerName: t('Payment Status') },
+    { field: 'paymentDate', headerName: t('Payment Date'), render: (value: any) => new Date(value).toLocaleDateString() },
+    { field: 'lastUpdate', headerName: t('Last Update'), render: (value: any) => new Date(value).toLocaleDateString() },
   ];
 
   const handleEdit = (id: any) => {

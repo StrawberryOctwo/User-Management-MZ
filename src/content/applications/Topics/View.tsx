@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, Button, Typography } from '@mui/material';
-import { t } from 'i18next'; // Import the translation hook
 import { format } from 'date-fns';
 import { fetchFranchiseById } from 'src/services/franchiseService';
 import ReusableDetails from 'src/components/View';
+import { useTranslation } from 'react-i18next';
 
 const ViewFranchisePage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [franchise, setFranchise] = useState<Record<string, any> | null>(null);
     const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null); // Error state for the page
-
+    const { t } = useTranslation();
     // Function to load the franchise by ID
     const loadFranchise = async () => {
         setLoading(true);
@@ -85,7 +85,7 @@ const ViewFranchisePage: React.FC = () => {
             columns: [
                 { field: 'name', headerName: t('location_name'), flex: 1 },
                 { field: 'address', headerName: t('address'), flex: 1 },
-                { field: 'postalCode', headerName: t('postal_code'), flex: 1 },                {
+                { field: 'postalCode', headerName: t('postal_code'), flex: 1 }, {
                     field: 'actions',
                     headerName: t('actions'),
                     renderCell: (params: { row: { id: any; }; }) => (
@@ -112,15 +112,15 @@ const ViewFranchisePage: React.FC = () => {
 
     return (
         <Box sx={{ position: 'relative', padding: 4 }}>
-           {franchise ? (  // Ensure franchise is not null or undefined before rendering
-      <ReusableDetails
-        fields={Fields}
-        data={transformedData}
-        entityName={t(franchise.name)} // Now safe to access franchise.name
-      />
-    ) : (
-      <Typography variant="h6">No franchise data available</Typography> // Fallback content if franchise is null
-    )}
+            {franchise ? (  // Ensure franchise is not null or undefined before rendering
+                <ReusableDetails
+                    fields={Fields}
+                    data={transformedData}
+                    entityName={t(franchise.name)} // Now safe to access franchise.name
+                />
+            ) : (
+                <Typography variant="h6">No franchise data available</Typography> // Fallback content if franchise is null
+            )}
         </Box>
     );
 };

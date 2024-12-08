@@ -28,7 +28,7 @@ import { getSurveyAnswers } from 'src/services/survey';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { debounce } from 'lodash';
 import { visuallyHidden } from '@mui/utils';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 // Define the Answer interface
 interface Answer {
@@ -76,7 +76,7 @@ function SubmissionsTable({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAnswers, setSelectedAnswers] = useState<Answer[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-
+  const { t } = useTranslation();
   // Debounced search to optimize API calls
   const debouncedSearch = useMemo(
     () =>

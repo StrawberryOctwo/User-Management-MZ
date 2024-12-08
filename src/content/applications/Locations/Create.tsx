@@ -1,17 +1,17 @@
 import React, { useState, useRef } from 'react';
 import Box from '@mui/material/Box';
 
-import { t } from 'i18next';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
 import ReusableForm from 'src/components/Table/tableRowCreate';
 import { fetchFranchises } from 'src/services/franchiseService';
 import { addLocation } from 'src/services/locationService';
+import { useTranslation } from 'react-i18next';
 
 export default function CreateLocation() {
     const [selectedFranchise, setSelectedFranchise] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const franchiseRef = useRef<any>(null);
-
+    const { t } = useTranslation();
     const handleFranchiseSelect = (selectedItem: any) => {
         setSelectedFranchise(selectedItem);
     };

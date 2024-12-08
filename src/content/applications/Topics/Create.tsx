@@ -1,15 +1,15 @@
 import React, { useState } from 'react';
 import Box from '@mui/material/Box';
-import { t } from 'i18next';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
 import { fetchFranchises } from 'src/services/franchiseService';
 import { addTopic } from 'src/services/topicService';
+import { useTranslation } from 'react-i18next';
 
 const CreateTopic = () => {
   const [selectedFranchise, setSelectedFranchise] = useState<any>(null); // Store single selected franchise
   const [loading, setLoading] = useState(false);
-
+  const { t } = useTranslation();
   // Handle franchise selection
   const handleFranchiseSelect = (selectedItem: any) => {
     setSelectedFranchise(selectedItem); // Save the single selected franchise

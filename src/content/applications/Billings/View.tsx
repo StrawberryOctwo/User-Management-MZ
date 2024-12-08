@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, Button, Typography } from '@mui/material';
-import { t } from 'i18next'; // Import the translation hook
 import { format } from 'date-fns';
 import { fetchFranchiseById } from 'src/services/franchiseService';
 import ReusableDetails from 'src/components/View';
+import { useTranslation } from 'react-i18next';
 
 const ViewFranchisePage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [franchise, setFranchise] = useState<Record<string, any> | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null); // Error state for the page
-
+  const { t } = useTranslation();
   // Function to load the franchise by ID
   const loadFranchise = async () => {
     setLoading(true);

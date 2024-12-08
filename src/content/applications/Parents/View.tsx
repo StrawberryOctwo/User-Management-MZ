@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, Button, Typography } from '@mui/material';
-import { t } from 'i18next';
 import { format } from 'date-fns';
 import { fetchParentById } from 'src/services/parentService';
 import ReusableDetails from 'src/components/View';
+import { useTranslation } from 'react-i18next';
 
 const ViewParent: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const [parent, setParent] = useState<Record<string, any> | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
+  const { t } = useTranslation();
   const loadParent = async () => {
     setLoading(true);
     setErrorMessage(null);

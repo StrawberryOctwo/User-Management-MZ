@@ -1,12 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, Typography, Button, Stack, Chip } from '@mui/material';
-import { t } from 'i18next';
 import { format } from 'date-fns';
 import { fetchInterestById, toggleAcceptedStatus } from 'src/services/interestService';
 import ReusableDetails from 'src/components/View';
 import { de } from 'date-fns/locale';
 import { base64ToBlob } from 'src/utils/utils';
+import { useTranslation } from 'react-i18next';
 
 const ViewInterest: React.FC = () => {
     const { id } = useParams<{ id: string }>();
@@ -14,7 +14,7 @@ const ViewInterest: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [updating, setUpdating] = useState(false);
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
+    const { t } = useTranslation();
     const loadInterest = async () => {
         setLoading(true);
         setErrorMessage(null);

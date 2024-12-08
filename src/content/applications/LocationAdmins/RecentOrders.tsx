@@ -5,7 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { deleteLocationAdmins, fetchLocationAdmins } from 'src/services/locationAdminService';
 import { useNavigate } from 'react-router-dom';
 import { LocationAdmin } from 'src/models/LocationAdminModel';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 export default function LocationAdminsContent() {
   const [admins, setAdmins] = useState<LocationAdmin[]>([]);
@@ -17,7 +17,7 @@ export default function LocationAdminsContent() {
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(25);
   const isMounted = useRef(false);
-
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   useEffect(() => {

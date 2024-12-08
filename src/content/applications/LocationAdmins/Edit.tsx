@@ -1,13 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import Box from '@mui/material/Box';
 
-import { t } from 'i18next';
 import { useParams } from 'react-router-dom';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
 import { fetchLocationAdminById, updateLocationAdmin } from 'src/services/locationAdminService';
 import { fetchLocations } from 'src/services/locationService';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
+import { useTranslation } from 'react-i18next';
 
 
 const EditLocationAdmin = () => {
@@ -17,7 +17,7 @@ const EditLocationAdmin = () => {
     const [loading, setLoading] = useState(true);
     const locationRef = useRef<any>(null);
     const { showMessage } = useSnackbar();
-
+    const { t } = useTranslation();
     const fetchLocationAdmin = async () => {
         setLoading(true);
         try {

@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import { useParams } from 'react-router-dom';
-import { t } from 'i18next';
 
 import { fetchFranchiseById, updateFranchise } from 'src/services/franchiseService';
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
+import { useTranslation } from 'react-i18next';
 
 const EditFranchise = () => {
     const { id } = useParams<{ id: string }>();
     const [franchiseData, setFranchiseData] = useState<Record<string, any> | null>(null);
     const [loading, setLoading] = useState(true);
     const [submitLoading, setSubmitLoading] = useState(false);
-
+    const { t } = useTranslation();
     const fetchFranchise = async () => {
         setLoading(true);
         try {

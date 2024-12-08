@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { t } from 'i18next';
 import UploadSection from 'src/components/Files/UploadDocuments';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
@@ -15,7 +14,7 @@ import { assignTeacherToTopics, fetchTopics } from 'src/services/topicService';
 import { generateEmployeeNumber } from 'src/utils/teacherUtils';
 import { TextField } from '@mui/material';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 const CreateTeacher = () => {
   const [selectedLocations, setSelectedLocations] = useState<any[]>([]);
@@ -24,7 +23,7 @@ const CreateTeacher = () => {
   const [loading, setLoading] = useState(false);
   const [employeeNumber, setEmployeeNumber] = useState('');
   const { showMessage } = useSnackbar();
-
+  const { t } = useTranslation();
   const handleGenerateEmployeeNumber = (formData: {
     firstName: string;
     lastName: string;

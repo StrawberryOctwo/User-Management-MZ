@@ -7,6 +7,5 @@ import { useAuth } from 'src/hooks/useAuth';
 import { fetchFranchises } from 'src/services/franchiseService';
 import { fetchLocationsByFranchise, fetchLocations } from 'src/services/locationService';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
-import { t } from 'i18next';
 
 

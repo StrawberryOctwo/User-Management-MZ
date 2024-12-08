@@ -2,7 +2,6 @@ import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 
 import { useParams } from 'react-router-dom';
-import { t } from 'i18next';
 import UploadSection from 'src/components/Files/UploadDocuments';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
@@ -11,6 +10,7 @@ import { assignTeacherToLocations, fetchLocations } from 'src/services/locationS
 import { fetchTeacherById, fetchTeacherDocumentsById, updateTeacher } from 'src/services/teacherService';
 import { assignTeacherToTopics, fetchTopics } from 'src/services/topicService';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
+import { useTranslation } from 'react-i18next';
 
 const EditTeacher = () => {
     const { id } = useParams<{ id: string }>();
@@ -20,7 +20,7 @@ const EditTeacher = () => {
     const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const { showMessage } = useSnackbar();
-
+    const { t } = useTranslation();
     const fetchTeacher = async () => {
         setLoading(true);
         try {

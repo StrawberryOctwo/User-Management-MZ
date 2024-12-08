@@ -1,16 +1,16 @@
 import React, { useState, useRef } from 'react';
 import Box from '@mui/material/Box';
-import { t } from 'i18next';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
 import ReusableForm from 'src/components/Table/tableRowCreate';
 import { fetchFranchises } from 'src/services/franchiseService';
 import { submitBilling } from 'src/services/billingService';
+import { useTranslation } from 'react-i18next';
 
 export default function CreateBilling() {
     const [selectedFranchise, setSelectedFranchise] = useState<any>(null); // Store selected franchise
     const [loading, setLoading] = useState(false); // Loading state for submission
     const franchiseRef = useRef<any>(null); // Ref to reset franchise select input
-
+    const { t } = useTranslation();
     const handleFranchiseSelect = (selectedItem: any) => {
         setSelectedFranchise(selectedItem); // Set the selected franchise
     };

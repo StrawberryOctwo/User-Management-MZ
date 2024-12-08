@@ -1,17 +1,17 @@
 import React, { useState, useRef } from 'react';
 import Box from '@mui/material/Box';
 
-import { t } from 'i18next';
 import { addFranchiseAdmin } from 'src/services/franchiseAdminService';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import { fetchFranchises } from 'src/services/franchiseService';
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
+import { useTranslation } from 'react-i18next';
 
 export default function CreateFranchiseAdmin() {
     const [selectedFranchises, setSelectedFranchises] = useState<any[]>([]);
     const dropdownRef = useRef<any>(null);
     const [loading, setLoading] = useState(false);
-
+    const { t } = useTranslation();
     const handleFranchiseSelect = (selectedItems: any[]) => {
         setSelectedFranchises(selectedItems);
     };

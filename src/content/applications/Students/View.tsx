@@ -11,7 +11,6 @@ import {
   DialogContent,
   DialogTitle
 } from '@mui/material';
-import { t } from 'i18next';
 import {
   fetchStudentById,
   fetchStudentDocumentsById
@@ -29,6 +28,7 @@ import {
   decodeAvailableDates,
   formatDate
 } from './utils';
+import { useTranslation } from 'react-i18next';
 
 const ViewStudentPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -40,7 +40,7 @@ const ViewStudentPage: React.FC = () => {
   const [payments, setPayments] = useState<any[]>([]);
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
-
+  const { t } = useTranslation();
   // Function to load the student and associated data
   const loadStudentData = async () => {
     setLoading(true);

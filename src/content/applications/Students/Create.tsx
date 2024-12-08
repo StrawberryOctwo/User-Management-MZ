@@ -1,6 +1,5 @@
 import React, { useRef, useState } from 'react';
 import Box from '@mui/material/Box';
-import { t } from 'i18next';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
@@ -24,8 +23,10 @@ import {
   Grid
 } from '@mui/material';
 import { daysOfWeek } from './utils';
+import { useTranslation } from 'react-i18next';
 
 export default function CreateStudent() {
+  const { t } = useTranslation();
   const [selectedLocationIds, setSelectedLocationIds] = useState<number[]>([]); // Update to handle multiple IDs
   const [selectedContractId, setSelectedContractId] = useState<number | null>(
     null

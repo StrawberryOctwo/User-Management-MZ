@@ -1,16 +1,16 @@
 import React, { useRef, useState } from 'react';
 import Box from '@mui/material/Box';
-import { t } from 'i18next';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
 import { addLocationAdmin } from 'src/services/locationAdminService';
 import { fetchLocations } from 'src/services/locationService';
+import { useTranslation } from 'react-i18next';
 
 
 const CreateLocationAdmin = () => {
     const [selectedLocations, setSelectedLocations] = useState<any[]>([]);
     const [loading, setLoading] = useState(false);
-
+    const { t } = useTranslation();
     const handleLocationSelect = (selectedItems: any[]) => {
         setSelectedLocations(selectedItems);
     };

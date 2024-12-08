@@ -5,7 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { deleteFranchiseAdmin, fetchFranchiseAdmins } from 'src/services/franchiseAdminService';
 import { useNavigate } from 'react-router-dom';
 import { FranchiseAdmin } from 'src/models/FranchiseAdminModel';
-import { t } from 'i18next'; // Import the translation hook
+import { useTranslation } from 'react-i18next';
 
 export default function FranchiseAdminsContent() {
   const [admins, setAdmins] = useState<FranchiseAdmin[]>([]);
@@ -18,7 +18,7 @@ export default function FranchiseAdminsContent() {
   const [limit, setLimit] = useState(25);
   const isMounted = useRef(false);
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   useEffect(() => {
     if (isMounted.current) {
       loadAdmins();

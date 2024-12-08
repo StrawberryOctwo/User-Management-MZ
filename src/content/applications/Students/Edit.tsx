@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import { useParams } from 'react-router-dom';
-import { t } from 'i18next';
 import UploadSection from 'src/components/Files/UploadDocuments';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
@@ -28,8 +27,10 @@ import {
   FormLabel
 } from '@mui/material';
 import { daysOfWeek, decodeAvailableDates } from './utils';
+import { useTranslation } from 'react-i18next';
 
 const EditStudent = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const [studentData, setStudentData] = useState<Record<string, any> | null>(
     null

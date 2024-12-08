@@ -3,12 +3,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import Box from '@mui/material/Box';
 
 import { useParams } from 'react-router-dom';
-import { t } from 'i18next';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
 import { fetchFranchiseAdminById, updateFranchiseAdmin } from 'src/services/franchiseAdminService';
 import { fetchFranchises } from 'src/services/franchiseService';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
+import { useTranslation } from 'react-i18next';
 
 export default function EditFranchiseAdmin() {
     const { id } = useParams<{ id: string }>();
@@ -18,7 +18,7 @@ export default function EditFranchiseAdmin() {
     const [loading, setLoading] = useState(false);
     const { showMessage } = useSnackbar();
     const franchiseRef = useRef<any>(null);
-
+    const { t } = useTranslation();
     const formatDateForInput = (date: string) => {
         const d = new Date(date);
         return d.toISOString().split('T')[0];

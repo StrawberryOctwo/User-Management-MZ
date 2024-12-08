@@ -1,12 +1,13 @@
 import React, { useState } from 'react';
 import { FieldConfig } from 'src/components/Table/tableRowCreate';
 import { Box } from '@mui/material';
-import { t } from 'i18next';
 import { addFranchise } from 'src/services/franchiseService';
 import ReusableForm from 'src/components/Table/tableRowCreate';
+import { useTranslation } from 'react-i18next';
 
 const CreateFranchise = () => {
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
 
   const handleFranchiseSubmit = async (
     data: Record<string, any>
@@ -40,7 +41,6 @@ const CreateFranchise = () => {
       setLoading(false);
     }
   };
-
   const statusOptions = [
     { label: t('active'), value: 'active' },
     { label: t('inactive'), value: 'inactive' },

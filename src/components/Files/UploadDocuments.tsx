@@ -3,9 +3,9 @@ import { Box, Button, Grid, TextField, MenuItem, Typography, IconButton, List, L
 import DeleteIcon from '@mui/icons-material/Delete';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { deleteFiles } from '../../services/fileUploadService';
-import { t } from 'i18next';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import FileView from './FileView';
+import { useTranslation } from 'react-i18next';
 
 interface UploadedFile {
     id?: number;  // `id` is optional because a file might not be saved yet
@@ -19,7 +19,7 @@ interface UploadSectionProps {
     onUploadChange: (files: UploadedFile[]) => void;
     initialDocuments?: UploadedFile[];
 }
-
+const { t } = useTranslation();
 const UploadSection: React.FC<UploadSectionProps> = ({ onUploadChange, initialDocuments = [] }) => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [fileName, setFileName] = useState('');

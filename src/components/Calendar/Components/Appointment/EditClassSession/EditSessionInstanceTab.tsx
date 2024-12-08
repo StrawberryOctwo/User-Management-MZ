@@ -19,7 +19,8 @@ import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWith
 import { fetchStudents } from 'src/services/studentService';
 import { fetchSessionTypes } from 'src/services/contractPackagesService';
 import { allowedDurations } from '../AddClassSession/AddClassSessionUtils';
-import { t } from 'i18next'
+import { useTranslation } from 'react-i18next';
+
 
 const EditSessionInstanceTab = ({
   session,
@@ -32,7 +33,7 @@ const EditSessionInstanceTab = ({
   const { userId, userRoles } = useAuth();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
   const [sessionTypes, setSessionTypes] = useState([]);
-
+  const { t } = useTranslation();
   useEffect(() => {
     const loadSessionTypes = async () => {
       try {
