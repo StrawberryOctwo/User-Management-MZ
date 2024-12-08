@@ -420,7 +420,7 @@ function InvoiceAnalytics() {
             <Grid item xs={12} sm={6} md={4}>
               <Box p={3} textAlign="center">
                 <Typography variant="h3" gutterBottom>
-                  €{totalIncome.toLocaleString()}
+                  €{totalIncome.toLocaleString('de')}
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
                   {t('Total Income')}
@@ -430,7 +430,7 @@ function InvoiceAnalytics() {
             <Grid item xs={12} sm={6} md={4}>
               <Box p={3} textAlign="center">
                 <Typography variant="h3" gutterBottom>
-                  €{totalExpense.toLocaleString()}
+                  €{totalExpense.toLocaleString('de')}
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
                   {t('Total Expense')}
@@ -440,7 +440,7 @@ function InvoiceAnalytics() {
             <Grid item xs={12} sm={6} md={4}>
               <Box p={3} textAlign="center">
                 <Typography variant="h3" gutterBottom>
-                  €{netIncome.toLocaleString()}
+                  €{netIncome.toLocaleString('de')}
                 </Typography>
                 <Typography
                   variant="body1"
@@ -467,7 +467,7 @@ function InvoiceAnalytics() {
             <Grid item xs={12} sm={6} md={4}>
               <Box p={3} textAlign="center">
                 <Typography variant="h3" gutterBottom>
-                  {totalInvoices.toLocaleString()}
+                  {totalInvoices.toLocaleString('de')}
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
                   {t('Total Invoices')}

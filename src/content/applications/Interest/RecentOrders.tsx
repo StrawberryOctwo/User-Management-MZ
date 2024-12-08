@@ -62,7 +62,7 @@ export default function ViewBookings() {
     {
       field: 'appointment',
       headerName: t('Appointment'),
-      render: (value: string) => value ? new Date(value).toLocaleString(): 'N/A',
+      render: (value: string) => value ? new Date(value).toLocaleString('de'): 'N/A',
     },
     { field: 'locationName', headerName: t('Location') },
     {

@@ -118,7 +118,7 @@ export default function ViewInvoices() {
     {
       field: 'createdAt',
       headerName: t('Created At'),
-      render: (value: any) => new Date(value).toLocaleString(),
+      render: (value: any) => new Date(value).toLocaleString('de'),
     },
     {
       field: 'actions',
