@@ -1,26 +1,15 @@
 import React, { useEffect, useState } from 'react';
-import {
-  Box,
-  Typography,
-  Alert,
-  Paper,
-  Toolbar,
-  Button,
-  IconButton,
-} from '@mui/material';
-import RefreshIcon from '@mui/icons-material/Refresh';
+import { Box, FormControlLabel, Switch, Typography } from '@mui/material';
 import ReusableTable from 'src/components/Table';
 import { fetchInterests } from 'src/services/interestService';
 import { useAuth } from 'src/hooks/useAuth';
-import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
-import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
-import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
-import DownloadTwoToneIcon from '@mui/icons-material/DownloadTwoTone';
 import { useNavigate } from 'react-router-dom';
-import { t } from 'i18next'
+import { t } from 'i18next';
 
 export default function ViewBookings() {
   const [bookings, setBookings] = useState<any[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [sortByAccepted, setSortByAccepted] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [totalCount, setTotalCount] = useState(0);
@@ -33,17 +22,22 @@ export default function ViewBookings() {
     if (userId) {
       loadUserBookings();
     }
-  }, [userId, page, limit]);
+  }, [userId, page, limit, sortByAccepted, searchQuery]);
 
   const loadUserBookings = async () => {
     setLoading(true);
     setErrorMessage(null);
     try {
-      const { data, total } = await fetchInterests(page + 1, limit); // Fetch bookings data
+      const { data, total } = await fetchInterests(
+        sortByAccepted,
+        page + 1,
+        limit,
+        searchQuery
+      ); // Fetch bookings data
       const processedData = data.map((booking: any) => ({
         id: booking.id, // Ensure each row has a unique 'id' field
         ...booking,
-        locationName: booking.location?.name || 'N/A',
+        locationName: booking.location?.name || 'N/A'
       }));
       setBookings(processedData);
       setTotalCount(total);
@@ -68,8 +62,8 @@ export default function ViewBookings() {
     {
       field: 'accepted',
       headerName: t('Status'),
-      render: (value: boolean) => (value ? 'Accepted' : 'Pending'),
-    },
+      render: (value: boolean) => (value ? 'Accepted' : 'Pending')
+    }
   ];
 
   const handlePageChange = (newPage: number) => setPage(newPage);
@@ -96,39 +90,36 @@ export default function ViewBookings() {
     console.log('Delete bookings with IDs:', ids);
   };
 
-
+  const handleSortByAcceptedChange = (
+    event: React.ChangeEvent<HTMLInputElement>
+  ) => {
+    setSortByAccepted(event.target.checked ? 'desc' : null);
+  };
 
   return (
-    <Box sx={{ padding: 4 }}>
-      {}
-      <Paper elevation={3} sx={{ padding: 2, marginBottom: 4 }}>
-        <Toolbar
-          sx={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            paddingLeft: 0,
-            paddingRight: 0,
-          }}
-        >
-          <Typography variant="h6" component="div">
-            Bookings List
-          </Typography>
-          <Button
-            variant="contained"
-            color="primary"
-            startIcon={<RefreshIcon />}
-            onClick={handleRefresh}
-          >
-            Refresh
-          </Button>
-        </Toolbar>
-      </Paper>
-
-      {}
+    <Box>
+      <Box
+        display="flex"
+        justifyContent="space-between"
+        alignItems="center"
+        mb={2}
+      >
+        <Typography variant="h4">{t('Interests Bookings')}</Typography>
+        <FormControlLabel
+          control={
+            <Switch
+              checked={sortByAccepted === 'desc'}
+              onChange={handleSortByAcceptedChange}
+              color="primary"
+            />
+          }
+          label={t('Sort by Accepted')}
+        />
+      </Box>
       <ReusableTable
         data={bookings}
         columns={columns}
-        title="Bookings List"
+        title="Interests Bookings"
         onView={handleView}
         onEdit={handleEdit}
         onDelete={handleDelete}
@@ -138,10 +129,10 @@ export default function ViewBookings() {
         limit={limit}
         onPageChange={handlePageChange}
         onLimitChange={handleLimitChange}
+        onSearchChange={(searchQuery: string) => setSearchQuery(searchQuery)}
         totalCount={totalCount}
         showDefaultActions={true}
       />
     </Box>
   );
 }
-

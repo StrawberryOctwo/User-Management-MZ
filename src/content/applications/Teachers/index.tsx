@@ -15,7 +15,7 @@ function ApplicationsFranchises() {
       <PageTitleWrapper>
         <PageHeader />
       </PageTitleWrapper>
-      <Box sx={{ mx: 15, px: 0 }}>
+      <Box sx={{ mx: 10, px: 0 }}>
         <Grid
           container
           direction="row"
@@ -24,11 +24,11 @@ function ApplicationsFranchises() {
           spacing={3}
           sx={{ mx: 0 }}
         >
-          <Grid item xs={12}>
+          <Grid item xs={14}>
             <RecentOrders />
           </Grid>
         </Grid>
-      </Box >
+      </Box>
       <Footer />
     </>
   );
