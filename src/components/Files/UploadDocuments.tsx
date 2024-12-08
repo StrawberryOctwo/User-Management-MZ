@@ -19,8 +19,8 @@ interface UploadSectionProps {
     onUploadChange: (files: UploadedFile[]) => void;
     initialDocuments?: UploadedFile[];
 }
-const { t } = useTranslation();
 const UploadSection: React.FC<UploadSectionProps> = ({ onUploadChange, initialDocuments = [] }) => {
+    const { t } = useTranslation();
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [fileName, setFileName] = useState('');
     const [fileType, setFileType] = useState('');
@@ -138,12 +138,12 @@ const UploadSection: React.FC<UploadSectionProps> = ({ onUploadChange, initialDo
                                 onChange={(e) => setFileType(e.target.value)}
                                 placeholder="Select file type"
                             >
-                            <MenuItem value="fee_agreement">{t('fee_agreement')}</MenuItem>
-                            <MenuItem value="affidavit">{t('affidavit')}</MenuItem>
-                            <MenuItem value="confidentiality_agreement">{t('confidentiality_agreement')}</MenuItem>
-                            <MenuItem value="non_compete_agreement">{t('non_compete_agreement')}</MenuItem>
-                            <MenuItem value="contract">{t('contract')}</MenuItem>
-                            <MenuItem value="absence">{t('absence')}</MenuItem>
+                                <MenuItem value="fee_agreement">{t('fee_agreement')}</MenuItem>
+                                <MenuItem value="affidavit">{t('affidavit')}</MenuItem>
+                                <MenuItem value="confidentiality_agreement">{t('confidentiality_agreement')}</MenuItem>
+                                <MenuItem value="non_compete_agreement">{t('non_compete_agreement')}</MenuItem>
+                                <MenuItem value="contract">{t('contract')}</MenuItem>
+                                <MenuItem value="absence">{t('absence')}</MenuItem>
 
                             </TextField>
                         </Grid>
