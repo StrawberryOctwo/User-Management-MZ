@@ -115,7 +115,9 @@ function RecentTodos() {
                         Priority: {todo.priority}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        Due Date: {todo.dueDate}
+                        {todo.dueDate
+                          ? new Date(todo.dueDate).toLocaleDateString()
+                          : 'No Due Date'}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
                         Assigned Roles:{' '}

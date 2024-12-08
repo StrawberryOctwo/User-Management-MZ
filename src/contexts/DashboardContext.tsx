@@ -10,10 +10,10 @@ import {
   fetchFranchiseCount,
   fetchSessionAnalytics,
   fetchInvoiceAnalytics,
-  fetchStudentAnalytics,
-  fetchDashboardTodos
+  fetchStudentAnalytics
 } from 'src/services/dashboardService';
 import { fetchFranchises } from 'src/services/franchiseService';
+import { fetchToDosByAssignedBy } from 'src/services/todoService';
 
 interface InvoiceAnalyticsData {
   periods: string[];
@@ -201,9 +201,9 @@ export const DashboardProvider: React.FC = ({ children }) => {
 
   const fetchTodos = useCallback(async () => {
     try {
-      const data = await fetchDashboardTodos(todoPage, todoLimit);
+      const data = await fetchToDosByAssignedBy(todoPage, todoLimit);
       console.log('Fetched todos:', data);
-      setTodos(data.todos);
+      setTodos(data.data);
     } catch (error) {
       console.error('Error fetching todos:', error);
       setError(error);
