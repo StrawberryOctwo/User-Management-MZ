@@ -116,10 +116,10 @@ function SessionsByCity() {
                 onChange={(event) => setAnalyticsFilter(event.target.value)} // Update filter in context
                 label="Filter"
               >
-                <MenuItem value="day">Day</MenuItem>
-                <MenuItem value="week">Week</MenuItem>
-                <MenuItem value="month">Month</MenuItem>
-                <MenuItem value="year">Year</MenuItem>
+                <MenuItem value="day">{t("Day")}</MenuItem>
+                <MenuItem value="week">{t("Week")}</MenuItem>
+                <MenuItem value="month">{t("Month")}</MenuItem>
+                <MenuItem value="year">{t("Year")}</MenuItem>
               </Select>
             </FormControl>
           </FilterContainer>
