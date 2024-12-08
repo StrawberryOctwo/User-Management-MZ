@@ -5,6 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { fetchStudents, deleteStudent, fetchParentStudents } from 'src/services/studentService';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from 'src/hooks/useAuth';
+import { t } from "i18next"
 
 export default function StudentsContent() {
   const [students, setStudents] = useState([]);
@@ -112,10 +113,10 @@ export default function StudentsContent() {
       <ReusableTable
         data={students}
         columns={[
-          { field: 'fullName', headerName: 'Full Name' },
-          { field: 'email', headerName: 'Email' },
-          { field: 'gradeLevel', headerName: 'Grade Level' },
-          { field: 'status', headerName: 'Status' },
+          { field: 'fullName', headerName: t('Full Name') },
+          { field: 'email', headerName: t('Email') },
+          { field: 'gradeLevel', headerName: t('Grade Level') },
+          { field: 'status', headerName: t('Status') },
         ]}
         title="Student List"
         onEdit={hasAdminPrivileges ? handleEdit : undefined}
@@ -132,7 +133,7 @@ export default function StudentsContent() {
 
       <ReusableDialog
         open={dialogOpen}
-        title="Confirm Deletion"
+        title={t("Confirm Deletion")}
         onClose={() => setDialogOpen(false)}
         actions={
           <>

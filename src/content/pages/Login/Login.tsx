@@ -13,6 +13,7 @@ import {
 import { login } from 'src/services/authService';
 import { isAuthenticated } from 'src/services/authService'; // Check token logic
 import { useWebSocket } from 'src/utils/webSocketProvider';
+import { t } from "i18next";
 
 const Login: React.FC = () => {
   const socket = useWebSocket();
@@ -74,7 +75,7 @@ const Login: React.FC = () => {
         <form onSubmit={handleLogin}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             <TextField
-              label="Email"
+              label={t("Email")}
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -82,7 +83,7 @@ const Login: React.FC = () => {
               fullWidth
             />
             <TextField
-              label="Password"
+              label={t("Password")}
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

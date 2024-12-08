@@ -17,6 +17,7 @@ import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import DownloadTwoToneIcon from '@mui/icons-material/DownloadTwoTone';
 import { useNavigate } from 'react-router-dom';
+import { t } from 'i18next'
 
 export default function ViewBookings() {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -54,19 +55,19 @@ export default function ViewBookings() {
   };
 
   const columns = [
-    { field: 'firstName', headerName: 'First Name' },
-    { field: 'lastName', headerName: 'Last Name' },
-    { field: 'email', headerName: 'Email' },
-    { field: 'phoneNumber', headerName: 'Phone Number' },
+    { field: 'firstName', headerName: t('First Name') },
+    { field: 'lastName', headerName: t('Last Name') },
+    { field: 'email', headerName: t('Email') },
+    { field: 'phoneNumber', headerName: t('Phone Number') },
     {
       field: 'appointment',
-      headerName: 'Appointment',
+      headerName: t('Appointment'),
       render: (value: string) => value ? new Date(value).toLocaleString(): 'N/A',
     },
-    { field: 'locationName', headerName: 'Location' },
+    { field: 'locationName', headerName: t('Location') },
     {
       field: 'accepted',
-      headerName: 'Status',
+      headerName: t('Status'),
       render: (value: boolean) => (value ? 'Accepted' : 'Pending'),
     },
   ];

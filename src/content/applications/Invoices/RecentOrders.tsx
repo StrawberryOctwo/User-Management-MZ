@@ -8,6 +8,7 @@ import generateTeacherInvoicePDF from './teacherInvoice';
 import { fetchTeacherById, fetchTeacherByUserId, fetchTeacherInvoiceInfoByUserId } from 'src/services/teacherService';
 import generateParentInvoicePDF from './parentInvoice';
 import { Visibility, Download } from '@mui/icons-material';
+import { t } from 'i18next';
 
 export default function ViewInvoices() {
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -100,28 +101,28 @@ export default function ViewInvoices() {
 
 
   const columns = [
-    { field: 'invoiceId', headerName: 'Invoice ID' },
+    { field: 'invoiceId', headerName: {t('Invoice ID')} },
     {
       field: 'firstName',
-      headerName: 'First Name',
+      headerName: {t('First Name')},
       render: (value: any, row: any) => row.user.firstName,
     },
     {
       field: 'lastName',
-      headerName: 'Last Name',
+      headerName: {t('Last Name')},
       render: (value: any, row: any) => row.user.lastName,
     },
 
-    { field: 'totalAmount', headerName: 'Total Amount' },
-    { field: 'status', headerName: 'Status' },
+    { field: 'totalAmount', headerName: {t('Total Amount')} },
+    { field: 'status', headerName: {t('Status')} },
     {
       field: 'createdAt',
-      headerName: 'Created At',
+      headerName: {t('Created At')},
       render: (value: any) => new Date(value).toLocaleString(),
     },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: {t('Actions')},
       render: (value: any, row: any) => (
         <div>
           {/* View PDF Icon Button */}
@@ -134,7 +135,7 @@ export default function ViewInvoices() {
               <Visibility />
             </IconButton>
           </Tooltip>
-    
+
           {/* Conditionally Render Download PDF Icon Button for FranchiseAdmin */}
           {userRoles.includes('FranchiseAdmin') && (
             <Tooltip title="Download Sepa & Invoice">
@@ -150,7 +151,7 @@ export default function ViewInvoices() {
         </div>
       ),
     },
-    
+
   ];
 
   const handlePageChange = (newPage: number) => setPage(newPage);

@@ -186,7 +186,7 @@ const EditTeacher = () => {
         { name: 'bic', label: t('bic'), type: 'text', required: false, section: 'Bank Details' },
         {
             name: 'locations',
-            label: 'Locations',
+            label: t('Locations'),
             type: 'custom',
             section: 'Teacher Assignment',
             component: (

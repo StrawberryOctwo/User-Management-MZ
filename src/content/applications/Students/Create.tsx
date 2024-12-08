@@ -195,7 +195,7 @@ export default function CreateStudent() {
   };
   const locationSelectionField = {
     name: 'locations',
-    label: 'Locations',
+    label: t('Locations'),
     type: 'custom',
     section: 'Student Assignment',
     component: (

@@ -19,6 +19,7 @@ import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWith
 import { fetchStudents } from 'src/services/studentService';
 import { fetchSessionTypes } from 'src/services/contractPackagesService';
 import { allowedDurations } from '../AddClassSession/AddClassSessionUtils';
+import { t } from 'i18next'
 
 const EditSessionInstanceTab = ({
   session,
@@ -96,7 +97,7 @@ const EditSessionInstanceTab = ({
                   isActive: e.target.value === 'active'
                 })
               }
-              label="Status"
+              label={t("Status")}
               disabled={sessionEnded}
             >
               <MenuItem value="active">Active</MenuItem>
@@ -106,7 +107,7 @@ const EditSessionInstanceTab = ({
         </Grid>
         <Grid item xs={6}>
           <TextField
-            label="Date"
+            label={t("Date")}
             type="date"
             fullWidth
             value={session.date}
@@ -119,7 +120,7 @@ const EditSessionInstanceTab = ({
       <Grid container spacing={2}>
         <Grid item xs={6}>
           <TextField
-            label="Start Time"
+            label={t("Start Time")}
             type="time"
             fullWidth
             value={session.startTime}
@@ -134,7 +135,7 @@ const EditSessionInstanceTab = ({
           <FormControl fullWidth>
             <InputLabel shrink>Duration (minutes)</InputLabel>
             <Select
-              label="Duration (minutes)"
+              label={t("Duration (minutes)")}
               value={session.duration}
               onChange={(e) =>
                 setSession({ ...session, duration: e.target.value })
@@ -156,7 +157,7 @@ const EditSessionInstanceTab = ({
             <SingleSelectWithAutocomplete
               disabled={sessionEnded}
               width="100%"
-              label="Search Teacher"
+              label={t("Search Teacher")}
               fetchData={(query) =>
                 strongestRoles.includes('Teacher')
                   ? fetchTeacherByUserId(userId).then((teacher) => [
@@ -186,7 +187,7 @@ const EditSessionInstanceTab = ({
             <MultiSelectWithCheckboxes
               disabled={sessionEnded}
               width="100%"
-              label="Search Students"
+              label={t("Search Students")}
               fetchData={(query) =>
                 fetchStudents(1, 5, query).then((data) =>
                   data.data.map((student) => ({
@@ -212,7 +213,7 @@ const EditSessionInstanceTab = ({
             <InputLabel>Room</InputLabel>
             <Select
               disabled={sessionEnded}
-              label="Room"
+              label={t("Room")}
               value={session.room || ''}
               onChange={(e) => setSession({ ...session, room: e.target.value })}
             >
@@ -229,7 +230,7 @@ const EditSessionInstanceTab = ({
             <InputLabel>Session Type</InputLabel>
             <Select
               disabled={sessionEnded}
-              label="Session Type"
+              label={t("Session Type")}
               value={session.sessionType || ''}
               onChange={(e) =>
                 setSession({ ...session, sessionType: e.target.value })
@@ -251,7 +252,7 @@ const EditSessionInstanceTab = ({
         </Grid>
       </Grid>
       <TextField
-        label="Note"
+        label={t("Note")}
         multiline
         rows={4}
         fullWidth

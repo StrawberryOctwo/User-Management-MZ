@@ -111,7 +111,7 @@ export default function EditLocation() {
         { name: 'numberOfRooms', label: t('number_of_rooms'), type: 'number', required: true, section: 'Location Information' },
         {
             name: 'franchises',
-            label: 'Franchise',
+            label: t('Franchise'),
             type: 'custom',
             section: 'Location Assignment',
             component: (

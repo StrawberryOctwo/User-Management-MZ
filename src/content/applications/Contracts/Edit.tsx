@@ -26,7 +26,7 @@ const EditContract = () => {
         try {
             const sessionTypesData = await fetchSessionTypes();
             const discountsData = await fetchDiscounts();
- 
+
             setSessionTypes(sessionTypesData.data);
             setDiscounts(discountsData);
 
@@ -141,7 +141,7 @@ const EditContract = () => {
         },
         {
             name: 'franchise',
-            label: 'Franchise',
+            label: t('Franchise'),
             type: 'custom',
             section: 'Franchise Assignment',
             component: (

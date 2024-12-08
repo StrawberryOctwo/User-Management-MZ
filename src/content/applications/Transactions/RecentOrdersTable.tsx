@@ -30,6 +30,7 @@ import { CryptoOrder, CryptoOrderStatus } from 'src/models/crypto_order';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import BulkActions from './BulkActions';
+import { t } from "i18next";
 
 interface RecentOrdersTableProps {
   className?: string;
@@ -190,7 +191,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                 <Select
                   value={filters.status || 'all'}
                   onChange={handleStatusChange}
-                  label="Status"
+                  label={t("Status")}
                   autoWidth
                 >
                   {statusOptions.map((statusOption) => (

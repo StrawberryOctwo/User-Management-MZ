@@ -31,6 +31,7 @@ import VolumeDown from '@mui/icons-material/VolumeDown';
 import VolumeUp from '@mui/icons-material/VolumeUp';
 
 import Switch from '@mui/material/Switch';
+import { t } from 'i18next';
 
 const label = { inputProps: { 'aria-label': 'Switch demo' } };
 
@@ -103,24 +104,24 @@ function Forms() {
                     <TextField
                       required
                       id="outlined-required"
-                      label="Required"
+                      label={t("Required")}
                       defaultValue="Hello World"
                     />
                     <TextField
                       disabled
                       id="outlined-disabled"
-                      label="Disabled"
+                      label={t("Disabled")}
                       defaultValue="Hello World"
                     />
                     <TextField
                       id="outlined-password-input"
-                      label="Password"
+                      label={t("Password")}
                       type="password"
                       autoComplete="current-password"
                     />
                     <TextField
                       id="outlined-read-only-input"
-                      label="Read Only"
+                      label={t("Read Only")}
                       defaultValue="Hello World"
                       InputProps={{
                         readOnly: true
@@ -128,7 +129,7 @@ function Forms() {
                     />
                     <TextField
                       id="outlined-number"
-                      label="Number"
+                      label={t("Number")}
                       type="number"
                       InputLabelProps={{
                         shrink: true
@@ -136,12 +137,12 @@ function Forms() {
                     />
                     <TextField
                       id="outlined-search"
-                      label="Search field"
+                      label={t("Search field")}
                       type="search"
                     />
                     <TextField
                       id="outlined-helperText"
-                      label="Helper text"
+                      label={t("Helper text")}
                       defaultValue="Default Value"
                       helperText="Some important text"
                     />
@@ -150,27 +151,27 @@ function Forms() {
                     <TextField
                       required
                       id="filled-required"
-                      label="Required"
+                      label={t("Required")}
                       defaultValue="Hello World"
                       variant="filled"
                     />
                     <TextField
                       disabled
                       id="filled-disabled"
-                      label="Disabled"
+                      label={t("Disabled")}
                       defaultValue="Hello World"
                       variant="filled"
                     />
                     <TextField
                       id="filled-password-input"
-                      label="Password"
+                      label={t("Password")}
                       type="password"
                       autoComplete="current-password"
                       variant="filled"
                     />
                     <TextField
                       id="filled-read-only-input"
-                      label="Read Only"
+                      label={t("Read Only")}
                       defaultValue="Hello World"
                       InputProps={{
                         readOnly: true
@@ -179,7 +180,7 @@ function Forms() {
                     />
                     <TextField
                       id="filled-number"
-                      label="Number"
+                      label={t("Number")}
                       type="number"
                       InputLabelProps={{
                         shrink: true
@@ -188,13 +189,13 @@ function Forms() {
                     />
                     <TextField
                       id="filled-search"
-                      label="Search field"
+                      label={t("Search field")}
                       type="search"
                       variant="filled"
                     />
                     <TextField
                       id="filled-helperText"
-                      label="Helper text"
+                      label={t("Helper text")}
                       defaultValue="Default Value"
                       helperText="Some important text"
                       variant="filled"
@@ -204,27 +205,27 @@ function Forms() {
                     <TextField
                       required
                       id="standard-required"
-                      label="Required"
+                      label={t("Required")}
                       defaultValue="Hello World"
                       variant="standard"
                     />
                     <TextField
                       disabled
                       id="standard-disabled"
-                      label="Disabled"
+                      label={t("Disabled")}
                       defaultValue="Hello World"
                       variant="standard"
                     />
                     <TextField
                       id="standard-password-input"
-                      label="Password"
+                      label={t("Password")}
                       type="password"
                       autoComplete="current-password"
                       variant="standard"
                     />
                     <TextField
                       id="standard-read-only-input"
-                      label="Read Only"
+                      label={t("Read Only")}
                       defaultValue="Hello World"
                       InputProps={{
                         readOnly: true
@@ -233,7 +234,7 @@ function Forms() {
                     />
                     <TextField
                       id="standard-number"
-                      label="Number"
+                      label={t("Number")}
                       type="number"
                       InputLabelProps={{
                         shrink: true
@@ -242,13 +243,13 @@ function Forms() {
                     />
                     <TextField
                       id="standard-search"
-                      label="Search field"
+                      label={t("Search field")}
                       type="search"
                       variant="standard"
                     />
                     <TextField
                       id="standard-helperText"
-                      label="Helper text"
+                      label={t("Helper text")}
                       defaultValue="Default Value"
                       helperText="Some important text"
                       variant="standard"
@@ -275,7 +276,7 @@ function Forms() {
                     <TextField
                       id="outlined-select-currency"
                       select
-                      label="Select"
+                      label={t("Select")}
                       value={currency}
                       onChange={handleChange}
                       helperText="Please select your currency"
@@ -289,7 +290,7 @@ function Forms() {
                     <TextField
                       id="outlined-select-currency-native"
                       select
-                      label="Native select"
+                      label={t("Native select")}
                       value={currency}
                       onChange={handleChange}
                       SelectProps={{
@@ -308,7 +309,7 @@ function Forms() {
                     <TextField
                       id="filled-select-currency"
                       select
-                      label="Select"
+                      label={t("Select")}
                       value={currency}
                       onChange={handleChange}
                       helperText="Please select your currency"
@@ -323,7 +324,7 @@ function Forms() {
                     <TextField
                       id="filled-select-currency-native"
                       select
-                      label="Native select"
+                      label={t("Native select")}
                       value={currency}
                       onChange={handleChange}
                       SelectProps={{
@@ -343,7 +344,7 @@ function Forms() {
                     <TextField
                       id="standard-select-currency"
                       select
-                      label="Select"
+                      label={t("Select")}
                       value={currency}
                       onChange={handleChange}
                       helperText="Please select your currency"
@@ -358,7 +359,7 @@ function Forms() {
                     <TextField
                       id="standard-select-currency-native"
                       select
-                      label="Native select"
+                      label={t("Native select")}
                       value={currency}
                       onChange={handleChange}
                       SelectProps={{
@@ -420,23 +421,23 @@ function Forms() {
                     <FormControlLabel
                       value="female"
                       control={<Radio />}
-                      label="Female"
+                      label={t("Female")}
                     />
                     <FormControlLabel
                       value="male"
                       control={<Radio />}
-                      label="Male"
+                      label={t("Male")}
                     />
                     <FormControlLabel
                       value="other"
                       control={<Radio />}
-                      label="Other"
+                      label={t("Other")}
                     />
                     <FormControlLabel
                       value="disabled"
                       disabled
                       control={<Radio />}
-                      label="other"
+                      label={t("other")}
                     />
                   </RadioGroup>
                 </FormControl>
