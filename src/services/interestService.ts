@@ -4,13 +4,14 @@ import { api } from './api';
 
 // Fetch all interests with pagination and optional search
 export const fetchInterests = async (
+  sortByAccepted: string | null = null,
   page: number = 1,
   limit: number = 10,
   searchQuery: string = ''
 ) => {
   try {
     const response = await api.get(`/interests`, {
-      params: { page, limit, search: searchQuery }, // Include search query in the request
+      params: { page, limit, search: searchQuery, sortByAccepted }
     });
     return response.data;
   } catch (error) {
@@ -45,7 +46,7 @@ export const addInterest = async (interestData: any) => {
 export const deleteInterests = async (interestIds: number[]) => {
   try {
     const response = await api.post('/interests/delete', {
-      ids: interestIds, // Send ids directly
+      ids: interestIds // Send ids directly
     });
     return response.data;
   } catch (error) {
@@ -55,10 +56,7 @@ export const deleteInterests = async (interestIds: number[]) => {
 };
 
 // Update an interest by ID
-export const updateInterest = async (
-  id: number,
-  updatedData: any
-) => {
+export const updateInterest = async (id: number, updatedData: any) => {
   try {
     const response = await api.put(`/interests/${id}`, updatedData);
     return response.data;
