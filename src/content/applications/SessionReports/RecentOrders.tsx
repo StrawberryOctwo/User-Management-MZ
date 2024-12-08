@@ -90,11 +90,11 @@ export default function ViewSessionReports() {
 
   const formatDateTime = (date: string | Date): string => {
     const parsedDate = new Date(date);
-    return `${parsedDate.toLocaleDateString('en-GB', {
+    return `${parsedDate.toLocaleDateString('de', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
-    })} - ${parsedDate.toLocaleTimeString('en-GB', {
+    })} - ${parsedDate.toLocaleTimeString('de', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false
