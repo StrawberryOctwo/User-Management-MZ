@@ -5,6 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { Franchise } from 'src/models/FranchiseModel';
 import { deleteFranchise, fetchFranchises } from 'src/services/franchiseService';
 import { useNavigate } from 'react-router-dom';
+import { t } from 'i18next'
 
 export default function ViewFranchisePage() {
   const [franchises, setFranchises] = useState<Franchise[]>([]);
@@ -41,11 +42,11 @@ export default function ViewFranchisePage() {
   };
 
   const columns = [
-    { field: 'name', headerName: 'Franchise Name' },
-    { field: 'ownerName', headerName: 'Owner Name' },
-    { field: 'status', headerName: 'Status' },
-    { field: 'totalEmployees', headerName: 'Total Employees' },
-    { field: 'createdAt', headerName: 'Created At', render: (value: any) => new Date(value).toLocaleDateString() },
+    { field: 'name', headerName: {t('Franchise Name')} },
+    { field: 'ownerName', headerName: {t('Owner Name')} },
+    { field: 'status', headerName: {t('Status')} },
+    { field: 'totalEmployees', headerName: {t('Total Employees')} },
+    { field: 'createdAt', headerName: {t('Created At')}, render: (value: any) => new Date(value).toLocaleDateString() },
   ];
 
   const handleEdit = (id: any) => {

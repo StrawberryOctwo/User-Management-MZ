@@ -5,6 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { Location } from 'src/models/LocationModel'; // Assuming LocationModel is available
 import { fetchLocations, deleteLocation } from 'src/services/locationService';
 import { useNavigate } from 'react-router-dom';
+import { t } from 'i18next';
 
 export default function ViewLocationPage() {
   const [locations, setLocations] = useState<Location[]>([]);
@@ -45,12 +46,12 @@ export default function ViewLocationPage() {
   };
 
   const columns = [
-    { field: 'name', headerName: 'Location Name' },
-    { field: 'address', headerName: 'Address' },
-    { field: 'postalCode', headerName: 'Postal Code' },
-    { field: 'franchiseName', headerName: 'Franchise Name' },
-    { field: 'totalTeachers', headerName: 'Total Teachers' },
-    { field: 'totalStudents', headerName: 'Total Students' }
+    { field: 'name', headerName: {t('Location Name')} },
+    { field: 'address', headerName: {t('Address')} },
+    { field: 'postalCode', headerName: {t('Postal Code')} },
+    { field: 'franchiseName', headerName: {t('Franchise Name')} },
+    { field: 'totalTeachers', headerName: {t('Total Teachers')} },
+    { field: 'totalStudents', headerName: {t('Total Students')} }
   ];
 
   const handleEdit = (id: any) => {

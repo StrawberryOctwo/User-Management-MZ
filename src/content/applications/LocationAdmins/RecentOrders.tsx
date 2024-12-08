@@ -5,6 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { deleteLocationAdmins, fetchLocationAdmins } from 'src/services/locationAdminService';
 import { useNavigate } from 'react-router-dom';
 import { LocationAdmin } from 'src/models/LocationAdminModel';
+import { t } from 'i18next';
 
 export default function LocationAdminsContent() {
   const [admins, setAdmins] = useState<LocationAdmin[]>([]);
@@ -48,19 +49,19 @@ export default function LocationAdminsContent() {
 
 
   const columns = [
-    { field: 'fullName', headerName: 'Full Name' },
+    { field: 'fullName', headerName: t('Full Name') },
     /* {
       field: 'dob',
       headerName: 'DOB',
       render: (value: any) => new Date(value).toLocaleDateString()
     }, */
-    { field: 'email', headerName: 'Email' },
+    { field: 'email', headerName: t('Email') },
     /* { field: 'address', headerName: 'Address' },
     { field: 'postalCode', headerName: 'Postal Code' }, */
-    { field: 'phoneNumber', headerName: 'Phone Number' },
+    { field: 'phoneNumber', headerName: t('Phone Number') },
     {
       field: 'locationNames',
-      headerName: 'Locations',
+      headerName: t('Locations'),
       render: (value: any) => {
         if (Array.isArray(value)) {
           return value.map((location: any) => location).join(', ');
@@ -114,7 +115,7 @@ export default function LocationAdminsContent() {
       <ReusableTable
         data={admins}
         columns={columns}
-        title="Location Admins List"
+        title={t("Location Admins List")}
         onEdit={handleEdit}
         onView={handleView}
         onDelete={confirmDelete}
@@ -129,7 +130,7 @@ export default function LocationAdminsContent() {
 
       <ReusableDialog
         open={dialogOpen}
-        title="Confirm Deletion"
+        title={t('Confirm Deletion')}
         onClose={() => setDialogOpen(false)}
         actions={
           <>
@@ -142,7 +143,7 @@ export default function LocationAdminsContent() {
               autoFocus
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+              {loading ? <CircularProgress size={24} /> : t('Confirm')}
             </Button>
           </>
         }

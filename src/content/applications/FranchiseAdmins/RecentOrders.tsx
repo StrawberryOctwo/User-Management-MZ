@@ -5,6 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { deleteFranchiseAdmin, fetchFranchiseAdmins } from 'src/services/franchiseAdminService';
 import { useNavigate } from 'react-router-dom';
 import { FranchiseAdmin } from 'src/models/FranchiseAdminModel';
+import { t } from 'i18next'; // Import the translation hook
 
 export default function FranchiseAdminsContent() {
   const [admins, setAdmins] = useState<FranchiseAdmin[]>([]);
@@ -64,10 +65,10 @@ export default function FranchiseAdminsContent() {
       headerName: 'DOB',
       render: (value: any) => new Date(value).toLocaleDateString()
     }, */
-    { field: 'email', headerName: 'Email' },
+    { field: 'email', headerName: t('Email') },
     /* { field: 'address', headerName: 'Address' },
     { field: 'postalCode', headerName: 'Postal Code' }, */
-    { field: 'phoneNumber', headerName: 'Phone Number' },
+    { field: 'phoneNumber', headerName: t('Phone Number') },
   ];
 
 

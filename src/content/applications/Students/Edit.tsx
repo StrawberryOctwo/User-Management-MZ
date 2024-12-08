@@ -388,7 +388,7 @@ const EditStudent = () => {
 
     {
       name: 'locations',
-      label: 'Locations',
+      label: t('Locations'),
       type: 'custom',
       section: 'Student Assignment',
       component: (

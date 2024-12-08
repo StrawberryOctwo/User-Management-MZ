@@ -15,6 +15,7 @@ import { assignTeacherToTopics, fetchTopics } from 'src/services/topicService';
 import { generateEmployeeNumber } from 'src/utils/teacherUtils';
 import { TextField } from '@mui/material';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
+import { t } from 'i18next';
 
 const CreateTeacher = () => {
   const [selectedLocations, setSelectedLocations] = useState<any[]>([]);
@@ -210,35 +211,35 @@ const CreateTeacher = () => {
     },
     {
       name: 'hourlyRate',
-      label: 'Hourly Rate',
+      label: t('Hourly Rate'),
       type: 'number',
       required: true,
       section: 'Teacher Information'
     },
     {
       name: 'rateMultiplier',
-      label: 'rateMultiplier',
+      label: t('rateMultiplier'),
       type: 'number',
       required: true,
       section: 'Teacher Information'
     },
     {
       name: 'sessionRateMultiplier',
-      label: 'sessionRateMultiplier',
+      label: t('sessionRateMultiplier'),
       type: 'number',
       required: true,
       section: 'Teacher Information'
     },
     {
       name: 'taxNumber',
-      label: 'Tax Number',
+      label: t('Tax Number'),
       type: 'text',
       required: true,
       section: 'Teacher Information'
     },
     {
       name: 'employeeNumber',
-      label: 'Teacher Number',
+      label: t('Teacher Number'),
       type: 'custom',
       required: true,
       section: 'Teacher Information',
@@ -277,49 +278,49 @@ const CreateTeacher = () => {
     },
     {
       name: 'idNumber',
-      label: 'ID Number',
+      label: t('ID Number'),
       type: 'text',
       required: false,
       section: 'Teacher Information'
     },
     {
       name: 'contractStartDate',
-      label: 'Contract Start Date',
+      label: t('Contract Start Date'),
       type: 'date',
       required: true,
       section: 'Teacher Information'
     },
     {
       name: 'contractEndDate',
-      label: 'Contract End Date',
+      label: t('Contract End Date'),
       type: 'date',
       required: true,
       section: 'Teacher Information'
     },
     {
       name: 'bank',
-      label: 'Bank',
+      label: t('Bank'),
       type: 'text',
       required: true,
       section: 'Bank Details'
     },
     {
       name: 'iban',
-      label: 'IBAN',
+      label: t('IBAN'),
       type: 'text',
       required: true,
       section: 'Bank Details'
     },
     {
       name: 'bic',
-      label: 'BIC',
+      label: t('BIC'),
       type: 'text',
       required: false,
       section: 'Bank Details'
     },
     {
       name: 'locations',
-      label: 'Locations',
+      label: t('Locations'),
       type: 'custom',
       required: true,
       section: 'Teacher Assignment',
@@ -337,7 +338,7 @@ const CreateTeacher = () => {
     },
     {
       name: 'topics',
-      label: 'Topics',
+      label: t('Topics'),
       type: 'custom',
       section: 'Teacher Assignment',
       component: (
@@ -354,7 +355,7 @@ const CreateTeacher = () => {
     },
     {
       name: 'documents',
-      label: 'Upload Documents',
+      label: t('Upload Documents'),
       type: 'custom',
       section: 'Documents',
       component: <UploadSection onUploadChange={handleFilesChange} />,

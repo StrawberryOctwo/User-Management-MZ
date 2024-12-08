@@ -153,7 +153,7 @@ const CreateContract = () => {
         },
         {
             name: 'franchise',
-            label: 'Franchise',
+            label: t('Franchise'),
             type: 'custom',
             section: 'Franchise Assignment',
             component: (

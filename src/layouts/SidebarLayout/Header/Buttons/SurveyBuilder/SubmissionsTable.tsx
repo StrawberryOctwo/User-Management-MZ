@@ -28,6 +28,7 @@ import { getSurveyAnswers } from 'src/services/survey';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { debounce } from 'lodash';
 import { visuallyHidden } from '@mui/utils';
+import { t } from 'i18next';
 
 // Define the Answer interface
 interface Answer {
@@ -216,7 +217,7 @@ function SubmissionsTable({
           <InputLabel id="sort-status-label">Sort By Status</InputLabel>
           <Select
             labelId="sort-status-label"
-            label="Sort By Status"
+            label={t("Sort By Status")}
             value={sortStatus}
             onChange={(e) => {
               setSortStatus(e.target.value);
