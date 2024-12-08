@@ -29,7 +29,11 @@ export default function FileUploadContent() {
   const loadFiles = async (searchQuery = '') => {
     setLoading(true);
     try {
-      const { data, total } = await fetchSelfFiles(page + 1, limit, searchQuery);
+      const { data, total } = await fetchSelfFiles(
+        page + 1,
+        limit,
+        searchQuery
+      );
       setFiles([...data]);
       setTotalCount(total);
     } catch (error) {
@@ -45,20 +49,26 @@ export default function FileUploadContent() {
     {
       field: 'user',
       headerName: 'Uploaded By',
-      render: (value, row) => `${row.user?.firstName || ''} ${row.user?.lastName || ''}`
+      render: (value, row) =>
+        `${row.user?.firstName || ''} ${row.user?.lastName || ''}`
     },
     {
       field: 'createdAt',
-      headerName: 'Created At',
-      render: (value) => new Date(value).toLocaleDateString()
+      headerName: 'Upload Date',
+      render: (value) =>
+        new Date(value).toLocaleString('en-US', {
+          dateStyle: 'medium',
+          timeStyle: 'short'
+        })
     },
     {
       field: 'actions',
       headerName: 'File Actions',
-      render: (value, row) => <FileActions fileId={row.id} fileName={row.name} /> // Use FileActions here
+      render: (value, row) => (
+        <FileActions fileId={row.id} fileName={row.name} />
+      ) // Use FileActions here
     }
   ];
-
 
   const handleDelete = async () => {
     setDialogOpen(false);
@@ -111,10 +121,19 @@ export default function FileUploadContent() {
         onClose={() => setDialogOpen(false)}
         actions={
           <>
-            <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
+            <Button
+              onClick={() => setDialogOpen(false)}
+              color="inherit"
+              disabled={loading}
+            >
               Cancel
             </Button>
-            <Button onClick={handleDelete} color="primary" autoFocus disabled={loading}>
+            <Button
+              onClick={handleDelete}
+              color="primary"
+              autoFocus
+              disabled={loading}
+            >
               {loading ? <CircularProgress size={24} /> : 'Confirm'}
             </Button>
           </>
