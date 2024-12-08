@@ -11,10 +11,13 @@ export const createToDo = async (toDoData: any) => {
   }
 };
 // Function to fetch ToDos created by the current user
-export const fetchToDosByAssignedBy = async (page: number = 1, limit: number = 10) => {
+export const fetchToDosByAssignedBy = async (
+  page: number = 1,
+  limit: number = 10
+) => {
   try {
     const response = await api.get(`/todos/created-by/`, {
-      params: { page, limit },
+      params: { page, limit }
     });
     return response.data;
   } catch (error) {
@@ -24,10 +27,14 @@ export const fetchToDosByAssignedBy = async (page: number = 1, limit: number = 1
 };
 
 // Function to fetch ToDos assigned to the current user
-export const fetchToDosByAssignedTo = async (assignedId: number, page: number = 1, limit: number = 10) => {
+export const fetchToDosByAssignedTo = async (
+  assignedId: number,
+  page: number = 1,
+  limit: number = 10
+) => {
   try {
     const response = await api.get(`/todos/assigned-to/${assignedId}`, {
-      params: { page, limit },
+      params: { page, limit }
     });
     return response.data;
   } catch (error) {
@@ -35,11 +42,18 @@ export const fetchToDosByAssignedTo = async (assignedId: number, page: number = 
     throw error;
   }
 };
+
 // Service to fetch all ToDos with pagination and filters
-export const fetchToDos = async (page: number = 1, limit: number = 10, search = '', priority = '', sortBy = 'date') => {
+export const fetchToDos = async (
+  page: number = 1,
+  limit: number = 10,
+  search = '',
+  priority = '',
+  sortBy = 'date'
+) => {
   try {
     const response = await api.get('/todos', {
-      params: { page, limit, search, priority, sortBy },
+      params: { page, limit, search, priority, sortBy }
     });
     return response.data;
   } catch (error) {
@@ -54,7 +68,7 @@ export const fetchToDosForSelf = async ({
   limit,
   sort,
   search,
-  priority,
+  priority
 }: {
   page: number;
   limit: number;
@@ -65,7 +79,7 @@ export const fetchToDosForSelf = async ({
   const params = new URLSearchParams({
     page: String(page),
     limit: String(limit),
-    sort,
+    sort
   });
 
   if (search) params.append('search', search);
@@ -74,8 +88,6 @@ export const fetchToDosForSelf = async ({
   const response = await api.get(`/todos/self?${params.toString()}`);
   return response.data;
 };
-
-
 
 // Service to assign a ToDo to a role
 export const assignToDoToRole = async (todoId: number, role: string) => {
@@ -113,7 +125,6 @@ export const toggleToDoCompletion = async (todoId: number) => {
 //   }
 // };
 
-
 // Service to delete a ToDo
 export const deleteToDo = async (todoId: number) => {
   try {
@@ -137,7 +148,9 @@ export const removeUserFromToDo = async (todoId: number, userId: number) => {
 
 export const assignToDoToUsers = async (todoId: number, userIds: number[]) => {
   try {
-    const response = await api.put(`/todos/${todoId}/assign-users`, { userIds });
+    const response = await api.put(`/todos/${todoId}/assign-users`, {
+      userIds
+    });
     return response.data;
   } catch (error) {
     console.error('Failed to assign ToDo to users:', error);
@@ -150,9 +163,12 @@ export const fetchAssignedUsersForTodo = async (
   params: FetchAssignedUsersParams = {}
 ): Promise<FetchAssignedUsersResponse> => {
   try {
-    const response = await api.get<FetchAssignedUsersResponse>(`/todos/${todoId}/assigned-users`, {
-      params,
-    });
+    const response = await api.get<FetchAssignedUsersResponse>(
+      `/todos/${todoId}/assigned-users`,
+      {
+        params
+      }
+    );
     return response.data;
   } catch (error: any) {
     console.error('Failed to fetch assigned users:', error);
@@ -160,7 +176,6 @@ export const fetchAssignedUsersForTodo = async (
     throw error.response?.data || error.message || 'Unknown error';
   }
 };
-
 
 interface FetchAssignedUsersParams {
   search?: string;
