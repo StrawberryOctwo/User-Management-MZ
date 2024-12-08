@@ -312,5 +312,14 @@
   "vat_exempt": "vat_exempt",
   "vat_percentage": "vat_percentage",
   "view_report": "view_report",
-  "Day": "Day"
+  "Day": "Day",
+  "...": "...",
+  "Appointment": "Appointment",
+  "Contract Period": "Contract Period",
+  "Grade Level": "Grade Level",
+  "Location": "Location",
+  "Owner Name": "Owner Name",
+  "Total Employees": "Total Employees",
+  "errors.invalidStartTime": "errors.invalidStartTime",
+  "key": "key"
 }
