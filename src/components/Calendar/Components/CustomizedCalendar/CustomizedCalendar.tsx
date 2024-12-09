@@ -96,6 +96,9 @@ export default function CustomizedCalendar({
   const [isClosingDayModalOpen, setIsClosingDayModalOpen] = useState(false);
   const [selectedSpecialDay, setSelectedSpecialDay] = useState<any>(null);
   const [sessionEnded, setIsSessionEnded] = useState<boolean | null>(false);
+  const isNavigating = useRef(false);
+  const isViewButtonClick = useRef(false);
+  const isWeekNavigating = useRef(false);
 
   const { showMessage } = useSnackbar();
   const { userRoles } = useAuth();
@@ -113,6 +116,23 @@ export default function CustomizedCalendar({
     mounted.current = true;
     return () => {
       mounted.current = false;
+    };
+  }, []);
+
+  useEffect(() => {
+    const handleNavigationClick = () => {
+      isNavigating.current = true;
+    };
+
+    const prevButton = document.querySelector('.fc-prev-button');
+    const nextButton = document.querySelector('.fc-next-button');
+
+    prevButton?.addEventListener('click', handleNavigationClick);
+    nextButton?.addEventListener('click', handleNavigationClick);
+
+    return () => {
+      prevButton?.removeEventListener('click', handleNavigationClick);
+      nextButton?.removeEventListener('click', handleNavigationClick);
     };
   }, []);
 
@@ -480,47 +500,39 @@ export default function CustomizedCalendar({
     return baseViews;
   };
 
-  useEffect(() => {
-    const calendarApi = calendarRef.current?.getApi();
-    if (
-      calendarApi &&
-      calendarApi.view.type === 'listWeek' &&
-      selectedLocations.length > 1
-    ) {
-      calendarApi.changeView('resourceTimelineDay');
-    }
-  }, [selectedLocations]);
-
   const handleViewChange = (viewInfo: any) => {
     if (!mounted.current) return;
 
     const currentView = viewInfo.view.type;
     saveViewPreference(currentView);
+
+    // Skip if view change was triggered by view button
+    if (isViewButtonClick.current) return;
+
     const targetDate = viewInfo.view.currentStart;
-
     if (currentView === 'listWeek') {
-      const weekStart = moment(targetDate).startOf('week');
-      const weekEnd = weekStart.clone().endOf('week');
+      // Only update if we're not already on this week
+      const weekStart = moment(targetDate).startOf('isoWeek');
+      const weekEnd = moment(targetDate).endOf('isoWeek');
+      const currentStart = moment(selectedDate).startOf('isoWeek').format('YYYY-MM-DD');
 
-      if (
-        weekStart.format('YYYY-MM-DD') !==
-        moment(selectedDate).startOf('week').format('YYYY-MM-DD')
-      ) {
+      if (weekStart.format('YYYY-MM-DD') !== currentStart) {
         onDateRangeChange(
           weekStart.format('YYYY-MM-DD'),
           weekEnd.format('YYYY-MM-DD')
         );
+        setSelectedDate(weekStart.toDate());
       }
     } else {
       const formattedDate = moment(targetDate).format('YYYY-MM-DD');
       if (formattedDate !== moment(selectedDate).format('YYYY-MM-DD')) {
         onDateChange(formattedDate);
+        setSelectedDate(targetDate);
       }
     }
-
-    setSelectedDate(targetDate);
   };
 
+  // Update custom buttons to handle view changes more simply
   const customButtons = {
     ...calendarHelpers.getCustomButtons(
       handleDatePickerClick,
@@ -538,15 +550,38 @@ export default function CustomizedCalendar({
           currentView === 'resourceTimelineDay'
             ? 'listWeek'
             : 'resourceTimelineDay';
-        saveViewPreference(newView);
-        calendarApi.changeView(newView);
 
-        // Update button text
+        isViewButtonClick.current = true;
+        saveViewPreference(newView);
+
+        const currentDate = calendarApi.getDate();
+
+        // Update view and text first
+        calendarApi.changeView(newView);
         const viewButton = document.querySelector('.fc-view-button');
         if (viewButton) {
           viewButton.textContent =
             newView === 'resourceTimelineDay' ? 'list' : 'day';
         }
+
+        // Then handle date changes
+        if (newView === 'listWeek') {
+          const weekStart = moment(currentDate).startOf('isoWeek');
+          const weekEnd = moment(currentDate).endOf('isoWeek');
+
+          calendarApi.gotoDate(weekStart.toDate());
+          onDateRangeChange(
+            weekStart.format('YYYY-MM-DD'),
+            weekEnd.format('YYYY-MM-DD')
+          );
+        } else {
+          calendarApi.gotoDate(currentDate);
+          onDateChange(moment(currentDate).format('YYYY-MM-DD'));
+        }
+
+        setTimeout(() => {
+          isViewButtonClick.current = false;
+        }, 0);
       }
     }
   };
@@ -624,6 +659,10 @@ export default function CustomizedCalendar({
           selectOverlap={(event) =>
             calendarEventHandlers.handleSelectOverlap(event, getDateStatus)
           }
+          navLinks={true}
+          firstDay={1} // Start week on Monday
+          weekNumberCalculation="ISO"
+          fixedWeekCount={false}
         />
         <Box sx={{
           display: 'flex',
