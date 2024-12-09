@@ -175,7 +175,7 @@ function SurveyNotifications() {
                             : 'inherit',
                       },
                       borderLeft: `4px solid ${statusConfig[survey.status].color}`,
-                      backgroundColor: alpha('#ffffff', 0.5), // Optional: Light background
+                      backgroundColor: 'primary', // Optional: Light background
                       borderRadius: '4px',
                       mb: 1,
                     }}
