@@ -32,12 +32,21 @@ const EventItem = ({ eventInfo }) => {
   const [extraStudents, setExtraStudents] = useState([]);
   const [anchorEl, setAnchorEl] = useState(null);
 
-  const maxVisibleStudents = 3;
-  const baseHeight = topicName.length > 15 ? 125 : 105;
-  const studentHeight = 16;
-  const extraButtonHeight = 22;
+  const maxVisibleStudents = 4; // Increased from 3 to 4
+  const baseHeight = topicName.length > 20 ? 250 : 120; // Adjusted threshold and heights
+
+  // Additional height factors
+  const teacherNameHeight = teacher.length > 15 ? 20 : 10; // Increase height for long teacher names
+  const warningHeight = hasOverlap ? 20 : 0; // Increase height if there's a warning
+
+  const studentHeight = 24; // Reduced from 26
+  const extraButtonHeight = 20; // Reduced from 22
+
+  // Updated eventHeight calculation
   const eventHeight =
     baseHeight +
+    teacherNameHeight +
+    warningHeight +
     studentHeight * Math.min(students.length, maxVisibleStudents) +
     (students.length > maxVisibleStudents ? extraButtonHeight : 0);
 
@@ -87,13 +96,13 @@ const EventItem = ({ eventInfo }) => {
   const renderIcon = () => {
     switch (sessionTypeName) {
       case 'Group':
-        return <GroupIcon style={{ color: '#333', width: 20, height: 20 }} />;
+        return <GroupIcon style={{ color: '#333', width: 18, height: 18 }} />; // Reduced size
       case 'Online':
-        return <TvIcon style={{ color: '#333', width: 20, height: 20 }} />;
+        return <TvIcon style={{ color: '#333', width: 18, height: 18 }} />; // Reduced size
       case 'Individual':
-        return <UserIcon style={{ color: '#333', width: 18, height: 18 }} />;
+        return <UserIcon style={{ color: '#333', width: 16, height: 16 }} />; // Reduced size
       case 'Intensive Individual':
-        return <UserIcon style={{ color: '#FF6347', width: 18, height: 18 }} />;
+        return <UserIcon style={{ color: '#FF6347', width: 16, height: 16 }} />; // Reduced size
       default:
         return null;
     }
@@ -107,7 +116,7 @@ const EventItem = ({ eventInfo }) => {
       setVisibleStudents(students);
       setExtraStudents([]);
     }
-  }, [students]);
+  }, [students, maxVisibleStudents]);
 
   useEffect(() => {
     // Early return if event is marked as isHoliday in original data
@@ -155,7 +164,9 @@ const EventItem = ({ eventInfo }) => {
         border: `2px solid ${isCancelled ? '#FF0000' : borderColor}`,
         backgroundColor: isCancelled ? 'rgba(255, 0, 0, 0.1)' : '#f5f5f5',
         height: `${eventHeight}px`,
-        position: 'relative'
+        position: 'relative',
+        padding: '2px', // Added padding to accommodate increased content
+        boxSizing: 'border-box'
       }}
     >
       {isCancelled && (
@@ -172,7 +183,7 @@ const EventItem = ({ eventInfo }) => {
             alignItems: 'center',
             justifyContent: 'center',
             zIndex: 10,
-            padding: '10px'
+            padding: '8px' // Reduced padding
           }}
         >
           <Typography
@@ -181,7 +192,8 @@ const EventItem = ({ eventInfo }) => {
               color: '#FF0000',
               fontWeight: 'bold',
               textTransform: 'uppercase',
-              marginBottom: '5px'
+              marginBottom: '4px', // Reduced margin
+              fontSize: '0.9rem' // Further reduced font size
             }}
           >
             Cancelled
@@ -192,7 +204,7 @@ const EventItem = ({ eventInfo }) => {
               variant="body2"
               style={{
                 color: '#FF0000',
-                fontSize: '0.85rem',
+                fontSize: '0.75rem', // Reduced font size
                 textAlign: 'center'
               }}
             >
@@ -202,31 +214,32 @@ const EventItem = ({ eventInfo }) => {
         </div>
       )}
       <div>
-        <div className="event-header">
+        <div className="event-header" style={{ display: 'flex', alignItems: 'center', marginBottom: '4px' }}>
           {renderIcon()}
-          <div className="event-title">
+          <div className="event-title" style={{ fontSize: '0.85rem', marginLeft: '6px', flex: 1 }}> {/* Adjusted font size and added margin */}
             {topicName}
-            {hasOverlap && (
-              <WarningIcon
-                color="error"
-                style={{ marginLeft: 5, verticalAlign: 'middle' }}
-              />
-            )}
+
           </div>
         </div>
-        <div className="event-details">
+        <div className="event-details" style={{ fontSize: '0.8rem' }}> {/* Adjusted font size */}
           <span className="time">
             {startTime} - {endTime}
           </span>
-          <span className="teacher" style={{ color: borderColor }}>
+          <span className="teacher" style={{ color: borderColor, marginLeft: 6, whiteSpace: 'nowrap', overflow: 'hidden', fontSize: '0.75rem', textOverflow: 'ellipsis' }}> {/* Added margin and text overflow handling */}
             {teacher}
           </span>
-          <span>{location}</span>
+          {hasOverlap && (
+              <WarningIcon
+                color="error"
+                style={{ marginLeft: 4, verticalAlign: 'middle', width: 16, height: 16 }} // Adjusted margin and size
+              />
+            )}
+          <span style={{ marginLeft: 6 }}>{location}</span> {/* Added margin */}
         </div>
       </div>
-      <div className="student-list">
+      <div className="student-list" style={{ marginTop: '8px' }}> {/* Added margin top */}
         {visibleStudents && visibleStudents.length > 0 ? (
-          <ul className="student-names">
+          <ul className="student-names" style={{ paddingLeft: 10, fontSize: '0.75rem', margin: 0 }}> {/* Adjusted padding and font size */}
             {visibleStudents.map((student, index) => (
               <li
                 key={index}
@@ -234,7 +247,11 @@ const EventItem = ({ eventInfo }) => {
                   student.absenceStatus ? 'student-absent' : 'student-present'
                 }
                 style={{
-                  color: student.absenceStatus ? '#f8b4b4' : lighterBorderColor
+                  color: student.absenceStatus ? '#f8b4b4' : lighterBorderColor,
+                  lineHeight: '1.2rem', // Adjusted line height
+                  whiteSpace: 'nowrap',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis'
                 }}
               >
                 G{student.gradeLevel}-{student.firstName}
@@ -245,13 +262,14 @@ const EventItem = ({ eventInfo }) => {
                 onClick={handleMoreClick}
                 className="more-students"
                 style={{
-                  padding: '0 4px',
-                  fontSize: '0.7rem',
+                  padding: '0 3px', // Reduced padding
+                  fontSize: '0.65rem', // Reduced font size
                   minWidth: 'auto',
                   margin: 0,
                   display: 'inline-flex',
                   alignItems: 'center',
-                  justifyContent: 'center'
+                  justifyContent: 'center',
+                  height: 20 // Set fixed height
                 }}
               >
                 + {extraStudents.length} more
@@ -270,15 +288,15 @@ const EventItem = ({ eventInfo }) => {
             position: 'absolute',
             bottom: 4,
             right: 4,
-            fontSize: '0.7rem',
-            padding: '2px 12px',
-            borderRadius: '20px',
+            fontSize: '0.65rem', // Reduced font size
+            padding: '1px 6px', // Adjusted padding
+            borderRadius: '15px', // Adjusted border radius
             backgroundColor: reportStatus.allReportsCompleted
               ? '#d4edda'
               : '#f8d7da',
             color: reportStatus.allReportsCompleted ? '#155724' : '#721c24',
             display: 'inline-block',
-            marginBottom: '3px'
+            marginBottom: '2px' // Reduced margin
           }}
         >
           {reportStatus.completedReports}/{reportStatus.totalStudents}
@@ -302,7 +320,8 @@ const EventItem = ({ eventInfo }) => {
           <MenuItem
             key={index}
             style={{
-              color: student.absenceStatus ? '#f8b4b4' : lighterBorderColor
+              color: student.absenceStatus ? '#f8b4b4' : lighterBorderColor,
+              fontSize: '0.75rem' // Reduced font size
             }}
             className={
               student.absenceStatus ? 'student-absent' : 'student-present'
