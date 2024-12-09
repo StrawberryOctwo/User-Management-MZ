@@ -9,6 +9,7 @@
   height: 90vh;
 }
 
+
 .fc-toolbar {
   display: flex;
   justify-content: space-between;
@@ -27,6 +28,8 @@
   background-color: #f9f9f9;
 
 }
+
+
 .fc-list-day-text,
 .fc-list-day-side-text,
 .fc-toolbar .fc-button-group .fc-button,
@@ -83,6 +86,7 @@
   color: #333333;
   font-size: 1rem;
 }
+
 
 .fc .fc-timeline-slot-cushion,
 .fc .fc-datagrid-cell-cushion {
@@ -155,6 +159,7 @@
   color: #333333;
 }
 
+.fc-scroller .fc-scroller-liquid,
 .fc-scrollgrid,
 .fc-scrollgrid-liquid {
   border-collapse: separate;

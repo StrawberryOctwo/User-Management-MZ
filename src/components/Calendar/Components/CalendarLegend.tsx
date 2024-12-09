@@ -43,7 +43,7 @@ const LegendItem = ({ color, label, isDeactivated = false }) => (
 const CalendarLegend = () => (
   <Box
     sx={{
-      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      backgroundColor: 'secondary',
       borderRadius: 1,
       padding: 1,
       border: '1px solid #e0e0e0',
