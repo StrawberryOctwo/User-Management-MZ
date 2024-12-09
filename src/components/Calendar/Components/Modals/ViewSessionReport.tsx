@@ -176,6 +176,8 @@ const StepContent = ({ step, formData, handleChange, readOnly }) => {
         </Box>
       );
 
+    // In the StepContent component, update case 3 (Homework & Notes section):
+
     case 3:
       return (
         <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
@@ -204,14 +206,24 @@ const StepContent = ({ step, formData, handleChange, readOnly }) => {
             </FormControl>
             <FormControl fullWidth sx={{ mt: 2 }}>
               <FormLabel>Homework for the next session</FormLabel>
-              <TextField
+              <RadioGroup
                 value={formData.nextHomework}
                 onChange={handleChange('nextHomework')}
-                fullWidth
-                multiline
-                rows={2}
-                InputProps={{ readOnly }}
-              />
+                row
+              >
+                <FormControlLabel
+                  value="worksheets"
+                  control={<Radio />}
+                  label="Worksheets"
+                  disabled={readOnly}
+                />
+                <FormControlLabel
+                  value="school-materials"
+                  control={<Radio />}
+                  label="School materials"
+                  disabled={readOnly}
+                />
+              </RadioGroup>
             </FormControl>
           </Box>
           <Box sx={{ mt: 2 }}>
@@ -262,6 +274,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
     nextHomework: '',
     tutorRemarks: '',
     sessionDate: '',
+    startTime: '',
     studentName: ''
   });
 
@@ -288,6 +301,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
             nextHomework: report.data.nextHomework || '',
             tutorRemarks: report.data.tutorRemarks || '',
             sessionDate: format(new Date(report.data.session.date), 'yyyy-MM-dd'),
+            startTime: report.data.session.startTime,
             studentName: `${report.data.student.user.firstName} ${report.data.student.user.lastName}`
           });
         } catch (error) {
@@ -355,9 +369,15 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
               <strong>{t('Session Date')}:</strong> {formData.sessionDate}
             </Typography>
           </Box>
-          <Typography variant="body1">
-            <strong>{t('Student')}:</strong> {formData.studentName}
-          </Typography>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+            <Typography variant="body1">
+              <strong>{t('Student')}:</strong> {formData.studentName}
+            </Typography>
+            <Typography variant="body1">
+              <strong>{t('Start')}:</strong> {formData.startTime}
+            </Typography>
+          </Box>
+
         </Box>
       </DialogTitle>
       <DialogContent>
