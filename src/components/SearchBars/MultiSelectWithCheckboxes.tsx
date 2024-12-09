@@ -8,7 +8,9 @@ import {
   Checkbox,
   TextField,
   Autocomplete,
-  CircularProgress
+  CircularProgress,
+  Chip,
+  Tooltip
 } from '@mui/material';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
@@ -72,11 +74,6 @@ const MultiSelectWithCheckboxes = forwardRef(
     useEffect(() => {
       let active = true;
       const timeoutId = setTimeout(async () => {
-        // Only fetch if:
-        // 1. Component is focused AND query has 2+ chars, OR
-        // 2. Options are empty (initial load)
-        // AND not currently selecting an item
-        
         if (!shouldFetch || isSelecting) return;
 
         if ((focused && inputValue.length >= 0) || options.length === 0) {
@@ -84,10 +81,7 @@ const MultiSelectWithCheckboxes = forwardRef(
           try {
             const data = await fetchData(inputValue);
             if (active) {
-              console.log(data)
               const newOptions = Array.isArray(data) ? data : [];
-              console.log(newOptions)
-              // Ensure all selected items remain in options
               selectedItems.forEach((selectedItem) => {
                 if (
                   !newOptions.some((option) => option.id === selectedItem.id)
@@ -98,7 +92,6 @@ const MultiSelectWithCheckboxes = forwardRef(
 
               setOptions(newOptions);
 
-              // Save initial options if this is the first load
               if (options.length === 0 && inputValue === '') {
                 setInitialOptions(newOptions);
               }
@@ -113,7 +106,6 @@ const MultiSelectWithCheckboxes = forwardRef(
             }
           }
         } else if (inputValue.length === 0) {
-          // If query is empty, restore initial options
           setOptions(initialOptions);
         }
       }, 300);
@@ -169,60 +161,88 @@ const MultiSelectWithCheckboxes = forwardRef(
       path.split('.').reduce((acc, part) => acc && acc[part], option);
 
     return (
-      <Autocomplete
-        multiple
-        value={selectedItems}
-        options={options}
-        disableCloseOnSelect
-        getOptionLabel={(option) =>
-          getNestedProperty(option, displayProperty) || ''
-        }
-        onChange={handleChange}
-        onInputChange={(event, newInputValue, reason) => {
-          // Only update input value if not selecting an option
-          if (reason !== 'reset' && !isSelecting) {
-            setInputValue(newInputValue);
-            if (newInputValue.length >= 0) {
-              setShouldFetch(true);
-            }
-          }
-        }}
-        onFocus={handleFocus}
-        onBlur={handleBlur}
-        loading={loading}
-        isOptionEqualToValue={(option, value) => option.id === value.id}
-        renderOption={(props, option, { selected }) => (
-          <li {...props} key={option.id}>
-            <Checkbox
-              icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
-              checkedIcon={<CheckBoxIcon fontSize="small" />}
-              style={{ marginRight: 8 }}
-              checked={selected}
-            />
-            {getNestedProperty(option, displayProperty)}
-          </li>
-        )}
-        renderInput={(params) => (
-          <TextField
-            {...params}
-            label={label}
-            placeholder={placeholder}
-            InputProps={{
-              ...params.InputProps,
-              endAdornment: (
-                <>
-                  {loading ? (
-                    <CircularProgress color="inherit" size={20} />
-                  ) : null}
-                  {params.InputProps.endAdornment}
-                </>
-              )
-            }}
-          />
-        )}
-        style={{ width }}
-        disabled={disabled}
+<Autocomplete
+  multiple
+  value={selectedItems}
+  options={options}
+  disableCloseOnSelect
+  getOptionLabel={(option) =>
+    getNestedProperty(option, displayProperty) || ''
+  }
+  onChange={handleChange}
+  onInputChange={(event, newInputValue, reason) => {
+    if (reason !== 'reset' && !isSelecting) {
+      setInputValue(newInputValue);
+      if (newInputValue.length >= 0) {
+        setShouldFetch(true);
+      }
+    }
+  }}
+  onFocus={handleFocus}
+  onBlur={handleBlur}
+  loading={loading}
+  isOptionEqualToValue={(option, value) => option.id === value.id}
+  renderOption={(props, option, { selected }) => (
+    <li {...props} key={option.id}>
+      <Checkbox
+        icon={<CheckBoxOutlineBlankIcon fontSize="small" />}
+        checkedIcon={<CheckBoxIcon fontSize="small" />}
+        style={{ marginRight: 8 }}
+        checked={selected}
       />
+      {getNestedProperty(option, displayProperty)}
+    </li>
+  )}
+  renderTags={(value, getTagProps) => {
+    const maxTags = 0; // Show only 2 tags
+    const displayedTags = value.slice(0, maxTags);
+    const remainingTags = value.length - maxTags;
+
+    return (
+      <>
+        {displayedTags.map((option, index) => (
+          <Chip
+            label={getNestedProperty(option, displayProperty)}
+            {...getTagProps({ index })}
+            key={option.id}
+            style={{ maxWidth: '100px', overflow: 'hidden', textOverflow: 'ellipsis' }}
+          />
+        ))}
+        {remainingTags > 0 && (
+          <Tooltip
+            title={value
+              .slice(maxTags)
+              .map((item) => getNestedProperty(item, displayProperty))
+              .join(', ')}
+          >
+            <Chip label={`${remainingTags} Selected`} />
+          </Tooltip>
+        )}
+      </>
+    );
+  }}
+  renderInput={(params) => (
+    <TextField
+      {...params}
+      label={label}
+      placeholder={selectedItems.length > 0 ? '' : placeholder}
+      InputProps={{
+        ...params.InputProps,
+        endAdornment: (
+          <>
+            {loading ? (
+              <CircularProgress color="inherit" size={20} />
+            ) : null}
+            {params.InputProps.endAdornment}
+          </>
+        )
+      }}
+    />
+  )}
+  style={{ width: '100%', maxWidth: '300px' }} // Restrict width
+  disabled={disabled}
+/>
+
     );
   }
 );
