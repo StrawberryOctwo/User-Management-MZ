@@ -625,9 +625,14 @@ export default function CustomizedCalendar({
             calendarEventHandlers.handleSelectOverlap(event, getDateStatus)
           }
         />
-        <div style={{ position: 'absolute', bottom: 5, width: '100%' }}>
+        <Box sx={{
+          display: 'flex',
+          justifyContent: 'flex-end',
+          padding: 2,
+          marginTop: 'auto'
+        }}>
           <CalendarLegend />
-        </div>
+        </Box>
       </div>
 
       <EventTypeSelectionModal
