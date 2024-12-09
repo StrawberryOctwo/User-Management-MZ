@@ -162,25 +162,26 @@ const HeaderToDoList: React.FC = () => {
               fontWeight: 500,
               textDecoration: isCompleted ? 'line-through' : 'none',
             }}
+            color="secondary"
           >
             {todo.title}
           </Typography>
           <Chip label={todo.priority} color={getPriorityColor(todo.priority)} size="small" />
         </Box>
-        <Typography variant="body2" color="text.secondary">
+        <Typography variant="body2" color="secondary">
           {todo.description || 'No description provided'}
         </Typography>
         <Box display="flex" justifyContent="space-between" mt={1}>
           <Typography
             variant="caption"
-            color="text.secondary"
+            color="secondary"
             sx={{ fontStyle: 'italic' }}
           >
             Assigned By: {todo.assignedBy?.firstName} {todo.assignedBy?.lastName}
           </Typography>
           <Typography
             variant="caption"
-            color="text.secondary"
+            color="secondary"
             sx={{ fontStyle: 'italic' }}
           >
             {formatDateGerman(todo.dueDate)}
@@ -307,7 +308,7 @@ const HeaderToDoList: React.FC = () => {
           </Box>
         ) : todos.length === 0 ? (
           <Box textAlign="center" py={4}>
-            <Typography variant="body2" color="text.secondary">
+            <Typography variant="body2" color="text.primary">
               No ToDos match your criteria.
             </Typography>
           </Box>
