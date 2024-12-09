@@ -24,7 +24,9 @@
   margin: 0 10px;
 }
 
-.fc-list-event-time{
+.fc-list-event-time,
+.fc-list-event-title,
+.fc-list-event-graphic{
   background-color: #f9f9f9;
 
 }
