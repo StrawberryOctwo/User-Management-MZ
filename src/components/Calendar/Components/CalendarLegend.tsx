@@ -99,16 +99,21 @@ const CalendarLegendWithInfo = () => {
   const open = Boolean(anchorEl);
 
   return (
-    <Box
-    sx={(theme) => ({
-      display: "flex",
-      alignItems: "center",
-      backgroundColor: theme.palette.primary.main, // Access theme.primary.main
-      borderRadius: 25,
-      padding: 1,
-      boxShadow: 1,
-    })}
-  >
+<Box
+  sx={(theme) => ({
+    display: "flex",
+    alignItems: "center",
+    backgroundColor: theme.palette.primary.main, // Access theme.primary.main
+    borderRadius: 25,
+    padding: 1,
+    boxShadow: 1,
+    opacity: 0.4, // Initial transparency
+    transition: "opacity 0.3s ease-in-out", // Smooth transition
+    '&:hover': {
+      opacity: 1, // Fully visible on hover
+    },
+  })}
+>
       <IconButton
         size="small"
         onMouseEnter={handlePopoverOpen}
