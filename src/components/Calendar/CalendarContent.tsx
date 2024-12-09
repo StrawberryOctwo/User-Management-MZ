@@ -13,14 +13,23 @@ import {
   fetchUserClassSessions
 } from 'src/services/classSessionService';
 import { calendarsharedService } from './CalendarSharedService';
-import { useHeaderMenu } from './Components/CustomizedCalendar/HeaderMenuContext';
-import { Holiday, fetchClosingDaysByLocationIds, fetchHolidaysByLocationIds } from 'src/services/specialDaysService';
+import {
+  Holiday,
+  fetchClosingDaysByLocationIds,
+  fetchHolidaysByLocationIds
+} from 'src/services/specialDaysService';
+import FilterToolbar from './Components/CustomizedCalendar/FilterToolbar';
 
 const CalendarContent: React.FC = () => {
   const HOLIDAYS_STORAGE_KEY = 'calendarHolidays';
   const CLOSING_DAYS_STORAGE_KEY = 'calendarClosingDays';
 
-  const [currentViewYear, setCurrentViewYear] = useState<number>(new Date().getFullYear());
+  const [selectedFranchise, setSelectedFranchise] = useState<any | null>(null);
+  const [selectedLocations, setSelectedLocations] = useState<any[]>([]);
+
+  const [currentViewYear, setCurrentViewYear] = useState<number>(
+    new Date().getFullYear()
+  );
   const [classSessionEvents, setClassSessionEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -36,12 +45,6 @@ const CalendarContent: React.FC = () => {
   const [strongestRole, setStrongestRole] = useState<string | null>(null);
   const [parentNbOfRooms, setParentNbOfRooms] = useState<number>(0);
   const { userId, userRoles } = useAuth();
-  const {
-    selectedFranchise,
-    setSelectedFranchise,
-    selectedLocations,
-    setSelectedLocations
-  } = useHeaderMenu();
 
   useEffect(() => {
     if (userRoles) {
@@ -49,16 +52,16 @@ const CalendarContent: React.FC = () => {
       const role = roles.includes('SuperAdmin')
         ? 'SuperAdmin'
         : roles.includes('FranchiseAdmin')
-          ? 'FranchiseAdmin'
-          : roles.includes('LocationAdmin')
-            ? 'LocationAdmin'
-            : roles.includes('Teacher')
-              ? 'Teacher'
-              : roles.includes('Parent')
-                ? 'Parent'
-                : roles.includes('Student')
-                  ? 'Student'
-                  : null;
+        ? 'FranchiseAdmin'
+        : roles.includes('LocationAdmin')
+        ? 'LocationAdmin'
+        : roles.includes('Teacher')
+        ? 'Teacher'
+        : roles.includes('Parent')
+        ? 'Parent'
+        : roles.includes('Student')
+        ? 'Student'
+        : null;
       setStrongestRole(role);
     }
   }, [userRoles]);
@@ -95,8 +98,6 @@ const CalendarContent: React.FC = () => {
       calendarsharedService.off('absenceUpdated', onAbsenceUpdated);
     };
   }, []);
-
-
 
   const transformClassSessionsToEvents = (
     classSessions: any[]
@@ -227,13 +228,21 @@ const CalendarContent: React.FC = () => {
       const targetYear = year || new Date().getFullYear();
 
       // Function to check if stored data is valid and for the correct year
-      const isValidStoredData = (storedData: string | null, locationIds: number[], year: number) => {
+      const isValidStoredData = (
+        storedData: string | null,
+        locationIds: number[],
+        year: number
+      ) => {
         if (!storedData) return false;
         try {
           const parsed = JSON.parse(storedData);
-          const storedLocationIds = [...new Set(parsed.map((day: Holiday) => day.locationId))];
+          const storedLocationIds = [
+            ...new Set(parsed.map((day: Holiday) => day.locationId))
+          ];
           const requestedLocationIds = [...new Set(locationIds)];
-          const hasCorrectLocations = JSON.stringify(storedLocationIds.sort()) === JSON.stringify(requestedLocationIds.sort());
+          const hasCorrectLocations =
+            JSON.stringify(storedLocationIds.sort()) ===
+            JSON.stringify(requestedLocationIds.sort());
 
           // Check if data contains dates from the target year
           const hasYearData = parsed.some((day: Holiday) => {
@@ -251,15 +260,23 @@ const CalendarContent: React.FC = () => {
       const storedHolidays = localStorage.getItem(HOLIDAYS_STORAGE_KEY);
       const storedClosingDays = localStorage.getItem(CLOSING_DAYS_STORAGE_KEY);
 
-      if (!isValidStoredData(storedHolidays, locationIds, targetYear) ||
-        !isValidStoredData(storedClosingDays, locationIds, targetYear)) {
+      if (
+        !isValidStoredData(storedHolidays, locationIds, targetYear) ||
+        !isValidStoredData(storedClosingDays, locationIds, targetYear)
+      ) {
         const [holidaysResponse, closingDaysResponse] = await Promise.all([
           fetchHolidaysByLocationIds(locationIds, targetYear),
           fetchClosingDaysByLocationIds(locationIds, targetYear)
         ]);
 
-        localStorage.setItem(HOLIDAYS_STORAGE_KEY, JSON.stringify(holidaysResponse.data));
-        localStorage.setItem(CLOSING_DAYS_STORAGE_KEY, JSON.stringify(closingDaysResponse.data));
+        localStorage.setItem(
+          HOLIDAYS_STORAGE_KEY,
+          JSON.stringify(holidaysResponse.data)
+        );
+        localStorage.setItem(
+          CLOSING_DAYS_STORAGE_KEY,
+          JSON.stringify(closingDaysResponse.data)
+        );
 
         setHolidays(holidaysResponse.data);
         setClosingDays(closingDaysResponse.data);
@@ -286,15 +303,14 @@ const CalendarContent: React.FC = () => {
     };
   }, []);
 
-  // useEffect(() => {
-  //   if (
-  //     strongestRole &&
-  //     (strongestRole !== 'SuperAdmin' || selectedLocations.length > 0)
-  //   ) {
-  //     console.log(date)
-  //     loadClassSessions();
-  //   }
-  // }, [date, selectedFranchise, selectedLocations, strongestRole]);
+  useEffect(() => {
+    if (
+      strongestRole &&
+      (strongestRole !== 'SuperAdmin' || selectedLocations.length > 0)
+    ) {
+      loadClassSessions();
+    }
+  }, [date, selectedFranchise, selectedLocations, strongestRole]);
 
   useEffect(() => {
     if (
@@ -306,9 +322,13 @@ const CalendarContent: React.FC = () => {
   }, [selectedFranchise, selectedLocations, strongestRole]);
 
   useEffect(() => {
-    if (strongestRole && (strongestRole !== 'SuperAdmin' || selectedLocations.length > 0)) {
+    if (
+      strongestRole &&
+      (strongestRole !== 'SuperAdmin' || selectedLocations.length > 0)
+    ) {
       const VIEW_STORAGE_KEY = 'calendarViewPreference';
-      const initialView = localStorage.getItem(VIEW_STORAGE_KEY) || 'resourceTimelineDay';
+      const initialView =
+        localStorage.getItem(VIEW_STORAGE_KEY) || 'resourceTimelineDay';
 
       if (initialView === 'listWeek') {
         const weekStart = moment(date).startOf('isoWeek');
@@ -331,25 +351,39 @@ const CalendarContent: React.FC = () => {
     checkAndUpdateYear(endDate);
 
     try {
-      const locationIds = selectedLocations.map(location => location.id);
+      const locationIds = selectedLocations.map((location) => location.id);
       let response;
 
       switch (strongestRole) {
         case 'Teacher':
         case 'Student':
-          response = await fetchUserClassSessions(userId?.toString() || '', startDate, endDate);
-          setClassSessionEvents(transformClassSessionsToEvents(response.sessionInstances));
+          response = await fetchUserClassSessions(
+            userId?.toString() || '',
+            startDate,
+            endDate
+          );
+          setClassSessionEvents(
+            transformClassSessionsToEvents(response.sessionInstances)
+          );
           break;
         case 'Parent':
-          response = await fetchParentClassSessions(userId?.toString() || '', startDate, endDate);
-          setClassSessionEvents(transformClassSessionsToEvents(response.sessionInstances));
+          response = await fetchParentClassSessions(
+            userId?.toString() || '',
+            startDate,
+            endDate
+          );
+          setClassSessionEvents(
+            transformClassSessionsToEvents(response.sessionInstances)
+          );
           break;
         case 'SuperAdmin':
         case 'FranchiseAdmin':
         case 'LocationAdmin':
           if (locationIds.length === 0) return;
           response = await fetchClassSessions(startDate, endDate, locationIds);
-          setClassSessionEvents(transformClassSessionsToEvents(response.sessionInstances));
+          setClassSessionEvents(
+            transformClassSessionsToEvents(response.sessionInstances)
+          );
           break;
       }
     } catch (error) {
@@ -375,9 +409,53 @@ const CalendarContent: React.FC = () => {
     }
   };
 
+  const handleFranchiseChange = (franchise: any) => {
+    setSelectedFranchise(franchise);
+    setSelectedLocations([]);
+    setClassSessionEvents([]);
+    if (franchise) {
+      localStorage.setItem('selectedFranchise', JSON.stringify(franchise));
+    } else {
+      localStorage.removeItem('selectedFranchise');
+      localStorage.removeItem('selectedLocations');
+    }
+  };
+
+  const handleLocationsChange = (locations: any[]) => {
+    setSelectedLocations(locations);
+    setClassSessionEvents([]);
+    if (locations.length > 0) {
+      localStorage.setItem('selectedLocations', JSON.stringify(locations));
+      fetchSpecialDays(locations);
+    } else {
+      localStorage.removeItem('selectedLocations');
+      setHolidays([]);
+      setClosingDays([]);
+    }
+  };
+
   return (
-    <Box sx={{ position: 'relative', height: '100%' }}>
-      <Box sx={{ position: 'relative', overflow: 'hidden' }}>
+    <Box>
+      <Box>
+        {['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin'].includes(
+          strongestRole || ''
+        ) && (
+          <FilterToolbar
+            onFranchiseChange={handleFranchiseChange}
+            onLocationsChange={handleLocationsChange}
+            selectedFranchise={selectedFranchise}
+            selectedLocations={selectedLocations}
+          />
+        )}
+        {selectedLocations.length === 0 &&
+          strongestRole !== 'Teacher' &&
+          strongestRole !== 'Student' &&
+          strongestRole !== 'Parent' && (
+            <Typography variant="h6" color="white" sx={{ ml: 2 }}>
+              Please enter a franchise and select locations to view the
+              calendar.
+            </Typography>
+          )}
         <CustomizedCalendar
           classSessionEvents={classSessionEvents}
           onDateChange={handleDateChange} // Use the new handler instead of setDate directly
@@ -388,29 +466,6 @@ const CalendarContent: React.FC = () => {
           parentNumberOfRooms={parentNbOfRooms}
           onDateRangeChange={handleDateRangeChange}
         />
-        {selectedLocations.length === 0 &&
-          strongestRole !== 'Teacher' &&
-          strongestRole !== 'Student' &&
-          strongestRole !== 'Parent' && (
-            <Box
-              sx={{
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                width: '100%',
-                backgroundColor: 'rgba(0, 0, 0, 0.5)',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center',
-                zIndex: 1000
-              }}
-            >
-              <Typography variant="h6" color="white">
-                Please enter a franchise and select locations to view the
-                calendar.
-              </Typography>
-            </Box>
-          )}
       </Box>
     </Box>
   );

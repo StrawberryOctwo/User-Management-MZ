@@ -1,5 +1,11 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Box, ClickAwayListener, Paper, Popper, Typography } from '@mui/material';
+import {
+  Box,
+  ClickAwayListener,
+  Paper,
+  Popper,
+  Typography
+} from '@mui/material';
 import moment from 'moment';
 import { Views } from 'react-big-calendar';
 import './index.css';
@@ -86,7 +92,8 @@ export default function CustomizedCalendar({
   const [events, setEvents] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEventTypeModalOpen, setIsEventTypeModalOpen] = useState(false);
-  const [isSmartScheduleModalOpen, setIsSmartScheduleModalOpen] = useState(false);
+  const [isSmartScheduleModalOpen, setIsSmartScheduleModalOpen] =
+    useState(false);
   const [isToDoModalOpen, setIsToDoModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState('');
   const [selectedSessionDetails, setSelectedSessionDetails] =
@@ -145,7 +152,8 @@ export default function CustomizedCalendar({
 
   const calendarKey = useMemo(
     () =>
-      `calendar-${holidays.length}-${closingDays.length
+      `calendar-${holidays.length}-${
+        closingDays.length
       }-${selectedDate.toISOString()}-${selectedLocations.length}`,
     [
       holidays.length,
@@ -162,9 +170,9 @@ export default function CustomizedCalendar({
       strongestRoles[0] === 'Parent'
         ? parentNumberOfRooms
         : selectedLocations.reduce(
-          (max, location) => Math.max(max, location.numberOfRooms || 0),
-          0
-        );
+            (max, location) => Math.max(max, location.numberOfRooms || 0),
+            0
+          );
 
     const unsortedResources = Array.from({ length: maxRooms }, (_, index) => ({
       id: `R${index + 1}`,
@@ -181,7 +189,8 @@ export default function CustomizedCalendar({
     if (classSessionEvents.length) {
       const totalSessions = classSessionEvents.length;
       const totalStudents = classSessionEvents.reduce(
-        (sum, session) => sum + (session.data?.appointment?.students?.length || 0),
+        (sum, session) =>
+          sum + (session.data?.appointment?.students?.length || 0),
         0
       );
       const totalTeachers = new Set(
@@ -192,8 +201,12 @@ export default function CustomizedCalendar({
     }
     const mappedEvents = classSessionEvents.map((session) => {
       // Get fresh data from localStorage for each event mapping
-      const storedHolidays = JSON.parse(localStorage.getItem(HOLIDAYS_STORAGE_KEY) || '[]');
-      const storedClosingDays = JSON.parse(localStorage.getItem(CLOSING_DAYS_STORAGE_KEY) || '[]');
+      const storedHolidays = JSON.parse(
+        localStorage.getItem(HOLIDAYS_STORAGE_KEY) || '[]'
+      );
+      const storedClosingDays = JSON.parse(
+        localStorage.getItem(CLOSING_DAYS_STORAGE_KEY) || '[]'
+      );
 
       const [firstName, lastName] = session.data.appointment.teacher.split(' ');
       const formattedTeacher = `${firstName[0]}. ${lastName}`;
@@ -225,7 +238,11 @@ export default function CustomizedCalendar({
     });
 
     setEvents(mappedEvents);
-  }, [classSessionEvents, localStorage.getItem('calendarHolidays'), localStorage.getItem('calendarClosingDays')]);
+  }, [
+    classSessionEvents,
+    localStorage.getItem('calendarHolidays'),
+    localStorage.getItem('calendarClosingDays')
+  ]);
 
   const getDateStatus = (date: Date) => {
     const dateStr = moment(date).format('YYYY-MM-DD');
@@ -400,12 +417,18 @@ export default function CustomizedCalendar({
   const checkOverlap = (currentSession: any, allSessions: any[]) => {
     const currentTeacher = currentSession.data.appointment.teacher;
     const currentDate = currentSession.data.appointment.date;
-    const currentStart = new Date(`${currentDate}T${currentSession.data.appointment.startTime}`);
-    const currentEnd = new Date(`${currentDate}T${currentSession.data.appointment.endTime}`);
+    const currentStart = new Date(
+      `${currentDate}T${currentSession.data.appointment.startTime}`
+    );
+    const currentEnd = new Date(
+      `${currentDate}T${currentSession.data.appointment.endTime}`
+    );
 
     return allSessions.some((otherSession) => {
       // Skip comparing with itself
-      if (otherSession.data.appointment.id === currentSession.data.appointment.id) {
+      if (
+        otherSession.data.appointment.id === currentSession.data.appointment.id
+      ) {
         return false;
       }
 
@@ -414,12 +437,16 @@ export default function CustomizedCalendar({
 
       // First check if same teacher and same day
       if (currentTeacher === otherTeacher && currentDate === otherDate) {
-        const otherStart = new Date(`${otherDate}T${otherSession.data.appointment.startTime}`);
-        const otherEnd = new Date(`${otherDate}T${otherSession.data.appointment.endTime}`);
+        const otherStart = new Date(
+          `${otherDate}T${otherSession.data.appointment.startTime}`
+        );
+        const otherEnd = new Date(
+          `${otherDate}T${otherSession.data.appointment.endTime}`
+        );
 
         // Then check for time overlap
         return (
-          (currentStart < otherEnd && currentEnd > otherStart) // General overlap check
+          currentStart < otherEnd && currentEnd > otherStart // General overlap check
         );
       }
 
@@ -525,20 +552,22 @@ export default function CustomizedCalendar({
 
   const handleViewChange = (viewInfo: any) => {
     if (!mounted.current) return;
-  
+
     const currentView = viewInfo.view.type;
     saveViewPreference(currentView);
-  
+
     // Skip if view change was triggered by view button
     if (isViewButtonClick.current) return;
-  
+
     const targetDate = viewInfo.view.currentStart;
     if (currentView === 'listWeek') {
       // Only update if we're not already on this week
       const weekStart = moment(targetDate).startOf('isoWeek');
       const weekEnd = moment(targetDate).endOf('isoWeek');
-      const currentStart = moment(selectedDate).startOf('isoWeek').format('YYYY-MM-DD');
-      
+      const currentStart = moment(selectedDate)
+        .startOf('isoWeek')
+        .format('YYYY-MM-DD');
+
       if (weekStart.format('YYYY-MM-DD') !== currentStart) {
         onDateRangeChange(
           weekStart.format('YYYY-MM-DD'),
@@ -554,7 +583,7 @@ export default function CustomizedCalendar({
       }
     }
   };
-  
+
   // Update custom buttons to handle view changes more simply
   const customButtons = {
     ...calendarHelpers.getCustomButtons(
@@ -568,18 +597,18 @@ export default function CustomizedCalendar({
       click: () => {
         const calendarApi = calendarRef.current?.getApi();
         if (!calendarApi) return;
-  
+
         const currentView = calendarApi.view.type;
         const newView =
           currentView === 'resourceTimelineDay'
             ? 'listWeek'
             : 'resourceTimelineDay';
-  
+
         isViewButtonClick.current = true;
         saveViewPreference(newView);
-        
+
         const currentDate = calendarApi.getDate();
-        
+
         // Update view and text first
         calendarApi.changeView(newView);
         const viewButton = document.querySelector('.fc-view-button');
@@ -587,12 +616,12 @@ export default function CustomizedCalendar({
           viewButton.textContent =
             newView === 'resourceTimelineDay' ? 'list' : 'day';
         }
-  
+
         // Then handle date changes
         if (newView === 'listWeek') {
           const weekStart = moment(currentDate).startOf('isoWeek');
           const weekEnd = moment(currentDate).endOf('isoWeek');
-          
+
           calendarApi.gotoDate(weekStart.toDate());
           onDateRangeChange(
             weekStart.format('YYYY-MM-DD'),
@@ -602,7 +631,7 @@ export default function CustomizedCalendar({
           calendarApi.gotoDate(currentDate);
           onDateChange(moment(currentDate).format('YYYY-MM-DD'));
         }
-  
+
         setTimeout(() => {
           isViewButtonClick.current = false;
         }, 0);
@@ -612,21 +641,21 @@ export default function CustomizedCalendar({
 
   return (
     <Box display="flex" flexDirection="column" height="100%" width="100%">
-            {/* Summary Section */}
-            <Box
+      {/* Summary Section */}
+      <Box
         sx={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "16px",
-          backgroundColor: "background.paper",
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+          padding: '16px',
+          backgroundColor: 'background.paper',
           boxShadow: 1,
           borderRadius: 2,
           mb: 2
         }}
       >
-        <Typography variant="h6">{("Class Sessions Overview")}</Typography>
-        <Box sx={{ display: "flex", gap: 3 }}>
+        <Typography variant="h6">{'Class Sessions Overview'}</Typography>
+        <Box sx={{ display: 'flex', gap: 3 }}>
           <Typography>Total Sessions: {totals.totalSessions}</Typography>
           <Typography>Total Students: {totals.totalStudents}</Typography>
           <Typography>Total Teachers: {totals.totalTeachers}</Typography>
@@ -671,7 +700,7 @@ export default function CustomizedCalendar({
           eventDidMount={(info) => {
             if (info.view.type === 'listWeek') {
               const eventEl = info.el;
-              console.log(info.event.extendedProps)
+              console.log(info.event.extendedProps);
               if (info.event.extendedProps.hasOverlap) {
                 eventEl.style.borderLeft = '3px solid red';
               }
@@ -708,26 +737,24 @@ export default function CustomizedCalendar({
           weekNumberCalculation="ISO"
           fixedWeekCount={false}
         />
-      <Box
-        sx={{
-          position: "absolute",
-          bottom: 45, 
-          right: 20, 
-          zIndex: 1000,
+        <Box
+          sx={{
+            position: 'absolute',
+            bottom: 45,
+            right: 20,
+            zIndex: 1000,
 
-          padding: 1,
-        }}
-      >
-        <CalendarLegendWithInfo />
-      </Box>
+            padding: 1
+          }}
+        >
+          <CalendarLegendWithInfo />
+        </Box>
       </div>
 
       <SmartScheduleModal
         isOpen={isSmartScheduleModalOpen}
         onClose={handleCloseSmartScheduleModal}
-
       />
-
 
       <EventTypeSelectionModal
         isOpen={isEventTypeModalOpen}
