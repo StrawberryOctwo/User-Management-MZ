@@ -253,7 +253,7 @@ const AddSessionReportForm: React.FC<AddSessionReportFormProps> = ({
     worksIndependently: 'no',
     cooperation: 'no',
     previousHomeworkCompleted: 'no',
-    nextHomework: 'worksheets',
+    nextHomework: '',
     tutorRemarks: '',
     participationNotes: '',
     concentrationNotes: '',
@@ -267,9 +267,9 @@ const AddSessionReportForm: React.FC<AddSessionReportFormProps> = ({
 
   const handleChange =
     (field: string) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setFormData((prev) => ({ ...prev, [field]: e.target.value }));
-    };
+      (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setFormData((prev) => ({ ...prev, [field]: e.target.value }));
+      };
 
   const handleNext = () => {
     setActiveStep((prevStep) => prevStep + 1);

@@ -263,6 +263,8 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     setConfirmOpen(false);
   };
 
+  console.log('isSubmittingReports', isSubmittingReports);
+
   return (
     <Dialog
       open={isOpen}
@@ -506,7 +508,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                     onClose={handleCloseReportForm}
                     reportId={selectedReportId}
                     onDelete={handleDeleteReportForm}
-                    isEditable={true}
+                    isEditable={!allReportsCompleted}
                   />
                 )}
 
@@ -592,9 +594,8 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       </ReusableDialog>
       <ReusableDialog
         open={deactivateDialogOpen}
-        title={`Confirm ${
-          classSession?.isActive ? 'Deactivation' : 'Reactivation'
-        }`}
+        title={`Confirm ${classSession?.isActive ? 'Deactivation' : 'Reactivation'
+          }`}
         onClose={() => setDeactivateDialogOpen(false)}
         actions={
           <>
