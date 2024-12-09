@@ -286,15 +286,15 @@ const CalendarContent: React.FC = () => {
     };
   }, []);
 
-  useEffect(() => {
-    if (
-      strongestRole &&
-      (strongestRole !== 'SuperAdmin' || selectedLocations.length > 0)
-    ) {
-      console.log(date)
-      loadClassSessions();
-    }
-  }, [date, selectedFranchise, selectedLocations, strongestRole]);
+  // useEffect(() => {
+  //   if (
+  //     strongestRole &&
+  //     (strongestRole !== 'SuperAdmin' || selectedLocations.length > 0)
+  //   ) {
+  //     console.log(date)
+  //     loadClassSessions();
+  //   }
+  // }, [date, selectedFranchise, selectedLocations, strongestRole]);
 
   useEffect(() => {
     if (
@@ -305,13 +305,31 @@ const CalendarContent: React.FC = () => {
     }
   }, [selectedFranchise, selectedLocations, strongestRole]);
 
+  useEffect(() => {
+    if (strongestRole && (strongestRole !== 'SuperAdmin' || selectedLocations.length > 0)) {
+      const VIEW_STORAGE_KEY = 'calendarViewPreference';
+      const initialView = localStorage.getItem(VIEW_STORAGE_KEY) || 'resourceTimelineDay';
+
+      if (initialView === 'listWeek') {
+        const weekStart = moment(date).startOf('isoWeek');
+        const weekEnd = moment(date).endOf('isoWeek');
+        handleDateRangeChange(
+          weekStart.format('YYYY-MM-DD'),
+          weekEnd.format('YYYY-MM-DD')
+        );
+      } else {
+        loadClassSessions();
+      }
+    }
+  }, [date, strongestRole, selectedLocations]);
+
   const handleDateRangeChange = async (startDate: string, endDate: string) => {
     setLoading(true);
     setErrorMessage(null);
 
     checkAndUpdateYear(startDate);
     checkAndUpdateYear(endDate);
-    
+
     try {
       const locationIds = selectedLocations.map(location => location.id);
       let response;

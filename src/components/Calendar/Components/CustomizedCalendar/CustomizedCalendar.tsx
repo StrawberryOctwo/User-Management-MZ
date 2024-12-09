@@ -502,20 +502,20 @@ export default function CustomizedCalendar({
 
   const handleViewChange = (viewInfo: any) => {
     if (!mounted.current) return;
-
+  
     const currentView = viewInfo.view.type;
     saveViewPreference(currentView);
-
+  
     // Skip if view change was triggered by view button
     if (isViewButtonClick.current) return;
-
+  
     const targetDate = viewInfo.view.currentStart;
     if (currentView === 'listWeek') {
       // Only update if we're not already on this week
       const weekStart = moment(targetDate).startOf('isoWeek');
       const weekEnd = moment(targetDate).endOf('isoWeek');
       const currentStart = moment(selectedDate).startOf('isoWeek').format('YYYY-MM-DD');
-
+      
       if (weekStart.format('YYYY-MM-DD') !== currentStart) {
         onDateRangeChange(
           weekStart.format('YYYY-MM-DD'),
@@ -531,7 +531,7 @@ export default function CustomizedCalendar({
       }
     }
   };
-
+  
   // Update custom buttons to handle view changes more simply
   const customButtons = {
     ...calendarHelpers.getCustomButtons(
@@ -544,18 +544,18 @@ export default function CustomizedCalendar({
       click: () => {
         const calendarApi = calendarRef.current?.getApi();
         if (!calendarApi) return;
-
+  
         const currentView = calendarApi.view.type;
         const newView =
           currentView === 'resourceTimelineDay'
             ? 'listWeek'
             : 'resourceTimelineDay';
-
+  
         isViewButtonClick.current = true;
         saveViewPreference(newView);
-
+        
         const currentDate = calendarApi.getDate();
-
+        
         // Update view and text first
         calendarApi.changeView(newView);
         const viewButton = document.querySelector('.fc-view-button');
@@ -563,12 +563,12 @@ export default function CustomizedCalendar({
           viewButton.textContent =
             newView === 'resourceTimelineDay' ? 'list' : 'day';
         }
-
+  
         // Then handle date changes
         if (newView === 'listWeek') {
           const weekStart = moment(currentDate).startOf('isoWeek');
           const weekEnd = moment(currentDate).endOf('isoWeek');
-
+          
           calendarApi.gotoDate(weekStart.toDate());
           onDateRangeChange(
             weekStart.format('YYYY-MM-DD'),
@@ -578,7 +578,7 @@ export default function CustomizedCalendar({
           calendarApi.gotoDate(currentDate);
           onDateChange(moment(currentDate).format('YYYY-MM-DD'));
         }
-
+  
         setTimeout(() => {
           isViewButtonClick.current = false;
         }, 0);
