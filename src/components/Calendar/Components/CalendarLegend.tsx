@@ -1,59 +1,73 @@
 import { Box, Typography } from "@mui/material";
 
-const CalendarLegend = () => (
-  <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap' }}>
-    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-      <Box sx={{ width: 20, height: 20, backgroundColor: '#5569ff', marginRight: 1 }} />
-      <Typography variant="body2">Online Session</Typography>
-    </Box>
-    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-      <Box sx={{ width: 20, height: 20, backgroundColor: '#ffa319', marginRight: 1 }} />
-      <Typography variant="body2">Group Session</Typography>
-    </Box>
-    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-      <Box sx={{ width: 20, height: 20, backgroundColor: '#4caf50', marginRight: 1 }} />
-      <Typography variant="body2">Individual Session</Typography>
-    </Box>
-    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-      <Box sx={{ width: 20, height: 20, backgroundColor: '#ff6347', marginRight: 1 }} />
-      <Typography variant="body2">Intensive Individual Session</Typography>
-    </Box>
-    <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-      <Box sx={{ width: 20, height: 20, backgroundColor: '#fff4e4', marginRight: 1 }} />
-      <Typography variant="body2">Holiday</Typography>
-    </Box>
-
-    <Box sx={{ mt: 2, display: 'flex', justifyContent: 'space-around', flexWrap: 'wrap' }}>
-      <Box sx={{ display: 'flex', alignItems: 'center', mb: 1 }}>
-        <Box
-          sx={{
-            width: 20,
-            height: 20,
+const LegendItem = ({ color, label, isDeactivated = false }) => (
+  <Box sx={{ display: 'flex', alignItems: 'center', mb: 1, mr: 2 }}>
+    <Box
+      sx={{
+        width: 16,
+        height: 16,
+        marginRight: 1,
+        ...(isDeactivated
+          ? {
             backgroundColor: '#fff',
             border: '1px solid #e0e0e0',
-            marginRight: 1,
             background: `
-           linear-gradient(
-             to top left,
-             rgba(255, 0, 0, 0) 0%,
-             rgba(255, 0, 0, 0) calc(50% - 0.8px),
-             rgba(255, 0, 0, 1) 50%,
-             rgba(255, 0, 0, 0) calc(50% + 0.8px),
-             rgba(255, 0, 0, 0) 100%
-           ),
-           linear-gradient(
-             to top right,
-             rgba(255, 0, 0, 0) 0%,
-             rgba(255, 0, 0, 0) calc(50% - 0.8px),
-             rgba(255, 0, 0, 1) 50%,
-             rgba(255, 0, 0, 0) calc(50% + 0.8px),
-             rgba(255, 0, 0, 0) 100%
-           )`
-          }}
-        />
-        <Typography variant="body2">Deactivated Session</Typography>
-      </Box>
-    </Box>
+                linear-gradient(
+                  to top left,
+                  rgba(255, 0, 0, 0) 0%,
+                  rgba(255, 0, 0, 0) calc(50% - 0.8px),
+                  rgba(255, 0, 0, 1) 50%,
+                  rgba(255, 0, 0, 0) calc(50% + 0.8px),
+                  rgba(255, 0, 0, 0) 100%
+                ),
+                linear-gradient(
+                  to top right,
+                  rgba(255, 0, 0, 0) 0%,
+                  rgba(255, 0, 0, 0) calc(50% - 0.8px),
+                  rgba(255, 0, 0, 1) 50%,
+                  rgba(255, 0, 0, 0) calc(50% + 0.8px),
+                  rgba(255, 0, 0, 0) 100%
+                )`
+          }
+          : {
+            backgroundColor: color
+          })
+      }}
+    />
+    <Typography variant="caption" sx={{ fontSize: '0.75rem', whiteSpace: 'nowrap' }}>
+      {label}
+    </Typography>
+  </Box>
+);
+
+const CalendarLegend = () => (
+  <Box
+    sx={{
+      backgroundColor: 'rgba(255, 255, 255, 0.9)',
+      borderRadius: 1,
+      padding: 1,
+      border: '1px solid #e0e0e0',
+      display: 'grid',
+      gridTemplateColumns: 'repeat(2, auto)',
+      gap: '4px 16px',
+      maxWidth: 'fit-content'
+    }}
+  >
+    {[
+      { color: '#5569ff', label: 'Online Session' },
+      { color: '#ffa319', label: 'Group Session' },
+      { color: '#4caf50', label: 'Individual Session' },
+      { color: '#ff6347', label: 'Intensive Individual' },
+      { color: '#fff4e4', label: 'Holiday' },
+      { color: '', label: 'Deactivated Session', isDeactivated: true }
+    ].map((item, index) => (
+      <LegendItem
+        key={index}
+        color={item.color}
+        label={item.label}
+        isDeactivated={item.isDeactivated}
+      />
+    ))}
   </Box>
 );
 
