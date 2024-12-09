@@ -18,6 +18,7 @@ const ViewInterest: React.FC = () => {
   const [updating, setUpdating] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const { t } = useTranslation();
+
   const loadInterest = async () => {
     setLoading(true);
     setErrorMessage(null);
@@ -25,6 +26,7 @@ const ViewInterest: React.FC = () => {
     try {
       const interestData = await fetchInterestById(Number(id));
       interestData.data.location = interestData.data.location.name;
+      console.log(interestData.data);
       setInterest(interestData);
     } catch (error: any) {
       console.error('Failed to fetch interest:', error);
@@ -44,7 +46,7 @@ const ViewInterest: React.FC = () => {
         ...interest,
         data: {
           ...interest.data,
-          accepted: updatedInterest.data.accepted ? 'yes' : 'no'
+          accepted: updatedInterest.data.accepted // Keep it as boolean
         }
       });
     } catch (error) {
@@ -148,17 +150,7 @@ const ViewInterest: React.FC = () => {
       name: 'accepted',
       label: t('accepted'),
       section: t('interest_details'),
-      component: (
-        <Chip
-          label={
-            interest?.data.accepted === 'yes'
-              ? t('accepted')
-              : t('not_accepted')
-          }
-          color={interest?.data.accepted === 'yes' ? 'success' : 'default'}
-          sx={{ fontSize: '14px', fontWeight: 'bold' }}
-        />
-      )
+      render: () => interest?.data?.accepted ? "yes" : "no", 
     },
     {
       name: 'fundingOption',
@@ -203,19 +195,19 @@ const ViewInterest: React.FC = () => {
           <ReusableDetails
             fields={Fields}
             data={transformedData}
-            entityName={`${interest.data.firstName} ${interest.data.lastName}`}
+            entityName={`${interest.data.firstName} ${interest.data.lastName}`} // Correct template literal
           />
           <Box textAlign="center">
             <Button
               variant="contained"
-              color={interest.data.accepted === 'yes' ? 'error' : 'primary'}
+              color={interest.data.accepted ? 'error' : 'primary'} // Boolean check
               onClick={handleToggleAccepted}
               disabled={updating}
               sx={{ textTransform: 'capitalize', fontSize: '16px', px: 4 }}
             >
               {updating
                 ? t('processing')
-                : interest.data.accepted === 'yes'
+                : interest.data.accepted
                 ? t('decline_user')
                 : t('accept_user')}
             </Button>
