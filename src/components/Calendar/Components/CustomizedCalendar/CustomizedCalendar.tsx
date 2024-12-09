@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Box, ClickAwayListener, Paper, Popper } from '@mui/material';
+import { Box, ClickAwayListener, Paper, Popper, Typography } from '@mui/material';
 import moment from 'moment';
 import { Views } from 'react-big-calendar';
 import './index.css';
@@ -33,6 +33,7 @@ import CalendarLegend from '../CalendarLegend';
 import listPlugin from '@fullcalendar/list';
 import { Holiday } from 'src/services/specialDaysService';
 import { CALENDAR_TIME_CONSTANTS } from '../../types/calendarHelpers';
+import CalendarLegendWithInfo from '../CalendarLegend';
 
 export enum TimeSlotMinutes {
   Five = 5,
@@ -66,7 +67,11 @@ export default function CustomizedCalendar({
 }: DemoProps) {
   const HOLIDAYS_STORAGE_KEY = 'calendarHolidays';
   const CLOSING_DAYS_STORAGE_KEY = 'calendarClosingDays';
-
+  const [totals, setTotals] = useState({
+    totalSessions: 0,
+    totalStudents: 0,
+    totalTeachers: 0
+  });
   const [selectedAppointment, setSelectedAppointment] = useState<any>(null);
   const [selectedClassSessionId, setSelectedClassSession] = useState<any>(null);
   const [isModalOpen, setModalOpen] = useState(false);
@@ -171,7 +176,18 @@ export default function CustomizedCalendar({
   useEffect(() => {
     const HOLIDAYS_STORAGE_KEY = 'calendarHolidays';
     const CLOSING_DAYS_STORAGE_KEY = 'calendarClosingDays';
+    if (classSessionEvents.length) {
+      const totalSessions = classSessionEvents.length;
+      const totalStudents = classSessionEvents.reduce(
+        (sum, session) => sum + (session.data?.appointment?.students?.length || 0),
+        0
+      );
+      const totalTeachers = new Set(
+        classSessionEvents.map((session) => session.data?.appointment?.teacher)
+      ).size;
 
+      setTotals({ totalSessions, totalStudents, totalTeachers });
+    }
     const mappedEvents = classSessionEvents.map((session) => {
       // Get fresh data from localStorage for each event mapping
       const storedHolidays = JSON.parse(localStorage.getItem(HOLIDAYS_STORAGE_KEY) || '[]');
@@ -588,6 +604,26 @@ export default function CustomizedCalendar({
 
   return (
     <Box display="flex" flexDirection="column" height="100%" width="100%">
+            {/* Summary Section */}
+            <Box
+        sx={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "16px",
+          backgroundColor: "background.paper",
+          boxShadow: 1,
+          borderRadius: 2,
+          mb: 2
+        }}
+      >
+        <Typography variant="h6">{("Class Sessions Overview")}</Typography>
+        <Box sx={{ display: "flex", gap: 3 }}>
+          <Typography>Total Sessions: {totals.totalSessions}</Typography>
+          <Typography>Total Students: {totals.totalStudents}</Typography>
+          <Typography>Total Teachers: {totals.totalTeachers}</Typography>
+        </Box>
+      </Box>
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <ClickAwayListener
           onClickAway={handleClickAway}
@@ -664,14 +700,18 @@ export default function CustomizedCalendar({
           weekNumberCalculation="ISO"
           fixedWeekCount={false}
         />
-        <Box sx={{
-          display: 'flex',
-          justifyContent: 'flex-end',
-          padding: 2,
-          marginTop: 'auto'
-        }}>
-          <CalendarLegend />
-        </Box>
+      <Box
+        sx={{
+          position: "absolute",
+          bottom: 45, 
+          right: 20, 
+          zIndex: 1000,
+
+          padding: 1,
+        }}
+      >
+        <CalendarLegendWithInfo />
+      </Box>
       </div>
 
       <EventTypeSelectionModal

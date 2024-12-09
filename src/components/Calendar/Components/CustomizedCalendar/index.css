@@ -99,7 +99,7 @@
 
 .fc-scroller {
   overflow-y: auto;
-  overflow-x: auto;
+  overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: #b0b0b0 #f0f0f0;
 }
@@ -150,7 +150,9 @@
 .fc-timeline-now-indicator-container {
   position: relative;
 }
-
+.fc-resource:last-child {
+  flex: 0; /* This could cause the last resource to stretch */
+}
 .fc-resource-area .fc-cell-text {
   font-size: 1.1rem;
   font-weight: 600;
