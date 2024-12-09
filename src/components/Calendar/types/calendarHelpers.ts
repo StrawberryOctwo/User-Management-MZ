@@ -28,6 +28,7 @@ export interface CalendarHelpers {
   getCustomButtons: (
     handleDatePickerClick: (event: MouseEvent) => void,
     handleOpenEventTypeModal: () => void,
+    handleOpenSmartScheduleModal: () => void,
     selectedDate: Date
   ) => {
     datePickerButton: {

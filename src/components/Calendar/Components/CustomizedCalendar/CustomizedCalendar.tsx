@@ -34,6 +34,7 @@ import listPlugin from '@fullcalendar/list';
 import { Holiday } from 'src/services/specialDaysService';
 import { CALENDAR_TIME_CONSTANTS } from '../../types/calendarHelpers';
 import CalendarLegendWithInfo from '../CalendarLegend';
+import SmartScheduleModal from 'src/components/SmartSchedule';
 
 export enum TimeSlotMinutes {
   Five = 5,
@@ -85,6 +86,7 @@ export default function CustomizedCalendar({
   const [events, setEvents] = useState([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEventTypeModalOpen, setIsEventTypeModalOpen] = useState(false);
+  const [isSmartScheduleModalOpen, setIsSmartScheduleModalOpen] = useState(false);
   const [isToDoModalOpen, setIsToDoModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState('');
   const [selectedSessionDetails, setSelectedSessionDetails] =
@@ -450,7 +452,12 @@ export default function CustomizedCalendar({
   const handleOpenEventTypeModal = () => {
     setIsEventTypeModalOpen(true);
   };
-
+  const handleOpenSmartScheduleModal = () => {
+    setIsSmartScheduleModalOpen(true);
+  };
+  const handleCloseSmartScheduleModal = () => {
+    setIsSmartScheduleModalOpen(false);
+  };
   const handleCloseEventTypeModal = () => {
     setIsEventTypeModalOpen(false);
   };
@@ -553,6 +560,7 @@ export default function CustomizedCalendar({
     ...calendarHelpers.getCustomButtons(
       handleDatePickerClick,
       handleOpenEventTypeModal,
+      handleOpenSmartScheduleModal,
       selectedDate
     ),
     view: {
@@ -713,6 +721,13 @@ export default function CustomizedCalendar({
         <CalendarLegendWithInfo />
       </Box>
       </div>
+
+      <SmartScheduleModal
+        isOpen={isSmartScheduleModalOpen}
+        onClose={handleCloseSmartScheduleModal}
+
+      />
+
 
       <EventTypeSelectionModal
         isOpen={isEventTypeModalOpen}
