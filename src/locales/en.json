@@ -321,5 +321,15 @@
   "Owner Name": "Owner Name",
   "Total Employees": "Total Employees",
   "errors.invalidStartTime": "errors.invalidStartTime",
-  "key": "key"
+  "key": "key",
+  "Monthly Fee": "Monthly Fee",
+  "No Monthly Fee": "No Monthly Fee",
+  "One-Time Fee": "One-Time Fee",
+  "No One-Time Fee": "No One-Time Fee",
+  "Session Prices:": "Session Prices:",
+  "Discounts:": "Discounts:",
+  "No Discounts": "No Discounts",
+  "VAT Percentage": "VAT Percentage",
+  "Edit": "Edit",
+  "€": "€"
 }
