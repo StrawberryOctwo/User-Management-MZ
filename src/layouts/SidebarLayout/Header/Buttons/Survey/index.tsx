@@ -20,6 +20,7 @@ import SkipNextIcon from '@mui/icons-material/SkipNext';
 import { getSurveysForSelf } from 'src/services/survey';
 import SurveySubmitDialog from './SurveySubmitDialog';
 import { styled, alpha } from '@mui/material/styles';
+import { useTranslation } from 'react-i18next';
 
 // Define possible survey statuses
 const SURVEY_STATUSES = {
@@ -29,23 +30,7 @@ const SURVEY_STATUSES = {
 };
 
 // Status Icons and Colors Mapping
-const statusConfig = {
-  [SURVEY_STATUSES.PENDING]: {
-    icon: <PollIcon fontSize="small" color="error" />,
-    color: 'error.main',
-    label: '{t("pending")}',
-  },
-  [SURVEY_STATUSES.COMPLETED]: {
-    icon: <CheckCircleIcon fontSize="small" color="success" />,
-    color: 'success.main',
-    label: '{t("completed")}',
-  },
-  [SURVEY_STATUSES.SKIPPED]: {
-    icon: <SkipNextIcon fontSize="small" color="warning" />,
-    color: 'warning.main',
-    label: '{t("skipped")}',
-  },
-};
+
 
 // Styled Badge to show pending survey count
 const PendingBadge = styled(Badge)(({ theme }) => ({
@@ -72,7 +57,25 @@ function SurveyNotifications() {
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
+  const { t } = useTranslation(); 
 
+  const statusConfig = {
+    [SURVEY_STATUSES.PENDING]: {
+      icon: <PollIcon fontSize="small" color="error" />,
+      color: 'error.main',
+      label: t("pending"),
+    },
+    [SURVEY_STATUSES.COMPLETED]: {
+      icon: <CheckCircleIcon fontSize="small" color="success" />,
+      color: 'success.main',
+      label: t("completed"),
+    },
+    [SURVEY_STATUSES.SKIPPED]: {
+      icon: <SkipNextIcon fontSize="small" color="warning" />,
+      color: 'warning.main',
+      label: t("skipped"),
+    },
+  };
   useEffect(() => {
     fetchSurveys(1);
   }, []);

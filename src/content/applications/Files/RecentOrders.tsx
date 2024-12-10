@@ -55,12 +55,12 @@ export default function FileUploadContent() {
     },
     {
       field: 'createdAt',
-      headerName: 'Created At',
+      headerName: t("created_at"),
       render: (value) => new Date(value).toLocaleDateString('de')
     },
     {
       field: 'actions',
-      headerName: 'File {t("actions")}',
+      headerName: t("file_actions"),
       render: (value, row) => <FileActions fileId={row.id} fileName={row.name} /> // Use FileActions here
     }
   ];
