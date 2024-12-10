@@ -25,7 +25,7 @@ export default function ToDoModal({ isOpen, onClose, onSave }: ToDoModalProps) {
                 <TextField
                     autoFocus
                     margin="dense"
-                    label={t("(title")}
+                    label={t("title")}
                     type="text"
                     fullWidth
                     value={title}
