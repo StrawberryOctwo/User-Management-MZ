@@ -43,7 +43,7 @@ const AddToDoForm: React.FC<AddToDoFormProps> = ({ onAdd }) => {
             <Grid container spacing={2}>
                 <Grid item xs={12}>
                     <TextField
-                        label={t("(title")}
+                        label={t("title")}
                         variant="outlined"
                         fullWidth
                         value={title}
