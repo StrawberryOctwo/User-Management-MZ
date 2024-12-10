@@ -38,18 +38,14 @@ export default function TeachersContent() {
         id: teacher.id,
         fullName: `${teacher.firstName} ${teacher.lastName}`.trim(), // Merged full name
         employeeNumber: teacher.employeeNumber,
-        contractStartDate: format(
-          new Date(teacher.contractStartDate),
-          'dd/MM/yyyy'
-        ),
-        contractEndDate: format(
-          new Date(teacher.contractEndDate),
-          'dd/MM/yyyy'
-        ),
-        contractPeriod: `${format(
-          new Date(teacher.contractStartDate),
-          'dd/MM/yyyy'
-        )} - ${format(new Date(teacher.contractEndDate), 'dd/MM/yyyy')}`,
+        contractStartDate: 
+          new Date(teacher.contractStartDate).toLocaleDateString('de'),
+        contractEndDate: 
+          new Date(teacher.contractEndDate).toLocaleDateString('de')
+        ,
+        contractPeriod: `${(
+          new Date(teacher.contractStartDate).toLocaleDateString('de')
+        )} - ${(new Date(teacher.contractEndDate).toLocaleDateString('de'))}`,
         hourlyRate: teacher.hourlyRate,
         email: teacher.email,
         status: teacher.status,

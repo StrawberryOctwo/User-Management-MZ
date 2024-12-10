@@ -35,13 +35,9 @@ const CalendarContent: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [holidays, setHolidays] = useState<Holiday[]>([]);
   const [closingDays, setClosingDays] = useState<Holiday[]>([]);
-  const [startDate, setStartDate] = useState<string>(
-    moment().startOf('month').format('YYYY-MM-DD')
-  );
-  const [endDate, setEndDate] = useState<string>(
-    moment().endOf('month').format('YYYY-MM-DD')
-  );
-  const [date, setDate] = useState<string>(() => moment().format('YYYY-MM-DD'));
+ 
+ 
+  const [date, setDate] = useState<string>(() => moment().toLocaleString());
   const [strongestRole, setStrongestRole] = useState<string | null>(null);
   const [parentNbOfRooms, setParentNbOfRooms] = useState<number>(0);
   const { userId, userRoles } = useAuth();
