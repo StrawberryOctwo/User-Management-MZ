@@ -19,6 +19,15 @@ export const handleMarkAsRead = async (
   }
 };
 
+
+export const markAllNotificationsAsRead = async () => {
+  try {
+    const data = await api.put(`/notifications/all/read`);
+    return data.data;
+  } catch (error) {
+    console.error('Failed to mark notifications as read:', error);
+  }
+};
 export const getNotifications = async (page: number, limit: number) => {
   try {
     const data = await api.get(`/notifications?page=${page}&limit=${limit}`);
