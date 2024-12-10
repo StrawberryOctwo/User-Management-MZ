@@ -1,6 +1,7 @@
 import { Typography, Button, Grid } from '@mui/material';
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { t } from "i18next"
 
 function PageHeader() {
   const navigate = useNavigate(); // Initialize useNavigate
@@ -17,10 +18,10 @@ function PageHeader() {
     <Grid container justifyContent="space-between" alignItems="center">
       <Grid item>
         <Typography variant="h3" component="h3" gutterBottom>
-          Files
+          {t("files")}
         </Typography>
         <Typography variant="subtitle2">
-          {user.name}These are your recent files
+          {user.name}{t("these_are_your_recent_files")}
         </Typography>
       </Grid>
       <Grid item>
@@ -30,7 +31,7 @@ function PageHeader() {
           startIcon={<AddTwoToneIcon fontSize="small" />}
           onClick={handleCreateFile} // Add onClick handler
         >
-          Upload file
+          {t("upload_file")}
         </Button>
       </Grid>
     </Grid>

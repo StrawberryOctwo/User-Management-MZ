@@ -132,7 +132,7 @@ const ViewFranchisePage: React.FC = () => {
           entityName={t(franchise.name)} // Now safe to access franchise.name
         />
       ) : (
-        <Typography variant="h6">No franchise data available</Typography> // Fallback content if franchise is null
+        <Typography variant="h6">{("no_franchise_data_available")}</Typography> // Fallback content if franchise is null
       )}
     </Box>
   );

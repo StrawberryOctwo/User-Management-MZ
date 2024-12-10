@@ -20,6 +20,7 @@ import {
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import RoleBasedComponent from 'src/components/ProtectedComponent';
+import { t } from "i18next"
 
 interface ToDoTableProps {
     todos: any[];
@@ -89,11 +90,11 @@ const ToDoTable: React.FC<ToDoTableProps> = ({
                 <Table stickyHeader>
                     <TableHead>
                         <TableRow>
-                            <TableCell>Title</TableCell>
-                            <TableCell>Priority</TableCell>
-                            <TableCell>Due Date</TableCell>
-                            <TableCell>Assigned Roles</TableCell>
-                            <TableCell>Actions</TableCell>
+                            <TableCell>{t("table")}</TableCell>
+                            <TableCell>{t("priority")}</TableCell>
+                            <TableCell>{t("due_date")}</TableCell>
+                            <TableCell>{t("assigned_roles")}</TableCell>
+                            <TableCell>{t("roles")}</TableCell>
                         </TableRow>
                     </TableHead>
                     <TableBody>
@@ -137,7 +138,7 @@ const ToDoTable: React.FC<ToDoTableProps> = ({
                         {todos.length === 0 && (
                             <TableRow>
                                 <TableCell colSpan={5} align="center">
-                                    No ToDos found.
+                                    {t("no_todos_found")}
                                 </TableCell>
                             </TableRow>
                         )}

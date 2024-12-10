@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { Alert, AlertTitle, CircularProgress, Box, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import axios from 'axios';
+import { t } from "i18next"
 
 interface AlertData {
   showAlert: boolean;
@@ -66,7 +67,7 @@ const RemoteAlert: React.FC = () => {
     return (
       <Box my={2}>
         <Alert severity="error">
-          <AlertTitle>Error</AlertTitle>
+          <AlertTitle>{t("error")}</AlertTitle>
           {error}
         </Alert>
       </Box>
@@ -94,7 +95,7 @@ const RemoteAlert: React.FC = () => {
             width: '100%', // Ensures the alert takes the full width of its container
           }}
         >
-          <AlertTitle>Notice</AlertTitle>
+          <AlertTitle>{t("notice")}</AlertTitle>
           {alertData.message}
         </Alert>
       </Box>

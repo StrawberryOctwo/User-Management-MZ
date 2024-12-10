@@ -75,7 +75,7 @@ const Login: React.FC = () => {
         <form onSubmit={handleLogin}>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
             <TextField
-              label={t("Email")}
+              label={t("email")}
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -83,7 +83,7 @@ const Login: React.FC = () => {
               fullWidth
             />
             <TextField
-              label={t("Password")}
+              label={t("password")}
               type="password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}

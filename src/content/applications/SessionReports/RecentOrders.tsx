@@ -71,10 +71,10 @@ export default function ViewSessionReports() {
       headerName: t('Report Date'),
       render: (value: any) => formatDateTime(value)
     },
-    { field: 'lessonTopic', headerName: t('Lesson Topic')} ,
+    { field: 'lessonTopic', headerName: t('lesson_topic') },
     {
       field: 'actions',
-      headerName: t('Actions'),
+      headerName: t('{t("actions")}'),
       render: (value: any, row: any) => (
         <Button
           variant="outlined"
@@ -157,7 +157,7 @@ export default function ViewSessionReports() {
               color="inherit"
               disabled={loading}
             >
-              Cancel
+              {t("(cancel")}
             </Button>
             <Button
               // onClick={handleDelete} Uncomment if delete function is implemented
@@ -165,7 +165,7 @@ export default function ViewSessionReports() {
               autoFocus
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+              {loading ? <CircularProgress size={24} /> : t("confirm")}
             </Button>
           </>
         }

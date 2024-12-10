@@ -40,6 +40,7 @@ import AddToDoForm from './AddToDoForm';
 import ToDoTable from './ToDoTable';
 import { styled, alpha } from '@mui/material/styles';
 
+import { useTranslation } from 'react-i18next';
 // Styled Components for enhanced visuals
 const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
   backgroundColor: theme.palette.primary.main,
@@ -82,7 +83,7 @@ const ToDoHeader: React.FC = () => {
     Teacher: [],
     Student: [],
   });
-
+  const { t } = useTranslation(); 
   const [expanded, setExpanded] = useState<string | false>('add'); // 'add' or 'view'
 
   const limit = 5;
@@ -310,14 +311,14 @@ const ToDoHeader: React.FC = () => {
             </Typography>
             <ActiveChip
               icon={<AddIcon />}
-              label="Create"
+              label={t("create")}
               variant={expanded === 'add' ? 'filled' : 'outlined'}
               color="primary"
               onClick={() => setExpanded(expanded === 'add' ? false : 'add')}
             />
             <ActiveChip
               icon={<VisibilityIcon />}
-              label="View"
+              label={t("view")}
               variant={expanded === 'view' ? 'filled' : 'outlined'}
               color="secondary"
               onClick={() => setExpanded(expanded === 'view' ? false : 'view')}

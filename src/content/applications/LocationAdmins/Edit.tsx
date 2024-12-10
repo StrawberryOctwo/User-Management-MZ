@@ -110,7 +110,7 @@ const EditLocationAdmin = () => {
     const otherFields = [
         {
             name: 'locations',
-            label: t('Locations'),
+            label: t('locations'),
             type: 'custom',
             section: 'Location Admin Assignment',
             component: (

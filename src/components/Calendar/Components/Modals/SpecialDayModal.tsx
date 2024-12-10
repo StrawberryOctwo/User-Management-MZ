@@ -30,6 +30,7 @@ import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelect
 import { fetchLocations } from 'src/services/locationService';
 import { useAuth } from 'src/hooks/useAuth';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
+import { t } from "i18next";
 
 interface SpecialDayModalProps {
   isOpen: boolean;
@@ -84,23 +85,23 @@ export default function SpecialDayModal({
 
   const validateForm = (): boolean => {
     if (!name.trim()) {
-      setError('Name is required');
+      setError(t('name_is_required'));
       return false;
     }
     if (!startDate) {
-      setError('Start date is required');
+      setError(t('start_date_is_required'));
       return false;
     }
     if (!isSingleDay && !endDate) {
-      setError('End date is required');
+      setError(t('end_date_is_required'));
       return false;
     }
     if (!isSingleDay && endDate!.isBefore(startDate)) {
-      setError('End date cannot be before start date');
+      setError(t('end_date_cannot_be_before_start_date'));
       return false;
     }
     if (!locationId) {
-      setError('Location is required');
+      setError(t('location_is_required'));
       return false;
     }
     return true;
@@ -199,7 +200,7 @@ export default function SpecialDayModal({
             </Alert>
           )}
           <TextField
-            label="Name"
+            label={t("name")}
             value={name}
             onChange={(e) => setName(e.target.value)}
             fullWidth
@@ -208,7 +209,7 @@ export default function SpecialDayModal({
           />
           <SingleSelectWithAutocomplete
             width="100%"
-            label="Select Location"
+            label={t("select_location")}
             fetchData={(query) =>
               fetchLocations(1, 5, query).then((data) => data.data)
             }
@@ -216,7 +217,7 @@ export default function SpecialDayModal({
               setLocationId(location?.id);
             }}
             displayProperty="name"
-            placeholder="Search Location"
+            placeholder={t("search_location")}
             initialValue={initialData?.locationId}
           // disabled={!strongestRoles.includes('Teacher')}
           />
@@ -227,12 +228,12 @@ export default function SpecialDayModal({
                 onChange={(e) => setIsSingleDay(e.target.checked)}
               />
             }
-            label="Single Day"
+            label={t("single_day")}
           />
           <LocalizationProvider dateAdapter={AdapterDayjs}>
             {isSingleDay ? (
               <DatePicker
-                label="Date"
+                label={t("date")}
                 value={startDate}
                 onChange={(newValue) => {
                   setStartDate(newValue);
@@ -246,7 +247,7 @@ export default function SpecialDayModal({
               <Box sx={{ display: 'flex', gap: 2 }}>
                 <Box sx={datePickerStyle}>
                   <DatePicker
-                    label="Start Date"
+                    label={t("start_date")}
                     value={startDate}
                     onChange={(newValue) => setStartDate(newValue)}
                     renderInput={(props: TextFieldProps) => (
@@ -256,7 +257,7 @@ export default function SpecialDayModal({
                 </Box>
                 <Box sx={datePickerStyle}>
                   <DatePicker
-                    label="End Date"
+                    label={t("end_date")}
                     value={endDate}
                     onChange={(newValue) => setEndDate(newValue)}
                     renderInput={(props: TextFieldProps) => (
@@ -269,15 +270,14 @@ export default function SpecialDayModal({
           </LocalizationProvider>
           {type === 'Closing Day' && (
             <Typography variant="body2" color="text.secondary">
-              Note: During closing days, no appointments can be scheduled, and
-              existing appointments will be disabled.
+              {t("note:_during_closing_days_no_appointments_can be_scheduled_and_existing_appointments_will_be_disabled.")}
             </Typography>
           )}
         </Box>
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} disabled={isSubmitting}>
-          Cancel
+          {t("(cancel")}
         </Button>
         <Button
           onClick={handleSubmit}
@@ -285,7 +285,7 @@ export default function SpecialDayModal({
           color="primary"
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Saving...' : 'Save'}
+          {isSubmitting ? 'Saving...' : '{t("(save")}'}
         </Button>
       </DialogActions>
     </Dialog>

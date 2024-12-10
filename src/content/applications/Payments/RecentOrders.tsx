@@ -23,7 +23,7 @@ export default function ViewPaymentsPage() {
   const { t } = useTranslation();
 
   const navigate = useNavigate();
-  const { userId,userRoles } = useAuth();
+  const { userId, userRoles } = useAuth();
 
   useEffect(() => {
     if (userId) {
@@ -58,10 +58,10 @@ export default function ViewPaymentsPage() {
 
 
   const columns = [
-    { field: 'amount', headerName: t('Amount') },
-    { field: 'paymentStatus', headerName: t('Payment Status') },
-    { field: 'paymentDate', headerName: t('Payment Date'), render: (value: any) => new Date(value).toLocaleDateString('de') },
-    { field: 'lastUpdate', headerName: t('Last Update'), render: (value: any) => new Date(value).toLocaleDateString('de') },
+    { field: 'amount', headerName: t('amount') },
+    { field: 'paymentStatus', headerName: t('payment_status') },
+    { field: 'paymentDate', headerName: t('payment_date'), render: (value: any) => new Date(value).toLocaleDateString() },
+    { field: 'lastUpdate', headerName: t('Last Update'), render: (value: any) => new Date(value).toLocaleDateString() },
   ];
 
   const handleEdit = (id: any) => {
@@ -115,7 +115,7 @@ export default function ViewPaymentsPage() {
         actions={
           <>
             <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
-              Cancel
+              {t("(cancel")}
             </Button>
             <Button
               // onClick={handleDelete} Uncomment if delete function is implemented
@@ -123,7 +123,7 @@ export default function ViewPaymentsPage() {
               autoFocus
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+              {loading ? <CircularProgress size={24} /> : t("confirm")}
             </Button>
           </>
         }

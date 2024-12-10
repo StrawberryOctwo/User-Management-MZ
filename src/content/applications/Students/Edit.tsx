@@ -239,12 +239,12 @@ const EditStudent = () => {
   };
   const contractSelectionField = {
     name: 'contracts',
-    label: 'Contracts',
+    label: t('contracts'),
     type: 'custom',
     section: 'Student Information',
     component: (
       <SingleSelectWithAutocomplete
-        label="Search Contracts"
+        label={t("search_contracts")}
         fetchData={(query) =>
           fetchContractPackagesByEntity(1, 5, query).then((data) => data.data)
         }
@@ -361,7 +361,7 @@ const EditStudent = () => {
             }))
           }
           displayProperty="name"
-          placeholder="Select Grade"
+          placeholder={t("select_grade")}
           initialValue={
             studentData?.gradeLevel
               ? gradeOptions.find(
@@ -389,12 +389,12 @@ const EditStudent = () => {
 
     {
       name: 'locations',
-      label: t('Locations'),
+      label: t('locations'),
       type: 'custom',
       section: 'Student Assignment',
       component: (
         <MultiSelectWithCheckboxes
-          label="Search Location"
+          label={t("search_location")}
           fetchData={(query) =>
             fetchLocations(1, 5, query).then((data) => data.data)
           }
@@ -424,7 +424,7 @@ const EditStudent = () => {
           }}
         >
           <FormLabel component="legend" sx={{ whiteSpace: 'nowrap' }}>
-            Available Days:
+            {t('available_days')}:
           </FormLabel>
           <FormGroup row sx={{ flexWrap: 'nowrap', gap: 2 }}>
             {daysOfWeek.map((day) => (
@@ -444,7 +444,7 @@ const EditStudent = () => {
           </FormGroup>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Button variant="outlined" size="small" onClick={handleSelectAll}>
-              Select All
+              {t('select_all')}
             </Button>
             <Button
               variant="outlined"
@@ -452,7 +452,7 @@ const EditStudent = () => {
               color="error"
               onClick={handleClearAll}
             >
-              Clear All
+              {t('clear_all')}
             </Button>
           </Box>
         </Box>
@@ -461,7 +461,7 @@ const EditStudent = () => {
 
     {
       name: 'topics',
-      label: 'Assign Topics',
+      label: t('assign_topics'),
       type: 'custom',
       section: 'Student Assignment',
       component: (
@@ -478,7 +478,7 @@ const EditStudent = () => {
     },
     {
       name: 'documents',
-      label: 'Uploaded Documents',
+      label: t('uploaded_documents'),
       type: 'custom',
       section: 'Documents',
       component: (

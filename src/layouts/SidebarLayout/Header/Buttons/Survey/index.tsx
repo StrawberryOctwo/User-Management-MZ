@@ -33,17 +33,17 @@ const statusConfig = {
   [SURVEY_STATUSES.PENDING]: {
     icon: <PollIcon fontSize="small" color="error" />,
     color: 'error.main',
-    label: 'Pending',
+    label: '{t("pending")}',
   },
   [SURVEY_STATUSES.COMPLETED]: {
     icon: <CheckCircleIcon fontSize="small" color="success" />,
     color: 'success.main',
-    label: 'Completed',
+    label: '{t("completed")}',
   },
   [SURVEY_STATUSES.SKIPPED]: {
     icon: <SkipNextIcon fontSize="small" color="warning" />,
     color: 'warning.main',
-    label: 'Skipped',
+    label: '{t("skipped")}',
   },
 };
 

@@ -6,6 +6,7 @@ import { ReactComponent as UserIcon } from '../../../assets/icons/UserIcon.svg';
 import { Warning as WarningIcon } from '@mui/icons-material';
 import { Button, Menu, MenuItem, Typography } from '@mui/material';
 import TvIcon from '@mui/icons-material/Tv';
+import { t } from "i18next"
 
 const EventItem = ({ eventInfo }) => {
   const {
@@ -125,9 +126,9 @@ const EventItem = ({ eventInfo }) => {
       setCancelReason('');
       return;
     }
-  
+
     let cancelReason = '';
-  
+
     const isInClosingDay = closingDays.some((day) => {
       const isInDay =
         moment(eventDate).isSameOrAfter(day.start_date) &&
@@ -137,7 +138,7 @@ const EventItem = ({ eventInfo }) => {
       }
       return isInDay;
     });
-  
+
     const isInHoliday = holidays.some((holiday) => {
       const isInHolidayPeriod =
         moment(eventDate).isSameOrAfter(holiday.start_date) &&
@@ -147,7 +148,7 @@ const EventItem = ({ eventInfo }) => {
       }
       return isInHolidayPeriod;
     });
-  
+
     if (isInClosingDay || (isInHoliday && !isHolidayCourse)) {
       setIsCancelled(true);
       setCancelReason(cancelReason);
@@ -196,7 +197,7 @@ const EventItem = ({ eventInfo }) => {
               fontSize: '0.9rem' // Further reduced font size
             }}
           >
-            Cancelled
+            {t("cancelled")}
           </Typography>
 
           {cancelReason && (
@@ -272,7 +273,7 @@ const EventItem = ({ eventInfo }) => {
                   height: 20 // Set fixed height
                 }}
               >
-                + {extraStudents.length} more
+                + {extraStudents.length} {t("more")}
               </Button>
             )}
           </ul>

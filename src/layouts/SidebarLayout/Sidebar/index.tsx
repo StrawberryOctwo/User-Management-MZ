@@ -17,6 +17,8 @@ import {
 
 import SidebarMenu from './SidebarMenu';
 import Logo from 'src/components/LogoSign';
+import { useTranslation } from 'react-i18next';
+
 
 const SidebarWrapper = styled(Box)(
   ({ theme }) => `
@@ -31,6 +33,7 @@ const SidebarWrapper = styled(Box)(
 );
 
 function Sidebar() {
+  const { t } = useTranslation(); 
   const { sidebarToggle, toggleSidebar } = useContext(SidebarContext);
   const closeSidebar = () => toggleSidebar();
   const theme = useTheme();
@@ -89,7 +92,7 @@ function Sidebar() {
             size="small"
             fullWidth
           >
-            Support
+            {t("support")}
           </Button>
         </Box>
       </SidebarWrapper>

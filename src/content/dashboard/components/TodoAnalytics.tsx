@@ -15,6 +15,7 @@ import {
 import AssignmentIcon from '@mui/icons-material/Assignment';
 import { useTranslation } from 'react-i18next';
 import { useDashboard } from 'src/contexts/DashboardContext';
+import { t } from "i18next"
 
 // Styled Components
 const ImageWrapper = styled(Avatar)(
@@ -55,9 +56,9 @@ function RecentTodos() {
   // Calculate paginated todos
   const paginatedTodos = Array.isArray(todos)
     ? todos.slice(
-        (todoPage - 1) * todoLimit,
-        (todoPage - 1) * todoLimit + todoLimit
-      )
+      (todoPage - 1) * todoLimit,
+      (todoPage - 1) * todoLimit + todoLimit
+    )
     : [];
 
   const getPriorityColor = (priority) => {
@@ -81,7 +82,7 @@ function RecentTodos() {
         {paginatedTodos.length === 0 ? (
           <Box display="flex" justifyContent="center" alignItems="center" p={4}>
             <Typography variant="h6" color="text.secondary">
-              No todos available.
+              {t("no_todos_available")}
             </Typography>
           </Box>
         ) : (
@@ -112,15 +113,13 @@ function RecentTodos() {
                         {todo.title}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        Priority: {todo.priority}
+                        {t("priority")}: {todo.priority}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        {todo.dueDate
-                          ? new Date(todo.dueDate).toLocaleDateString('de')
-                          : 'No Due Date'}
+                        {t("due_date")} : {todo.dueDate ? new Date(todo.dueDate).toLocaleDateString() : 'No Due Date'}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        Assigned Roles:{' '}
+                        {t("assigned_roles")}:{' '}
                         {Array.isArray(todo.assignedRoles)
                           ? todo.assignedRoles.join(', ')
                           : todo.assignedRoles}{' '}

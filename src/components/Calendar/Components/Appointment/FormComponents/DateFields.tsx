@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Box, TextField } from '@mui/material';
 import moment from 'moment';
+import { t } from "i18next"
 
 export default function DateFields({ session, setSession, isPartial }) {
   const [fieldErrors, setFieldErrors] = useState({
@@ -54,7 +55,7 @@ export default function DateFields({ session, setSession, isPartial }) {
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* Start Date */}
       <TextField
-        label="Start Date"
+        label={t("start_date")}
         type="date"
         fullWidth
         value={moment(session.startDate).format('YYYY-MM-DD')}
@@ -72,7 +73,7 @@ export default function DateFields({ session, setSession, isPartial }) {
 
       {/* End Date */}
       <TextField
-        label="End Date"
+        label={t("end_date")}
         type="date"
         fullWidth
         value={moment(session.endDate).format('YYYY-MM-DD')}

@@ -56,7 +56,7 @@ export default function CreateLocation() {
         { name: 'numberOfRooms', label: t('number_of_rooms'), type: 'number', required: true, section: 'Location Information' },
         {
             name: 'franchises',
-            label: t('Franchise'),
+            label: t('franchise'),
             type: 'custom',
             section: 'Location Assignment',
             component: (

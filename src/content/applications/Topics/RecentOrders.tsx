@@ -6,6 +6,8 @@ import { useSnackbar } from 'src/contexts/SnackbarContext';
 import { deleteTopic, fetchTopics } from 'src/services/topicService';
 import { useNavigate } from 'react-router-dom';
 import { Topic } from 'src/models/TopicModel';
+import { useTranslation } from 'react-i18next';
+
 
 export default function ViewTopicPage() {
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -16,7 +18,7 @@ export default function ViewTopicPage() {
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(25);
-
+  const { t } = useTranslation();
   const { showMessage } = useSnackbar();
   const navigate = useNavigate();
 
@@ -47,9 +49,9 @@ export default function ViewTopicPage() {
 
 
   const columns = [
-    { field: 'name', headerName: 'Topic Name' },
-    { field: 'franchiseName', headerName: 'Franchise' },
-    { field: 'createdAt', headerName: 'Created At', render: (value: any) => new Date(value).toLocaleDateString('de') },
+    { field: 'name', headerName: t('topic_name') },
+    { field: 'franchiseName', headerName: t('franchise') },
+    { field: 'createdAt', headerName: 'Created At', render: (value: any) => new Date(value).toLocaleDateString() },
   ];
   // const handleEdit = (id: any) => {
   //   navigate(`edit/${id}`);
@@ -118,7 +120,7 @@ export default function ViewTopicPage() {
         actions={
           <>
             <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
-              Cancel
+              {t("(cancel")}
             </Button>
             <Button
               onClick={handleDelete}
@@ -126,7 +128,7 @@ export default function ViewTopicPage() {
               autoFocus
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+              {loading ? <CircularProgress size={24} /> : t("confirm")}
             </Button>
           </>
         }

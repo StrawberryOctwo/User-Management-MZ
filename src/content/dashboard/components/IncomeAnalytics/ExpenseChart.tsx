@@ -3,6 +3,7 @@
 import React from 'react';
 import Chart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
+import { t } from "i18next"
 
 type ExpenseChartProps = {
   data: number[];

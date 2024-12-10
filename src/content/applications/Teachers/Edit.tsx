@@ -186,7 +186,7 @@ const EditTeacher = () => {
         { name: 'bic', label: t('bic'), type: 'text', required: false, section: 'Bank Details' },
         {
             name: 'locations',
-            label: t('Locations'),
+            label: t('locations'),
             type: 'custom',
             section: 'Teacher Assignment',
             component: (
@@ -202,7 +202,7 @@ const EditTeacher = () => {
         },
         {
             name: 'topics',
-            label: 'Topics',
+            label: t('topics'),
             type: 'custom',
             section: 'Teacher Assignment',
             component: (

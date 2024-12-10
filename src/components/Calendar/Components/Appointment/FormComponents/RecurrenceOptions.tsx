@@ -16,6 +16,7 @@ import {
   getDayLabel,
   recurrenceOptions
 } from '../AddClassSession/AddClassSessionUtils';
+import { t } from "i18next"
 
 export default function RecurrenceOptions({
   recurrenceOption,
@@ -80,7 +81,7 @@ export default function RecurrenceOptions({
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       {/* Recurrence Pattern Selection */}
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-        <Typography variant="h6">Recurrence Pattern:</Typography>
+        <Typography variant="h6">{t("recurrence_pattern")}:</Typography>
         <RadioGroup
           row
           name="recurrence-pattern"
@@ -104,7 +105,7 @@ export default function RecurrenceOptions({
       <ToggleButtonGroup
         value={Object.keys(dayDetails)}
         onChange={handleDayToggle}
-        aria-label="days of the week"
+        aria-label={t("days_of_the_week")}
         exclusive={recurrenceOption === 'weekly' || recurrenceOption === 'once'}
         sx={{ display: 'flex', flexWrap: 'wrap', gap: 0.2 }}
       >
@@ -132,7 +133,7 @@ export default function RecurrenceOptions({
         onlySelectedDay && (
           <Box sx={{ display: 'flex', gap: 2 }}>
             <TextField
-              label="Start Time"
+              label={t("start_time")}
               type="time"
               fullWidth
               value={dayDetails[onlySelectedDay]?.startTime || ''}
@@ -154,11 +155,11 @@ export default function RecurrenceOptions({
               displayEmpty
             >
               <MenuItem value="" disabled>
-                Select Duration
+                {t("select_duration")}
               </MenuItem>
               {allowedDurations.map((duration) => (
                 <MenuItem key={duration} value={duration}>
-                  {duration} mins
+                  {duration} {t("mins")}{t("start_time")}
                 </MenuItem>
               ))}
             </Select>
@@ -186,11 +187,11 @@ export default function RecurrenceOptions({
               displayEmpty
             >
               <MenuItem value="" disabled>
-                Select Duration
+                {t("select_duration")}
               </MenuItem>
               {allowedDurations.map((duration) => (
                 <MenuItem key={duration} value={duration}>
-                  {duration} mins
+                  {duration} {t("mins")}
                 </MenuItem>
               ))}
             </Select>

@@ -9,6 +9,7 @@ import TextInputQuestion from './QuestionTypes/TextInputQuestion';
 import CheckboxQuestion from './QuestionTypes/CheckboxQuestion';
 import DropdownQuestion from './QuestionTypes/DropdownQuestion';
 import { styled, alpha, useTheme } from '@mui/material/styles';
+import { t } from "i18next"
 
 interface Question {
   id: string;
@@ -230,7 +231,7 @@ function DropArea({ questions, onEdit, onDelete }: DropAreaProps) {
                     sx={{ mt: 2 }}
                     fullWidth
                   >
-                    Save
+                    {t("(save")}
                   </Button>
                 </>
               )}

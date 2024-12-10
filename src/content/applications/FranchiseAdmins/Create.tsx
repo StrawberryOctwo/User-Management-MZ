@@ -74,17 +74,17 @@ export default function CreateFranchiseAdmin() {
     const otherFields = [
         {
             name: 'franchises',
-            label: t('Franchises'),
+            label: t('franchises'),
             type: 'custom',
             section: 'Franchise Admin Assignment',
             component: (
                 <MultiSelectWithCheckboxes
                     ref={dropdownRef}
-                    label={t('Search_and_assign_franchises')}
+                    label={t('search_and_assign_franchises')}
                     fetchData={(query) => fetchFranchises(1, 5, query).then((data) => data.data)}
                     onSelect={handleFranchiseSelect}
                     displayProperty="name"
-                    placeholder="Type to search franchises"
+                    placeholder={t('type_to_search_franchises')}
                 />
             ),
         },

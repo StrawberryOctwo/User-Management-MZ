@@ -19,6 +19,7 @@ import { useChat } from "../../context/ChatContext";
 import NewChatPopup from "./NewChatPopup";
 import { useWebSocket } from "src/utils/webSocketProvider";
 import { resetUnreadCount, getAllChats } from "src/services/chatService";
+import { useTranslation } from 'react-i18next';
 
 const calculateItemsPerPage = (containerHeight, itemHeight) => {
   return Math.floor(containerHeight / itemHeight);
@@ -74,7 +75,7 @@ function SidebarContent() {
   const socket = useWebSocket();
   const listRef = useRef(null);
   const chatItemHeight = 72;
-
+  const { t } = useTranslation(); 
   useEffect(() => {
     const updateItemsPerPage = () => {
       if (listRef.current) {
@@ -234,7 +235,7 @@ function SidebarContent() {
               </InputAdornment>
             ),
           }}
-          placeholder="Search..."
+          placeholder={t("search_bar")}
         />
         <Tooltip title="New Chat" arrow>
           <Button

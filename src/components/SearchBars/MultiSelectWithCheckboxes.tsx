@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import { t } from "i18next"
 
 interface MultiSelectWithCheckboxesProps {
   label: string;

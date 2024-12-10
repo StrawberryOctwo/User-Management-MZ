@@ -1,5 +1,6 @@
 import React from 'react';
 import { TextField, Box } from '@mui/material';
+import { t } from 'i18next';
 
 interface SearchBarProps {
   searchQuery: string;
@@ -7,7 +8,7 @@ interface SearchBarProps {
   placeholder?: string;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ searchQuery, onSearchChange, placeholder = "Search..." }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ searchQuery, onSearchChange, placeholder = t("search_bar") }) => {
   const handleSearchChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     onSearchChange(event.target.value);
   };

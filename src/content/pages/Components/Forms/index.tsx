@@ -115,7 +115,7 @@ function Forms() {
                     />
                     <TextField
                       id="outlined-password-input"
-                      label={t("Password")}
+                      label={t("password")}
                       type="password"
                       autoComplete="current-password"
                     />
@@ -164,7 +164,7 @@ function Forms() {
                     />
                     <TextField
                       id="filled-password-input"
-                      label={t("Password")}
+                      label={t("password")}
                       type="password"
                       autoComplete="current-password"
                       variant="filled"
@@ -218,7 +218,7 @@ function Forms() {
                     />
                     <TextField
                       id="standard-password-input"
-                      label={t("Password")}
+                      label={t("password")}
                       type="password"
                       autoComplete="current-password"
                       variant="standard"

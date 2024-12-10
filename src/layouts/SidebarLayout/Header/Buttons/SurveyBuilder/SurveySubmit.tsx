@@ -4,6 +4,7 @@ import { Button, Box, Typography, TextField, Alert, Dialog, DialogTitle, DialogC
 import { useState, useEffect } from 'react';
 import { createSurvey, updateSurvey } from 'src/services/survey'; // Ensure these functions are correctly implemented
 import { styled } from '@mui/material/styles';
+import { t } from "i18next"
 
 interface SurveySubmitProps {
   surveyId?: string; // Optional surveyId for editing
@@ -128,7 +129,7 @@ function SurveySubmit({ surveyId, titleProp = '', questions, onSubmitSuccess }: 
 
         {error && <ErrorAlert severity="error">{error}</ErrorAlert>}
 
-        <StyledTextField 
+        <StyledTextField
           fullWidth
           size="small" // Smaller size for compactness
           label="Survey Title"
@@ -141,9 +142,9 @@ function SurveySubmit({ surveyId, titleProp = '', questions, onSubmitSuccess }: 
           {surveyId ? "Review and update your survey." : "Review your survey before submitting."}
         </Typography>
 
-        <StyledButton 
-          variant="contained" 
-          color="primary" 
+        <StyledButton
+          variant="contained"
+          color="primary"
           onClick={handleOpenConfirm} // Open confirmation dialog instead of submitting directly
           disabled={loading}
         >
@@ -210,7 +211,7 @@ function SurveySubmit({ surveyId, titleProp = '', questions, onSubmitSuccess }: 
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseConfirm} color="secondary" variant="outlined">
-            Cancel
+            {t("cancel")}
           </Button>
           <Button onClick={handleConfirmSubmit} color="primary" variant="contained" disabled={loading}>
             {loading ? (surveyId ? "Updating..." : "Submitting...") : (surveyId ? "Update" : "Submit")}

@@ -48,17 +48,17 @@ export default function CreateBilling() {
         { name: 'revenue', label: t('revenue'), type: 'number', required: true, section: 'Billing Information' },
         {
             name: 'franchise',
-            label: t('Franchise'),
+            label: t('franchise'),
             type: 'custom',
             section: 'Franchise Assignment',
             component: (
                 <SingleSelectWithAutocomplete
                     ref={franchiseRef} // Attach the ref to reset if needed
-                    label={t("Search_and_assign_franchises")}
+                    label={t("search_and_assign_franchises")}
                     fetchData={(query) => fetchFranchises(1, 5, query).then((data) => data.data)}
                     onSelect={handleFranchiseSelect}
                     displayProperty="name"
-                    placeholder="Type to search franchises"
+                    placeholder={t("type_to_search_franchises")}
                 />
             ),
         },

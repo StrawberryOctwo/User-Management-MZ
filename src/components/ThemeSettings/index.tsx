@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import UnfoldMoreTwoToneIcon from '@mui/icons-material/UnfoldMoreTwoTone';
 import { NavLink } from 'react-router-dom';
 import ContrastIcon from '@mui/icons-material/Contrast';
+import { t } from "i18next"
 
 const ThemeSettingsButton = styled(Badge)(
   ({ theme }) => `
@@ -250,7 +251,7 @@ const ThemeSettings = () => {
     <>
       <ThemeSettingsButton>
         <Tooltip arrow title={t('Theme Settings')}>
-        <IconButton color="primary" ref={ref} onClick={handleOpen}>
+          <IconButton color="primary" ref={ref} onClick={handleOpen}>
             <ContrastIcon />
           </IconButton>
         </Tooltip>
@@ -268,7 +269,6 @@ const ThemeSettings = () => {
             horizontal: 'right'
           }}
         >
-
           <Divider />
           <ThemeToggleWrapper>
             <Typography
@@ -281,7 +281,7 @@ const ThemeSettings = () => {
               }}
               variant="body1"
             >
-              Light color schemes
+              {t("light_color_schemes")}
             </Typography>
             <Stack alignItems="center" spacing={2}>
               <Tooltip placement="left" title="Pure Light" arrow>

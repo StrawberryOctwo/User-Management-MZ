@@ -1,10 +1,12 @@
 import { Box, Button, CircularProgress } from '@mui/material';
 import React, { useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { useNavigate } from 'react-router';
 import FileActions from 'src/components/Files/FileActions';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { fetchSelfFiles, deleteFiles } from 'src/services/fileUploadService';
+
 
 export default function FileUploadContent() {
   const [files, setFiles] = useState([]);
@@ -15,7 +17,7 @@ export default function FileUploadContent() {
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(25);
   const isMounted = useRef(false);
-
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -44,13 +46,12 @@ export default function FileUploadContent() {
   };
 
   const columns = [
-    { field: 'name', headerName: 'File Name' },
-    { field: 'type', headerName: 'File Type' },
+    { field: 'name', headerName: t('file_name') },
+    { field: 'type', headerName: t('file_type') },
     {
       field: 'user',
-      headerName: 'Uploaded By',
-      render: (value, row) =>
-        `${row.user?.firstName || ''} ${row.user?.lastName || ''}`
+      headerName: t('uploaded_by'),
+      render: (value, row) => `${row.user?.firstName || ''} ${row.user?.lastName || ''}`
     },
     {
       field: 'createdAt',
@@ -59,10 +60,8 @@ export default function FileUploadContent() {
     },
     {
       field: 'actions',
-      headerName: 'File Actions',
-      render: (value, row) => (
-        <FileActions fileId={row.id} fileName={row.name} />
-      ) // Use FileActions here
+      headerName: 'File {t("actions")}',
+      render: (value, row) => <FileActions fileId={row.id} fileName={row.name} /> // Use FileActions here
     }
   ];
 
@@ -100,7 +99,7 @@ export default function FileUploadContent() {
       <ReusableTable
         data={files}
         columns={columns}
-        title="Files List"
+        title={t("files_list")}
         onDelete={confirmDelete}
         onSearchChange={loadFiles}
         loading={loading}
@@ -113,29 +112,20 @@ export default function FileUploadContent() {
 
       <ReusableDialog
         open={dialogOpen}
-        title="Confirm Deletion"
+        title={t("confirm_deletion")}
         onClose={() => setDialogOpen(false)}
         actions={
           <>
-            <Button
-              onClick={() => setDialogOpen(false)}
-              color="inherit"
-              disabled={loading}
-            >
-              Cancel
+            <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
+              {t("(cancel")}
             </Button>
-            <Button
-              onClick={handleDelete}
-              color="primary"
-              autoFocus
-              disabled={loading}
-            >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+            <Button onClick={handleDelete} color="primary" autoFocus disabled={loading}>
+              {loading ? <CircularProgress size={24} /> : t("confirm")}
             </Button>
           </>
         }
       >
-        <p>Are you sure you want to delete the selected files?</p>
+        <p>{t("are_you_sure_you_want_to_delete_the_selected_files?")}</p>
       </ReusableDialog>
     </Box>
   );

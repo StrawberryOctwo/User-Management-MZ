@@ -231,21 +231,21 @@ const CreateTeacher = () => {
     },
     {
       name: 'taxNumber',
-      label: t('Tax Number'),
+      label: t('tax_number'),
       type: 'text',
       required: true,
       section: 'Teacher Information'
     },
     {
       name: 'employeeNumber',
-      label: t('Teacher Number'),
+      label: t('employee_number'),
       type: 'custom',
       required: true,
       section: 'Teacher Information',
       component: (
         <Box display="flex" alignItems="center" gap={1} sx={{ width: '95%' }}>
           <TextField
-            label="Teacher Number *"
+            label="employee_number *"
             value={employeeNumber}
             variant="outlined"
             fullWidth
@@ -277,49 +277,49 @@ const CreateTeacher = () => {
     },
     {
       name: 'idNumber',
-      label: t('ID Number'),
+      label: t('id_number'),
       type: 'text',
       required: false,
       section: 'Teacher Information'
     },
     {
       name: 'contractStartDate',
-      label: t('Contract Start Date'),
+      label: t('contract_start_date'),
       type: 'date',
       required: true,
       section: 'Teacher Information'
     },
     {
       name: 'contractEndDate',
-      label: t('Contract End Date'),
+      label: t('contract_end_date'),
       type: 'date',
       required: true,
       section: 'Teacher Information'
     },
     {
       name: 'bank',
-      label: t('Bank'),
+      label: t('bank'),
       type: 'text',
       required: true,
       section: 'Bank Details'
     },
     {
       name: 'iban',
-      label: t('IBAN'),
+      label: t('iban'),
       type: 'text',
       required: true,
       section: 'Bank Details'
     },
     {
       name: 'bic',
-      label: t('BIC'),
+      label: t('bic'),
       type: 'text',
       required: false,
       section: 'Bank Details'
     },
     {
       name: 'locations',
-      label: t('Locations'),
+      label: t('locations'),
       type: 'custom',
       required: true,
       section: 'Teacher Assignment',
@@ -337,7 +337,7 @@ const CreateTeacher = () => {
     },
     {
       name: 'topics',
-      label: t('Topics'),
+      label: t('topics'),
       type: 'custom',
       section: 'Teacher Assignment',
       component: (

@@ -63,17 +63,17 @@ export default function TeachersContent() {
 
   const columns = [
     { field: 'fullName', headerName: t('Full Name') },
-    { field: 'franchise', headerName: t('Franchise Name') },
-    { field: 'email', headerName: t('Email') },
-    { field: 'employeeNumber', headerName: t('Teacher Number') },
+    { field: 'franchise', headerName: t('franchise_name') },
+    { field: 'email', headerName: t('email') },
+    { field: 'employeeNumber', headerName: t('employee_number') },
     {
       field: 'contractPeriod',
       headerName: t('Contract Period'),
       render: (value: any, row: any) =>
         `${row.contractStartDate} - ${row.contractEndDate}`
     },
-    { field: 'status', headerName: t('Status') },
-    { field: 'hourlyRate', headerName: t('Hourly Rate') }
+    { field: 'status', headerName: t('status') },
+    { field: 'hourlyRate', headerName: t('Hourly Rate') },
   ];
 
   const handleEdit = (id: any) => {
@@ -152,7 +152,7 @@ export default function TeachersContent() {
               autoFocus
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+              {loading ? <CircularProgress size={24} /> : t("confirm")}
             </Button>
           </>
         }

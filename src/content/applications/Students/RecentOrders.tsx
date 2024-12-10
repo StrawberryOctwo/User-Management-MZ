@@ -124,10 +124,9 @@ export default function StudentsContent() {
         data={students}
         columns={[
           { field: 'fullName', headerName: t('Full Name') },
-          { field: 'email', headerName: t('Email') },
-          { field: 'gradeLevel', headerName: t('Grade Level') },
-          { field: 'contractName', headerName: t('Contract') },
-          { field: 'status', headerName: t('Status') }
+          { field: 'email', headerName: t('email') },
+          { field: 'gradeLevel', headerName: t('grade_level') },
+          { field: 'status', headerName: t('status') },
         ]}
         title="Student List"
         onEdit={hasAdminPrivileges ? handleEdit : undefined}
@@ -161,7 +160,7 @@ export default function StudentsContent() {
               autoFocus
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+              {loading ? <CircularProgress size={24} /> : t("confirm")}
             </Button>
           </>
         }

@@ -42,6 +42,7 @@ import { fetchAssignedUsersForTodo, removeUserFromToDo } from 'src/services/todo
 import { styled, alpha, useTheme } from '@mui/material/styles';
 import UsersTable from './UsersTable';
 import ConfirmationDialog from 'src/components/Calendar/Components/Modals/ConfirmationDialog';
+import { useTranslation } from 'react-i18next';
 
 interface User {
     id?: number;
@@ -69,32 +70,7 @@ interface CustomRoleDialogProps {
     originName: string;
 }
 
-const rolesConfig = [
-    {
-        role: 'FranchiseAdmin',
-        label: 'Franchise Admins',
-        allowedRoles: ['SuperAdmin'],
-        idField: 'id',
-    },
-    {
-        role: 'LocationAdmin',
-        label: 'Location Admins',
-        allowedRoles: ['FranchiseAdmin'],
-        idField: 'id',
-    },
-    {
-        role: 'Teacher',
-        label: 'Teachers',
-        allowedRoles: ['FranchiseAdmin', 'LocationAdmin'],
-        idField: 'userId',
-    },
-    {
-        role: 'Student',
-        label: 'Students',
-        allowedRoles: ['FranchiseAdmin', 'LocationAdmin', 'Teacher'],
-        idField: 'userId',
-    },
-];
+
 
 // Styled Components for enhanced visuals
 const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
@@ -131,6 +107,7 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
     onSave,
     originName
 }) => {
+    const { t } = useTranslation(); 
     const theme = useTheme();
     const [filter, setFilter] = useState('');
     const [selectedRole, setSelectedRole] = useState('All');
@@ -149,7 +126,32 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
         message: string;
         severity: 'success' | 'error';
     }>({ open: false, message: '', severity: 'success' });
-
+    const rolesConfig = [
+        {
+            role: 'FranchiseAdmin',
+            label: t('franchise_admins'),
+            allowedRoles: ['SuperAdmin'],
+            idField: 'id',
+        },
+        {
+            role: 'LocationAdmin',
+            label: t('location_admins'),
+            allowedRoles: ['FranchiseAdmin'],
+            idField: 'id',
+        },
+        {
+            role: 'Teacher',
+            label: t('teachers'),
+            allowedRoles: ['FranchiseAdmin', 'LocationAdmin'],
+            idField: 'userId',
+        },
+        {
+            role: 'Student',
+            label: t('students'),
+            allowedRoles: ['FranchiseAdmin', 'LocationAdmin', 'Teacher'],
+            idField: 'userId',
+        },
+    ];
     // Accessing userRoles from useAuth hook
     const { userRoles } = useAuth(); // e.g., userRoles = ['SuperAdmin']
 
@@ -462,7 +464,7 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                                     }}
                                     label="Filter by Role"
                                 >
-                                    <MenuItem value="All">All</MenuItem>
+                                    <MenuItem value="All">{t("all")}</MenuItem>
                                     {allowedRolesForFilter.map(({ role }) => (
                                         <MenuItem key={role} value={role}>
                                             {role}
@@ -512,7 +514,7 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose} color="secondary" variant="outlined">
-                    Cancel
+                    {t("(cancel")}
                 </Button>
                 {originName === 'AssignRole' && (
                     <Button
@@ -544,7 +546,7 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                         color="primary"
                         variant="contained"
                     >
-                        Save
+                        {t("(save")}
                     </Button>
                 )}
             </DialogActions>
@@ -558,7 +560,7 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                 confirmButtonText="Remove"
                 confirmButtonColor="error"
             />
-        </Dialog>
+        </Dialog >
     );
 };
 

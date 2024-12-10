@@ -49,21 +49,21 @@ export default function ViewBookings() {
   };
 
   const columns = [
-    { field: 'firstName', headerName: t('First Name') },
-    { field: 'lastName', headerName: t('Last Name') },
-    { field: 'email', headerName: t('Email') },
-    { field: 'phoneNumber', headerName: t('Phone Number') },
+    { field: 'firstName', headerName: t('first_name') },
+    { field: 'lastName', headerName: t('last_name') },
+    { field: 'email', headerName: t('email') },
+    { field: 'phoneNumber', headerName: t('phone_Number') },
     {
       field: 'appointment',
       headerName: t('Appointment'),
-      render: (value: string) => value ? new Date(value).toLocaleString('de') : 'N/A',
+      render: (value: string) => value ? new Date(value).toLocaleString() : 'N/A',
     },
-    { field: 'locationName', headerName: t('Location') },
+    { field: 'locationName', headerName: t('location') },
     {
       field: 'accepted',
-      headerName: t('Status'),
-      render: (value: boolean) => (value ? 'Accepted' : 'Pending')
-    }
+      headerName: t('status'),
+      render: (value: boolean) => (value ? 'Accepted' : '{t("pending")}'),
+    },
   ];
 
   const handlePageChange = (newPage: number) => setPage(newPage);

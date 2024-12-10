@@ -8,7 +8,7 @@ import {
 } from '@mui/material';
 import { Helmet } from 'react-helmet-async';
 import Logo from 'src/components/LogoSign';
-
+import { t } from "i18next"
 import { styled } from '@mui/material/styles';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import TwitterIcon from '@mui/icons-material/Twitter';
@@ -30,7 +30,7 @@ function StatusMaintenance() {
   return (
     <>
       <Helmet>
-        <title>Status - Maintenance</title>
+        <title>{t("status_maintenance")}</title>
       </Helmet>
       <MainContent>
         <Container maxWidth="md">

@@ -2,7 +2,7 @@
 import React from 'react';
 import { Card, CardContent, Typography, Box, Button } from '@mui/material';
 import DeleteButtonWithConfirmation from '../DeleteButton';
-import { useTranslation } from 'react-i18next'; // Import useTranslation
+import { useTranslation } from 'react-i18next';
 
 type SessionTypePrice = {
     name: string;
@@ -58,7 +58,7 @@ const ContractCard: React.FC<ContractCardProps> = ({
                 <Box display="flex" justifyContent="space-around" alignItems="center" sx={{ mb: 3 }}>
                     <Box>
                         <Typography variant="body1" color="textSecondary" sx={{ fontWeight: 'bold' }}>
-                            {t('Monthly Fee')}
+                            Monthly Fee
                         </Typography>
                         <Typography variant="h6" color="primary">
                             {monthly_fee ? `${t('€')} ${monthly_fee.toFixed(2)}` : t('No Monthly Fee')}
@@ -66,7 +66,7 @@ const ContractCard: React.FC<ContractCardProps> = ({
                     </Box>
                     <Box>
                         <Typography variant="body1" color="textSecondary" sx={{ fontWeight: 'bold' }}>
-                            {t('One-Time Fee')}
+                            One-Time Fee
                         </Typography>
                         <Typography variant="h6" color="primary">
                             {one_time_fee ? `${t('€')} ${one_time_fee.toFixed(2)}` : t('No One-Time Fee')}
@@ -76,9 +76,7 @@ const ContractCard: React.FC<ContractCardProps> = ({
 
                 {/* Session Prices */}
                 <Box mt={2} mb={2} sx={{ borderTop: '1px solid #ddd', pt: 2 }}>
-                    <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>
-                        {t('Session Prices:')}
-                    </Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>Session Prices:</Typography>
                     {sessions.map((session, index) => (
                         <Box key={`session-${index}`} display="flex" alignItems="center" justifyContent="center" my={1}>
                             <Typography variant="body2">
@@ -88,9 +86,7 @@ const ContractCard: React.FC<ContractCardProps> = ({
                     ))}
 
                     {/* Discounts */}
-                    <Typography variant="body2" sx={{ fontWeight: 'bold', mt: 2, mb: 1 }}>
-                        {t('Discounts:')}
-                    </Typography>
+                    <Typography variant="body2" sx={{ fontWeight: 'bold', mt: 2, mb: 1 }}>Discounts:</Typography>
                     {discounts.filter(discount => discount.percentage > 0).length > 0 ? (
                         discounts.filter(discount => discount.percentage > 0).map((discount, index) => (
                             <Box key={`discount-${index}`} display="flex" alignItems="center" justifyContent="center" my={1}>
@@ -101,18 +97,16 @@ const ContractCard: React.FC<ContractCardProps> = ({
                         ))
                     ) : (
                         <Box display="flex" alignItems="center" justifyContent="center" my={1}>
-                            <Typography variant="body2">{t('No Discounts')}</Typography>
+                            <Typography variant="body2">No Discounts</Typography>
                         </Box>
                     )}
 
-                    {/* VAT Status */}
+                    {/* VAT {t("status")} */}
                     <Box display="flex" alignItems="center" justifyContent="center" my={1}>
                         {isVatExempt ? (
-                            <Typography variant="body2">• {t('VAT Exempt')}</Typography>
+                            <Typography variant="body2">• VAT Exempt</Typography>
                         ) : (
-                            <Typography variant="body2">
-                                • {t('VAT Percentage')}: {vat_percentage}%
-                            </Typography>
+                            <Typography variant="body2">• VAT Percentage: {vat_percentage}%</Typography>
                         )}
                     </Box>
                 </Box>
@@ -127,7 +121,8 @@ const ContractCard: React.FC<ContractCardProps> = ({
                     {t('Edit')}
                 </Button>
                 <Typography variant="body2" color="textSecondary" sx={{ mt: 1, cursor: 'pointer' }}>
-                    <DeleteButtonWithConfirmation onDelete={onDelete} />
+                <DeleteButtonWithConfirmation onDelete={onDelete} />
+
                 </Typography>
             </CardContent>
         </Card>

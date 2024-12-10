@@ -1,4 +1,5 @@
 import { CardContent, Typography } from '@mui/material';
+import { t } from "i18next"
 
 function StudentDetails() {
   return (

@@ -20,6 +20,7 @@ import {
 import { useTranslation } from 'react-i18next';
 import { addSessionReport } from 'src/services/sessionReportService';
 
+
 interface AddSessionReportFormProps {
   isOpen: boolean;
   onClose: () => void;
@@ -47,6 +48,7 @@ const StepContent = ({
   teacher,
   sessionDate
 }) => {
+  const { t } = useTranslation(); 
   switch (step) {
     case 0:
       return (
@@ -145,7 +147,7 @@ const StepContent = ({
                 sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1 }}
               >
                 <TextField
-                  label="Notes"
+                  label={t("notes")}
                   value={formData[inputField]}
                   onChange={handleChange(inputField)}
                   size="small"
@@ -281,7 +283,7 @@ const AddSessionReportForm: React.FC<AddSessionReportFormProps> = ({
 
   const handleSave = async () => {
     try {
-      // Save the session report
+      // {t("(save")} the session report
       const newReport = {
         ...formData,
         studentId: studentId,
@@ -313,18 +315,18 @@ const AddSessionReportForm: React.FC<AddSessionReportFormProps> = ({
           >
             <Typography variant="h6">{t('Lesson Protocol')}</Typography>
             <Typography variant="body1">
-              <strong>{t('Session Date')}:</strong> {sessionDate || '-'}
+              <strong>{t('session_date')}:</strong> {sessionDate || '-'}
             </Typography>
           </Box>
           <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
             <Typography variant="body1">
-              <strong>{t('Student')}:</strong>{' '}
+              <strong>{t('student')}:</strong>{' '}
               {user?.user?.firstName
                 ? `${user.user.firstName} ${user.user.lastName}`
                 : '-'}
             </Typography>
             <Typography variant="body1">
-              <strong>{t('Teacher')}:</strong>{' '}
+              <strong>{t('teacher')}:</strong>{' '}
               {teacher?.user?.firstName
                 ? `${teacher.user.firstName} ${teacher.user.lastName}`
                 : '-'}
@@ -371,13 +373,13 @@ const AddSessionReportForm: React.FC<AddSessionReportFormProps> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="secondary">
-          {t('Cancel')}
+          {t('{t("(cancel")}')}
         </Button>
         <Box sx={{ display: 'flex', gap: 1 }}>
           {activeStep > 0 && <Button onClick={handleBack}>{t('Back')}</Button>}
           {activeStep === steps.length - 1 ? (
             <Button onClick={handleSave} variant="contained" color="primary">
-              {t('Save')}
+              {t('{t("(save")}')}
             </Button>
           ) : (
             <Button onClick={handleNext} variant="contained" color="primary">

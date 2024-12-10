@@ -55,13 +55,13 @@ export default function LocationAdminsContent() {
       headerName: 'DOB',
       render: (value: any) => new Date(value).toLocaleDateString('de')
     }, */
-    { field: 'email', headerName: t('Email') },
+    { field: 'email', headerName: t('email') },
     /* { field: 'address', headerName: 'Address' },
     { field: 'postalCode', headerName: 'Postal Code' }, */
-    { field: 'phoneNumber', headerName: t('Phone Number') },
+    { field: 'phoneNumber', headerName: t('phone_Number') },
     {
       field: 'locationNames',
-      headerName: t('Locations'),
+      headerName: t('locations'),
       render: (value: any) => {
         if (Array.isArray(value)) {
           return value.map((location: any) => location).join(', ');
@@ -135,7 +135,7 @@ export default function LocationAdminsContent() {
         actions={
           <>
             <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
-              Cancel
+              {t("(cancel")}
             </Button>
             <Button
               onClick={handleDelete}
@@ -143,7 +143,7 @@ export default function LocationAdminsContent() {
               autoFocus
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : t('Confirm')}
+              {loading ? <CircularProgress size={24} /> : t(t("confirm"))}
             </Button>
           </>
         }

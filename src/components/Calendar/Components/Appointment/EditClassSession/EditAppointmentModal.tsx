@@ -17,6 +17,7 @@ import {
 } from 'src/services/classSessionService';
 import EditSessionInstanceTab from './EditSessionInstanceTab';
 import { useSession } from '../../SessionContext';
+import { t } from "i18next"
 
 interface EditClassSessionModalProps {
   isOpen: boolean;
@@ -124,7 +125,7 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} color="secondary">
-          Cancel
+          {t("cancel")}
         </Button>
         <Button
           onClick={onSave}
@@ -132,7 +133,7 @@ const EditClassSessionModal: React.FC<EditClassSessionModalProps> = ({
           variant="contained"
           disabled={disabled}
         >
-          Save
+          {t("save")}
         </Button>
       </DialogActions>
     </Dialog>

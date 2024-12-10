@@ -12,6 +12,7 @@ import {
 import ShoppingBagTwoToneIcon from '@mui/icons-material/ShoppingBagTwoTone';
 import FavoriteTwoToneIcon from '@mui/icons-material/FavoriteTwoTone';
 import StarTwoToneIcon from '@mui/icons-material/StarTwoTone';
+import { t } from "i18next"
 
 const AvatarPrimary = styled(Avatar)(
   ({ theme }) => `

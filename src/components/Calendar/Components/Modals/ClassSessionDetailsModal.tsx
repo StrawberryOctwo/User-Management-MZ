@@ -31,6 +31,8 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import { calculateEndTimeInMinutes } from 'src/utils/teacherUtils';
 import StudentDetailCard from './StudentDetailCArd';
 import ConfirmationDialog from './ConfirmationDialog';
+import { useTranslation } from 'react-i18next';
+
 
 interface ClassSessionDetailsModalProps {
   isOpen: boolean;
@@ -61,6 +63,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
   sessionEnded,
   setIsSessionEnded
 }) => {
+  const { t } = useTranslation(); 
   const [classSession, setClassSession] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -291,7 +294,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
           alignItems: 'center'
         }}
       >
-        <Typography variant="h6">Class Session Details</Typography>
+        <Typography variant="h6">{t("class_session_details")}</Typography>
         <Box sx={{ display: 'flex', gap: 1 }}>
           {canEdit && (
             <IconButton
@@ -367,31 +370,31 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
               <Card variant="outlined" sx={{ mb: 3 }}>
                 <CardContent>
                   <Typography variant="subtitle1">
-                    <strong>Session Name:</strong>{' '}
+                    <strong>{t("session_name")}:</strong>{' '}
                     {classSession.classSession.name}
                   </Typography>
                   <Typography variant="subtitle1">
-                    <strong>Teacher:</strong>{' '}
+                    <strong>{t("teacher")}:</strong>{' '}
                     {classSession.teacher?.user?.firstName}{' '}
                     {classSession.teacher?.user?.lastName}
                   </Typography>
                   <Typography variant="subtitle1">
-                    <strong>Topic:</strong>{' '}
+                    <strong>{t("topic")}:</strong>{' '}
                     {classSession.classSession.topic?.name}
                   </Typography>
                   <Typography variant="subtitle1">
-                    <strong>Location:</strong> {classSession.location.name}
+                    <strong>{t("location")}:</strong> {classSession.location.name}
                   </Typography>
                   <Typography variant="subtitle1">
-                    <strong>Session Type:</strong>{' '}
+                    <strong>{t("session_type")}:</strong>{' '}
                     {classSession?.sessionType?.name}
                   </Typography>
                   <Typography variant="subtitle1">
-                    <strong>Start Time:</strong>{' '}
+                    <strong>{t("start_time")}:</strong>{' '}
                     {classSession.startTime.slice(0, 5)}
                   </Typography>
                   <Typography variant="subtitle1">
-                    <strong>End Time:</strong>{' '}
+                    <strong>{t("end_time")}:</strong>{' '}
                     {calculateEndTimeInMinutes(
                       classSession.startTime,
                       classSession.duration
@@ -400,7 +403,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                 </CardContent>
                 <CardContent>
                   <Typography variant="subtitle1">
-                    <strong>Notes:</strong>
+                    <strong>{t("notes")}:</strong>
                   </Typography>
 
                   <Typography
@@ -419,7 +422,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                       }
                     }}
                   >
-                    {classSession.note || 'No notes available.'}
+                    {classSession.note || t('no_notes_available.')}
                   </Typography>
                 </CardContent>
               </Card>
@@ -444,7 +447,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                     />
                   ))
                 ) : (
-                  <Typography variant="body2">No students enrolled.</Typography>
+                  <Typography variant="body2">{t("class_session_details")}No students enrolled.</Typography>
                 )}
 
                 {/* Display success or error messages */}
@@ -455,7 +458,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                     sx={{ mt: 2 }}
                   >
                     {submissionSuccess &&
-                      'All session reports have been successfully submitted.'}
+                      t('all_session_reports_have_been_successfully_submitted.')}
                   </Typography>
                 )}
                 {submissionError && (
@@ -477,7 +480,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                       isSubmittingReports && <CircularProgress size={20} />
                     }
                   >
-                    Submit All Reports
+                    {t("aubmit_all_reports")}
                   </Button>
                 </Box>
 
@@ -526,7 +529,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
             )}
           </Box>
         ) : (
-          <Typography>No class session details available.</Typography>
+          <Typography>{t("no_class_session_details_available.")}</Typography>
         )}
       </DialogContent>
       {/* <DialogActions sx={{ marginBottom: 2 }}>
@@ -549,7 +552,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                 color="error"
                 variant="outlined"
               >
-                Delete
+                {t("delete")}
               </Button>
               <RoleBasedComponent
                 allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin', 'Teacher']}>
@@ -568,7 +571,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
 
       <ReusableDialog
         open={deleteDialogOpen}
-        title="Confirm Deletion"
+        title={t("confirm_deletion")}
         onClose={() => setDeleteDialogOpen(false)}
         actions={
           <>
@@ -577,7 +580,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
               color="inherit"
               disabled={loading}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               onClick={onDelete}
@@ -585,12 +588,12 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
               autoFocus
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+              {loading ? <CircularProgress size={24} /> : t("confirm")}
             </Button>
           </>
         }
       >
-        <p>Are you sure you want to delete the class session?</p>
+        <p>{t("are_you_sure_you_want_to_delete_the_class_session?")}</p>
       </ReusableDialog>
       <ReusableDialog
         open={deactivateDialogOpen}
@@ -604,7 +607,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
               color="inherit"
               disabled={loading}
             >
-              Cancel
+              {t("cancel")}{t("(cancel")}
             </Button>
             <Button
               onClick={handleToggleActivation}
@@ -612,13 +615,13 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
               autoFocus
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+              {loading ? <CircularProgress size={24} /> : t("confirm")}
             </Button>
           </>
         }
       >
         <p>
-          Are you sure you want to{' '}
+          {t("are_you_sure_you_want_to")}{' '}
           {classSession?.isActive ? 'deactivate' : 'reactivate'} the class
           session?
         </p>

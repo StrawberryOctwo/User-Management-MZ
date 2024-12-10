@@ -15,6 +15,8 @@ import { fetchLocations } from 'src/services/locationService';
 import dayjs from 'dayjs';
 import { DatePicker } from '@mui/x-date-pickers';
 import { fetchTeacherById } from 'src/services/teacherService';
+import { useTranslation } from 'react-i18next';
+
 
 export interface ClosingDayData {
     id?: number;
@@ -27,6 +29,7 @@ export interface ClosingDayData {
 export default function EditClosingDay() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { t } = useTranslation(); 
     const [closingDayData, setClosingDayData] = useState<ClosingDayData | null>(null);
     const [selectedLocation, setSelectedLocation] = useState<any>(null);
     const [loading, setLoading] = useState(false);
@@ -106,17 +109,17 @@ export default function EditClosingDay() {
         },
         {
             name: 'location',
-            label: 'Location',
+            label: t('location'),
             type: 'custom',
             section: 'Closing Day Information',
             component: (
                 <SingleSelectWithAutocomplete
                     width="100%"
-                    label="Select Location"
+                    label={t("select_location")}
                     fetchData={(query) => fetchLocations(1, 5, query).then((data) => data.data)}
                     onSelect={handleLocationSelect}
                     displayProperty="name"
-                    placeholder="Search Location"
+                    placeholder={t("search_location")}
                     initialValue={selectedLocation}
                 />
             ),
@@ -128,7 +131,7 @@ export default function EditClosingDay() {
             section: 'Closing Day Dates',
             component: (
                 <DatePicker
-                    label="Start Date"
+                    label={t("start_date")}
                     value={closingDayData?.start_date ? dayjs(closingDayData.start_date) : null}
                     onChange={(newValue) => {
                         if (closingDayData) {
@@ -149,7 +152,7 @@ export default function EditClosingDay() {
             section: 'Closing Day Dates',
             component: (
                 <DatePicker
-                    label="End Date"
+                    label={t("end_date")}
                     value={closingDayData?.end_date ? dayjs(closingDayData.end_date) : null}
                     onChange={(newValue) => {
                         if (closingDayData) {

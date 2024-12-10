@@ -30,6 +30,8 @@ import useTableSort from './useTableSort';
 import { CSVLink } from 'react-csv';
 import React from 'react';
 import DownloadTwoToneIcon from '@mui/icons-material/DownloadTwoTone';
+import { useTranslation } from 'react-i18next';
+
 
 interface Column {
   field: string;
@@ -56,16 +58,6 @@ interface ReusableTableProps {
   showDefaultActions?: boolean;
 }
 
-const getStatusLabel = (status: string): JSX.Element => {
-  const map = {
-    active: { text: 'Active', color: 'success' },
-    inactive: { text: 'Inactive', color: 'error' },
-    interested: { text: 'Interested', color: 'info' }
-  };
-
-  const { text, color } = map[status] || { text: 'Unknown', color: 'default' };
-  return <Label color={color}>{text}</Label>;
-};
 
 export default function ReusableTable({
   data = [],
@@ -90,11 +82,22 @@ export default function ReusableTable({
   const { order, orderBy, handleRequestSort, sortData } = useTableSort(
     columns[0]?.field || ''
   );
+  const { t } = useTranslation(); 
   const sortedData = sortData(data);
   const allSelected = selectedRows.length === data.length;
   const debounceTimeout = React.useRef<NodeJS.Timeout | null>(null);
   const theme = useTheme();
-
+  const getStatusLabel = (status: string): JSX.Element => {
+    const map = {
+      active: { text: t('active'), color: 'success' },
+      inactive: { text: t('inactive'), color: 'error' },
+      interested: { text: t('interested'), color: 'info' }
+    };
+  
+    const { text, color } = map[status] || { text: 'Unknown', color: 'default' };
+    return <Label color={color}>{text}</Label>;
+  };
+  
   useEffect(() => {
     if (debounceTimeout.current) {
       clearTimeout(debounceTimeout.current);
@@ -162,7 +165,7 @@ export default function ReusableTable({
               }}
             >
               <Typography variant="h6" color="error">
-                Error fetching data
+                {t("error_fetching_data")}
               </Typography>
             </Box>
           </TableCell>
@@ -182,7 +185,7 @@ export default function ReusableTable({
                 height: 200
               }}
             >
-              <Typography variant="h6">No Data Available</Typography>
+              <Typography variant="h6">{t("no_data_available")}</Typography>
             </Box>
           </TableCell>
         </TableRow>
@@ -312,7 +315,7 @@ export default function ReusableTable({
               }}
             >
               <TextField
-                placeholder="Search..."
+                placeholder={t("search_bar")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 size="small"
@@ -364,7 +367,7 @@ export default function ReusableTable({
               ))}
               {/* Conditionally render the Actions column */}
               {showDefaultActions && (
-                <TableCell align="right">Actions</TableCell>
+                <TableCell align="right">{t("actions")}</TableCell>
               )}
             </TableRow>
           </TableHead>

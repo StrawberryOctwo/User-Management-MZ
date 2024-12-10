@@ -108,7 +108,7 @@ function SessionsByCity() {
         action={
           <FilterContainer>
             <FormControl variant="outlined" size="small">
-              <InputLabel id="filter-label">Filter</InputLabel>
+              <InputLabel id="filter-label">{t('filter')}</InputLabel>
               <Select
                 labelId="filter-label"
                 id="filter-select"
@@ -116,10 +116,10 @@ function SessionsByCity() {
                 onChange={(event) => setAnalyticsFilter(event.target.value)} // Update filter in context
                 label="Filter"
               >
-                <MenuItem value="day">{t("Day")}</MenuItem>
-                <MenuItem value="week">{t("Week")}</MenuItem>
-                <MenuItem value="month">{t("Month")}</MenuItem>
-                <MenuItem value="year">{t("Year")}</MenuItem>
+                <MenuItem value="day">{t('day')}</MenuItem>
+                <MenuItem value="week">{t('week')}</MenuItem>
+                <MenuItem value="month">{t('month')}</MenuItem>
+                <MenuItem value="year">{t('year')}</MenuItem>
               </Select>
             </FormControl>
           </FilterContainer>
@@ -154,10 +154,10 @@ function SessionsByCity() {
                         {item.locationName}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        Total Sessions: {item.totalSessions}
+                        {t('total_sessions')}: {item.totalSessions}
                       </Typography>
                       <Typography variant="body2" color="text.secondary">
-                        Avg Duration: {item.avgSessionDuration}
+                        {t('avg_duration')}: {item.avgSessionDuration}
                       </Typography>
                     </Box>
 

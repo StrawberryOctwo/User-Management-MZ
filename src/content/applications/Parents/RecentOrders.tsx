@@ -51,8 +51,8 @@ export default function ParentsContent() {
 
   const columns = [
     { field: 'fullName', headerName: t('Full Name') },
-    { field: 'email', headerName: t('Email') },
-    { field: 'address', headerName: t('Address') },
+    { field: 'email', headerName: t('email') },
+    { field: 'address', headerName: t('address') },
   ];
 
   const handleEdit = (id: any) => {
@@ -119,7 +119,7 @@ export default function ParentsContent() {
         actions={
           <>
             <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
-              Cancel
+              {t("(cancel")}
             </Button>
             <Button
               onClick={handleDelete}
@@ -127,7 +127,7 @@ export default function ParentsContent() {
               autoFocus
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+              {loading ? <CircularProgress size={24} /> : t("confirm")}
             </Button>
           </>
         }

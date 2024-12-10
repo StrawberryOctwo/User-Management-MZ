@@ -46,12 +46,12 @@ export default function ViewLocationPage() {
   };
 
   const columns = [
-    { field: 'name', headerName: t('Location Name')} ,
-    { field: 'address', headerName: t('Address')} ,
-    { field: 'postalCode', headerName: t('Postal Code')} ,
-    { field: 'franchiseName', headerName: t('Franchise Name')} ,
-    { field: 'totalTeachers', headerName: t('Total Teachers')} ,
-    { field: 'totalStudents', headerName: t('Total Students')} 
+    { field: 'name', headerName: t('location_name') },
+    { field: 'address', headerName: t('address') },
+    { field: 'postalCode', headerName: t('postal_code') },
+    { field: 'franchiseName', headerName: t('franchise_name') },
+    { field: 'totalTeachers', headerName: t('total_teachers') },
+    { field: 'totalStudents', headerName: t('total_students') }
   ];
 
   const handleEdit = (id: any) => {
@@ -122,7 +122,7 @@ export default function ViewLocationPage() {
               color="inherit"
               disabled={loading}
             >
-              Cancel
+              {t("(cancel")}
             </Button>
             <Button
               onClick={handleDelete}
@@ -130,7 +130,7 @@ export default function ViewLocationPage() {
               autoFocus
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+              {loading ? <CircularProgress size={24} /> : t("confirm")}
             </Button>
           </>
         }

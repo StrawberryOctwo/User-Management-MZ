@@ -8,7 +8,7 @@ import {
   Grid,
   Button
 } from '@mui/material';
-
+import { t } from "i18next"
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 
 function Feed() {

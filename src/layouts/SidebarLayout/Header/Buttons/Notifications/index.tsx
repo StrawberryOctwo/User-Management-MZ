@@ -24,6 +24,7 @@ import { useAuth } from 'src/hooks/useAuth';
 import { INotification, fetchNotifications } from './utils';
 import { GridCloseIcon } from '@mui/x-data-grid';
 import { api } from 'src/services/api';
+import { t } from "i18next"
 
 // Styled Badge for Notifications
 const NotificationsBadge = styled(Badge)(
@@ -187,7 +188,7 @@ function HeaderNotifications() {
           <Typography variant="h6" fontWeight="bold">
             {notifications.length > 0
               ? `${unreadCount} Unread Notification${unreadCount !== 1 ? 's' : ''}`
-              : 'No Notifications'}
+              : t('no_notifications')}
           </Typography>
           <Button
             size="small"
@@ -203,7 +204,7 @@ function HeaderNotifications() {
               },
             }}
           >
-            Mark All as Read
+            {t('mark_all_as_read')}
           </Button>
         </Box>
         <List
@@ -314,7 +315,7 @@ function HeaderNotifications() {
                       fontSize: '0.75rem',
                     }}
                   >
-                    Mark as Read
+                    {t("mark_as_read")}
                   </Button>
                 ) : (
                   <Fade in={notification.isRead}>
@@ -326,8 +327,8 @@ function HeaderNotifications() {
                         color: 'success.main'
                       }}
                     >
-                      <CheckCircleOutlineIcon sx={{ mr: 0.5 }} fontSize="small" />
-                      Read
+                      <CheckCircleOutlineIcon sx={{ mr: 0.5 }} />
+                      {t("read")}
                     </Typography>
                   </Fade>
                 )}
@@ -350,10 +351,10 @@ function HeaderNotifications() {
               disabled={currentPage === 0}
               onClick={handlePreviousPage}
             >
-              Previous
+              {t("previous")}
             </Button>
             <Typography variant="body2">
-              Page {currentPage + 1} of {totalPages}
+              {t("page")} {currentPage + 1} of {totalPages}
             </Typography>
             <Button
               variant="contained"
@@ -361,7 +362,7 @@ function HeaderNotifications() {
               disabled={currentPage >= totalPages - 1}
               onClick={handleNextPage}
             >
-              Next
+              {t("next")}
             </Button>
           </Box>
         )}

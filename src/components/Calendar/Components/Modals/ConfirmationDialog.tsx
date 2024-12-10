@@ -6,6 +6,7 @@ import {
   DialogActions,
   Button
 } from '@mui/material';
+import { t } from "i18next"
 
 interface ConfirmationDialogProps {
   open: boolean;
@@ -24,9 +25,9 @@ const ConfirmationDialog: React.FC<ConfirmationDialogProps> = ({
   onConfirm,
   title,
   content,
-  confirmButtonText = 'Confirm',
-  cancelButtonText = 'Cancel',
-  confirmButtonColor = 'primary'
+  confirmButtonText = t('confirm'),
+  cancelButtonText = t('cancel'),
+  confirmButtonColor = t('primary')
 }) => {
   return (
     <Dialog

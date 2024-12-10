@@ -1,5 +1,6 @@
 import React from 'react';
 import { Avatar } from '@mui/material';
+import { t } from "i18next"
 
 interface AvatarWithInitialsProps {
   firstName: string;
@@ -14,7 +15,7 @@ const AvatarWithInitials: React.FC<AvatarWithInitialsProps> = ({
   lastName = 'Doe',
   avatarUrl,
   size = 40,
-  
+
 }) => {
   const isValidName = (name: string) => {
     return /^[a-zA-Z]+$/.test(name);
@@ -28,15 +29,15 @@ const AvatarWithInitials: React.FC<AvatarWithInitialsProps> = ({
   };
 
   return (
-    <Avatar 
-    variant="rounded"
-    sx={{
-      bgcolor: (theme) => theme.palette.primary.main,
-      color: (theme) => theme.palette.primary.contrastText,
-    }}
-  >
-    {getInitials()} 
-  </Avatar>
+    <Avatar
+      variant="rounded"
+      sx={{
+        bgcolor: (theme) => theme.palette.primary.main,
+        color: (theme) => theme.palette.primary.contrastText,
+      }}
+    >
+      {getInitials()}
+    </Avatar>
   );
 };
 

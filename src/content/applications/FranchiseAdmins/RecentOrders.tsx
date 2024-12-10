@@ -52,7 +52,7 @@ export default function FranchiseAdminsContent() {
     { field: 'fullName', headerName: 'Full Name' },
     {
       field: 'franchiseNames',
-      headerName: 'Franchise Name',
+      headerName: t('franchise_name'),
       render: (value: any) => {
         if (Array.isArray(value)) {
           return value.map((franchise: any) => franchise || franchise).join(', ');
@@ -65,10 +65,10 @@ export default function FranchiseAdminsContent() {
       headerName: 'DOB',
       render: (value: any) => new Date(value).toLocaleDateString('de')
     }, */
-    { field: 'email', headerName: t('Email') },
+    { field: 'email', headerName: t('email') },
     /* { field: 'address', headerName: 'Address' },
     { field: 'postalCode', headerName: 'Postal Code' }, */
-    { field: 'phoneNumber', headerName: t('Phone Number') },
+    { field: 'phoneNumber', headerName: t('phone_Number') },
   ];
 
 
@@ -135,7 +135,7 @@ export default function FranchiseAdminsContent() {
         actions={
           <>
             <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
-              Cancel
+              {t("(cancel")}
             </Button>
             <Button
               onClick={handleDelete}
@@ -143,7 +143,7 @@ export default function FranchiseAdminsContent() {
               autoFocus
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+              {loading ? <CircularProgress size={24} /> : t("confirm")}
             </Button>
           </>
         }

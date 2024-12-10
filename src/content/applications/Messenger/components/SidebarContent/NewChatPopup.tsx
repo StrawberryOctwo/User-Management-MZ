@@ -25,8 +25,10 @@ import { createOrGetChatRoom } from 'src/services/chatService';
 import ConfirmationDialog from 'src/components/Calendar/Components/Modals/ConfirmationDialog';
 import { fetchStudents } from 'src/services/studentService';
 import { fetchParents } from 'src/services/parentService';
+import { useTranslation } from 'react-i18next';
 
 import { useAuth } from 'src/hooks/useAuth';
+
 
 interface User {
   id: number;
@@ -40,13 +42,6 @@ interface NewChatPopupProps {
   onSelectUser: (user: User, roomId: string) => void;
 }
 
-const userTypes = [
-  { id: 'FranchiseAdmin', label: 'Franchise Admin', icon: '🏢' },
-  { id: 'LocationAdmin', label: 'Location Admin', icon: '📍' },
-  { id: 'Teacher', label: 'Teacher', icon: '👩‍🏫' },
-  { id: 'Student', label: 'Student', icon: '👩‍🏫' },
-  { id: 'Parent', label: 'Parent', icon: '👩‍🏫' }
-];
 
 const fetchUsersByType = async (type: string, query: string) => {
   const page = 1;
@@ -101,6 +96,16 @@ const NewChatPopup: React.FC<NewChatPopupProps> = ({
   onSelectUser
 }) => {
   const { userId, userRoles } = useAuth();
+
+  const { t } = useTranslation(); 
+  const userTypes = [
+    { id: 'FranchiseAdmin', label: t('franchise_admin'), icon: '🏢' },
+    { id: 'LocationAdmin', label: t('location_admin'), icon: '📍' },
+    { id: 'Teacher', label: t('teacher'), icon: '👩‍🏫' },
+    { id: 'Student', label: t('student'), icon: '👩‍🏫' },
+    { id: 'Parent', label: t('parent'), icon: '👩‍🏫' }
+  ];
+  
   const filteredUserTypes = userTypes.filter((type) => {
     if (userRoles.includes('Student') || userRoles.includes('Parent')) {
       return !['Student', 'Parent'].includes(type.id);
@@ -240,7 +245,7 @@ const NewChatPopup: React.FC<NewChatPopupProps> = ({
               </List>
               <Box display="flex" justifyContent="flex-end" mt={2}>
                 <Button onClick={handleClose} color="primary" variant="outlined">
-                  Cancel
+                  {t("(cancel")}
                 </Button>
               </Box>
             </>
@@ -270,7 +275,7 @@ const NewChatPopup: React.FC<NewChatPopupProps> = ({
               />
               <Box display="flex" justifyContent="flex-end" mt={2}>
                 <Button onClick={handleClose} color="primary" variant="outlined">
-                  Cancel
+                  {t("(cancel")}
                 </Button>
               </Box>
             </>

@@ -32,7 +32,7 @@ export default function EditLocation() {
                 return loc;
             });
 
-            // Save back to localStorage
+            // {t("(save")} back to localStorage
             localStorage.setItem('selectedLocations', JSON.stringify(updatedLocations));
         } catch (error) {
             console.error('Error updating localStorage:', error);
@@ -111,7 +111,7 @@ export default function EditLocation() {
         { name: 'numberOfRooms', label: t('number_of_rooms'), type: 'number', required: true, section: 'Location Information' },
         {
             name: 'franchises',
-            label: t('Franchise'),
+            label: t('franchise'),
             type: 'custom',
             section: 'Location Assignment',
             component: (
