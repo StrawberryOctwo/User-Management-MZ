@@ -373,13 +373,13 @@ const AddSessionReportForm: React.FC<AddSessionReportFormProps> = ({
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose} color="secondary">
-          {t('{t("(cancel")}')}
+          {t('cancel')}
         </Button>
         <Box sx={{ display: 'flex', gap: 1 }}>
           {activeStep > 0 && <Button onClick={handleBack}>{t('Back')}</Button>}
           {activeStep === steps.length - 1 ? (
             <Button onClick={handleSave} variant="contained" color="primary">
-              {t('{t("(save")}')}
+              {t('save')}
             </Button>
           ) : (
             <Button onClick={handleNext} variant="contained" color="primary">
