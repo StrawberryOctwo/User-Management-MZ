@@ -15,6 +15,7 @@ import {
   IconButtonToggle
 } from './index-styles';
 import { ChatProvider } from './context/ChatContext';
+import { t } from "i18next"
 
 function ApplicationsMessenger() {
   const theme = useTheme();

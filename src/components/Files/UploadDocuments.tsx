@@ -121,7 +121,7 @@ const UploadSection: React.FC<UploadSectionProps> = ({ onUploadChange, initialDo
 
                         <Grid item xs={12} sm={12}>
                             <TextField
-                                label="File Name"
+                                label={t("file_name")}
                                 fullWidth
                                 value={fileName}
                                 onChange={(e) => setFileName(e.target.value)}
@@ -131,19 +131,19 @@ const UploadSection: React.FC<UploadSectionProps> = ({ onUploadChange, initialDo
 
                         <Grid item xs={12} sm={12}>
                             <TextField
-                                label="File Type"
+                                label={t("file_type")}
                                 select
                                 fullWidth
                                 value={fileType}
                                 onChange={(e) => setFileType(e.target.value)}
                                 placeholder="Select file type"
                             >
-                            <MenuItem value="fee_agreement">{t('fee_agreement')}</MenuItem>
-                            <MenuItem value="affidavit">{t('affidavit')}</MenuItem>
-                            <MenuItem value="confidentiality_agreement">{t('confidentiality_agreement')}</MenuItem>
-                            <MenuItem value="non_compete_agreement">{t('non_compete_agreement')}</MenuItem>
-                            <MenuItem value="contract">{t('contract')}</MenuItem>
-                            <MenuItem value="absence">{t('absence')}</MenuItem>
+                                <MenuItem value="fee_agreement">{t('fee_agreement')}</MenuItem>
+                                <MenuItem value="affidavit">{t('affidavit')}</MenuItem>
+                                <MenuItem value="confidentiality_agreement">{t('confidentiality_agreement')}</MenuItem>
+                                <MenuItem value="non_compete_agreement">{t('non_compete_agreement')}</MenuItem>
+                                <MenuItem value="contract">{t('contract')}</MenuItem>
+                                <MenuItem value="absence">{t('absence')}</MenuItem>
 
                             </TextField>
                         </Grid>
@@ -222,13 +222,13 @@ const UploadSection: React.FC<UploadSectionProps> = ({ onUploadChange, initialDo
                 onClose={() => setOpenDialog(false)}
                 actions={
                     <>
-                        <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-                        <Button color="error" onClick={confirmDelete}>Delete</Button>
+                        <Button onClick={() => setOpenDialog(false)}>{t("(cancel")}</Button>
+                        <Button color="error" onClick={confirmDelete}>{t("delete")}</Button>
                     </>
                 }
             >
                 <Typography>
-                    Are you sure you want to delete this file?
+                    {t("are_you_sure_you_want_to_delete_this_file?")}
                 </Typography>
             </ReusableDialog>
         </Box>

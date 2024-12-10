@@ -10,7 +10,7 @@ import {
 import { Helmet } from 'react-helmet-async';
 import RefreshTwoToneIcon from '@mui/icons-material/RefreshTwoTone';
 import LoadingButton from '@mui/lab/LoadingButton';
-
+import { t } from "i18next"
 import { styled } from '@mui/material/styles';
 
 const GridWrapper = styled(Grid)(
@@ -52,7 +52,7 @@ function Status500() {
   return (
     <>
       <Helmet>
-        <title>Status - 500</title>
+        <title>{t("status_500")}</title>
       </Helmet>
       <MainContent>
         <Grid
@@ -115,7 +115,7 @@ function Status500() {
               <Container maxWidth="sm">
                 <Box textAlign="center">
                   <TypographyPrimary variant="h1" sx={{ my: 2 }}>
-                  User Management System
+                    User Management System
                   </TypographyPrimary>
                   <TypographySecondary
                     variant="h4"

@@ -24,6 +24,7 @@ import {
   deleteSessionReport
 } from 'src/services/sessionReportService';
 import { format } from 'date-fns';
+import { t } from 'i18next';
 
 interface ViewSessionReportFormProps {
   isOpen: boolean;
@@ -173,7 +174,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
               </Grid>
               <Grid item xs={6}>
                 <TextField
-                  label="Session Date"
+                  label={t("session_date")}
                   value={sessionDate}
                   fullWidth
                   InputProps={{ readOnly: true }}
@@ -181,7 +182,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="Lesson Topic"
+                  label={("lesson_topic")}
                   value={lessonTopic}
                   onChange={(e) => setLessonTopic(e.target.value)}
                   fullWidth
@@ -235,7 +236,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="Tutor Remarks"
+                  label={t("tutor_remarks")}
                   value={tutorRemarks}
                   onChange={(e) => setTutorRemarks(e.target.value)}
                   fullWidth
@@ -253,9 +254,9 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
             <Grid container spacing={2}>
               <Grid item xs={6}>
                 <FormControl fullWidth>
-                  <InputLabel>Active Participation</InputLabel>
+                  <InputLabel>{t("active_participation")}</InputLabel>
                   <Select
-                    label="Active Participation"
+                    label={t("active_participation")}
                     value={activeParticipation ? 'Yes' : 'No'}
                     onChange={(e) =>
                       setActiveParticipation(e.target.value === 'Yes')
@@ -285,31 +286,31 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
           </Box>
         ) : (
           <Box display="flex" flexDirection="column" gap={3} mt={2}>
-        
+
             <Grid container spacing={2}>
               <Grid item xs={6}>
                 <Typography variant="body1">
-                  <strong>Student Name:</strong> {studentName}
+                  <strong>{t("student_name")}:</strong> {studentName}
                 </Typography>
               </Grid>
               <Grid item xs={6}>
                 <Typography variant="body1">
-                  <strong>Session Date:</strong> {sessionDate}
+                  <strong>{t("session_date")}:</strong> {sessionDate}
                 </Typography>
               </Grid>
               <Grid item xs={12}>
                 <Typography variant="body1">
-                  <strong>Lesson Topic:</strong> {lessonTopic}
+                  <strong>{t("lesson_topic")}:</strong> {lessonTopic}
                 </Typography>
               </Grid>
               <Grid item xs={12}>
                 <Typography variant="body1">
-                  <strong>Covered Materials:</strong> {coveredMaterials}
+                  <strong>{t("covered_materials")}:</strong> {coveredMaterials}
                 </Typography>
               </Grid>
               <Grid item xs={12}>
                 <Typography variant="body1">
-                  <strong>Progress:</strong> {progress}
+                  <strong>{t("progress")}:</strong> {progress}
                 </Typography>
               </Grid>
             </Grid>
@@ -347,7 +348,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
             <Grid container spacing={2}>
               <Grid item xs={6}>
                 <Typography variant="body1">
-                  <strong>Active Participation:</strong>{' '}
+                  <strong>{t("active_participation")}:</strong>{' '}
                   {activeParticipation ? 'Yes' : 'No'}
                 </Typography>
               </Grid>
@@ -380,10 +381,10 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
       {isEditable && (
         <DialogActions>
           <Button onClick={handleDelete} color="error">
-            Delete
+            {t("delete")}
           </Button>
           <Button onClick={handleSave} variant="contained" color="primary">
-            Save
+            {t("(save")}
           </Button>
         </DialogActions>
       )}

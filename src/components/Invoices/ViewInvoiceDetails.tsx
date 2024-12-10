@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, CircularProgress } from '@mui/material';
 import { fetchInvoiceById } from 'src/services/invoiceService';
+import { t } from "i18next"
 
 interface ViewInvoiceDetailsProps {
   isOpen: boolean;
@@ -39,7 +40,7 @@ export default function ViewInvoiceDetails({
 
   return (
     <Dialog open={isOpen} onClose={onClose} fullWidth maxWidth="sm">
-      <DialogTitle>Invoice Details</DialogTitle>
+      <DialogTitle>{t("invoice_details")}</DialogTitle>
       <DialogContent>
         {loading ? (
           <CircularProgress />
@@ -47,11 +48,11 @@ export default function ViewInvoiceDetails({
           <div>{errorMessage}</div>
         ) : (
           <div>
-            <p><strong>Invoice ID:</strong> {invoice.invoiceId}</p>
-            <p><strong>Total Amount:</strong> ${invoice.totalAmount}</p>
-            <p><strong>Extra Amount:</strong> ${invoice.extraAmount}</p>
-            <p><strong>Status:</strong> {invoice.status}</p>
-            <p><strong>Created At:</strong> {new Date(invoice.createdAt).toLocaleString()}</p>
+            <p><strong>{t("invoice_id")}</strong> {invoice.invoiceId}</p>
+            <p><strong>{t("invototal_amountice_details")}:</strong> ${invoice.totalAmount}</p>
+            <p><strong>{t("extra_amount")}:</strong> ${invoice.extraAmount}</p>
+            <p><strong>{t("status")}:</strong> {invoice.status}</p>
+            <p><strong>{t("created_at")}:</strong> {new Date(invoice.createdAt).toLocaleString()}</p>
           </div>
         )}
       </DialogContent>

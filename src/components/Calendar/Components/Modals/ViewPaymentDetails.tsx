@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, Typography, Box } from '@mui/material';
 import { getPaymentsForUserByClassSession } from 'src/services/paymentService';
+import { t } from 'i18next';
 
 interface ViewPaymentDetailsProps {
     isOpen: boolean;
@@ -15,7 +16,7 @@ const ViewPaymentDetails: React.FC<ViewPaymentDetailsProps> = ({ isOpen, onClose
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
-        if (isOpen && userId) { 
+        if (isOpen && userId) {
             const fetchPayment = async () => {
                 setLoading(true);
                 try {
@@ -37,11 +38,11 @@ const ViewPaymentDetails: React.FC<ViewPaymentDetailsProps> = ({ isOpen, onClose
             <DialogTitle>Payment Details for {studentName}</DialogTitle>
             <DialogContent>
                 {loading ? (
-                    <Typography>Loading payment...</Typography>
+                    <Typography>{t("loading_payment")}...</Typography>
                 ) : payment ? (
                     <Box>
-                        <Typography><strong>Amount:</strong> ${payment.amount}</Typography>
-                        <Typography><strong>Status:</strong> {payment.paymentStatus}</Typography>
+                        <Typography><strong>{t("amout")}:</strong> ${payment.amount}</Typography>
+                        <Typography><strong>{t("status")}:</strong> {payment.paymentStatus}</Typography>
                         <Typography><strong>Date:</strong> {new Date(payment.paymentDate).toLocaleDateString()}</Typography>
                     </Box>
                 ) : (

@@ -30,6 +30,7 @@ import useTableSort from './useTableSort';
 import { CSVLink } from 'react-csv';
 import React from 'react';
 import DownloadTwoToneIcon from '@mui/icons-material/DownloadTwoTone';
+import { t } from 'i18next';
 
 interface Column {
   field: string;
@@ -58,9 +59,9 @@ interface ReusableTableProps {
 
 const getStatusLabel = (status: string): JSX.Element => {
   const map = {
-    active: { text: 'Active', color: 'success' },
-    inactive: { text: 'Inactive', color: 'error' },
-    interested: { text: 'Interested', color: 'info' }
+    active: { text: t('active'), color: 'success' },
+    inactive: { text: t('inactive'), color: 'error' },
+    interested: { text: t('interested'), color: 'info' }
   };
 
   const { text, color } = map[status] || { text: 'Unknown', color: 'default' };
@@ -162,7 +163,7 @@ export default function ReusableTable({
               }}
             >
               <Typography variant="h6" color="error">
-                Error fetching data
+                {t("error_fetching_data")}
               </Typography>
             </Box>
           </TableCell>
@@ -182,7 +183,7 @@ export default function ReusableTable({
                 height: 200
               }}
             >
-              <Typography variant="h6">No Data Available</Typography>
+              <Typography variant="h6">{t("no_data_available")}</Typography>
             </Box>
           </TableCell>
         </TableRow>
@@ -312,7 +313,7 @@ export default function ReusableTable({
               }}
             >
               <TextField
-                placeholder="Search..."
+                placeholder={t("search_bar")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 size="small"
@@ -364,7 +365,7 @@ export default function ReusableTable({
               ))}
               {/* Conditionally render the Actions column */}
               {showDefaultActions && (
-                <TableCell align="right">Actions</TableCell>
+                <TableCell align="right">{t("actions")}</TableCell>
               )}
             </TableRow>
           </TableHead>

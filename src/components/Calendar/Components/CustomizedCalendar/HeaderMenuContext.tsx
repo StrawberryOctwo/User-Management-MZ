@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useState } from 'react';
+import { t } from 'i18next';
 
 interface HeaderMenuContextProps {
   selectedFranchise: any | null;

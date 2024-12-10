@@ -2,6 +2,7 @@ import { FC } from 'react';
 import PropTypes from 'prop-types';
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import { Typography, Button, Grid } from '@mui/material';
+import { t } from "i18next";
 
 interface PageTitleProps {
   heading?: string;
@@ -37,7 +38,7 @@ const PageTitle: FC<PageTitleProps> = ({
           variant="contained"
           startIcon={<AddTwoToneIcon fontSize="small" />}
         >
-          {heading} Documentation
+          {heading} {t("documentation")}
         </Button>
       </Grid>
     </Grid>

@@ -14,6 +14,7 @@ import { fetchHolidayById, updateHoliday } from 'src/services/specialDaysService
 import { fetchLocations } from 'src/services/locationService';
 import dayjs from 'dayjs';
 import { DatePicker } from '@mui/x-date-pickers';
+import { t } from 'i18next';
 
 export interface HolidayData {
     id?: number;
@@ -105,17 +106,17 @@ export default function EditHoliday() {
         },
         {
             name: 'location',
-            label: 'Location',
+            label: t('location'),
             type: 'custom',
             section: 'Holiday Information',
             component: (
                 <SingleSelectWithAutocomplete
                     width="100%"
-                    label="Select Location"
+                    label={t("select_location")}
                     fetchData={(query) => fetchLocations(1, 5, query).then((data) => data.data)}
                     onSelect={handleLocationSelect}
                     displayProperty="name"
-                    placeholder="Search Location"
+                    placeholder={t("search_location")}
                     initialValue={selectedLocation}
                 />
             ),
@@ -127,7 +128,7 @@ export default function EditHoliday() {
             section: 'Holiday Dates',
             component: (
                 <DatePicker
-                    label="Start Date"
+                    label={t("start_date")}
                     value={holidayData?.start_date ? dayjs(holidayData.start_date) : null}
                     onChange={(newValue) => {
                         if (holidayData) {
@@ -148,7 +149,7 @@ export default function EditHoliday() {
             section: 'Holiday Dates',
             component: (
                 <DatePicker
-                    label="End Date"
+                    label={t("end_date")}
                     value={holidayData?.end_date ? dayjs(holidayData.end_date) : null}
                     onChange={(newValue) => {
                         if (holidayData) {

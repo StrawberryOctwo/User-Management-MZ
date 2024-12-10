@@ -6,6 +6,7 @@ import React, {
   useEffect
 } from 'react';
 import { useAuth } from 'src/hooks/useAuth';
+import { t } from "i18next"
 
 interface Participant {
   id: number;
@@ -25,8 +26,8 @@ interface ChatContextData {
 const ChatContext = createContext<ChatContextData>({
   chatRoomId: null,
   participants: [],
-  setChatRoomId: () => {},
-  setParticipants: () => {},
+  setChatRoomId: () => { },
+  setParticipants: () => { },
   firstName: '',
   lastName: ''
 });

@@ -129,7 +129,7 @@ export default function EditFranchiseAdmin() {
     const otherFields = [
         {
             name: 'franchises',
-            label: 'Franchises',
+            label: t('franchises'),
             type: 'custom',
             section: 'Franchise Admin Assignment',
             component: (

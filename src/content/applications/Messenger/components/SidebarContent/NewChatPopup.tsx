@@ -27,6 +27,7 @@ import { fetchStudents } from 'src/services/studentService';
 import { fetchParents } from 'src/services/parentService';
 
 import { useAuth } from 'src/hooks/useAuth';
+import { t } from 'i18next';
 
 interface User {
   id: number;
@@ -41,11 +42,11 @@ interface NewChatPopupProps {
 }
 
 const userTypes = [
-  { id: 'FranchiseAdmin', label: 'Franchise Admin', icon: '🏢' },
+  { id: 'FranchiseAdmin', label: t('franchise_admin'), icon: '🏢' },
   { id: 'LocationAdmin', label: 'Location Admin', icon: '📍' },
-  { id: 'Teacher', label: 'Teacher', icon: '👩‍🏫' },
-  { id: 'Student', label: 'Student', icon: '👩‍🏫' },
-  { id: 'Parent', label: 'Parent', icon: '👩‍🏫' }
+  { id: 'Teacher', label: t('teacher'), icon: '👩‍🏫' },
+  { id: 'Student', label: t('student'), icon: '👩‍🏫' },
+  { id: 'Parent', label: t('parent'), icon: '👩‍🏫' }
 ];
 
 const fetchUsersByType = async (type: string, query: string) => {
@@ -240,7 +241,7 @@ const NewChatPopup: React.FC<NewChatPopupProps> = ({
               </List>
               <Box display="flex" justifyContent="flex-end" mt={2}>
                 <Button onClick={handleClose} color="primary" variant="outlined">
-                  Cancel
+                  {t("(cancel")}
                 </Button>
               </Box>
             </>
@@ -270,7 +271,7 @@ const NewChatPopup: React.FC<NewChatPopupProps> = ({
               />
               <Box display="flex" justifyContent="flex-end" mt={2}>
                 <Button onClick={handleClose} color="primary" variant="outlined">
-                  Cancel
+                  {t("(cancel")}
                 </Button>
               </Box>
             </>

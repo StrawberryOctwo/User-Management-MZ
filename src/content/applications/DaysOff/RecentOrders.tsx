@@ -5,6 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
 import { deleteClosingDay, deleteHoliday, fetchClosingDaysByLocationIds, fetchHolidaysByLocationIds } from 'src/services/specialDaysService';
+import { t } from "i18next"
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -210,7 +211,7 @@ export default function DaysOffContent() {
         actions={
           <>
             <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
-              Cancel
+              {t("(cancel")}
             </Button>
             <Button
               onClick={handleDelete}
@@ -218,7 +219,7 @@ export default function DaysOffContent() {
               autoFocus
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+              {loading ? <CircularProgress size={24} /> : t("confirm")}
             </Button>
           </>
         }

@@ -29,6 +29,7 @@ import {
   Close as CloseIcon, // Import CloseIcon for Chips
 } from '@mui/icons-material';
 import { fetchToDosForSelf, toggleToDoCompletion } from 'src/services/todoService';
+import { t } from "i18next"
 
 const HeaderToDoList: React.FC = () => {
   const [anchorEl, setAnchorEl] = useState<HTMLButtonElement | null>(null);
@@ -176,7 +177,7 @@ const HeaderToDoList: React.FC = () => {
             color="text.secondary"
             sx={{ fontStyle: 'italic' }}
           >
-            Assigned By: {todo.assignedBy?.firstName} {todo.assignedBy?.lastName}
+            {t("assigned_by")}: {todo.assignedBy?.firstName} {todo.assignedBy?.lastName}
           </Typography>
           <Typography
             variant="caption"
@@ -192,7 +193,7 @@ const HeaderToDoList: React.FC = () => {
           sx={{ alignSelf: 'flex-end' }}
           onClick={() => handleToggleComplete(todo.id)}
         >
-          {isCompleted ? 'Reopen Task' : 'Mark as Complete'}
+          {isCompleted ? t("reopen_task") : t('mark_as_complete')}
         </Button>
       </Card>
     ));
@@ -227,7 +228,7 @@ const HeaderToDoList: React.FC = () => {
         </Typography>
         <Box display="flex" gap={1} mb={2}>
           <TextField
-            label="Search"
+            label={t("search")}
             size="small"
             fullWidth
             value={searchQuery}
@@ -241,7 +242,7 @@ const HeaderToDoList: React.FC = () => {
           />
           <TextField
             select
-            label="Priority"
+            label={t("priority")}
             size="small"
             value={priorityFilter}
             onChange={(e) => {
@@ -250,17 +251,17 @@ const HeaderToDoList: React.FC = () => {
             }}
             sx={{ minWidth: 120 }}
           >
-            <MenuItem value="All">All</MenuItem>
-            <MenuItem value="High">High</MenuItem>
-            <MenuItem value="Medium">Medium</MenuItem>
-            <MenuItem value="Low">Low</MenuItem>
+            <MenuItem value="All">{t("all")}</MenuItem>
+            <MenuItem value="High">{t("high")}</MenuItem>
+            <MenuItem value="Medium">{t("medium")}</MenuItem>
+            <MenuItem value="Low">{t("low")}</MenuItem>
           </TextField>
         </Box>
 
         {/* Active Filters Display */}
         {(searchQuery || (priorityFilter && priorityFilter !== 'All')) && (
           <Box display="flex" gap={1} alignItems="center" mb={2}>
-            <Typography variant="subtitle1">Active Filters:</Typography>
+            <Typography variant="subtitle1">{t("active_filters")}:</Typography>
             {searchQuery && (
               <Chip
                 label={`Search: "${searchQuery}"`}
@@ -296,7 +297,7 @@ const HeaderToDoList: React.FC = () => {
                 setPage(1); // Reset to first page when filters are cleared
               }}
             >
-              Clear All
+              {t("clear_all")}
             </Button>
           </Box>
         )}
@@ -308,14 +309,14 @@ const HeaderToDoList: React.FC = () => {
         ) : todos.length === 0 ? (
           <Box textAlign="center" py={4}>
             <Typography variant="body2" color="text.secondary">
-              No ToDos match your criteria.
+              {t("no_todos_match_your_criteria.")}
             </Typography>
           </Box>
         ) : (
           <>
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
               <Typography variant="subtitle2" color="text.secondary">
-                Pending Tasks
+                {t("pending_tasks")}
               </Typography>
               <IconButton
                 size="small"
@@ -330,7 +331,7 @@ const HeaderToDoList: React.FC = () => {
             <Divider sx={{ my: 2 }} />
             <Box display="flex" justifyContent="space-between" alignItems="center" mb={1}>
               <Typography variant="subtitle2" color="text.secondary">
-                Completed Tasks
+                {t("completed_tasks")}
               </Typography>
               <IconButton
                 size="small"

@@ -1,6 +1,7 @@
 import { Typography, Button, Grid } from '@mui/material';
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { t } from "i18next"
 
 function PageHeader() {
   const navigate = useNavigate(); // Initialize useNavigate

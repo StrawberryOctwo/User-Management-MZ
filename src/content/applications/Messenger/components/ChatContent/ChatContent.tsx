@@ -12,6 +12,7 @@ import {
   CardWrapperPrimary,
   CardWrapperSecondary
 } from './styles';
+import { t } from "i18next"
 
 interface ChatContentProps {
   scrollbarRef: React.RefObject<any>;

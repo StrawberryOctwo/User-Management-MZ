@@ -89,7 +89,7 @@ const HeaderMenu: React.FC = () => {
             }
             onSelect={handleFranchiseChange}
             displayProperty="name"
-            placeholder="Search Franchise"
+            placeholder={t("search_franchise")}
             initialValue={selectedFranchise}
           />
         </Grid>
@@ -103,7 +103,7 @@ const HeaderMenu: React.FC = () => {
       >
         <MultiSelectWithCheckboxes
           ref={locationRef}
-          label={t('Search_and_assign_locations')}
+          label={t('search_and_assign_locations')}
           fetchData={(query) => {
             if (hasFranchiseAccess && franchiseId) {
               return fetchLocationsByFranchise(franchiseId, query).then(
@@ -124,7 +124,7 @@ const HeaderMenu: React.FC = () => {
           }}
           onSelect={handleLocationsChange}
           displayProperty="name"
-          placeholder="Type to search locations"
+          placeholder={t('type_to_search_locations')}
           initialValue={selectedLocations}
           width="100%"
           disabled={!isLocationEnabled}

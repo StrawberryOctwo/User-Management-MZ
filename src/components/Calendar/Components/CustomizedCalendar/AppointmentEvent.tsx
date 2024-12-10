@@ -1,6 +1,7 @@
 import { Box, Typography } from '@mui/material';
 import { AppointmentStatusCode, EVENT_STATUS_COLORS } from '../../constants';
 import { Appointment } from '../../types';
+import { t } from "i18next"
 
 export default function AppointmentEvent({
   appointment,
@@ -61,14 +62,14 @@ export default function AppointmentEvent({
         </Typography>
 
         <Typography fontSize={13} variant="caption" mt={1} fontWeight="bold">
-          {teacher ? teacher : 'Unknown Teacher'}
+          {teacher ? teacher : t('unknown_teacher')}
         </Typography>
         {location && <Typography variant="caption">{location}</Typography>}
         {/* <Typography variant="caption"to">
           Students: {studentCount}
         </Typography> */}
         <Typography fontSize={13} variant="caption">
-          Students: {studentCount}
+          {t("students")}: {studentCount}
         </Typography>
       </Box>
     </Box>

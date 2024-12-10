@@ -17,6 +17,7 @@ import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import DownloadTwoToneIcon from '@mui/icons-material/DownloadTwoTone';
 import { useNavigate } from 'react-router-dom';
+import { t } from 'i18next'
 
 export default function ViewBookings() {
   const [bookings, setBookings] = useState<any[]>([]);
@@ -54,20 +55,20 @@ export default function ViewBookings() {
   };
 
   const columns = [
-    { field: 'firstName', headerName: 'First Name' },
-    { field: 'lastName', headerName: 'Last Name' },
-    { field: 'email', headerName: 'Email' },
-    { field: 'phoneNumber', headerName: 'Phone Number' },
+    { field: 'firstName', headerName: t('first_name') },
+    { field: 'lastName', headerName: t('last_name') },
+    { field: 'email', headerName: t('email') },
+    { field: 'phoneNumber', headerName: t('phone_Number') },
     {
       field: 'appointment',
-      headerName: 'Appointment',
-      render: (value: string) => value ? new Date(value).toLocaleString(): 'N/A',
+      headerName: t('Appointment'),
+      render: (value: string) => value ? new Date(value).toLocaleString() : 'N/A',
     },
-    { field: 'locationName', headerName: 'Location' },
+    { field: 'locationName', headerName: t('location') },
     {
       field: 'accepted',
-      headerName: 'Status',
-      render: (value: boolean) => (value ? 'Accepted' : 'Pending'),
+      headerName: t('status'),
+      render: (value: boolean) => (value ? 'Accepted' : '{t("pending")}'),
     },
   ];
 
@@ -99,7 +100,7 @@ export default function ViewBookings() {
 
   return (
     <Box sx={{ padding: 4 }}>
-      {}
+      { }
       <Paper elevation={3} sx={{ padding: 2, marginBottom: 4 }}>
         <Toolbar
           sx={{
@@ -123,7 +124,7 @@ export default function ViewBookings() {
         </Toolbar>
       </Paper>
 
-      {}
+      { }
       <ReusableTable
         data={bookings}
         columns={columns}

@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import { useDashboard } from 'src/contexts/DashboardContext';
 import BusinessTwoToneIcon from '@mui/icons-material/BusinessTwoTone';
+import { t } from 'i18next';
 
 const AvatarError = styled(Avatar)(
   ({ theme }) => `
@@ -31,7 +32,7 @@ const AvatarError = styled(Avatar)(
 const CardContentWrapper = styled(CardContent)(
   ({ theme }) => `
      padding: ${theme.spacing(2.5, 3, 3)};
-  
+
      &:last-child {
      padding-bottom: 0;
      }
@@ -66,7 +67,7 @@ function TotalFranchises() {
           id="filter-select"
           value={selectedFranchise}
           onChange={handleFranchiseChange}
-          label="Franchise"
+          label={t("franchise")}
           sx={{
             maxHeight: 35
           }}

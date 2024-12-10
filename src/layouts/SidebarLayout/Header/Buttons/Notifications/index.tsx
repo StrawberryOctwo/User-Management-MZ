@@ -25,6 +25,7 @@ import { useAuth } from 'src/hooks/useAuth';
 import { INotification, fetchNotifications } from './utils';
 import { GridCloseIcon } from '@mui/x-data-grid';
 import { api } from 'src/services/api';
+import { t } from "i18next"
 
 const NotificationsBadge = styled(Badge)(
   ({ theme }) => `
@@ -267,7 +268,7 @@ function HeaderNotifications() {
                     }}
                     startIcon={<RemoveRedEyeOutlinedIcon />}
                   >
-                    Mark as Read
+                    {t("mark_as_read")}
                   </Button>
                 ) : (
                   <Fade in={notification.isRead}>
@@ -280,7 +281,7 @@ function HeaderNotifications() {
                       }}
                     >
                       <CheckCircleOutlineIcon sx={{ mr: 0.5 }} />
-                      Read
+                      {t("read")}
                     </Typography>
                   </Fade>
                 )}
@@ -303,10 +304,10 @@ function HeaderNotifications() {
               disabled={currentPage === 0}
               onClick={handlePreviousPage}
             >
-              Previous
+              {t("previous")}
             </Button>
             <Typography variant="body2">
-              Page {currentPage + 1} of {totalPages}
+              {t("page")} {currentPage + 1} of {totalPages}
             </Typography>
             <Button
               variant="contained"
@@ -314,7 +315,7 @@ function HeaderNotifications() {
               disabled={currentPage >= totalPages - 1}
               onClick={handleNextPage}
             >
-              Next
+              {t("next")}
             </Button>
           </Box>
         )}

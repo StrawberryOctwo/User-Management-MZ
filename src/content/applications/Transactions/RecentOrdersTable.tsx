@@ -30,6 +30,7 @@ import { CryptoOrder, CryptoOrderStatus } from 'src/models/crypto_order';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import BulkActions from './BulkActions';
+import { t } from "i18next";
 
 interface RecentOrdersTableProps {
   className?: string;
@@ -47,11 +48,11 @@ const getStatusLabel = (cryptoOrderStatus: CryptoOrderStatus): JSX.Element => {
       color: 'error'
     },
     completed: {
-      text: 'Completed',
+      text: '{t("completed")}',
       color: 'success'
     },
     pending: {
-      text: 'Pending',
+      text: '{t("pending")}',
       color: 'warning'
     }
   };
@@ -186,11 +187,11 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
           action={
             <Box width={150}>
               <FormControl fullWidth variant="outlined">
-                <InputLabel>Status</InputLabel>
+                <InputLabel>{t("status")}</InputLabel>
                 <Select
                   value={filters.status || 'all'}
                   onChange={handleStatusChange}
-                  label="Status"
+                  label={t("status")}
                   autoWidth
                 >
                   {statusOptions.map((statusOption) => (
@@ -218,12 +219,12 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                   onChange={handleSelectAllCryptoOrders}
                 />
               </TableCell>
-              <TableCell>Order Details</TableCell>
-              <TableCell>Order ID</TableCell>
-              <TableCell>Source</TableCell>
-              <TableCell align="right">Amount</TableCell>
-              <TableCell align="right">Status</TableCell>
-              <TableCell align="right">Actions</TableCell>
+              <TableCell>{t("order_details")}</TableCell>
+              <TableCell>{t("order_id")}</TableCell>
+              <TableCell>{t("source")}</TableCell>
+              <TableCell align="right">{t("amout")}</TableCell>
+              <TableCell align="right">{t("status")}</TableCell>
+              <TableCell align="right">{t("actions")}</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>

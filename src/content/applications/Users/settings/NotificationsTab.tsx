@@ -10,6 +10,7 @@ import {
   Divider,
   Switch
 } from '@mui/material';
+import { t } from "i18next"
 
 function NotificationsTab() {
   const [state, setState] = useState({

@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { t } from 'i18next';
 import UploadSection from 'src/components/Files/UploadDocuments';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
@@ -15,6 +14,7 @@ import { assignTeacherToTopics, fetchTopics } from 'src/services/topicService';
 import { generateEmployeeNumber } from 'src/utils/teacherUtils';
 import { TextField } from '@mui/material';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
+import { t } from 'i18next';
 
 const CreateTeacher = () => {
   const [selectedLocations, setSelectedLocations] = useState<any[]>([]);
@@ -210,42 +210,42 @@ const CreateTeacher = () => {
     },
     {
       name: 'hourlyRate',
-      label: 'Hourly Rate',
+      label: t('Hourly Rate'),
       type: 'number',
       required: true,
       section: 'Teacher Information'
     },
     {
       name: 'rateMultiplier',
-      label: 'rateMultiplier',
+      label: t('rateMultiplier'),
       type: 'number',
       required: true,
       section: 'Teacher Information'
     },
     {
       name: 'sessionRateMultiplier',
-      label: 'sessionRateMultiplier',
+      label: t('sessionRateMultiplier'),
       type: 'number',
       required: true,
       section: 'Teacher Information'
     },
     {
       name: 'taxNumber',
-      label: 'Tax Number',
+      label: t('tax_number'),
       type: 'text',
       required: true,
       section: 'Teacher Information'
     },
     {
       name: 'employeeNumber',
-      label: 'Teacher Number',
+      label: t('employee_number'),
       type: 'custom',
       required: true,
       section: 'Teacher Information',
       component: (
         <Box display="flex" alignItems="center" gap={1} sx={{ width: '95%' }}>
           <TextField
-            label="Teacher Number *"
+            label="employee_number *"
             value={employeeNumber}
             variant="outlined"
             fullWidth
@@ -277,49 +277,49 @@ const CreateTeacher = () => {
     },
     {
       name: 'idNumber',
-      label: 'ID Number',
+      label: t('id_number'),
       type: 'text',
       required: false,
       section: 'Teacher Information'
     },
     {
       name: 'contractStartDate',
-      label: 'Contract Start Date',
+      label: t('contract_start_date'),
       type: 'date',
       required: true,
       section: 'Teacher Information'
     },
     {
       name: 'contractEndDate',
-      label: 'Contract End Date',
+      label: t('contract_end_date'),
       type: 'date',
       required: true,
       section: 'Teacher Information'
     },
     {
       name: 'bank',
-      label: 'Bank',
+      label: t('bank'),
       type: 'text',
       required: true,
       section: 'Bank Details'
     },
     {
       name: 'iban',
-      label: 'IBAN',
+      label: t('iban'),
       type: 'text',
       required: true,
       section: 'Bank Details'
     },
     {
       name: 'bic',
-      label: 'BIC',
+      label: t('bic'),
       type: 'text',
       required: false,
       section: 'Bank Details'
     },
     {
       name: 'locations',
-      label: 'Locations',
+      label: t('locations'),
       type: 'custom',
       required: true,
       section: 'Teacher Assignment',
@@ -337,7 +337,7 @@ const CreateTeacher = () => {
     },
     {
       name: 'topics',
-      label: 'Topics',
+      label: t('topics'),
       type: 'custom',
       section: 'Teacher Assignment',
       component: (
@@ -354,7 +354,7 @@ const CreateTeacher = () => {
     },
     {
       name: 'documents',
-      label: 'Upload Documents',
+      label: t('Upload Documents'),
       type: 'custom',
       section: 'Documents',
       component: <UploadSection onUploadChange={handleFilesChange} />,

@@ -7,6 +7,7 @@ import {
   Divider,
   Grid
 } from '@mui/material';
+import { t } from "i18next"
 
 import { ArrowForwardTwoTone } from '@mui/icons-material';
 

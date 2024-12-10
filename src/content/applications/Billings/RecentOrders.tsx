@@ -4,6 +4,7 @@ import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { useNavigate } from 'react-router-dom';
 import { confirmBillingAsPaid, fetchAllBillings } from 'src/services/billingService';
+import { t } from 'i18next';
 
 export default function ViewBillingsPage() {
   const [billings, setBillings] = useState<any[]>([]);
@@ -40,17 +41,17 @@ export default function ViewBillingsPage() {
   };
 
   const columns = [
-    { field: 'revenue', headerName: 'Revenue' },
-    { field: 'amountDue', headerName: 'Amount Due' },
-    { field: 'billingDate', headerName: 'Billing Date', render: (value: any) => new Date(value).toLocaleDateString() },
+    { field: 'revenue', headerName: t('tevenue') },
+    { field: 'amountDue', headerName: t('amount_due') },
+    { field: 'billingDate', headerName: t('billing_date'), render: (value: any) => new Date(value).toLocaleDateString() },
     {
       field: 'franchiseName',
-      headerName: 'Franchise Name',
+      headerName: t('franchise_name'),
       render: (value: any, row: any) => row.franchise?.name || 'N/A',
     },
     {
       field: 'isPaid',
-      headerName: 'Paid',
+      headerName: t('paid'),
       render: (value: any, row: any) => (
         <Switch
           checked={row.isPaid}
@@ -120,7 +121,7 @@ export default function ViewBillingsPage() {
       <ReusableTable
         data={billings}
         columns={columns}
-        title="Billings List"
+        title={t("billings_list")}
         onEdit={handleEdit}
         onView={handleView}
         // onDelete={confirmDelete}
@@ -135,12 +136,12 @@ export default function ViewBillingsPage() {
 
       <ReusableDialog
         open={dialogOpen}
-        title="Confirm Deletion"
+        title={t("confirm_deletion")}
         onClose={() => setDialogOpen(false)}
         actions={
           <>
             <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
-              Cancel
+              {t("(cancel")}
             </Button>
             <Button
               // onClick={handleDelete}
@@ -148,12 +149,12 @@ export default function ViewBillingsPage() {
               autoFocus
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+              {loading ? <CircularProgress size={24} /> : t("confirm")}
             </Button>
           </>
         }
       >
-        <p>Are you sure you want to delete the selected billing?</p>
+        <p>{t("are_you_sure_you_want_to_delete_the_selected_billing?")}</p>
       </ReusableDialog>
     </Box>
   );

@@ -25,7 +25,7 @@ import { styled } from '@mui/material/styles';
 import { TransitionProps } from '@mui/material/transitions';
 import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
 import FindInPageTwoToneIcon from '@mui/icons-material/FindInPageTwoTone';
-
+import { t } from "i18next"
 import ChevronRightTwoToneIcon from '@mui/icons-material/ChevronRightTwoTone';
 
 const Transition = forwardRef(function Transition(
@@ -144,7 +144,7 @@ function HeaderSearch() {
                 </Typography>
               </Typography>
               <Link href="#" variant="body2" underline="hover">
-                Advanced search
+                {t("advanced_search")}
               </Link>
             </Box>
             <Divider sx={{ my: 1 }} />

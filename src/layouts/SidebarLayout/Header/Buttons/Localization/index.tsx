@@ -13,6 +13,7 @@ import {
 import TranslateIcon from '@mui/icons-material/Translate';
 import { useRef, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
+import { t } from 'i18next';
 
 function HeaderLocalization() {
   const ref = useRef(null);
@@ -76,7 +77,7 @@ function HeaderLocalization() {
         }}
       >
         <Box sx={{ p: 2, minWidth: 200 }}>
-          <Typography variant="h6">Select Language</Typography>
+          <Typography variant="h6">{t("select_language")}</Typography>
         </Box>
         <Divider />
         <List>

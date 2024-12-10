@@ -8,6 +8,7 @@ import { getParentPayments, getPaymentsForUser } from 'src/services/paymentServi
 import PaymentPDF from './PaymentPDF';
 import { jsPDF } from 'jspdf';
 import generatePDF from './PaymentPDF';
+import { t } from 'i18next';
 
 export default function ViewPaymentsPage() {
   const [payments, setPayments] = useState<any[]>([]);
@@ -22,7 +23,7 @@ export default function ViewPaymentsPage() {
 
 
   const navigate = useNavigate();
-  const { userId,userRoles } = useAuth();
+  const { userId, userRoles } = useAuth();
 
   useEffect(() => {
     if (userId) {
@@ -41,7 +42,7 @@ export default function ViewPaymentsPage() {
     setLoading(true);
     try {
       const isParent = userRoles.includes('Parent');
-      const { data, total } = isParent 
+      const { data, total } = isParent
         ? await getParentPayments(userId, page + 1, limit)
         : await getPaymentsForUser(userId, page + 1, limit);
       setPayments(data);
@@ -57,10 +58,10 @@ export default function ViewPaymentsPage() {
 
 
   const columns = [
-    { field: 'amount', headerName: 'Amount' },
-    { field: 'paymentStatus', headerName: 'Payment Status' },
-    { field: 'paymentDate', headerName: 'Payment Date', render: (value: any) => new Date(value).toLocaleDateString() },
-    { field: 'lastUpdate', headerName: 'Last Update', render: (value: any) => new Date(value).toLocaleDateString() },
+    { field: 'amount', headerName: t('amount') },
+    { field: 'paymentStatus', headerName: t('payment_status') },
+    { field: 'paymentDate', headerName: t('payment_date'), render: (value: any) => new Date(value).toLocaleDateString() },
+    { field: 'lastUpdate', headerName: t('Last Update'), render: (value: any) => new Date(value).toLocaleDateString() },
   ];
 
   const handleEdit = (id: any) => {
@@ -114,7 +115,7 @@ export default function ViewPaymentsPage() {
         actions={
           <>
             <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
-              Cancel
+              {t("(cancel")}
             </Button>
             <Button
               // onClick={handleDelete} Uncomment if delete function is implemented
@@ -122,7 +123,7 @@ export default function ViewPaymentsPage() {
               autoFocus
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+              {loading ? <CircularProgress size={24} /> : t("confirm")}
             </Button>
           </>
         }

@@ -7,6 +7,7 @@ import Footer from 'src/components/Footer';
 import { styled } from '@mui/material/styles';
 import EditProfileTab from './EditProfileTab';
 import SecurityTab from './SecurityTab';
+import { t } from "i18next"
 
 const TabsWrapper = styled(Tabs)(
   () => `

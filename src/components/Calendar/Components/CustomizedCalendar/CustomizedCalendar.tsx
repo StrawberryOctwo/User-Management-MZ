@@ -33,6 +33,7 @@ import CalendarLegend from '../CalendarLegend';
 import listPlugin from '@fullcalendar/list';
 import { Holiday } from 'src/services/specialDaysService';
 import { CALENDAR_TIME_CONSTANTS } from '../../types/calendarHelpers';
+import { t } from "i18next"
 
 export enum TimeSlotMinutes {
   Five = 5,

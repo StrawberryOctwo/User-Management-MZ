@@ -33,6 +33,7 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import withRole from 'src/hooks/withRole';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
+import { t } from 'i18next';
 
 const MenuWrapper = styled(Box)(
   ({ theme }) => `
@@ -149,9 +150,9 @@ const SubMenuWrapper = styled(Box)(
                 background: ${theme.colors.alpha.trueWhite[100]};
                 opacity: 0;
                 transition: ${theme.transitions.create([
-                  'transform',
-                  'opacity'
-                ])};
+    'transform',
+    'opacity'
+  ])};
                 width: 6px;
                 height: 6px;
                 transform: scale(0);
@@ -186,7 +187,7 @@ function SidebarMenu() {
         component="div"
         subheader={
           <ListSubheader component="div" disableSticky>
-            Dashboards
+            {t("dashboards")}
           </ListSubheader>
         }
       >
@@ -210,7 +211,7 @@ function SidebarMenu() {
                   to="/dashboard/calendar"
                   startIcon={<EditCalendarIcon />}
                 >
-                  Calendar
+                  {t("calendar")}
                 </Button>
               </ListItem>
             </ProtectedListItem>
@@ -225,7 +226,7 @@ function SidebarMenu() {
                   to="/dashboard/charts"
                   startIcon={<InsertChartIcon />}
                 >
-                  Dashboard
+                  {t("dashboards")}
                 </Button>
               </ListItem>
             </ProtectedListItem>
@@ -238,7 +239,7 @@ function SidebarMenu() {
                   to="/dashboard/interests"
                   startIcon={<Interests />}
                 >
-                  Interests
+                  {t("interests")}
                 </Button>
               </ListItem>
             </ProtectedListItem>
@@ -253,7 +254,7 @@ function SidebarMenu() {
           component="div"
           subheader={
             <ListSubheader component="div" disableSticky>
-              User Management
+              {t("user_management")}
             </ListSubheader>
           }
         >
@@ -278,7 +279,7 @@ function SidebarMenu() {
                 to="/management/franchises"
                 startIcon={<BusinessOutlined />}
               >
-                Franchises
+                {t("franchises")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -294,7 +295,7 @@ function SidebarMenu() {
                 to="/management/locations"
                 startIcon={<LocationOnIcon />}
               >
-                Locations
+                {t("locations")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -307,7 +308,7 @@ function SidebarMenu() {
                 to="/management/franchise-admins"
                 startIcon={<LocationSearchingTwoTone />}
               >
-                Franchise Admins
+                {t("franchise_admins")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -320,7 +321,7 @@ function SidebarMenu() {
                 to="/management/location-admins"
                 startIcon={<LocationSearching />}
               >
-                Location Admins
+                {t("location_admins")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -335,7 +336,7 @@ function SidebarMenu() {
                 to="/management/teachers"
                 startIcon={<Person />}
               >
-                Teachers
+                {t("teachers")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -350,7 +351,7 @@ function SidebarMenu() {
                 to="/management/parents"
                 startIcon={<PersonAddAlt1Sharp />}
               >
-                Parents
+                {t("parents")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -371,7 +372,7 @@ function SidebarMenu() {
                 to="/management/students"
                 startIcon={<PersonAddAlt1Sharp />}
               >
-                Students
+                {t("students")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -382,7 +383,7 @@ function SidebarMenu() {
           component="div"
           subheader={
             <ListSubheader component="div" disableSticky>
-              Chat
+              {t("chat")}
             </ListSubheader>
           }
         >
@@ -404,7 +405,7 @@ function SidebarMenu() {
                 to="/management/chat"
                 startIcon={<ChatBubble />}
               >
-                Chat Room
+                {t("chat_room")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -415,7 +416,7 @@ function SidebarMenu() {
           component="div"
           subheader={
             <ListSubheader component="div" disableSticky>
-              Content Management
+              {t("content_management")}
             </ListSubheader>
           }
         >
@@ -428,7 +429,7 @@ function SidebarMenu() {
                 to="/management/files"
                 startIcon={<FileUploadSharp />}
               >
-                Files
+                {t("files")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -441,7 +442,7 @@ function SidebarMenu() {
                 to="/management/topics"
                 startIcon={<Topic />}
               >
-                Topics
+                {t("topics")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -454,7 +455,7 @@ function SidebarMenu() {
                 to="/management/contracts"
                 startIcon={<Topic />}
               >
-                Contracts
+                {t("contracts")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -465,7 +466,7 @@ function SidebarMenu() {
           component="div"
           subheader={
             <ListSubheader component="div" disableSticky>
-              Reports
+              {t("reports")}
             </ListSubheader>
           }
         >
@@ -478,7 +479,7 @@ function SidebarMenu() {
                 to="/management/session-reports"
                 startIcon={<DescriptionOutlinedIcon />}
               >
-                Session Reports
+                {t("session_reports")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -491,7 +492,7 @@ function SidebarMenu() {
                 to="/management/payments"
                 startIcon={<AttachMoney />}
               >
-                Session Payments
+                {t("session_payments")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -502,7 +503,7 @@ function SidebarMenu() {
           component="div"
           subheader={
             <ListSubheader component="div" disableSticky>
-              Finance
+              {t("finance")}
             </ListSubheader>
           }
         >
@@ -515,7 +516,7 @@ function SidebarMenu() {
                 to="/management/invoices"
                 startIcon={<ReceiptIcon />}
               >
-                Monthly Invoices
+                {t("monthly_invoices")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -528,7 +529,7 @@ function SidebarMenu() {
                 to="/management/billings"
                 startIcon={<MoneyRounded />}
               >
-                Franchise Bills
+                {t("franchise_bills")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -539,7 +540,7 @@ function SidebarMenu() {
           component="div"
           subheader={
             <ListSubheader component="div" disableSticky>
-              HR
+              {t("HR")}
             </ListSubheader>
           }
         >
@@ -552,7 +553,7 @@ function SidebarMenu() {
                 to="/management/daysoff"
                 startIcon={<EventBusyIcon />}
               >
-                Days Off
+                {t("days_off")}
               </Button>
             </ListItem>
           </ProtectedListItem>

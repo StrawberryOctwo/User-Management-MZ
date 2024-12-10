@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import UnfoldMoreTwoToneIcon from '@mui/icons-material/UnfoldMoreTwoTone';
 import { NavLink } from 'react-router-dom';
 import ContrastIcon from '@mui/icons-material/Contrast';
+import { t } from "i18next"
 
 const ThemeSettingsButton = styled(Badge)(
   ({ theme }) => `
@@ -250,7 +251,7 @@ const ThemeSettings = () => {
     <>
       <ThemeSettingsButton>
         <Tooltip arrow title={t('Theme Settings')}>
-        <IconButton color="primary" ref={ref} onClick={handleOpen}>
+          <IconButton color="primary" ref={ref} onClick={handleOpen}>
             <ContrastIcon />
           </IconButton>
         </Tooltip>
@@ -278,7 +279,7 @@ const ThemeSettings = () => {
               }}
               variant="body1"
             >
-              Layout Blueprints
+              {t("layout_blueprints")}
             </Typography>
             <Button
               fullWidth
@@ -290,7 +291,7 @@ const ThemeSettings = () => {
               aria-expanded={open ? 'true' : undefined}
               onClick={openMenu}
             >
-              Choose layout
+              {t("choose_layout")}
             </Button>
             <Menu
               disableScrollLock
@@ -313,7 +314,7 @@ const ThemeSettings = () => {
                 component={NavLink}
                 to="/extended-sidebar/dashboards"
               >
-                Extended Sidebar
+                {t("extended_sidebar")}
               </MenuItem>
               <MenuItem
                 sx={{
@@ -322,7 +323,7 @@ const ThemeSettings = () => {
                 component={NavLink}
                 to="/accent-header/dashboards"
               >
-                Accent Header
+                {t("accent_header")}
               </MenuItem>
               <MenuItem
                 sx={{
@@ -331,7 +332,7 @@ const ThemeSettings = () => {
                 component={NavLink}
                 to="/accent-sidebar/dashboards"
               >
-                Accent Sidebar
+                {t("accent_sidebar")}
               </MenuItem>
               <MenuItem
                 sx={{
@@ -340,7 +341,7 @@ const ThemeSettings = () => {
                 component={NavLink}
                 to="/boxed-sidebar/dashboards"
               >
-                Boxed Sidebar
+                {t("boxed_sidebar")}
               </MenuItem>
               <MenuItem
                 sx={{
@@ -349,7 +350,7 @@ const ThemeSettings = () => {
                 component={NavLink}
                 to="/collapsed-sidebar/dashboards"
               >
-                Collapsed Sidebar
+                {t("collapsed_sidebar")}
               </MenuItem>
               <MenuItem
                 sx={{
@@ -358,7 +359,7 @@ const ThemeSettings = () => {
                 component={NavLink}
                 to="/bottom-navigation/dashboards"
               >
-                Bottom Navigation
+                {t("bottom_navigation")}
               </MenuItem>
               <MenuItem
                 sx={{
@@ -367,7 +368,7 @@ const ThemeSettings = () => {
                 component={NavLink}
                 to="/top-navigation/dashboards"
               >
-                Top Navigation
+                {t("top_navigation")}
               </MenuItem>
             </Menu>
           </Box>
@@ -383,7 +384,7 @@ const ThemeSettings = () => {
               }}
               variant="body1"
             >
-              Light color schemes
+              {t("light_color_schemes")}
             </Typography>
             <Stack alignItems="center" spacing={2}>
               <Tooltip placement="left" title="Pure Light" arrow>

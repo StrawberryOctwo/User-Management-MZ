@@ -25,6 +25,7 @@ import {
   GridToolbarFilterButton,
   GridToolbarQuickFilter,
 } from '@mui/x-data-grid';
+import { t } from "i18next"
 
 interface DetailFieldConfig {
   name: string;
@@ -230,7 +231,7 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({
                         {field.label}
                       </Typography>
                       <Typography variant="body2" color="error">
-                        Columns not defined for this table.
+                        {t("columns_not_defined_for_this_table.")}
                       </Typography>
                     </Box>
                   );
@@ -268,7 +269,7 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({
                         noRowsOverlay: {
                           children: (
                             <Typography variant="body2" sx={{ mt: 1 }}>
-                              No results found.
+                              {t("no_results_found.")}
                             </Typography>
                           ),
                         },

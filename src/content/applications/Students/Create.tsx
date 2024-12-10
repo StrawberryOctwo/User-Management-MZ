@@ -178,35 +178,35 @@ export default function CreateStudent() {
   };
   const contractSelectionField = {
     name: 'contracts',
-    label: 'Contracts',
+    label: t('contracts'),
     type: 'custom',
     section: 'Student Information',
     component: (
       <SingleSelectWithAutocomplete
-        label="Search Contracts"
+        label={t("search_contracts")}
         fetchData={(query) =>
           fetchContractPackagesByEntity(1, 5, query).then((data) => data.data)
         }
         onSelect={handleContractSelect}
         displayProperty="name"
-        placeholder="Type to search contracts"
+        placeholder={t("type_to_search_contracts")}
       />
     )
   };
   const locationSelectionField = {
     name: 'locations',
-    label: 'Locations',
+    label: t('locations'),
     type: 'custom',
     section: 'Student Assignment',
     component: (
       <MultiSelectWithCheckboxes
-        label="Search Location"
+        label={t("search_location")}
         fetchData={(query) =>
           fetchLocations(1, 5, query).then((data) => data.data)
         }
         onSelect={handleLocationSelect}
         displayProperty="name"
-        placeholder="Type to search location"
+        placeholder={t("type_to_search_location")}
       />
     )
   };
@@ -345,7 +345,7 @@ export default function CreateStudent() {
           }}
         >
           <FormLabel component="legend" sx={{ whiteSpace: 'nowrap' }}>
-            Available Days:
+            {("available_days")} :
           </FormLabel>
           <FormGroup row sx={{ flexWrap: 'nowrap', gap: 2 }}>
             {daysOfWeek.map((day) => (
@@ -365,7 +365,7 @@ export default function CreateStudent() {
           </FormGroup>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Button variant="outlined" size="small" onClick={handleSelectAll}>
-              Select All
+              {("select_all")}
             </Button>
             <Button
               variant="outlined"
@@ -373,7 +373,7 @@ export default function CreateStudent() {
               color="error"
               onClick={handleClearAll}
             >
-              Clear All
+              {("clear_all")}
             </Button>
           </Box>
         </Box>

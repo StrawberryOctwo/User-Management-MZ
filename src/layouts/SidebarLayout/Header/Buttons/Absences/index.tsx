@@ -25,6 +25,7 @@ import EventBusyIcon from '@mui/icons-material/EventBusy';
 import { getSelfAbsences, fetchAbsenceById, assignFilesToAbsence, updateAbsenceReason } from 'src/services/absence';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import { fetchSelfFiles } from 'src/services/fileUploadService';
+import { t } from "i18next"
 
 const AbsencesBadge = styled(Badge)(
     ({ theme }) => `
@@ -66,9 +67,9 @@ function AbsenceNotifications() {
 
     useEffect(() => {
         fetchAbsences(1);
-      }, []);
+    }, []);
 
-      
+
     const fetchAbsences = async (pageNumber) => {
         try {
             const data = await getSelfAbsences(pageNumber, limit);
@@ -108,7 +109,7 @@ function AbsenceNotifications() {
         try {
             const fileIds = files.map((file) => file.id); // Get IDs of selected files
             await assignFilesToAbsence(selectedAbsence.id, fileIds);
-            await updateAbsenceReason(selectedAbsence.id, selectedAbsence.reason); 
+            await updateAbsenceReason(selectedAbsence.id, selectedAbsence.reason);
             setSelectedAbsence(null);
             setFiles([]);
             setDialogOpen(false);
@@ -119,9 +120,9 @@ function AbsenceNotifications() {
     };
 
     const renderStatus = (status) => {
-        if (status === null) return <Typography color="textSecondary">Pending</Typography>;
-        if (status) return <Typography color="success.main">Accepted</Typography>;
-        return <Typography color="error.main">Rejected</Typography>;
+        if (status === null) return <Typography color="textSecondary">{t("pending")}</Typography>;
+        if (status) return <Typography color="success.main">{t("accepted")}</Typography>;
+        return <Typography color="error.main">{t("rejected")}</Typography>;
     };
 
     const formatGermanDate = (dateString) => {
@@ -132,7 +133,7 @@ function AbsenceNotifications() {
         <>
             <Tooltip arrow title="Absences">
                 <IconButton color="primary" ref={ref} onClick={handleOpen}>
-                    <AbsencesBadge badgeContent={ absences.filter(absence => absence.status === null).length}>
+                    <AbsencesBadge badgeContent={absences.filter(absence => absence.status === null).length}>
                         <EventBusyIcon />
                     </AbsencesBadge>
                 </IconButton>
@@ -157,7 +158,7 @@ function AbsenceNotifications() {
                 }}
             >
                 <Box sx={{ p: 2 }} display="flex" alignItems="center" justifyContent="space-between">
-                    <Typography variant="h5" fontWeight="bold">Your Absences</Typography>
+                    <Typography variant="h5" fontWeight="bold">{t("your_absences")}</Typography>
                 </Box>
                 <Divider />
                 <List sx={{ p: 0 }}>
@@ -165,14 +166,14 @@ function AbsenceNotifications() {
                         <ListItem key={absence.id} sx={{ p: 2, display: 'flex', alignItems: 'center' }}>
                             <Box flex="1">
                                 <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'medium', mt: 1 }}>
-                                    Class Session: <span style={{ fontWeight: 'bold' }}>{formatGermanDate(absence.classSessionDate)}</span>
+                                    {t("class_session")}: <span style={{ fontWeight: 'bold' }}>{formatGermanDate(absence.classSessionDate)}</span>
                                 </Typography>
                                 {renderStatus(absence.status)}
                                 <Typography variant="body2" color="textSecondary" sx={{ fontWeight: 'medium', mt: 0.5 }}>
-                                    Reported: <span style={{ fontWeight: 'bold' }}>{formatDistance(new Date(absence.date), new Date(), { addSuffix: true })}</span>
+                                    {t("reported")}: <span style={{ fontWeight: 'bold' }}>{formatDistance(new Date(absence.date), new Date(), { addSuffix: true })}</span>
                                 </Typography>
                             </Box>
-                            <Tooltip title="Edit Absence">
+                            <Tooltip title={t("edit_absence")}>
                                 <IconButton onClick={() => handleEditAbsence(absence)} disabled={absence.status !== null}>
                                     <EditIcon />
                                 </IconButton>
@@ -183,7 +184,7 @@ function AbsenceNotifications() {
                 {absences.length >= limit * page && (
                     <Box sx={{ textAlign: 'center', p: 1 }}>
                         <Button onClick={() => fetchAbsences(page + 1)} color="primary">
-                            See More
+                            {t("see_more")}
                         </Button>
                     </Box>
                 )}
@@ -191,10 +192,10 @@ function AbsenceNotifications() {
 
             {/* Dialog for editing absence */}
             <Dialog open={dialogOpen} onClose={() => setDialogOpen(false)} maxWidth="sm" fullWidth>
-                <DialogTitle>Edit Absence</DialogTitle>
+                <DialogTitle>{t("edit_absence")}</DialogTitle>
                 <DialogContent>
                     <TextField
-                        label="Reason"
+                        label={t("reason")}
                         fullWidth
                         margin="dense"
                         value={selectedAbsence?.reason || ''}
@@ -207,12 +208,12 @@ function AbsenceNotifications() {
                         fetchData={(query) => fetchSelfFiles(1, 5, query).then((data) => data.data)}
                         onSelect={(selectedFiles) => setFiles(selectedFiles)} // Update files state on selection
                         displayProperty="name"
-                        placeholder="Type to search files"
+                        placeholder={t("type_to_search_files")}
                         initialValue={files} // Set initial files from the current state
                     />
 
                     <Box sx={{ mt: 2 }}>
-                        <Typography variant="subtitle1">Files:</Typography>
+                        <Typography variant="subtitle1">Files{t("reported")}:</Typography>
                         <List>
                             {files.map((file, index) => (
                                 <ListItem key={index}>
@@ -228,10 +229,10 @@ function AbsenceNotifications() {
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={() => setDialogOpen(false)} color="secondary">
-                        Cancel
+                        {t("(cancel")}
                     </Button>
                     <Button onClick={handleSubmitProof} color="primary" variant="contained">
-                        Submit
+                        {t("submit")}
                     </Button>
                 </DialogActions>
             </Dialog>

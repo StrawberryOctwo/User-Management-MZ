@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import { Visibility, VisibilityOff } from '@mui/icons-material';
 import { updateUserPassword } from 'src/services/userService';
+import { t } from "i18next"
 
 // Password Change Modal Component
 const PasswordChangeModal = ({ open, onClose }) => {
@@ -131,7 +132,7 @@ const PasswordChangeModal = ({ open, onClose }) => {
       </DialogContent>
       <DialogActions sx={{ p: 2 }}>
         <Button onClick={onClose} disabled={loading}>
-          Cancel
+          {t("(cancel")}
         </Button>
         <Button
           variant="contained"

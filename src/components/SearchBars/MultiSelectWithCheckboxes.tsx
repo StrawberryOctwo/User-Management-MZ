@@ -12,6 +12,7 @@ import {
 } from '@mui/material';
 import CheckBoxOutlineBlankIcon from '@mui/icons-material/CheckBoxOutlineBlank';
 import CheckBoxIcon from '@mui/icons-material/CheckBox';
+import { t } from "i18next"
 
 interface MultiSelectWithCheckboxesProps {
   label: string;
@@ -76,7 +77,7 @@ const MultiSelectWithCheckboxes = forwardRef(
         // 1. Component is focused AND query has 2+ chars, OR
         // 2. Options are empty (initial load)
         // AND not currently selecting an item
-        
+
         if (!shouldFetch || isSelecting) return;
 
         if ((focused && inputValue.length >= 0) || options.length === 0) {
@@ -98,7 +99,7 @@ const MultiSelectWithCheckboxes = forwardRef(
 
               setOptions(newOptions);
 
-              // Save initial options if this is the first load
+              // {t("(save")} initial options if this is the first load
               if (options.length === 0 && inputValue === '') {
                 setInitialOptions(newOptions);
               }

@@ -17,6 +17,7 @@ import {
 
 import SidebarMenu from './SidebarMenu';
 import Logo from 'src/components/LogoSign';
+import { t } from 'i18next';
 
 const SidebarWrapper = styled(Box)(
   ({ theme }) => `
@@ -89,7 +90,7 @@ function Sidebar() {
             size="small"
             fullWidth
           >
-            Support
+            {t("support")}
           </Button>
         </Box>
       </SidebarWrapper>

@@ -3,6 +3,7 @@ import { useAuth } from 'src/hooks/useAuth';
 import { useChat } from '../../context/ChatContext';
 import AvatarWithInitials from '../../utils/Avatar';
 import { RootWrapper } from './styles';
+import { t } from "i18next"
 
 function TopBarContent() {
   const { chatRoomId, participants } = useChat();
@@ -20,8 +21,8 @@ function TopBarContent() {
   const displayName = isGroup
     ? 'Group Chat'
     : participant
-    ? `${participant.firstName} ${participant.lastName}`
-    : 'Select a Chat';
+      ? `${participant.firstName} ${participant.lastName}`
+      : 'Select a Chat';
 
   return (
     <RootWrapper>
