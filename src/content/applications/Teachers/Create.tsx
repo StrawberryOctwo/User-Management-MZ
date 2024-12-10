@@ -15,6 +15,7 @@ import { generateEmployeeNumber } from 'src/utils/teacherUtils';
 import { TextField } from '@mui/material';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
 import { useTranslation } from 'react-i18next';
+import IbanInput from 'src/utils/IbanInput';
 
 const CreateTeacher = () => {
   const [selectedLocations, setSelectedLocations] = useState<any[]>([]);
@@ -22,6 +23,10 @@ const CreateTeacher = () => {
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [employeeNumber, setEmployeeNumber] = useState('');
+  const [iban, setIban] = useState('');
+  const handleIbanChange = (value: string) => {
+    setIban(value);
+  };
   const { showMessage } = useSnackbar();
   const { t } = useTranslation();
   const handleGenerateEmployeeNumber = (formData: {
@@ -94,7 +99,7 @@ const CreateTeacher = () => {
           rateMultiplier: data.rateMultiplier,
           sessionRateMultiplier: data.sessionRateMultiplier,
           bank: data.bank,
-          iban: data.iban,
+          iban: iban.replace(/\s+/g, ''), // Trim all whitespaces from IBAN
           bic: data.bic
         }
       };
@@ -306,9 +311,17 @@ const CreateTeacher = () => {
     {
       name: 'iban',
       label: t('iban'),
-      type: 'text',
-      required: true,
-      section: 'Bank Details'
+      type: 'custom',
+      section: 'Bank Details',
+      component: (
+        <IbanInput
+          label="IBAN"
+          value={iban}
+          onChange={handleIbanChange}
+          required
+          sx={{ width: '95%' }}
+        />
+      )
     },
     {
       name: 'bic',
