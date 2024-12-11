@@ -33,6 +33,7 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import withRole from 'src/hooks/withRole';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
+import { t } from 'i18next';
 
 const MenuWrapper = styled(Box)(
   ({ theme }) => `
@@ -74,7 +75,7 @@ const SubMenuWrapper = styled(Box)(
             color: ${theme.palette.primary.contrastText};
           }
         }
-    
+
         .MuiButton-root {
           display: flex;
           color: ${theme.colors.alpha.trueWhite[70]};
@@ -98,7 +99,7 @@ const SubMenuWrapper = styled(Box)(
             font-size: ${theme.typography.pxToRem(20)};
             margin-right: ${theme.spacing(1)};
           }
-          
+
           .MuiButton-endIcon {
             color: ${theme.colors.alpha.trueWhite[50]};
             margin-left: auto;
@@ -320,7 +321,7 @@ function SidebarMenu() {
                 to="/management/location-admins"
                 startIcon={<LocationSearching />}
               >
-                Location Admins
+                {t('location_admins')}
               </Button>
             </ListItem>
           </ProtectedListItem>

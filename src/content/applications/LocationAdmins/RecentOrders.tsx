@@ -5,6 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { deleteLocationAdmins, fetchLocationAdmins } from 'src/services/locationAdminService';
 import { useNavigate } from 'react-router-dom';
 import { LocationAdmin } from 'src/models/LocationAdminModel';
+import { t } from 'i18next';
 
 export default function LocationAdminsContent() {
   const [admins, setAdmins] = useState<LocationAdmin[]>([]);
@@ -54,13 +55,13 @@ export default function LocationAdminsContent() {
       headerName: 'DOB',
       render: (value: any) => new Date(value).toLocaleDateString()
     }, */
-    { field: 'email', headerName: 'Email' },
+    { field: 'email', headerName: t('email') },
     /* { field: 'address', headerName: 'Address' },
     { field: 'postalCode', headerName: 'Postal Code' }, */
-    { field: 'phoneNumber', headerName: 'Phone Number' },
+    { field: 'phoneNumber', headerName: t('phone_Number') },
     {
       field: 'locationNames',
-      headerName: 'Locations',
+      headerName: t('locations'),
       render: (value: any) => {
         if (Array.isArray(value)) {
           return value.map((location: any) => location).join(', ');

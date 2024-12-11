@@ -19,6 +19,7 @@ import {
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { addSessionReport } from 'src/services/sessionReportService';
+import { t } from 'i18next';
 
 interface AddSessionReportFormProps {
   isOpen: boolean;
@@ -145,7 +146,7 @@ const StepContent = ({
                 sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1 }}
               >
                 <TextField
-                  label="Notes"
+                  label={t("notes")}
                   value={formData[inputField]}
                   onChange={handleChange(inputField)}
                   size="small"

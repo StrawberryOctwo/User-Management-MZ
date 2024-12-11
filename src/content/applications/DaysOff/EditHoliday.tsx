@@ -14,6 +14,7 @@ import { fetchHolidayById, updateHoliday } from 'src/services/specialDaysService
 import { fetchLocations } from 'src/services/locationService';
 import dayjs from 'dayjs';
 import { DatePicker } from '@mui/x-date-pickers';
+import { t } from 'i18next';
 
 export interface HolidayData {
     id?: number;
@@ -105,7 +106,7 @@ export default function EditHoliday() {
         },
         {
             name: 'location',
-            label: 'Location',
+            label: t('location'),
             type: 'custom',
             section: 'Holiday Information',
             component: (

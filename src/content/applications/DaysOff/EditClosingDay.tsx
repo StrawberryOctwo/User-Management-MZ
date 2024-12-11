@@ -15,6 +15,7 @@ import { fetchLocations } from 'src/services/locationService';
 import dayjs from 'dayjs';
 import { DatePicker } from '@mui/x-date-pickers';
 import { fetchTeacherById } from 'src/services/teacherService';
+import { t } from 'i18next';
 
 export interface ClosingDayData {
     id?: number;
@@ -106,7 +107,7 @@ export default function EditClosingDay() {
         },
         {
             name: 'location',
-            label: 'Location',
+            label: t('location'),
             type: 'custom',
             section: 'Closing Day Information',
             component: (

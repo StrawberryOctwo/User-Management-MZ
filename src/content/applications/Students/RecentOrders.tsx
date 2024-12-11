@@ -5,6 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { fetchStudents, deleteStudent, fetchParentStudents } from 'src/services/studentService';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from 'src/hooks/useAuth';
+import { t } from 'i18next';
 
 export default function StudentsContent() {
   const [students, setStudents] = useState([]);
@@ -113,9 +114,9 @@ export default function StudentsContent() {
         data={students}
         columns={[
           { field: 'fullName', headerName: 'Full Name' },
-          { field: 'email', headerName: 'Email' },
-          { field: 'gradeLevel', headerName: 'Grade Level' },
-          { field: 'status', headerName: 'Status' },
+          { field: 'email', headerName: t('email') },
+          { field: 'gradeLevel', headerName: t('grade_level') },
+          { field: 'status', headerName: t('status') },
         ]}
         title="Student List"
         onEdit={hasAdminPrivileges ? handleEdit : undefined}

@@ -74,7 +74,7 @@ export default function CreateFranchiseAdmin() {
     const otherFields = [
         {
             name: 'franchises',
-            label: 'Franchises',
+            label: t('franchises'),
             type: 'custom',
             section: 'Franchise Admin Assignment',
             component: (

@@ -12,6 +12,7 @@ import {
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import Text from 'src/components/Text';
+import { t } from 'i18next';
 
 interface TeacherInfo {
   idNumber: string;
@@ -117,7 +118,7 @@ function TeacherDetails({ user, isEditing, setUser }: TeacherDetailsProps) {
           </Grid>
           <Grid container alignItems="center" sx={{ mb: 2 }}>
             <Grid item xs={12} sm={4} md={3} textAlign={{ sm: 'right' }}>
-              <Box pr={3}>Hourly Rate:</Box>
+              <Box pr={3}>{t("hourly_rate")}:</Box>
             </Grid>
             <Grid item xs={12} sm={8} md={9}>
               <Text color="black">€{teacherInfo.hourlyRate}/hr</Text>

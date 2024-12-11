@@ -5,6 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { fetchTeachers, deleteTeacher } from 'src/services/teacherService';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
+import { t } from 'i18next';
 
 export default function TeachersContent() {
   const [teachers, setTeachers] = useState([]);
@@ -59,17 +60,17 @@ export default function TeachersContent() {
 
   const columns = [
     { field: 'fullName', headerName: 'Full Name' },
-    { field: 'franchise', headerName: 'Franchise Name' },
-    { field: 'email', headerName: 'Email' },
-    { field: 'employeeNumber', headerName: 'Teacher Number' },
+    { field: 'franchise', headerName: t('franchise_name') },
+    { field: 'email', headerName: t('email') },
+    { field: 'employeeNumber', headerName: t('employee_number') },
     {
       field: 'contractPeriod',
       headerName: 'Contract Period',
       render: (value: any, row: any) =>
         `${row.contractStartDate} - ${row.contractEndDate}`,
     },
-    { field: 'status', headerName: 'Status' },
-    { field: 'hourlyRate', headerName: 'Hourly Rate' },
+    { field: 'status', headerName: t('status') },
+    { field: 'hourlyRate', headerName: t('hourly_rate') },
   ];
 
   const handleEdit = (id: any) => {

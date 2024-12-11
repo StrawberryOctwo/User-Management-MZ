@@ -1,4 +1,5 @@
 import { fetchUserAnalytics } from 'src/services/dashboardService';
+import { t } from 'i18next';
 
 export const fetchData = async (
   selectedFranchise: string,
@@ -30,26 +31,26 @@ export const fetchData = async (
 export const periods = [
   {
     value: 'Week',
-    text: 'Week'
+    text: t('week')
   },
   {
     value: 'Month',
-    text: 'Month'
+    text: t('month')
   },
   {
     value: 'Year',
-    text: 'Year'
+    text: t('year')
   }
 ];
 
 export const userTypes = [
   {
     value: 'Teachers',
-    text: 'Teachers'
+    text: t('teachers')
   },
   {
     value: 'Students',
-    text: 'Students'
+    text: t('students')
   }
 ];
 

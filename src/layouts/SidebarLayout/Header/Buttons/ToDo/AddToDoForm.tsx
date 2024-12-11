@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Button, TextField, Grid, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { createToDo } from 'src/services/todoService';
+import { t } from 'i18next';
 
 interface AddToDoFormProps {
     onAdd: () => void;
@@ -52,7 +53,7 @@ const AddToDoForm: React.FC<AddToDoFormProps> = ({ onAdd }) => {
                 </Grid>
                 <Grid item xs={12}>
                     <TextField
-                        label="Description"
+                        label={t("description")}
                         variant="outlined"
                         fullWidth
                         multiline

@@ -210,7 +210,7 @@ const CreateTeacher = () => {
     },
     {
       name: 'hourlyRate',
-      label: 'Hourly Rate',
+      label: t('hourly_rate'),
       type: 'number',
       required: true,
       section: 'Teacher Information'
@@ -231,14 +231,14 @@ const CreateTeacher = () => {
     },
     {
       name: 'taxNumber',
-      label: 'Tax Number',
+      label: t('tax_number'),
       type: 'text',
       required: true,
       section: 'Teacher Information'
     },
     {
       name: 'employeeNumber',
-      label: 'Teacher Number',
+      label: t('employee_number'),
       type: 'custom',
       required: true,
       section: 'Teacher Information',
@@ -277,49 +277,49 @@ const CreateTeacher = () => {
     },
     {
       name: 'idNumber',
-      label: 'ID Number',
+      label: t('id_number'),
       type: 'text',
       required: false,
       section: 'Teacher Information'
     },
     {
       name: 'contractStartDate',
-      label: 'Contract Start Date',
+      label: t('contract_start_date'),
       type: 'date',
       required: true,
       section: 'Teacher Information'
     },
     {
       name: 'contractEndDate',
-      label: 'Contract End Date',
+      label: t('contract_end_date'),
       type: 'date',
       required: true,
       section: 'Teacher Information'
     },
     {
       name: 'bank',
-      label: 'Bank',
+      label: t('bank'),
       type: 'text',
       required: true,
       section: 'Bank Details'
     },
     {
       name: 'iban',
-      label: 'IBAN',
+      label: t('iban'),
       type: 'text',
       required: true,
       section: 'Bank Details'
     },
     {
       name: 'bic',
-      label: 'BIC',
+      label: t('bic'),
       type: 'text',
       required: false,
       section: 'Bank Details'
     },
     {
       name: 'locations',
-      label: 'Locations',
+      label: t('locations'),
       type: 'custom',
       required: true,
       section: 'Teacher Assignment',
@@ -337,7 +337,7 @@ const CreateTeacher = () => {
     },
     {
       name: 'topics',
-      label: 'Topics',
+      label: t('topics'),
       type: 'custom',
       section: 'Teacher Assignment',
       component: (

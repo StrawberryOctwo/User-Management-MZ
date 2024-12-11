@@ -121,7 +121,7 @@ const UploadSection: React.FC<UploadSectionProps> = ({ onUploadChange, initialDo
 
                         <Grid item xs={12} sm={12}>
                             <TextField
-                                label="File Name"
+                                label={t("file_name")}
                                 fullWidth
                                 value={fileName}
                                 onChange={(e) => setFileName(e.target.value)}

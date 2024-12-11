@@ -5,6 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { useAuth } from 'src/hooks/useAuth';
 import { fetchParentSessionReports } from 'src/services/parentService';
 import ViewSessionReportForm from 'src/components/Calendar/Components/Modals/ViewSessionReport';
+import { t } from 'i18next';
 
 export default function ViewSessionReports() {
   const [payments, setPayments] = useState<any[]>([]);
@@ -54,7 +55,7 @@ export default function ViewSessionReports() {
   };
 
   const columns = [
-    { field: 'studentName', headerName: 'Name' },
+    { field: 'studentName', headerName: t('name') },
     {
       field: 'sessionStartDate',
       headerName: 'Session Start Date',
@@ -70,7 +71,7 @@ export default function ViewSessionReports() {
       headerName: 'Report Date',
       render: (value: any) => formatDateTime(value)
     },
-    { field: 'lessonTopic', headerName: 'Lesson Topic' },
+    { field: 'lessonTopic', headerName: t('lesson_topic') },
     {
       field: 'actions',
       headerName: 'Actions',

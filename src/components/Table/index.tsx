@@ -30,6 +30,7 @@ import useTableSort from './useTableSort';
 import { CSVLink } from 'react-csv';
 import React from 'react';
 import DownloadTwoToneIcon from '@mui/icons-material/DownloadTwoTone';
+import { t } from 'i18next';
 
 interface Column {
   field: string;
@@ -312,7 +313,7 @@ export default function ReusableTable({
               }}
             >
               <TextField
-                placeholder="Search..."
+                placeholder={t("search_bar")}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 size="small"

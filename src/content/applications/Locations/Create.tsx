@@ -8,12 +8,12 @@ import { fetchFranchises } from 'src/services/franchiseService';
 import { addLocation } from 'src/services/locationService';
 
 export default function CreateLocation() {
-    const [selectedFranchise, setSelectedFranchise] = useState<any>(null); 
-    const [loading, setLoading] = useState(false); 
-    const franchiseRef = useRef<any>(null); 
+    const [selectedFranchise, setSelectedFranchise] = useState<any>(null);
+    const [loading, setLoading] = useState(false);
+    const franchiseRef = useRef<any>(null);
 
     const handleFranchiseSelect = (selectedItem: any) => {
-        setSelectedFranchise(selectedItem); 
+        setSelectedFranchise(selectedItem);
     };
 
     const handleLocationSubmit = async (data: Record<string, any>): Promise<{ message: string }> => {
@@ -37,7 +37,7 @@ export default function CreateLocation() {
 
             setSelectedFranchise(null);
             if (franchiseRef.current) {
-                franchiseRef.current.reset(); 
+                franchiseRef.current.reset();
             }
             return response;
         } catch (error: any) {
@@ -56,7 +56,7 @@ export default function CreateLocation() {
         { name: 'numberOfRooms', label: t('number_of_rooms'), type: 'number', required: true, section: 'Location Information' },
         {
             name: 'franchises',
-            label: 'Franchise',
+            label: t('franchise'),
             type: 'custom',
             section: 'Location Assignment',
             component: (

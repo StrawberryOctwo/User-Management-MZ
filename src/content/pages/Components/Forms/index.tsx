@@ -31,6 +31,7 @@ import VolumeDown from '@mui/icons-material/VolumeDown';
 import VolumeUp from '@mui/icons-material/VolumeUp';
 
 import Switch from '@mui/material/Switch';
+import { t } from 'i18next';
 
 const label = { inputProps: { 'aria-label': 'Switch demo' } };
 
@@ -114,7 +115,7 @@ function Forms() {
                     />
                     <TextField
                       id="outlined-password-input"
-                      label="Password"
+                      label={t("password")}
                       type="password"
                       autoComplete="current-password"
                     />
@@ -163,7 +164,7 @@ function Forms() {
                     />
                     <TextField
                       id="filled-password-input"
-                      label="Password"
+                      label={t("password")}
                       type="password"
                       autoComplete="current-password"
                       variant="filled"
@@ -217,7 +218,7 @@ function Forms() {
                     />
                     <TextField
                       id="standard-password-input"
-                      label="Password"
+                      label={("password")}
                       type="password"
                       autoComplete="current-password"
                       variant="standard"

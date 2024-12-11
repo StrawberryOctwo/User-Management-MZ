@@ -5,6 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { deleteFranchiseAdmin, fetchFranchiseAdmins } from 'src/services/franchiseAdminService';
 import { useNavigate } from 'react-router-dom';
 import { FranchiseAdmin } from 'src/models/FranchiseAdminModel';
+import { t } from 'i18next';
 
 export default function FranchiseAdminsContent() {
   const [admins, setAdmins] = useState<FranchiseAdmin[]>([]);
@@ -51,7 +52,7 @@ export default function FranchiseAdminsContent() {
     { field: 'fullName', headerName: 'Full Name' },
     {
       field: 'franchiseNames',
-      headerName: 'Franchise Name',
+      headerName: t('franchise_name'),
       render: (value: any) => {
         if (Array.isArray(value)) {
           return value.map((franchise: any) => franchise || franchise).join(', ');
@@ -64,10 +65,10 @@ export default function FranchiseAdminsContent() {
       headerName: 'DOB',
       render: (value: any) => new Date(value).toLocaleDateString()
     }, */
-    { field: 'email', headerName: 'Email' },
+    { field: 'email', headerName: t('email') },
     /* { field: 'address', headerName: 'Address' },
     { field: 'postalCode', headerName: 'Postal Code' }, */
-    { field: 'phoneNumber', headerName: 'Phone Number' },
+    { field: 'phoneNumber', headerName: t('phone_Number') },
   ];
 
 

@@ -238,7 +238,7 @@ const EditStudent = () => {
   };
   const contractSelectionField = {
     name: 'contracts',
-    label: 'Contracts',
+    label: t('contract'),
     type: 'custom',
     section: 'Student Information',
     component: (
@@ -388,7 +388,7 @@ const EditStudent = () => {
 
     {
       name: 'locations',
-      label: 'Locations',
+      label: t('locations'),
       type: 'custom',
       section: 'Student Assignment',
       component: (

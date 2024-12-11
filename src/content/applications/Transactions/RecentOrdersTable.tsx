@@ -30,6 +30,7 @@ import { CryptoOrder, CryptoOrderStatus } from 'src/models/crypto_order';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import BulkActions from './BulkActions';
+import { t } from 'i18next';
 
 interface RecentOrdersTableProps {
   className?: string;
@@ -186,11 +187,11 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
           action={
             <Box width={150}>
               <FormControl fullWidth variant="outlined">
-                <InputLabel>Status</InputLabel>
+                <InputLabel>{t('status')}</InputLabel>
                 <Select
                   value={filters.status || 'all'}
                   onChange={handleStatusChange}
-                  label="Status"
+                  label={t("status")}
                   autoWidth
                 >
                   {statusOptions.map((statusOption) => (
@@ -222,7 +223,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
               <TableCell>Order ID</TableCell>
               <TableCell>Source</TableCell>
               <TableCell align="right">Amount</TableCell>
-              <TableCell align="right">Status</TableCell>
+              <TableCell align="right">{t('status')}</TableCell>
               <TableCell align="right">Actions</TableCell>
             </TableRow>
           </TableHead>

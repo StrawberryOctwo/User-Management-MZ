@@ -39,6 +39,7 @@ import CustomRoleDialog from './CustomRoleDialog';
 import AddToDoForm from './AddToDoForm';
 import ToDoTable from './ToDoTable';
 import { styled, alpha } from '@mui/material/styles';
+import { t } from 'i18next';
 
 // Styled Components for enhanced visuals
 const StyledDialogTitle = styled(DialogTitle)(({ theme }) => ({
@@ -317,7 +318,7 @@ const ToDoHeader: React.FC = () => {
             />
             <ActiveChip
               icon={<VisibilityIcon />}
-              label="View"
+              label={t("view")}
               variant={expanded === 'view' ? 'filled' : 'outlined'}
               color="secondary"
               onClick={() => setExpanded(expanded === 'view' ? false : 'view')}

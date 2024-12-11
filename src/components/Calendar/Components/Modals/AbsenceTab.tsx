@@ -10,6 +10,7 @@ import { calendarsharedService } from '../../CalendarSharedService';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import PreviewIcon from '@mui/icons-material/Visibility';
 import { downloadFile } from 'src/services/fileUploadService';
+import { t } from 'i18next';
 
 interface AbsenceTabProps {
     classSessionId: string;
@@ -135,15 +136,15 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
         setIsStatusEditable(true);
     };
     const isDateOlderThan3Days = (date: string | number | Date): boolean => {
-        const targetDate = new Date(date); 
-        const today = new Date(); 
-    
+        const targetDate = new Date(date);
+        const today = new Date();
+
         const differenceInDays = Math.floor(
             (today.getTime() - targetDate.getTime()) / (1000 * 60 * 60 * 24)
         ); // Calculate the difference in days
         return differenceInDays > 3;
     };
-    
+
     return (
         <Dialog
             open={isOpen}
@@ -232,9 +233,9 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
                                         disabled
                                     />
                                     <FormControl fullWidth sx={{ mb: 1 }}>
-                                        <InputLabel>Status</InputLabel>
+                                        <InputLabel>{t('status')}</InputLabel>
                                         <Select
-                                            label="Status"
+                                            label={t("status")}
                                             value={
                                                 status === null
                                                     ? ''

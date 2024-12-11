@@ -42,6 +42,7 @@ import { fetchAssignedUsersForTodo, removeUserFromToDo } from 'src/services/todo
 import { styled, alpha, useTheme } from '@mui/material/styles';
 import UsersTable from './UsersTable';
 import ConfirmationDialog from 'src/components/Calendar/Components/Modals/ConfirmationDialog';
+import { t } from 'i18next';
 
 interface User {
     id?: number;
@@ -72,25 +73,25 @@ interface CustomRoleDialogProps {
 const rolesConfig = [
     {
         role: 'FranchiseAdmin',
-        label: 'Franchise Admins',
+        label: t('franchises_admins'),
         allowedRoles: ['SuperAdmin'],
         idField: 'id',
     },
     {
         role: 'LocationAdmin',
-        label: 'Location Admins',
+        label: t('location_admins'),
         allowedRoles: ['FranchiseAdmin'],
         idField: 'id',
     },
     {
         role: 'Teacher',
-        label: 'Teachers',
+        label: t('teachers'),
         allowedRoles: ['FranchiseAdmin', 'LocationAdmin'],
         idField: 'userId',
     },
     {
         role: 'Student',
-        label: 'Students',
+        label: t('students'),
         allowedRoles: ['FranchiseAdmin', 'LocationAdmin', 'Teacher'],
         idField: 'userId',
     },

@@ -48,7 +48,7 @@ function PageHeader() {
             }
             onSelect={handleFranchiseChange}
             displayProperty="name"
-            placeholder="Search Franchise"
+            placeholder="{t('search_franchise')}"
             initialValue={selectedFranchise}
           />
         </FormControl>

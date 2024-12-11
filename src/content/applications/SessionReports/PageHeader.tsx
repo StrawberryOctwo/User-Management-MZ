@@ -1,6 +1,7 @@
 import { Typography, Button, Grid } from '@mui/material';
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { t } from 'i18next';
 
 function PageHeader() {
   const navigate = useNavigate(); // Initialize useNavigate
@@ -19,7 +20,7 @@ function PageHeader() {
     <Grid container justifyContent="space-between" alignItems="center">
       <Grid item>
         <Typography variant="h3" component="h3" gutterBottom>
-          Session Reports
+          {t('session_reports')}
         </Typography>
         <Typography variant="subtitle2">
           {user.name}These are your students session reports

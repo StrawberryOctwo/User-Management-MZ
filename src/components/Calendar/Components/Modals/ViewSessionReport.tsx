@@ -24,6 +24,7 @@ import {
   deleteSessionReport
 } from 'src/services/sessionReportService';
 import { format } from 'date-fns';
+import { t } from 'i18next';
 
 interface ViewSessionReportFormProps {
   isOpen: boolean;
@@ -173,7 +174,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
               </Grid>
               <Grid item xs={6}>
                 <TextField
-                  label="Session Date"
+                  label={t("session_date")}
                   value={sessionDate}
                   fullWidth
                   InputProps={{ readOnly: true }}
@@ -181,7 +182,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="Lesson Topic"
+                  label={t("lesson_topic")}
                   value={lessonTopic}
                   onChange={(e) => setLessonTopic(e.target.value)}
                   fullWidth
@@ -235,7 +236,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  label="Tutor Remarks"
+                  label={t("tutor_remarks")}
                   value={tutorRemarks}
                   onChange={(e) => setTutorRemarks(e.target.value)}
                   fullWidth
@@ -255,7 +256,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
                 <FormControl fullWidth>
                   <InputLabel>Active Participation</InputLabel>
                   <Select
-                    label="Active Participation"
+                    label={t("active_participation")}
                     value={activeParticipation ? 'Yes' : 'No'}
                     onChange={(e) =>
                       setActiveParticipation(e.target.value === 'Yes')
@@ -285,7 +286,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
           </Box>
         ) : (
           <Box display="flex" flexDirection="column" gap={3} mt={2}>
-        
+
             <Grid container spacing={2}>
               <Grid item xs={6}>
                 <Typography variant="body1">
@@ -380,10 +381,10 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
       {isEditable && (
         <DialogActions>
           <Button onClick={handleDelete} color="error">
-            Delete
+            {t('delete')}
           </Button>
           <Button onClick={handleSave} variant="contained" color="primary">
-            Save
+            {t('save')}
           </Button>
         </DialogActions>
       )}

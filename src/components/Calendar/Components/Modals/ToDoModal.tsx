@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
+import { t } from 'i18next';
 
 type ToDoModalProps = {
     isOpen: boolean;
@@ -31,7 +32,7 @@ export default function ToDoModal({ isOpen, onClose, onSave }: ToDoModalProps) {
                 />
                 <TextField
                     margin="dense"
-                    label="Description"
+                    label={t("description")}
                     type="text"
                     fullWidth
                     multiline

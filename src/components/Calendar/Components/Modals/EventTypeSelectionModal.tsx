@@ -12,6 +12,7 @@ import {
   Typography
 } from '@mui/material';
 import RoleBasedComponent from 'src/components/ProtectedComponent';
+import { t } from 'i18next';
 
 type EventTypeSelectionModalProps = {
   isOpen: boolean;
@@ -64,7 +65,7 @@ export default function EventTypeSelectionModal({
             <FormControlLabel
               value="Class Session"
               control={<Radio />}
-              label="Class Session"
+              label={t("classSessions")}
             />
             {/* <FormControlLabel value="To-Do" control={<Radio />} label="To-Do" /> */}
 

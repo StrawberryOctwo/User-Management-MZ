@@ -4,6 +4,7 @@ import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { fetchParents, deleteParents } from 'src/services/parentService';
 import { useNavigate } from 'react-router-dom';
+import { t } from 'i18next';
 
 export default function ParentsContent() {
   const [parents, setParents] = useState([]);
@@ -50,8 +51,8 @@ export default function ParentsContent() {
 
   const columns = [
     { field: 'fullName', headerName: 'Full Name' },
-    { field: 'email', headerName: 'Email' },
-    { field: 'address', headerName: 'Address' },
+    { field: 'email', headerName: t('email') },
+    { field: 'address', headerName: t('address') },
   ];
 
   const handleEdit = (id: any) => {

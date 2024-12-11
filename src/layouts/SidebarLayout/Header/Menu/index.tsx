@@ -89,7 +89,7 @@ const HeaderMenu: React.FC = () => {
             }
             onSelect={handleFranchiseChange}
             displayProperty="name"
-            placeholder="Search Franchise"
+            placeholder="{t('search_franchise')}"
             initialValue={selectedFranchise}
           />
         </Grid>

@@ -14,6 +14,7 @@ import { styled } from '@mui/material/styles';
 
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import MoreVertTwoToneIcon from '@mui/icons-material/MoreVertTwoTone';
+import { t } from 'i18next';
 
 const ButtonError = styled(Button)(
   ({ theme }) => `
@@ -50,7 +51,7 @@ function BulkActions() {
             startIcon={<DeleteTwoToneIcon />}
             variant="contained"
           >
-            Delete
+            {t('delete')}
           </ButtonError>
         </Box>
         <IconButton

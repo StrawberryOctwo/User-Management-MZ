@@ -7,6 +7,7 @@ import ParentDetails from './ParentDetails';
 import TeacherDetails from './TeacherDetails';
 import UserDetails from './UserDetails';
 import { fetchUserProfile, updateUserProfile } from 'src/services/userService';
+import { t } from 'i18next';
 
 function EditProfileTab() {
   const [isEditingUser, setIsEditingUser] = useState(false); // State for User Details
@@ -68,7 +69,7 @@ function EditProfileTab() {
           >
             <Box>
               <Typography variant="h4" gutterBottom>
-                Personal Details
+                {t('user_details')}
               </Typography>
               <Typography variant="subtitle2">
                 Manage information related to your personal details

@@ -71,7 +71,7 @@ const CreateLocationAdmin = () => {
     const otherFields = [
         {
             name: 'locations',
-            label: 'Locations',
+            label: t('locations'),
             type: 'custom',
             section: 'Location Admin Assignment',
             component: (

@@ -21,6 +21,7 @@ import { useAuth } from '../../../../hooks/useAuth';
 import { PersonOffOutlined, Settings } from '@mui/icons-material';
 import HeaderLocalization from '../Buttons/Localization';
 import { useWebSocket } from 'src/utils/webSocketProvider';
+import { t } from 'i18next';
 
 const UserBoxButton = styled(Button)(
   ({ theme }) => `
@@ -152,7 +153,7 @@ function HeaderUserbox() {
         <Box sx={{ m: 1 }}>
           <Button color="primary" fullWidth onClick={handleProfile}>
             <Settings sx={{ mr: 1 }} />
-            Settings
+            {t('settings')}
           </Button>
         </Box>
         <Box sx={{ m: 1 }}>

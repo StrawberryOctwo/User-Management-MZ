@@ -10,7 +10,7 @@ import {
     CircularProgress,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-
+import { t } from 'i18next';
 interface User {
     id?: number;
     userId?: number;
@@ -41,7 +41,7 @@ const UsersTable: React.FC<UsersTableProps> = ({
                     <TableRow>
                         <TableCell>Role</TableCell>
                         <TableCell>Name</TableCell>
-                        <TableCell>Email</TableCell>
+                        <TableCell>{t('email')}</TableCell>
                         <TableCell>Action</TableCell>
                     </TableRow>
                 </TableHead>

@@ -5,6 +5,7 @@ import FileActions from 'src/components/Files/FileActions';
 import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { fetchSelfFiles, deleteFiles } from 'src/services/fileUploadService';
+import { t } from 'i18next';
 
 export default function FileUploadContent() {
   const [files, setFiles] = useState([]);
@@ -40,11 +41,11 @@ export default function FileUploadContent() {
   };
 
   const columns = [
-    { field: 'name', headerName: 'File Name' },
+    { field: 'name', headerName: t('file_name') },
     { field: 'type', headerName: 'File Type' },
     {
       field: 'user',
-      headerName: 'Uploaded By',
+      headerName: t('uploaded_by'),
       render: (value, row) => `${row.user?.firstName || ''} ${row.user?.lastName || ''}`
     },
     {

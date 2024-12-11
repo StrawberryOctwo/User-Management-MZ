@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents';
 import LocationCityIcon from '@mui/icons-material/LocationCity';
 import { useDashboard } from 'src/contexts/DashboardContext';
+import { t } from 'i18next';
 
 // Styled Components
 const ImageWrapper = styled(Avatar)(

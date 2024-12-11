@@ -178,7 +178,7 @@ export default function CreateStudent() {
   };
   const contractSelectionField = {
     name: 'contracts',
-    label: 'Contracts',
+    label: t('contract'),
     type: 'custom',
     section: 'Student Information',
     component: (
@@ -195,7 +195,7 @@ export default function CreateStudent() {
   };
   const locationSelectionField = {
     name: 'locations',
-    label: 'Locations',
+    label: t('locations'),
     type: 'custom',
     section: 'Student Assignment',
     component: (

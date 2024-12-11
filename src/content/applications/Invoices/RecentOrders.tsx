@@ -8,6 +8,7 @@ import generateTeacherInvoicePDF from './teacherInvoice';
 import { fetchTeacherById, fetchTeacherByUserId, fetchTeacherInvoiceInfoByUserId } from 'src/services/teacherService';
 import generateParentInvoicePDF from './parentInvoice';
 import { Visibility, Download } from '@mui/icons-material';
+import { t } from 'i18next';
 
 export default function ViewInvoices() {
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -103,17 +104,17 @@ export default function ViewInvoices() {
     { field: 'invoiceId', headerName: 'Invoice ID' },
     {
       field: 'firstName',
-      headerName: 'First Name',
+      headerName: t('first_name'),
       render: (value: any, row: any) => row.user.firstName,
     },
     {
       field: 'lastName',
-      headerName: 'Last Name',
+      headerName: t('last_name'),
       render: (value: any, row: any) => row.user.lastName,
     },
 
     { field: 'totalAmount', headerName: 'Total Amount' },
-    { field: 'status', headerName: 'Status' },
+    { field: 'status', headerName: t('status') },
     {
       field: 'createdAt',
       headerName: 'Created At',
@@ -121,7 +122,7 @@ export default function ViewInvoices() {
     },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: t('actions'),
       render: (value: any, row: any) => (
         <div>
           {/* View PDF Icon Button */}
@@ -134,7 +135,7 @@ export default function ViewInvoices() {
               <Visibility />
             </IconButton>
           </Tooltip>
-    
+
           {/* Conditionally Render Download PDF Icon Button for FranchiseAdmin */}
           {userRoles.includes('FranchiseAdmin') && (
             <Tooltip title="Download Sepa & Invoice">
@@ -150,7 +151,7 @@ export default function ViewInvoices() {
         </div>
       ),
     },
-    
+
   ];
 
   const handlePageChange = (newPage: number) => setPage(newPage);

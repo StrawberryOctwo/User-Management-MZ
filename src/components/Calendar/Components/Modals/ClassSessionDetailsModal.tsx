@@ -31,6 +31,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import { calculateEndTimeInMinutes } from 'src/utils/teacherUtils';
 import StudentDetailCard from './StudentDetailCArd';
 import ConfirmationDialog from './ConfirmationDialog';
+import { t } from 'i18next';
 
 interface ClassSessionDetailsModalProps {
   isOpen: boolean;
@@ -398,7 +399,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
                 </CardContent>
                 <CardContent>
                   <Typography variant="subtitle1">
-                    <strong>Notes:</strong>
+                    <strong>{t('notes')}:</strong>
                   </Typography>
 
                   <Typography

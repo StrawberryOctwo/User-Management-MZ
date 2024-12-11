@@ -6,6 +6,7 @@ import { useSnackbar } from 'src/contexts/SnackbarContext';
 import { deleteTopic, fetchTopics } from 'src/services/topicService';
 import { useNavigate } from 'react-router-dom';
 import { Topic } from 'src/models/TopicModel';
+import { t } from 'i18next';
 
 export default function ViewTopicPage() {
   const [topics, setTopics] = useState<Topic[]>([]);
@@ -47,8 +48,8 @@ export default function ViewTopicPage() {
 
 
   const columns = [
-    { field: 'name', headerName: 'Topic Name' },
-    { field: 'franchiseName', headerName: 'Franchise' },
+    { field: 'name', headerName: t('Topic Name') },
+    { field: 'franchiseName', headerName: t('franchise') },
     { field: 'createdAt', headerName: 'Created At', render: (value: any) => new Date(value).toLocaleDateString() },
   ];
   // const handleEdit = (id: any) => {

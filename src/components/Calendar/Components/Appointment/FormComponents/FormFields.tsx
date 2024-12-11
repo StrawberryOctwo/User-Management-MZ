@@ -22,6 +22,7 @@ import { fetchStudents } from 'src/services/studentService';
 import { fetchLocations } from 'src/services/locationService';
 import { useSession } from '../../SessionContext';
 import { fetchSessionTypes } from 'src/services/contractPackagesService';
+import { t } from 'i18next';
 
 export default function FormFields({
   strongestRoles,
@@ -129,7 +130,7 @@ export default function FormFields({
           <FormControl fullWidth>
             <InputLabel>Session Type</InputLabel>
             <Select
-              label="Session Type"
+              label={t("sessionType")}
               value={session.sessionType || ''}
               onChange={(e) =>
                 setSession({ ...session, sessionType: e.target.value })

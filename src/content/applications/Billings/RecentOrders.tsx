@@ -4,6 +4,7 @@ import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { useNavigate } from 'react-router-dom';
 import { confirmBillingAsPaid, fetchAllBillings } from 'src/services/billingService';
+import { t } from 'i18next';
 
 export default function ViewBillingsPage() {
   const [billings, setBillings] = useState<any[]>([]);
@@ -45,7 +46,7 @@ export default function ViewBillingsPage() {
     { field: 'billingDate', headerName: 'Billing Date', render: (value: any) => new Date(value).toLocaleDateString() },
     {
       field: 'franchiseName',
-      headerName: 'Franchise Name',
+      headerName: t('franchise_name'),
       render: (value: any, row: any) => row.franchise?.name || 'N/A',
     },
     {

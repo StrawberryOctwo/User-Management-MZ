@@ -19,6 +19,7 @@ import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWith
 import { fetchStudents } from 'src/services/studentService';
 import { fetchSessionTypes } from 'src/services/contractPackagesService';
 import { allowedDurations } from '../AddClassSession/AddClassSessionUtils';
+import { t } from 'i18next';
 
 const EditSessionInstanceTab = ({
   session,
@@ -85,7 +86,7 @@ const EditSessionInstanceTab = ({
       <Grid container spacing={2}>
         <Grid item xs={6}>
           <FormControl fullWidth>
-            <InputLabel id="is-active-label">Status</InputLabel>
+            <InputLabel id="is-active-label">{t('status')}</InputLabel>
             <Select
               labelId="is-active-label"
               id="is-active-select"
@@ -96,7 +97,7 @@ const EditSessionInstanceTab = ({
                   isActive: e.target.value === 'active'
                 })
               }
-              label="Status"
+              label={t("status")}
               disabled={sessionEnded}
             >
               <MenuItem value="active">Active</MenuItem>
@@ -229,7 +230,7 @@ const EditSessionInstanceTab = ({
             <InputLabel>Session Type</InputLabel>
             <Select
               disabled={sessionEnded}
-              label="Session Type"
+              label={t("sessionType")}
               value={session.sessionType || ''}
               onChange={(e) =>
                 setSession({ ...session, sessionType: e.target.value })
