@@ -1,0 +1,21 @@
+[
+    {
+      "name": "Franchise 1",
+      "ownerName": "John Doe",
+      "cardHolderName": "John Doe",
+      "iban": "FR7630006000011234567890189",
+      "bic": "BNPAFRPP",
+      "status": "Active",
+      "totalEmployees": 10
+    },
+    {
+      "name": "Franchise 2",
+      "ownerName": "Jane Smith",
+      "cardHolderName": "Jane Smith",
+      "iban": "FR7630006000019876543210987",
+      "bic": "BNPAFRPP",
+      "status": "Active",
+      "totalEmployees": 15
+    }
+  ]
+  

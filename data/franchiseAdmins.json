@@ -1,0 +1,25 @@
+[
+    {
+      "firstName": "John",
+      "lastName": "Doe",
+      "email": "john.doe@example.com",
+      "password": "adminpass123",
+      "dob": "1975-01-01",
+      "address": "123 Main St",
+      "postalCode": "10001",
+      "phoneNumber": "123-456-7890",
+      "franchiseId": 1
+    },
+    {
+      "firstName": "Jane",
+      "lastName": "Smith",
+      "email": "jane.smith@example.com",
+      "password": "adminpass456",
+      "dob": "1980-02-02",
+      "address": "456 Elm St",
+      "postalCode": "10002",
+      "phoneNumber": "987-654-3210",
+      "franchiseId": 2
+    }
+  ]
+  
