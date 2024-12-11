@@ -33,7 +33,7 @@ function PageHeader() {
           startIcon={<AddTwoToneIcon fontSize="small" />}
           onClick={handleCreateFranchise} // Add onClick handler
         >
-          Create location
+          Create location admins
         </Button>
       </Grid>
     </Grid>

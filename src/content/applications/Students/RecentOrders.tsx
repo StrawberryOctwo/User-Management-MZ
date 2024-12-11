@@ -126,6 +126,7 @@ export default function StudentsContent() {
           { field: 'fullName', headerName: t('Full Name') },
           { field: 'email', headerName: t('email') },
           { field: 'gradeLevel', headerName: t('grade_level') },
+          { field: 'contractName', headerName: t('contract_name') },
           { field: 'status', headerName: t('status') },
         ]}
         title="Student List"
