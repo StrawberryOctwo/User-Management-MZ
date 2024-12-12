@@ -421,7 +421,7 @@ function SidebarMenu() {
             </ListSubheader>
           }
         >
-          <ProtectedListItem allowedRoles={['SuperAdmin', 'FranchiseAdmin']}>
+          <ProtectedListItem allowedRoles={['SuperAdmin', 'FranchiseAdmin','Parent', 'Student','Teacher']}>
             <ListItem component="div">
               <Button
                 disableRipple
