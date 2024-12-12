@@ -21,7 +21,7 @@ const IbanInput: React.FC<IbanInputProps> = ({ value, onChange, ...props }) => {
     const cleanedValue = inputValue.replace(/[^0-9]/g, '');
     // Group the digits in sets of 4
     const formattedValue = cleanedValue.match(/.{1,4}/g)?.join(' ') || '';
-    return `DE - ${formattedValue}`;
+    return `DE${formattedValue}`;
   };
 
   const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {

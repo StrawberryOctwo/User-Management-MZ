@@ -72,8 +72,53 @@ export default function CustomizedCalendar({
   parentNumberOfRooms,
   onDateRangeChange
 }: DemoProps) {
+  // **Define VIEW_STORAGE_KEY and getStoredView before using them**
+  const VIEW_STORAGE_KEY = 'calendarViewPreference';
+  
+  // **Define getAvailableViews early since getStoredView relies on it**
+  const getAvailableViews = () => {
+    const baseViews = {
+      resourceTimelineDay: {
+        type: 'resourceTimeline' as const,
+        duration: { days: 1 },
+        buttonText: 'Day'
+      }
+    };
+
+    if (selectedLocations.length === 1) {
+      return {
+        ...baseViews,
+        listWeek: {
+          type: 'list' as const,
+          duration: { weeks: 1 },
+          buttonText: 'List'
+        }
+      };
+    }
+
+    return baseViews;
+  };
+
+  const availableViews = getAvailableViews();
+
+  const getStoredView = () => {
+    const storedView = localStorage.getItem(VIEW_STORAGE_KEY);
+    if (storedView && availableViews.hasOwnProperty(storedView)) {
+      return storedView;
+    }
+    return 'resourceTimelineDay'; // Default view
+  };
+
+  const saveViewPreference = (view: string) => {
+    localStorage.setItem(VIEW_STORAGE_KEY, view);
+  };
+
+  // **Initialize currentView state using getStoredView**
+  const [currentView, setCurrentView] = useState(getStoredView());
+
   const HOLIDAYS_STORAGE_KEY = 'calendarHolidays';
   const CLOSING_DAYS_STORAGE_KEY = 'calendarClosingDays';
+  
   const [totals, setTotals] = useState({
     totalSessions: 0,
     totalStudents: 0,
@@ -83,25 +128,21 @@ export default function CustomizedCalendar({
   const [selectedClassSessionId, setSelectedClassSession] = useState<any>(null);
   const [isModalOpen, setModalOpen] = useState(false);
   const [isDetailsModalOpen, setDetailsModalOpen] = useState(false);
-  const [selectedAppointmentId, setSelectedAppointmentId] = useState<
-    string | null
-  >(null);
+  const [selectedAppointmentId, setSelectedAppointmentId] = useState<string | null>(null);
   const [canEditSession, setCanEditSession] = useState<boolean | null>(true);
   const [canAddReport, setCanAddReport] = useState<boolean | null>(false);
   const [canReactivate, setCanReactivate] = useState<boolean | null>(true);
-  const [events, setEvents] = useState([]);
+  const [events, setEvents] = useState<any[]>([]);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isEventTypeModalOpen, setIsEventTypeModalOpen] = useState(false);
-  const [isSmartScheduleModalOpen, setIsSmartScheduleModalOpen] =
-    useState(false);
+  const [isSmartScheduleModalOpen, setIsSmartScheduleModalOpen] = useState(false);
   const [isToDoModalOpen, setIsToDoModalOpen] = useState(false);
   const [selectedRoom, setSelectedRoom] = useState('');
-  const [selectedSessionDetails, setSelectedSessionDetails] =
-    useState<any>(null);
-  const [selectedRange, setSelectedRange] = useState<{
-    start: Date;
-    end: Date;
-  }>({ start: new Date(), end: new Date() });
+  const [selectedSessionDetails, setSelectedSessionDetails] = useState<any>(null);
+  const [selectedRange, setSelectedRange] = useState<{ start: Date; end: Date }>({
+    start: new Date(),
+    end: new Date()
+  });
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
@@ -117,14 +158,6 @@ export default function CustomizedCalendar({
   const { showMessage } = useSnackbar();
   const { userRoles } = useAuth();
   const mounted = useRef(false);
-
-  const VIEW_STORAGE_KEY = 'calendarViewPreference';
-  const getStoredView = () =>
-    localStorage.getItem(VIEW_STORAGE_KEY) || 'resourceTimelineDay';
-
-  const saveViewPreference = (view: string) => {
-    localStorage.setItem(VIEW_STORAGE_KEY, view);
-  };
 
   useEffect(() => {
     mounted.current = true;
@@ -154,17 +187,20 @@ export default function CustomizedCalendar({
     () =>
       `calendar-${holidays.length}-${
         closingDays.length
-      }-${selectedDate.toISOString()}-${selectedLocations.length}`,
+      }-${selectedDate.toISOString()}-${selectedLocations.length}-${currentView}`, // Included currentView
     [
       holidays.length,
       closingDays.length,
       selectedDate,
-      selectedLocations.length
+      selectedLocations.length,
+      currentView // Added currentView to dependencies
     ]
   );
+
   const calendarRef = useRef<any>(null);
   const isHandlingClick = useRef(false);
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
+  
   const resources = useMemo(() => {
     const maxRooms =
       strongestRoles[0] === 'Parent'
@@ -184,8 +220,6 @@ export default function CustomizedCalendar({
   }, [selectedLocations, strongestRoles, classSessionEvents]);
 
   useEffect(() => {
-    const HOLIDAYS_STORAGE_KEY = 'calendarHolidays';
-    const CLOSING_DAYS_STORAGE_KEY = 'calendarClosingDays';
     if (classSessionEvents.length) {
       const totalSessions = classSessionEvents.length;
       const totalStudents = classSessionEvents.reduce(
@@ -199,6 +233,7 @@ export default function CustomizedCalendar({
 
       setTotals({ totalSessions, totalStudents, totalTeachers });
     }
+
     const mappedEvents = classSessionEvents.map((session) => {
       // Get fresh data from localStorage for each event mapping
       const storedHolidays = JSON.parse(
@@ -240,8 +275,8 @@ export default function CustomizedCalendar({
     setEvents(mappedEvents);
   }, [
     classSessionEvents,
-    localStorage.getItem('calendarHolidays'),
-    localStorage.getItem('calendarClosingDays')
+    HOLIDAYS_STORAGE_KEY,
+    CLOSING_DAYS_STORAGE_KEY
   ]);
 
   const getDateStatus = (date: Date) => {
@@ -527,40 +562,18 @@ export default function CustomizedCalendar({
     return <EventItem eventInfo={eventInfo} />;
   };
 
-  const getAvailableViews = () => {
-    const baseViews = {
-      resourceTimelineDay: {
-        type: 'resourceTimeline' as const,
-        duration: { days: 1 },
-        buttonText: 'day'
-      }
-    };
-
-    if (selectedLocations.length === 1) {
-      return {
-        ...baseViews,
-        listWeek: {
-          type: 'list' as const,
-          duration: { weeks: 1 },
-          buttonText: 'list'
-        }
-      };
-    }
-
-    return baseViews;
-  };
-
   const handleViewChange = (viewInfo: any) => {
     if (!mounted.current) return;
 
-    const currentView = viewInfo.view.type;
-    saveViewPreference(currentView);
+    const newView = viewInfo.view.type;
+    setCurrentView(newView);
+    saveViewPreference(newView);
 
     // Skip if view change was triggered by view button
     if (isViewButtonClick.current) return;
 
     const targetDate = viewInfo.view.currentStart;
-    if (currentView === 'listWeek') {
+    if (newView === 'listWeek') {
       // Only update if we're not already on this week
       const weekStart = moment(targetDate).startOf('isoWeek');
       const weekEnd = moment(targetDate).endOf('isoWeek');
@@ -584,7 +597,7 @@ export default function CustomizedCalendar({
     }
   };
 
-  // Update custom buttons to handle view changes more simply
+  // **Update customButtons to reflect currentView state**
   const customButtons = {
     ...calendarHelpers.getCustomButtons(
       handleDatePickerClick,
@@ -593,48 +606,36 @@ export default function CustomizedCalendar({
       selectedDate
     ),
     view: {
-      text: 'day',
+      text: currentView === 'resourceTimelineDay' ? 'List' : 'Day',
       click: () => {
         const calendarApi = calendarRef.current?.getApi();
         if (!calendarApi) return;
 
-        const currentView = calendarApi.view.type;
         const newView =
           currentView === 'resourceTimelineDay'
             ? 'listWeek'
             : 'resourceTimelineDay';
 
-        isViewButtonClick.current = true;
+        setCurrentView(newView);
         saveViewPreference(newView);
 
         const currentDate = calendarApi.getDate();
 
-        // Update view and text first
-        calendarApi.changeView(newView);
-        const viewButton = document.querySelector('.fc-view-button');
-        if (viewButton) {
-          viewButton.textContent =
-            newView === 'resourceTimelineDay' ? 'list' : 'day';
-        }
-
-        // Then handle date changes
         if (newView === 'listWeek') {
           const weekStart = moment(currentDate).startOf('isoWeek');
           const weekEnd = moment(currentDate).endOf('isoWeek');
 
+          calendarApi.changeView(newView);
           calendarApi.gotoDate(weekStart.toDate());
           onDateRangeChange(
             weekStart.format('YYYY-MM-DD'),
             weekEnd.format('YYYY-MM-DD')
           );
         } else {
+          calendarApi.changeView(newView);
           calendarApi.gotoDate(currentDate);
           onDateChange(moment(currentDate).format('YYYY-MM-DD'));
         }
-
-        setTimeout(() => {
-          isViewButtonClick.current = false;
-        }, 0);
       }
     }
   };
@@ -661,6 +662,8 @@ export default function CustomizedCalendar({
           <Typography>Total Teachers: {totals.totalTeachers}</Typography>
         </Box>
       </Box>
+      
+      {/* Date Picker */}
       <LocalizationProvider dateAdapter={AdapterDayjs}>
         <ClickAwayListener
           onClickAway={handleClickAway}
@@ -685,18 +688,19 @@ export default function CustomizedCalendar({
         </ClickAwayListener>
       </LocalizationProvider>
 
+      {/* Calendar */}
       <div style={{ position: 'relative' }}>
         <FullCalendar
-          key={calendarKey}
+          key={calendarKey} // Includes currentView
           ref={calendarRef}
           plugins={[resourceTimelinePlugin, interactionPlugin, listPlugin]}
           schedulerLicenseKey="GPL-My-Project-Is-Open-Source"
-          views={getAvailableViews()}
+          views={availableViews} // Use availableViews defined earlier
           datesSet={handleViewChange}
           initialDate={selectedDate}
-          initialView={getStoredView()}
+          initialView={currentView} // Uses currentView state
           headerToolbar={calendarHelpers.getHeaderToolbar()}
-          customButtons={customButtons}
+          customButtons={customButtons} // Uses updated customButtons
           eventDidMount={(info) => {
             if (info.view.type === 'listWeek') {
               const eventEl = info.el;
@@ -743,7 +747,6 @@ export default function CustomizedCalendar({
             bottom: 45,
             right: 20,
             zIndex: 1000,
-
             padding: 1
           }}
         >
@@ -751,6 +754,7 @@ export default function CustomizedCalendar({
         </Box>
       </div>
 
+      {/* Modals */}
       <SmartScheduleModal
         isOpen={isSmartScheduleModalOpen}
         onClose={handleCloseSmartScheduleModal}

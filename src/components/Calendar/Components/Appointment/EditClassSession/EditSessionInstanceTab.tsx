@@ -19,8 +19,8 @@ import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWith
 import { fetchStudents } from 'src/services/studentService';
 import { fetchSessionTypes } from 'src/services/contractPackagesService';
 import { allowedDurations } from '../AddClassSession/AddClassSessionUtils';
-import { useTranslation } from 'react-i18next';
 
+import { useTranslation } from 'react-i18next';
 
 const EditSessionInstanceTab = ({
   session,
