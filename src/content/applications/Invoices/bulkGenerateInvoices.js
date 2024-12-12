@@ -22,7 +22,7 @@ export const generateParentInvoiceBlobs = async (invoice) => {
 
   // Helper Functions
   const formatDate = (date) => new Date(date).toLocaleDateString('de-DE');
-  const formatCurrency = (amount) => `€${Number(amount).toFixed(2)}`;
+  const formatCurrency = (amount) => `${Number(amount).toFixed(2)}€`;
   const loadImage = (src) =>
     new Promise<HTMLImageElement>((resolve, reject) => {
       const img = new Image();
@@ -226,7 +226,7 @@ export const generateTeacherInvoiceBlobs = async (invoice, teacher) => {
 
   // Helper Functions
   const formatDate = (date) => new Date(date).toLocaleDateString('de-DE');
-  const formatCurrency = (amount) => `€${Number(amount).toFixed(2)}`;
+  const formatCurrency = (amount) => `${Number(amount).toFixed(2)}€`;
   const loadImage = (src) =>
     new Promise<HTMLImageElement>((resolve, reject) => {
       const img = new Image();

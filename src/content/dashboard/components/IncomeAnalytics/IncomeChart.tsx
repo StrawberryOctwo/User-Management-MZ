@@ -56,7 +56,7 @@ const IncomeChart: React.FC<IncomeChartProps> = ({
     tooltip: {
       theme: themeMode,
       y: {
-        formatter: (val: number) => `€${val.toLocaleString('de')}`
+        formatter: (val: number) => `${val.toLocaleString('de')}€`
       }
     },
     grid: {

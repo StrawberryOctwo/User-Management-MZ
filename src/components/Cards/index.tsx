@@ -61,7 +61,7 @@ const ContractCard: React.FC<ContractCardProps> = ({
                             Monthly Fee
                         </Typography>
                         <Typography variant="h6" color="primary">
-                            {monthly_fee ? `${t('€')} ${monthly_fee.toFixed(2)}` : t('No Monthly Fee')}
+                            {monthly_fee ? `${monthly_fee.toFixed(2)}${t('€')}` : t('No Monthly Fee')}
                         </Typography>
                     </Box>
                     <Box>
@@ -69,7 +69,7 @@ const ContractCard: React.FC<ContractCardProps> = ({
                             One-Time Fee
                         </Typography>
                         <Typography variant="h6" color="primary">
-                            {one_time_fee ? `${t('€')} ${one_time_fee.toFixed(2)}` : t('No One-Time Fee')}
+                            {one_time_fee ? `${one_time_fee.toFixed(2)}${t('€')}` : t('No One-Time Fee')}
                         </Typography>
                     </Box>
                 </Box>
@@ -80,7 +80,7 @@ const ContractCard: React.FC<ContractCardProps> = ({
                     {sessions.map((session, index) => (
                         <Box key={`session-${index}`} display="flex" alignItems="center" justifyContent="center" my={1}>
                             <Typography variant="body2">
-                                • {session.name}: {t('€')}{Number(session.price).toFixed(2)}
+                                • {session.name}: {Number(session.price).toFixed(2)}{t('€')}
                             </Typography>
                         </Box>
                     ))}

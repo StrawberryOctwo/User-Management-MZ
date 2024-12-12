@@ -65,13 +65,13 @@ function DashboardMetrics() {
     {
       icon: <MonetizationOnIcon fontSize="large" />,
       label: t('incomePerFranchise'),
-      value: incomePerFranchise !== 'N/A' ? `€${incomePerFranchise}` : 'N/A',
+      value: incomePerFranchise !== 'N/A' ? `${incomePerFranchise}€` : 'N/A',
       color: 'success',
     },
     {
       icon: <ReceiptIcon fontSize="large" />,
       label: t('expensePerStudent'),
-      value: expensePerStudent !== 'N/A' ? `€${expensePerStudent}` : 'N/A',
+      value: expensePerStudent !== 'N/A' ? `${expensePerStudent}€` : 'N/A',
       color: 'warning',
     },
     {
