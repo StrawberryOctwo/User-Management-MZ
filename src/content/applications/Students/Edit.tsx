@@ -1,3 +1,4 @@
+// src/pages/EditStudent.tsx
 import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import { useParams } from 'react-router-dom';
@@ -26,8 +27,9 @@ import {
   FormGroup,
   FormLabel
 } from '@mui/material';
-import { daysOfWeek, decodeAvailableDates } from './utils';
+import { daysOfWeek, decodeAvailableDates, decodeAvailableTimes } from './utils';
 import { useTranslation } from 'react-i18next';
+import AvailableTimePicker from './AvailableTimesPicker';
 
 const EditStudent = () => {
   const { t } = useTranslation();
@@ -35,12 +37,16 @@ const EditStudent = () => {
   const [studentData, setStudentData] = useState<Record<string, any> | null>(
     null
   );
-  const [selectedLocations, setSelectedLocations] = useState<any[]>([]); // Changed to an array for multiple locations
+  const [selectedLocations, setSelectedLocations] = useState<any[]>([]); // Multiple locations
   const [selectedContract, setSelectedContract] = useState<any | null>(null);
   const [selectedSchoolType, setSelectedSchoolType] = useState<any | null>(
     null
   );
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [availableTime, setAvailableTime] = useState<{ start: string; end: string }>({
+    start: '',
+    end: '',
+  }); // Single available time
 
   const [selectedTopics, setSelectedTopics] = useState<any[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
@@ -91,6 +97,10 @@ const EditStudent = () => {
         setSelectedContract(fetchedData.contract);
         setSelectedSchoolType(fetchedData.schoolType);
         setSelectedDays(decodeAvailableDates(fetchedData.availableDates) || []);
+        setAvailableTime(decodeAvailableTimes(fetchedData.availableTimes) || {
+          start: '',
+          end: '',
+        });
       }
 
       const formattedDocuments = studentDocuments.documents.map((doc) => ({
@@ -104,12 +114,11 @@ const EditStudent = () => {
       setUploadedFiles(formattedDocuments);
     } catch (error) {
       console.error('Error fetching student:', error);
+      showMessage(t("error_fetching_student"), "error");
     } finally {
       setLoading(false);
     }
   };
-
-
 
   useEffect(() => {
     fetchStudent();
@@ -152,6 +161,11 @@ const EditStudent = () => {
       showMessage("Topics field can't be empty", 'error');
       return;
     }
+    if (!availableTime.start || !availableTime.end) {
+      showMessage("Available time must have both start and end times", 'error');
+      return;
+    }
+    // Optional: Add validation to ensure start time is before end time
 
     setLoading(true);
     try {
@@ -176,11 +190,11 @@ const EditStudent = () => {
         contractEndDate: data.contractEndDate,
         notes: data.notes,
         availableDates: selectedDays,
+        availableTime, // Include availableTime
         gradeLevel: data.gradeLevel,
         locationIds,
         schoolType: selectedSchoolType?.id
       };
-
 
       const response = await updateStudent(
         Number(id),
@@ -208,9 +222,11 @@ const EditStudent = () => {
       }
 
       await fetchStudent();
+      showMessage(t("student_updated_successfully"), "success");
       return response;
     } catch (error) {
       console.error('Error updating student:', error);
+      showMessage(t("error_updating_student"), "error");
       throw error;
     } finally {
       setLoading(false);
@@ -335,7 +351,7 @@ const EditStudent = () => {
     }
   ];
 
-  const studentFields = [
+  const studentFields: FieldConfig[] = [
     {
       name: 'status',
       label: t('status'),
@@ -386,7 +402,6 @@ const EditStudent = () => {
       required: false,
       section: 'Student Information'
     },
-
     {
       name: 'locations',
       label: t('locations'),
@@ -455,10 +470,14 @@ const EditStudent = () => {
               {t('clear_all')}
             </Button>
           </Box>
+          {/* Add AvailableTimePicker */}
+          <AvailableTimePicker
+            availableTime={availableTime}
+            setAvailableTime={setAvailableTime}
+          />
         </Box>
       )
     },
-
     {
       name: 'topics',
       label: t('assign_topics'),

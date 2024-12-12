@@ -51,3 +51,24 @@ export const formatDate = (dateString: string): string => {
   };
   return new Intl.DateTimeFormat('en-US', options).format(date);
 };
+
+// utils.ts
+// utils.ts
+export const decodeAvailableTimes = (availableTimesData: any): { start: string; end: string } => {
+  // Assuming availableTimesData is an object like { start: '09:00', end: '12:00' }
+  if (!availableTimesData) {
+    return { start: '', end: '' };
+  }
+  return {
+    start: availableTimesData.start || '',
+    end: availableTimesData.end || '',
+  };
+};
+
+export const encodeAvailableTimes = (availableTime: { start: string; end: string }): any => {
+  // Prepare the data structure expected by the backend
+  return {
+    start: availableTime.start,
+    end: availableTime.end,
+  };
+};
