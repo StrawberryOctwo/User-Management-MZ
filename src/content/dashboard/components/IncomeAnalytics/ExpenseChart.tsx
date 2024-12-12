@@ -52,7 +52,7 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({ data, categories, themeMode
     tooltip: {
       theme: themeMode,
       y: {
-        formatter: (val: number) => `€${val.toLocaleString('de')}`,
+        formatter: (val: number) => `${val.toLocaleString('de')}€`,
       },
     },
     grid: {

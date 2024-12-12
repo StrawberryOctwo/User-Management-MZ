@@ -60,7 +60,7 @@ const SummaryChart: React.FC<SummaryChartProps> = ({
     tooltip: {
       theme: themeMode,
       y: {
-        formatter: (val: number) => `€${val.toLocaleString('de')}`,
+        formatter: (val: number) => `${val.toLocaleString('de')}€`,
       },
     },
     grid: {

@@ -36,8 +36,8 @@ const generatePDF = (payment) => {
             <tr>
               <td style="border: 1px solid #ddd; padding: 8px;">February</td>
               <td style="border: 1px solid #ddd; padding: 8px;">14hrs 15mins</td>
-              <td style="border: 1px solid #ddd; padding: 8px;">€15</td>
-              <td style="border: 1px solid #ddd; padding: 8px;">€135.78</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">15€</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">135.78€</td>
             </tr>
           </tbody>
         </table>
