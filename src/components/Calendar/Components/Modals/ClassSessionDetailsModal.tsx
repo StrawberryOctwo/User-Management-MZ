@@ -11,7 +11,8 @@ import {
   CircularProgress,
   Tabs,
   Tab,
-  IconButton
+  IconButton,
+  Tooltip
 } from '@mui/material';
 import moment from 'moment';
 import {
@@ -63,7 +64,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
   sessionEnded,
   setIsSessionEnded
 }) => {
-  const { t } = useTranslation(); 
+  const { t } = useTranslation();
   const [classSession, setClassSession] = useState<any>(null);
   const [loading, setLoading] = useState<boolean>(true);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -318,31 +319,35 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
             ]}
           >
             {classSession?.isActive && !sessionEnded ? (
-              <IconButton
-                onClick={() => setDeactivateDialogOpen(true)}
-                color="warning"
-                sx={{
-                  backgroundColor: '#f0f0f0',
-                  borderRadius: '50%',
-                  '&:hover': { backgroundColor: '#e0e0e0' }
-                }}
-              >
-                <VisibilityOffIcon />
-              </IconButton>
-            ) : (
-              !classSession?.isActive &&
-              canReactivate && (
+              <Tooltip title={t("Deactivate Session")}>
                 <IconButton
                   onClick={() => setDeactivateDialogOpen(true)}
-                  color="success"
+                  color="warning"
                   sx={{
                     backgroundColor: '#f0f0f0',
                     borderRadius: '50%',
                     '&:hover': { backgroundColor: '#e0e0e0' }
                   }}
                 >
-                  <VisibilityIcon />
+                  <VisibilityOffIcon />
                 </IconButton>
+              </Tooltip>
+            ) : (
+              !classSession?.isActive &&
+              canReactivate && (
+                <Tooltip title={t("Reactivate Session")}>
+                  <IconButton
+                    onClick={() => setDeactivateDialogOpen(true)}
+                    color="success"
+                    sx={{
+                      backgroundColor: '#f0f0f0',
+                      borderRadius: '50%',
+                      '&:hover': { backgroundColor: '#e0e0e0' }
+                    }}
+                  >
+                    <VisibilityIcon />
+                  </IconButton>
+                </Tooltip>
               )
             )}
           </RoleBasedComponent>
