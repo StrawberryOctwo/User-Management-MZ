@@ -52,6 +52,7 @@ const ViewStudentPage: React.FC = () => {
       studentData.availableDates = decodeAvailableDates(
         studentData.availableDates
       ).map(capitalizeFirstLetter);
+      studentData.availableTime = [studentData.availableTime.start,studentData.availableTime.end]
 
       // Transform locations: Array of Objects to Array of Names
       if (studentData.locations && Array.isArray(studentData.locations)) {
@@ -160,7 +161,14 @@ const ViewStudentPage: React.FC = () => {
       label: t('available_dates'),
       section: t('student_details'),
       isArray: true,
-      isTextArray: true // Display available dates as comma-separated
+      isTextArray: true 
+    },
+    {
+      name: 'availableTime', // Add availableTime here
+      label: t('available_time'),
+      section: t('student_details'),
+      isArray: true,
+      isTextArray: true 
     },
     {
       name: 'createdAt',
