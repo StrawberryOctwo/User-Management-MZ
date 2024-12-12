@@ -9,7 +9,7 @@ import {
   CircularProgress,
   Snackbar,
   Alert,
-  TextField, // Needed for DatePicker renderInput
+  TextField,
 } from '@mui/material';
 import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
@@ -29,6 +29,10 @@ import generateTeacherInvoicePDF from './teacherInvoice';
 import { generateBulkInvoicesZip } from './bulkGenerateInvoices';
 import { saveAs } from 'file-saver';
 import dayjs from 'dayjs';
+import 'dayjs/locale/de'; // Import German locale
+
+// Set dayjs locale globally
+dayjs.locale('de');
 
 export default function ViewInvoices() {
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -38,11 +42,7 @@ export default function ViewInvoices() {
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(25);
   const [bulkLoading, setBulkLoading] = useState(false);
-
-  // New state for DatePicker
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-
-  // New state for showing messages
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null); // Date Picker state
   const [message, setMessage] = useState<{
     text: string;
     severity: 'success' | 'error' | 'info' | 'warning';
@@ -82,7 +82,7 @@ export default function ViewInvoices() {
     }
   };
 
-  // New function to show messages
+  // Function to show messages
   const showMessage = (
     text: string,
     severity: 'success' | 'error' | 'info' | 'warning'
@@ -254,13 +254,13 @@ export default function ViewInvoices() {
 
   return (
     // Wrap with LocalizationProvider for DatePicker
-    <LocalizationProvider dateAdapter={AdapterDayjs}>
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="de">
       <Box>
         {userRoles.includes('FranchiseAdmin') && (
           <Box mb={2}>
             {/* Date Picker for selecting invoice date */}
             <DatePicker
-              label="Select Date"
+              label="Datum auswählen" // Translated label
               value={selectedDate}
               onChange={(newValue) => setSelectedDate(newValue)}
               renderInput={(params) => (
