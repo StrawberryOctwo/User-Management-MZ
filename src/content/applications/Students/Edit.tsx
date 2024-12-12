@@ -97,7 +97,7 @@ const EditStudent = () => {
         setSelectedContract(fetchedData.contract);
         setSelectedSchoolType(fetchedData.schoolType);
         setSelectedDays(decodeAvailableDates(fetchedData.availableDates) || []);
-        setAvailableTime(decodeAvailableTimes(fetchedData.availableTimes) || {
+        setAvailableTime(decodeAvailableTimes(fetchedData.availableTime) || {
           start: '',
           end: '',
         });
