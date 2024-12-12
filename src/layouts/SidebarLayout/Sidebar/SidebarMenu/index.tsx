@@ -7,7 +7,8 @@ import {
   List,
   styled,
   Button,
-  ListItem
+  ListItem,
+  SpeedDialIcon
 } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
@@ -180,7 +181,7 @@ const SubMenuWrapper = styled(Box)(
 
 function SidebarMenu() {
   const { closeSidebar } = useContext(SidebarContext);
-  const { t } = useTranslation(); 
+  const { t } = useTranslation();
   return (
     <MenuWrapper>
       {/* Dashboards Section */}
@@ -421,7 +422,20 @@ function SidebarMenu() {
             </ListSubheader>
           }
         >
-          <ProtectedListItem allowedRoles={['SuperAdmin', 'FranchiseAdmin','Parent', 'Student','Teacher']}>
+          <ProtectedListItem allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'Parent', 'Teacher']}>
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to="/management/manage/todos"
+                startIcon={<SpeedDialIcon />}
+              >
+                {t("todos")}
+              </Button>
+            </ListItem>
+          </ProtectedListItem>
+          <ProtectedListItem allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'Parent', 'Student', 'Teacher']}>
             <ListItem component="div">
               <Button
                 disableRipple
