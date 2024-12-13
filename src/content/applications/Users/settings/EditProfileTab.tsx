@@ -40,7 +40,7 @@ function EditProfileTab() {
   const handleSaveUser = async () => {
     try {
       await updateUserProfile(user);
-      console.log('User profile updated successfully!');
+      
     } catch (error) {
       console.error('Failed to update user profile:', error);
     }

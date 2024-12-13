@@ -129,7 +129,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       // Check if all reports are submitted
       const allCompleted = response.reportsSubmitted;
 
-      // console.log()
+      // 
       setAllReportsCompleted(allCompleted);
       setSubmissionSuccess(allCompleted);
     } catch (error) {
@@ -158,7 +158,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
       setSelectedReportId(reportData.reportId);
       setViewReportFormOpen(true);
     } else {
-      console.log('No report available for this student');
+      
     }
   };
 
@@ -267,7 +267,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
     setConfirmOpen(false);
   };
 
-  console.log('isSubmittingReports', isSubmittingReports);
+  
 
   return (
     <Dialog

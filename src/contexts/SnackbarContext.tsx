@@ -40,7 +40,7 @@ export const SnackbarProvider: React.FC<{ children: React.ReactNode }> = ({ chil
   const [alertColor, setAlertColor] = useState<string>(''); // Add state for custom color
 
   const theme = useTheme(); // Access theme for dynamic colors
-  console.log(theme)
+  
   const showMessage = (
     msg: string,
     sev: SnackbarSeverity,

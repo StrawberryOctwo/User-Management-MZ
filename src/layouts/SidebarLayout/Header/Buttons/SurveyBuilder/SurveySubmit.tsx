@@ -82,13 +82,13 @@ function SurveySubmit({ surveyId, titleProp = '', questions, onSubmitSuccess }: 
         // Update survey if surveyId exists
         response = await updateSurvey(surveyId, title, questions);
         if (response) {
-          console.log("Survey updated successfully!");
+          
         }
       } else {
         // Create new survey if no surveyId
         response = await createSurvey(title, questions);
         if (response) {
-          console.log("Survey submitted successfully!");
+          
         }
       }
       onSubmitSuccess();

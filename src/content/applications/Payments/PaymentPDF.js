@@ -65,7 +65,7 @@ const generatePDF = (payment) => {
         .from(element)
         .save()
         .then(() => {
-            console.log('PDF generated!');
+            
         })
         .catch((error) => {
             console.error('Error generating PDF:', error);

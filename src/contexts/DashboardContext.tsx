@@ -165,11 +165,7 @@ export const DashboardProvider: React.FC = ({ children }) => {
     try {
       const franchiseId =
         selectedFranchise === 'All Franchises' ? undefined : selectedFranchise;
-      console.log('Fetching invoice analytics with params:', {
-        franchiseId,
-        invoiceFilter,
-        filterParams
-      });
+;
       const data = await fetchInvoiceAnalytics(
         franchiseId,
         invoiceFilter,
@@ -202,7 +198,7 @@ export const DashboardProvider: React.FC = ({ children }) => {
   const fetchTodos = useCallback(async () => {
     try {
       const data = await fetchToDosByAssignedBy(todoPage, todoLimit);
-      console.log('Fetched todos:', data);
+      
       setTodos(data.data);
     } catch (error) {
       console.error('Error fetching todos:', error);

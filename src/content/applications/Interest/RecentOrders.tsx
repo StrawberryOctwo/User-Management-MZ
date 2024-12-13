@@ -77,17 +77,17 @@ export default function ViewBookings() {
   const handleView = (id: any) => {
     navigate(`view/${id}`);
 
-    console.log('View booking with ID:', id);
+    
   };
 
   const handleEdit = (id: any) => {
     // Implement edit logic, e.g., open edit dialog
-    console.log('Edit booking with ID:', id);
+    
   };
 
   const handleDelete = (ids: number[]) => {
     // Implement delete logic, e.g., send delete request
-    console.log('Delete bookings with IDs:', ids);
+    
   };
 
   const handleSortByAcceptedChange = (

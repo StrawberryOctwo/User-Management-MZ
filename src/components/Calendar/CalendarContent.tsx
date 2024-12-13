@@ -98,7 +98,7 @@ const CalendarContent: React.FC = () => {
   const transformClassSessionsToEvents = (
     classSessions: any[]
   ): EventItem[] => {
-    // console.log('classSessions:', classSessions);
+    // 
     if (classSessions === undefined) return [];
     return classSessions.map((session) => {
       const resource = session.room || 'R2';
@@ -143,7 +143,7 @@ const CalendarContent: React.FC = () => {
   };
 
   const loadClassSessions = async (locations = selectedLocations) => {
-    console.log('Loading class sessions for date:', date);
+    
     setLoading(true);
     setErrorMessage(null);
     try {
@@ -157,7 +157,7 @@ const CalendarContent: React.FC = () => {
       switch (strongestRole) {
         case 'Teacher':
         case 'Student':
-          console.log('Fetching teacher/student sessions');
+          
           response = await fetchUserClassSessions(
             userId?.toString() || '',
             date,
@@ -391,7 +391,7 @@ const CalendarContent: React.FC = () => {
   };
 
   const handleDateChange = (newDate: string) => {
-    console.log('Date changed:', date, '->', newDate);
+    
     setDate(newDate);
     checkAndUpdateYear(newDate);
   };
@@ -399,7 +399,7 @@ const CalendarContent: React.FC = () => {
   const checkAndUpdateYear = (dateStr: string) => {
     const newYear = moment(dateStr).year();
     if (newYear !== currentViewYear) {
-      console.log('Year changed:', currentViewYear, '->', newYear);
+      
       setCurrentViewYear(newYear);
       fetchSpecialDays(selectedLocations, newYear);
     }

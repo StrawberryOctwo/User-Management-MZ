@@ -122,7 +122,7 @@ function HeaderNotifications() {
     );
 
     eventSource.onopen = () => {
-      console.log('SSE connection established successfully.');
+      
     };
 
     eventSource.onmessage = (event) => {

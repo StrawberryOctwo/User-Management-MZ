@@ -107,7 +107,7 @@ export default function ViewInvoices() {
           generateTeacherInvoicePDF(invoiceData, teacherData, true);
       } else if (userRoles.includes('FranchiseAdmin')) {
         if (invoiceData.student) {
-          console.log(invoiceData);
+          
           if (isMounted.current)
             generateParentInvoicePDF(invoiceData, true);
         } else {
@@ -141,7 +141,7 @@ export default function ViewInvoices() {
           generateTeacherInvoicePDF(invoiceData, teacherData, false);
       } else if (userRoles.includes('FranchiseAdmin')) {
         if (invoiceData.student) {
-          console.log(invoiceData);
+          
           if (isMounted.current)
             generateParentInvoicePDF(invoiceData, false);
         } else {

@@ -110,7 +110,7 @@ function SidebarContent() {
     socket.emit("join_room", `user_${userId}`);
 
     socket.on("chat_updated", (updatedChat) => {
-      console.log("Received chat_updated:", updatedChat);
+      
 
       setChats((prevChats) => {
         const chatIndex = prevChats.findIndex(
@@ -149,7 +149,7 @@ function SidebarContent() {
     if (chat.lastMessage?.sender?.id !== userId && !chat.lastMessage?.isRead) {
       try {
         await resetUnreadCount(chat.id);
-        console.log("Unread messages reset successfully.");
+        
       } catch (error) {
         console.error("Failed to reset unread messages:", error);
       }

@@ -27,7 +27,7 @@ const EditFranchise = () => {
     setLoading(true);
     try {
       const fetchedFranchise = await fetchFranchiseById(Number(id));
-      console.log(fetchedFranchise);
+      
       setFranchiseData(fetchedFranchise);
       setIban(fetchedFranchise.iban);
     } catch (error) {
@@ -75,7 +75,7 @@ const EditFranchise = () => {
         finalPayload.append('franchiseLogo', data.franchiseLogo);
       }
 
-      console.log('submitted iban', payload.iban);
+      
 
       const response = await updateFranchise(Number(id), finalPayload);
       fetchFranchise();

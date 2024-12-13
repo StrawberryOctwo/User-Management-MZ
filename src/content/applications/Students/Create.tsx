@@ -138,7 +138,7 @@ export default function CreateStudent() {
         }
       };
 
-      console.log(payload)
+      
 
       const response = await addStudent(payload);
       await assignStudentToTopics(response.studentId, topicIds);

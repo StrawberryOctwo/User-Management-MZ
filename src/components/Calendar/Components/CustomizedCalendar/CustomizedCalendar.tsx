@@ -555,7 +555,7 @@ export default function CustomizedCalendar({
   };
 
   const handleSaveToDo = (todo: any) => {
-    console.log('Saving To-Do:', todo);
+    
   };
 
   const renderEventContent = (eventInfo: any) => {
@@ -704,7 +704,7 @@ export default function CustomizedCalendar({
           eventDidMount={(info) => {
             if (info.view.type === 'listWeek') {
               const eventEl = info.el;
-              console.log(info.event.extendedProps);
+              
               if (info.event.extendedProps.hasOverlap) {
                 eventEl.style.borderLeft = '3px solid red';
               }

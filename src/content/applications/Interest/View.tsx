@@ -26,7 +26,7 @@ const ViewInterest: React.FC = () => {
     try {
       const interestData = await fetchInterestById(Number(id));
       interestData.data.location = interestData.data.location.name;
-      console.log(interestData.data);
+      
       setInterest(interestData);
     } catch (error: any) {
       console.error('Failed to fetch interest:', error);
