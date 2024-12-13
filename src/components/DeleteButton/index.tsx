@@ -35,7 +35,7 @@ export default function DeleteButtonWithConfirmation({ onDelete }: { onDelete: (
                 </DialogContent>
                 <DialogActions>
                     <Button onClick={handleClose} color="primary">
-                        {t("(cancel")}
+                        {t("cancel")}
                     </Button>
                     <Button onClick={handleConfirmDelete} color="secondary" autoFocus>
                         Confirm

@@ -612,7 +612,7 @@ const ClassSessionDetailsModal: React.FC<ClassSessionDetailsModalProps> = ({
               color="inherit"
               disabled={loading}
             >
-              {t("cancel")}{t("(cancel")}
+              {t("cancel")}{t("cancel")}
             </Button>
             <Button
               onClick={handleToggleActivation}

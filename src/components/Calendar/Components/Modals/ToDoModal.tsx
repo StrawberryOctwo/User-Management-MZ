@@ -43,8 +43,8 @@ export default function ToDoModal({ isOpen, onClose, onSave }: ToDoModalProps) {
                 />
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>{t("(cancel")}</Button>
-                <Button onClick={handleSave} variant="contained" color="primary">{t("(save")}</Button>
+                <Button onClick={onClose}>{t("cancel")}</Button>
+                <Button onClick={handleSave} variant="contained" color="primary">{t("save")}</Button>
             </DialogActions>
         </Dialog>
     );

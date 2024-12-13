@@ -157,7 +157,7 @@ export default function ViewSessionReports() {
               color="inherit"
               disabled={loading}
             >
-              {t("(cancel")}
+              {t("cancel")}
             </Button>
             <Button
               // onClick={handleDelete} Uncomment if delete function is implemented

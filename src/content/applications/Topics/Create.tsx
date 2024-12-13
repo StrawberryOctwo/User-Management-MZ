@@ -12,7 +12,7 @@ const CreateTopic = () => {
   const { t } = useTranslation();
   // Handle franchise selection
   const handleFranchiseSelect = (selectedItem: any) => {
-    setSelectedFranchise(selectedItem); // {t("(save")} the single selected franchise
+    setSelectedFranchise(selectedItem); // {t("save")} the single selected franchise
   };
 
   // Handle form submission

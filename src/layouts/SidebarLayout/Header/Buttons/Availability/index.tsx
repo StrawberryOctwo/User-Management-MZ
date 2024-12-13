@@ -188,7 +188,7 @@ function HeaderAvailability() {
                         onClick={handleAvailabilitySubmit}
                         sx={{ minWidth: 120 }}
                     >
-                        {t("(save_availability")}
+                        {t("save_availability")}
                     </Button>
                 </Box>
             </Popover>

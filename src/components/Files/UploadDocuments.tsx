@@ -222,7 +222,7 @@ const UploadSection: React.FC<UploadSectionProps> = ({ onUploadChange, initialDo
                 onClose={() => setOpenDialog(false)}
                 actions={
                     <>
-                        <Button onClick={() => setOpenDialog(false)}>{t("(cancel")}</Button>
+                        <Button onClick={() => setOpenDialog(false)}>{t("cancel")}</Button>
                         <Button color="error" onClick={confirmDelete}>{t("delete")}</Button>
                     </>
                 }

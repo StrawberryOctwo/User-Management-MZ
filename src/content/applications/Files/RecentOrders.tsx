@@ -117,7 +117,7 @@ export default function FileUploadContent() {
         actions={
           <>
             <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
-              {t("(cancel")}
+              {t("cancel")}
             </Button>
             <Button onClick={handleDelete} color="primary" autoFocus disabled={loading}>
               {loading ? <CircularProgress size={24} /> : t("confirm")}

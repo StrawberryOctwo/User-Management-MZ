@@ -91,7 +91,7 @@ const AddToDoForm: React.FC<AddToDoFormProps> = ({ onAdd }) => {
             </Grid>
             <Box display="flex" justifyContent="flex-end" mt={2}>
                 <Button onClick={handleAddToDo} color="primary" variant="contained">
-                    {t("(save")} ToDo
+                    {t("save")} ToDo
                 </Button>
             </Box>
             {errorMessage && <Box mt={1} color="error.main">{errorMessage}</Box>}

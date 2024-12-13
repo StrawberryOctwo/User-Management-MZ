@@ -231,7 +231,7 @@ function DropArea({ questions, onEdit, onDelete }: DropAreaProps) {
                     sx={{ mt: 2 }}
                     fullWidth
                   >
-                    {t("(save")}
+                    {t("save")}
                   </Button>
                 </>
               )}

@@ -32,7 +32,7 @@ export default function EditLocation() {
                 return loc;
             });
 
-            // {t("(save")} back to localStorage
+            // {t("save")} back to localStorage
             localStorage.setItem('selectedLocations', JSON.stringify(updatedLocations));
         } catch (error) {
             console.error('Error updating localStorage:', error);

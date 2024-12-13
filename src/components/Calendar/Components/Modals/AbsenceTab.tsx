@@ -351,7 +351,7 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
                         </Typography>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={cancelStatusChange} color="secondary">{t("(cancel")}</Button>
+                        <Button onClick={cancelStatusChange} color="secondary">{t("cancel")}</Button>
                         <Button onClick={confirmStatusUpdate} color="primary" variant="contained">
                             {t("confirm")}
                         </Button>

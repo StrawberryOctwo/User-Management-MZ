@@ -277,7 +277,7 @@ export default function SpecialDayModal({
       </DialogContent>
       <DialogActions>
         <Button onClick={handleClose} disabled={isSubmitting}>
-          {t("(cancel")}
+          {t("cancel")}
         </Button>
         <Button
           onClick={handleSubmit}
@@ -285,7 +285,7 @@ export default function SpecialDayModal({
           color="primary"
           disabled={isSubmitting}
         >
-          {isSubmitting ? 'Saving...' : '{t("(save")}'}
+          {isSubmitting ? 'Saving...' : '{t("save")}'}
         </Button>
       </DialogActions>
     </Dialog>

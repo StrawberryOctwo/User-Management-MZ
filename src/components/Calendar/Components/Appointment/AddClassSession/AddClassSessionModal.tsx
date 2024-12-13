@@ -152,7 +152,7 @@ const AddClassSessionModal: React.FC<AddClassSessionModalProps> = ({
         onConfirm={handleConfirmSave}
         title={t("confirm_save")}
         content="Please review all details carefully before saving. Are you sure you want to save?"
-        confirmButtonText={t("(save")}
+        confirmButtonText={t("save")}
       />
     </>
   );

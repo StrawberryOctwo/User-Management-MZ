@@ -119,7 +119,7 @@ export default function ParentsContent() {
         actions={
           <>
             <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
-              {t("(cancel")}
+              {t("cancel")}
             </Button>
             <Button
               onClick={handleDelete}

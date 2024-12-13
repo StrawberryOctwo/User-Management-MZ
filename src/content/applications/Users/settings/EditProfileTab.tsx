@@ -83,7 +83,7 @@ function EditProfileTab() {
                   startIcon={<CancelTwoToneIcon />}
                   onClick={() => setIsEditingUser(false)}
                 >
-                  {t("(cancel")}
+                  {t("cancel")}
                 </Button>
               )}
               <Button
@@ -93,7 +93,7 @@ function EditProfileTab() {
                 }
                 onClick={handleUserEditToggle}
               >
-                {isEditingUser ? '{t("(save")}' : 'Edit'}
+                {isEditingUser ? '{t("save")}' : 'Edit'}
               </Button>
             </Box>
           </Box>
@@ -125,7 +125,7 @@ function EditProfileTab() {
                     startIcon={<CancelTwoToneIcon />}
                     onClick={() => setIsEditingParent(false)}
                   >
-                    {t("(cancel")}
+                    {t("cancel")}
                   </Button>
                 )}
                 <Button
@@ -135,7 +135,7 @@ function EditProfileTab() {
                   }
                   onClick={handleParentEditToggle}
                 >
-                  {isEditingParent ? '{t("(save")}' : 'Edit'}
+                  {isEditingParent ? '{t("save")}' : 'Edit'}
                 </Button>
               </Box>
             </Box>
@@ -169,7 +169,7 @@ function EditProfileTab() {
                     startIcon={<CancelTwoToneIcon />}
                     onClick={() => setIsEditingTeacher(false)}
                   >
-                    {t("(cancel")}
+                    {t("cancel")}
                   </Button>
                 )}
                 <Button
@@ -179,7 +179,7 @@ function EditProfileTab() {
                   }
                   onClick={handleTeacherEditToggle}
                 >
-                  {isEditingTeacher ? '{t("(save")}' : 'Edit'}
+                  {isEditingTeacher ? '{t("save")}' : 'Edit'}
                 </Button>
               </Box>
             </Box>

@@ -132,7 +132,7 @@ const PasswordChangeModal = ({ open, onClose }) => {
       </DialogContent>
       <DialogActions sx={{ p: 2 }}>
         <Button onClick={onClose} disabled={loading}>
-          {t("(cancel")}
+          {t("cancel")}
         </Button>
         <Button
           variant="contained"

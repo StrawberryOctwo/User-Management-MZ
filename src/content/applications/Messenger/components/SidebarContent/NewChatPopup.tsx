@@ -245,7 +245,7 @@ const NewChatPopup: React.FC<NewChatPopupProps> = ({
               </List>
               <Box display="flex" justifyContent="flex-end" mt={2}>
                 <Button onClick={handleClose} color="primary" variant="outlined">
-                  {t("(cancel")}
+                  {t("cancel")}
                 </Button>
               </Box>
             </>
@@ -275,7 +275,7 @@ const NewChatPopup: React.FC<NewChatPopupProps> = ({
               />
               <Box display="flex" justifyContent="flex-end" mt={2}>
                 <Button onClick={handleClose} color="primary" variant="outlined">
-                  {t("(cancel")}
+                  {t("cancel")}
                 </Button>
               </Box>
             </>

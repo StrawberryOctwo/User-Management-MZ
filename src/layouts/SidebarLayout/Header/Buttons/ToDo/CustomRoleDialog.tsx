@@ -514,7 +514,7 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
             </DialogContent>
             <DialogActions>
                 <Button onClick={onClose} color="secondary" variant="outlined">
-                    {t("(cancel")}
+                    {t("cancel")}
                 </Button>
                 {originName === 'AssignRole' && (
                     <Button
@@ -546,7 +546,7 @@ const CustomRoleDialog: React.FC<CustomRoleDialogProps> = ({
                         color="primary"
                         variant="contained"
                     >
-                        {t("(save")}
+                        {t("save")}
                     </Button>
                 )}
             </DialogActions>

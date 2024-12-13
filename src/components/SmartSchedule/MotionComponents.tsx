@@ -1,4 +1,3 @@
-// src/components/SmartSchedule/MotionComponents.tsx
 import React from 'react';
 import { Paper, PaperProps, Backdrop, BackdropProps } from '@mui/material';
 import { motion } from 'framer-motion';

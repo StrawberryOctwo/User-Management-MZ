@@ -87,7 +87,7 @@ const StudentExamsHeader: React.FC = () => {
       </Tooltip>
 
       <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
-        <DialogTitle>{t("(my_exams")}</DialogTitle>
+        <DialogTitle>{t("my_exams")}</DialogTitle>
         <DialogContent dividers>
           {errorMessage && (
             <Typography color="error" variant="body2" sx={{ mb: 2 }}>
@@ -109,7 +109,7 @@ const StudentExamsHeader: React.FC = () => {
               {exams.length === 0 && (
                 <Box p={2}>
                   <Typography variant="body2" color="textSecondary">
-                    {t("(no_exams_found.")}
+                    {t("no_exams_found.")}
                   </Typography>
                 </Box>
               )}
@@ -131,7 +131,7 @@ const StudentExamsHeader: React.FC = () => {
 
           {/* Add Exam Form */}
           <Typography variant="h6" align="center" gutterBottom>
-            {t("(add_new_exam")}
+            {t("add_new_exam")}
           </Typography>
           <Grid container spacing={2}>
             <Grid item xs={12}>
@@ -156,10 +156,10 @@ const StudentExamsHeader: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="secondary">
-            {t("(cancel")}
+            {t("cancel")}
           </Button>
           <Button onClick={handleAddExam} color="primary" variant="contained">
-            {t("(save_exam")}
+            {t("save_exam")}
           </Button>
         </DialogActions>
       </Dialog>

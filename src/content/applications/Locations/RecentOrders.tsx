@@ -122,7 +122,7 @@ export default function ViewLocationPage() {
               color="inherit"
               disabled={loading}
             >
-              {t("(cancel")}
+              {t("cancel")}
             </Button>
             <Button
               onClick={handleDelete}
