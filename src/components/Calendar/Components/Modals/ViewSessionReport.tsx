@@ -14,8 +14,7 @@ import {
   FormLabel,
   Typography,
   CircularProgress,
-  styled,
-  Grid
+  styled
 } from '@mui/material';
 import {
   getSessionReportById,
@@ -49,8 +48,8 @@ const StyledDialogContent = styled(DialogContent)(({ theme }) => ({
         : theme.palette.primary.main,
     borderRadius: '4px',
     border: `2px solid ${theme.palette.mode === 'dark'
-      ? theme.palette.background.paper
-      : theme.palette.background.default
+        ? theme.palette.background.paper
+        : theme.palette.background.default
       }`,
   },
   '&::-webkit-scrollbar-thumb:hover': {
@@ -62,8 +61,8 @@ const StyledDialogContent = styled(DialogContent)(({ theme }) => ({
   // For Firefox
   scrollbarWidth: 'thin',
   scrollbarColor: `${theme.palette.primary.main} ${theme.palette.mode === 'dark'
-    ? theme.palette.background.paper
-    : theme.palette.background.default
+      ? theme.palette.background.paper
+      : theme.palette.background.default
     }`,
 }));
 
@@ -200,373 +199,208 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
           <Box display="flex" justifyContent="center" mt={2}>
             <CircularProgress />
           </Box>
-        ) : isEditable ? (
-          <Box display="flex" flexDirection="column" gap={3} mt={2}>
-            {/* Session Details */}
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <TextField
-                  label="Student Name"
-                  value={studentName}
-                  fullWidth
-                  InputProps={{ readOnly: true }}
-                />
-              </Grid>
-              <Grid item xs={6}>
-                <TextField
-                  label={t("session_date")}
-                  value={sessionDate}
-                  fullWidth
-                  InputProps={{ readOnly: true }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label={t("lesson_topic")}
-                  value={lessonTopic}
-                  onChange={(e) => setLessonTopic(e.target.value)}
-                  fullWidth
-                  InputProps={{ readOnly: !isEditable }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Covered Materials"
-                  value={coveredMaterials}
-                  onChange={(e) => setCoveredMaterials(e.target.value)}
-                  fullWidth
-                  InputProps={{ readOnly: !isEditable }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Progress"
-                  value={progress}
-                  onChange={(e) => setProgress(e.target.value)}
-                  fullWidth
-                  InputProps={{ readOnly: !isEditable }}
-                />
-              </Grid>
-            </Grid>
-
-            <Divider />
-
-            {/* Learning Assessment */}
-            <Typography variant="h6" gutterBottom>
-              Learning Assessment
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  label="Assessment"
-                  value={learningAssessment}
-                  onChange={(e) => setLearningAssessment(e.target.value)}
-                  fullWidth
-                  InputProps={{ readOnly: !isEditable }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label="Next Homework"
-                  value={nextHomework}
-                  onChange={(e) => setNextHomework(e.target.value)}
-                  fullWidth
-                  InputProps={{ readOnly: !isEditable }}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  label={t("tutor_remarks")}
-                  value={tutorRemarks}
-                  onChange={(e) => setTutorRemarks(e.target.value)}
-                  fullWidth
-                  InputProps={{ readOnly: !isEditable }}
-                />
-              </Grid>
-            </Grid>
-
-            <Divider />
-
-            {/* Behavioral Assessment */}
-            <Typography variant="h6" gutterBottom>
-              Behavioral Assessment
-            </Typography>
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Active Participation</InputLabel>
-                  <Select
-                    label={t("active_participation")}
-                    value={activeParticipation ? 'Yes' : 'No'}
-                    onChange={(e) =>
-                      setActiveParticipation(e.target.value === 'Yes')
-                    }
-                    inputProps={{ readOnly: !isEditable }}
-                  >
-                    <MenuItem value="Yes">Yes</MenuItem>
-                    <MenuItem value="No">No</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-              <Grid item xs={6}>
-                <FormControl fullWidth>
-                  <InputLabel>Concentration</InputLabel>
-                  <Select
-                    label="Concentration"
-                    value={concentration ? 'Yes' : 'No'}
-                    onChange={(e) => setConcentration(e.target.value === 'Yes')}
-                    inputProps={{ readOnly: !isEditable }}
-                  >
-                    <MenuItem value="Yes">Yes</MenuItem>
-                    <MenuItem value="No">No</MenuItem>
-                  </Select>
-                </FormControl>
-              </Grid>
-            </Grid>
-          </Box>
         ) : (
-          <Box display="flex" flexDirection="column" gap={3} mt={2}>
-
-            <Grid container spacing={2}>
-              <Grid item xs={6}>
-                <Typography variant="body1">
-                  <strong>Student Name:</strong> {studentName}
-                </Typography>
-              </Grid>
-              <Grid item xs={6}>
-                <Typography variant="body1">
-                  <strong>Session Date:</strong> {sessionDate}
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="body1">
-                  <strong>Lesson Topic:</strong> {lessonTopic}
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="body1">
-                  <strong>Covered Materials:</strong> {coveredMaterials}
-                </Typography>
-              </Grid>
-              <Grid item xs={12}>
-                <Typography variant="body1">
-                  <strong>Progress:</strong> {progress}
-                </Typography>
-              </Grid>
-            </Grid>
-            ) : (
-            <Box sx={{ width: '100%', mt: 2 }}>
-              {/* Lesson Content Section */}
-              <Box sx={{ mb: 4 }}>
-                <Typography variant="h6" gutterBottom>
-                  {t('1. Lesson Content')}
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <TextField
-                    label={t('Topic of the Lesson')}
-                    value={formData.lessonTopic}
-                    onChange={handleChange('lessonTopic')}
-                    fullWidth
-                    InputProps={{ readOnly: !isEditable }}
-                  />
-                  <TextField
-                    label={t('Covered Topics/Exercises')}
-                    value={formData.coveredMaterials}
-                    onChange={handleChange('coveredMaterials')}
-                    fullWidth
-                    InputProps={{ readOnly: !isEditable }}
-                  />
-                </Box>
+          <Box sx={{ width: '100%', mt: 2 }}>
+            {/* Lesson Content Section */}
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="h6" gutterBottom>
+                {t('1. Lesson Content')}
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <TextField
+                  label={t('Topic of the Lesson')}
+                  value={formData.lessonTopic}
+                  onChange={handleChange('lessonTopic')}
+                  fullWidth
+                  InputProps={{ readOnly: !isEditable }}
+                />
+                <TextField
+                  label={t('Covered Topics/Exercises')}
+                  value={formData.coveredMaterials}
+                  onChange={handleChange('coveredMaterials')}
+                  fullWidth
+                  InputProps={{ readOnly: !isEditable }}
+                />
               </Box>
+            </Box>
 
-              {/* Progress & Learning Section */}
-              <Box sx={{ mb: 4 }}>
-                <Typography variant="h6" gutterBottom>
-                  {t('2. Progress & Learning')}
-                </Typography>
-                <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
-                  <FormControl component="fieldset">
-                    <FormLabel component="legend">{t('Progress')}</FormLabel>
+            {/* Progress & Learning Section */}
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="h6" gutterBottom>
+                {t('2. Progress & Learning')}
+              </Typography>
+              <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                <FormControl component="fieldset">
+                  <FormLabel component="legend">{t('Progress')}</FormLabel>
+                  <RadioGroup
+                    value={formData.progress}
+                    onChange={handleChange('progress')}
+                    row
+                  >
+                    <FormControlLabel
+                      value="very-good"
+                      control={<Radio />}
+                      label={t('Very Good')}
+                      disabled={!isEditable}
+                    />
+                    <FormControlLabel
+                      value="good"
+                      control={<Radio />}
+                      label={t('Good')}
+                      disabled={!isEditable}
+                    />
+                    <FormControlLabel
+                      value="needs-improvement"
+                      control={<Radio />}
+                      label={t('Needs Improvement')}
+                      disabled={!isEditable}
+                    />
+                    <FormControlLabel
+                      value="difficult"
+                      control={<Radio />}
+                      label={t('Difficult')}
+                      disabled={!isEditable}
+                    />
+                  </RadioGroup>
+                </FormControl>
+                <TextField
+                  label={t('Brief Explanation/Assessment of Learning Progress')}
+                  value={formData.learningAssessment}
+                  onChange={handleChange('learningAssessment')}
+                  multiline
+                  rows={3}
+                  fullWidth
+                  InputProps={{ readOnly: !isEditable }}
+                />
+              </Box>
+            </Box>
+
+            {/* Attention Section */}
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="h6" gutterBottom>
+                {t('3. Attention')}
+              </Typography>
+              {[
+                {
+                  field: 'activeParticipation',
+                  label: t('Regular and active participation in class'),
+                  inputField: 'participationNotes'
+                },
+                {
+                  field: 'concentration',
+                  label: t('Remains focused'),
+                  inputField: 'concentrationNotes'
+                },
+                {
+                  field: 'worksIndependently',
+                  label: t('Works independently'),
+                  inputField: 'independentWorkNotes'
+                },
+                {
+                  field: 'cooperation',
+                  label: t('Cooperative'),
+                  inputField: 'cooperationNotes'
+                }
+              ].map(({ field, label, inputField }) => (
+                <Box key={field} sx={{ mb: 2 }}>
+                  <FormLabel>{label}</FormLabel>
+                  <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1 }}>
+                    <TextField
+                      label={t('Notes')}
+                      value={formData[inputField]}
+                      onChange={handleChange(inputField)}
+                      size="small"
+                      fullWidth
+                      InputProps={{ readOnly: !isEditable }}
+                    />
                     <RadioGroup
-                      value={formData.progress}
-                      onChange={handleChange('progress')}
+                      value={formData[field] ? 'yes' : 'no'}
+                      onChange={handleChange(field)}
                       row
-                    >
-                      <FormControlLabel
-                        value="very-good"
-                        control={<Radio />}
-                        label={t('Very Good')}
-                        disabled={!isEditable}
-                      />
-                      <FormControlLabel
-                        value="good"
-                        control={<Radio />}
-                        label={t('Good')}
-                        disabled={!isEditable}
-                      />
-                      <FormControlLabel
-                        value="needs-improvement"
-                        control={<Radio />}
-                        label={t('Needs Improvement')}
-                        disabled={!isEditable}
-                      />
-                      <FormControlLabel
-                        value="difficult"
-                        control={<Radio />}
-                        label={t('Difficult')}
-                        disabled={!isEditable}
-                      />
-                    </RadioGroup>
-                  </FormControl>
-                  <TextField
-                    label={t('Brief Explanation/Assessment of Learning Progress')}
-                    value={formData.learningAssessment}
-                    onChange={handleChange('learningAssessment')}
-                    multiline
-                    rows={3}
-                    fullWidth
-                    InputProps={{ readOnly: !isEditable }}
-                  />
-                </Box>
-              </Box>
-
-              {/* Attention Section */}
-              <Box sx={{ mb: 4 }}>
-                <Typography variant="h6" gutterBottom>
-                  {t('3. Attention')}
-                </Typography>
-                {[
-                  {
-                    field: 'activeParticipation',
-                    label: t('Regular and active participation in class'),
-                    inputField: 'participationNotes'
-                  },
-                  {
-                    field: 'concentration',
-                    label: t('Remains focused'),
-                    inputField: 'concentrationNotes'
-                  },
-                  {
-                    field: 'worksIndependently',
-                    label: t('Works independently'),
-                    inputField: 'independentWorkNotes'
-                  },
-                  {
-                    field: 'cooperation',
-                    label: t('Cooperative'),
-                    inputField: 'cooperationNotes'
-                  }
-                ].map(({ field, label, inputField }) => (
-                  <Box key={field} sx={{ mb: 2 }}>
-                    <FormLabel>{label}</FormLabel>
-                    <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1 }}>
-                      <TextField
-                        label={t('Notes')}
-                        value={formData[inputField]}
-                        onChange={handleChange(inputField)}
-                        size="small"
-                        fullWidth
-                        InputProps={{ readOnly: !isEditable }}
-                      />
-                      <RadioGroup
-                        value={formData[field] ? 'yes' : 'no'}
-                        onChange={handleChange(field)}
-                        row
-                        sx={{ minWidth: '150px' }}
-                      >
-                        <FormControlLabel
-                          value="yes"
-                          control={<Radio size="small" />}
-                          label={t('Yes')}
-                          disabled={!isEditable}
-                        />
-                        <FormControlLabel
-                          value="no"
-                          control={<Radio size="small" />}
-                          label={t('No')}
-                          disabled={!isEditable}
-                        />
-                      </RadioGroup>
-                    </Box>
-                  </Box>
-                ))}
-              </Box>
-
-              {/* Homework & Notes Section */}
-              <Box sx={{ mb: 4 }}>
-                <Typography variant="h6" gutterBottom>
-                  {t('4. Homework & Notes')}
-                </Typography>
-                <Box>
-                  <FormControl fullWidth sx={{ mt: 2 }}>
-                    <FormLabel>{t('Previous homework completed')}</FormLabel>
-                    <RadioGroup
-                      value={formData.previousHomeworkCompleted ? 'yes' : 'no'}
-                      onChange={handleChange('previousHomeworkCompleted')}
-                      row
+                      sx={{ minWidth: '150px' }}
                     >
                       <FormControlLabel
                         value="yes"
-                        control={<Radio />}
+                        control={<Radio size="small" />}
                         label={t('Yes')}
                         disabled={!isEditable}
                       />
                       <FormControlLabel
                         value="no"
-                        control={<Radio />}
+                        control={<Radio size="small" />}
                         label={t('No')}
                         disabled={!isEditable}
                       />
                     </RadioGroup>
-                  </FormControl>
-                  <FormControl fullWidth sx={{ mt: 2 }}>
-                    <FormLabel>{t('Homework for the next session')}</FormLabel>
-                    <RadioGroup
-                      value={formData.nextHomework}
-                      onChange={handleChange('nextHomework')}
-                      row
-                    >
-                      <FormControlLabel
-                        value="worksheets"
-                        control={<Radio />}
-                        label={t('Worksheets')}
-                        disabled={!isEditable}
-                      />
-                      <FormControlLabel
-                        value="school-materials"
-                        control={<Radio />}
-                        label={t('School Materials')}
-                        disabled={!isEditable}
-                      />
-                    </RadioGroup>
-                  </FormControl>
+                  </Box>
                 </Box>
-                <Box sx={{ mt: 2 }}>
-                  <FormLabel component="legend">{t('Notes from the Tutor')}</FormLabel>
-                  <TextField
-                    label={t('Additional Comments')}
-                    value={formData.tutorRemarks}
-                    onChange={handleChange('tutorRemarks')}
-                    multiline
-                    rows={4}
-                    fullWidth
-                    margin="normal"
-                    InputProps={{ readOnly: !isEditable }}
-                  />
-                </Box>
+              ))}
+            </Box>
+
+            {/* Homework & Notes Section */}
+            <Box sx={{ mb: 4 }}>
+              <Typography variant="h6" gutterBottom>
+                {t('4. Homework & Notes')}
+              </Typography>
+              <Box>
+                <FormControl fullWidth sx={{ mt: 2 }}>
+                  <FormLabel>{t('Previous homework completed')}</FormLabel>
+                  <RadioGroup
+                    value={formData.previousHomeworkCompleted ? 'yes' : 'no'}
+                    onChange={handleChange('previousHomeworkCompleted')}
+                    row
+                  >
+                    <FormControlLabel
+                      value="yes"
+                      control={<Radio />}
+                      label={t('Yes')}
+                      disabled={!isEditable}
+                    />
+                    <FormControlLabel
+                      value="no"
+                      control={<Radio />}
+                      label={t('No')}
+                      disabled={!isEditable}
+                    />
+                  </RadioGroup>
+                </FormControl>
+                <FormControl fullWidth sx={{ mt: 2 }}>
+                  <FormLabel>{t('Homework for the next session')}</FormLabel>
+                  <RadioGroup
+                    value={formData.nextHomework}
+                    onChange={handleChange('nextHomework')}
+                    row
+                  >
+                    <FormControlLabel
+                      value="worksheets"
+                      control={<Radio />}
+                      label={t('Worksheets')}
+                      disabled={!isEditable}
+                    />
+                    <FormControlLabel
+                      value="school-materials"
+                      control={<Radio />}
+                      label={t('School Materials')}
+                      disabled={!isEditable}
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </Box>
+              <Box sx={{ mt: 2 }}>
+                <FormLabel component="legend">{t('Notes from the Tutor')}</FormLabel>
+                <TextField
+                  label={t('Additional Comments')}
+                  value={formData.tutorRemarks}
+                  onChange={handleChange('tutorRemarks')}
+                  multiline
+                  rows={4}
+                  fullWidth
+                  margin="normal"
+                  InputProps={{ readOnly: !isEditable }}
+                />
               </Box>
             </Box>
-        )}
-          </DialogContent >
-  {isEditable && (
-          <DialogActions>
-            <Button onClick={handleDelete} color="error">
-              {t('delete')}
-            </Button>
-            <Button onClick={handleSave} variant="contained" color="primary">
-              {t('save')}
-            </Button>
-          </DialogActions>
+          </Box>
         )}
       </StyledDialogContent>
       <DialogActions>
@@ -584,7 +418,7 @@ const ViewSessionReportForm: React.FC<ViewSessionReportFormProps> = ({
           <Button onClick={onClose}>{t('Close')}</Button>
         </Box>
       </DialogActions>
-    </Dialog >
+    </Dialog>
   );
 };
 
