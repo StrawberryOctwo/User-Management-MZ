@@ -29,7 +29,7 @@ const AvatarPrimary = styled(Avatar)(
 const CardContentWrapper = styled(CardContent)(
   ({ theme }) => `
      padding: ${theme.spacing(2.5, 3, 3)};
-  
+
      &:last-child {
      padding-bottom: 0;
      }
@@ -43,7 +43,7 @@ function TotalTeachers() {
     <Card>
       <CardContentWrapper>
         <Typography variant="overline" color="text.primary">
-          {t('Teachers')}
+          {t('teachers')}
         </Typography>
 
         <ListItem

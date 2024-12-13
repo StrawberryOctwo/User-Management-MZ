@@ -9,17 +9,22 @@ export const calendarHelpers: CalendarHelpers = {
   getHeaderToolbar: () => ({
     left: 'today view', // Group view button
     center: 'prev datePickerButton next',
-    right: 'eventButton'
+    right: 'smartSchedule eventButton'
   }),
 
   getCustomButtons: (
     handleDatePickerClick,
     handleOpenEventTypeModal,
+    handleOpenSmartScheduleModal,
     selectedDate
   ) => ({
     datePickerButton: {
       text: moment(selectedDate).format('dddd, MMMM D, YYYY'),
       click: (e: MouseEvent) => handleDatePickerClick(e)
+    },
+    smartSchedule: {
+      text: 'Smart Schedule',
+      click: handleOpenSmartScheduleModal
     },
     eventButton: {
       text: 'Add Event',

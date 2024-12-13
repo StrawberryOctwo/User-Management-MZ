@@ -12,6 +12,7 @@ import { getStrongestRoles } from 'src/hooks/roleUtils';
 import { addClassSession } from 'src/services/classSessionService';
 import { Session, useSession } from '../../SessionContext';
 import ConfirmationDialog from '../../Modals/ConfirmationDialog';
+import { t } from "i18next"
 
 interface AddClassSessionModalProps {
   isOpen: boolean;
@@ -116,7 +117,7 @@ const AddClassSessionModal: React.FC<AddClassSessionModalProps> = ({
   return (
     <>
       <Dialog open={isOpen} onClose={handleClose} maxWidth="lg" fullWidth>
-        <DialogTitle>Add Class Session</DialogTitle>
+        <DialogTitle>t{("add_class_session")}</DialogTitle>
         <DialogContent
           sx={{
             paddingBottom: 0
@@ -132,7 +133,7 @@ const AddClassSessionModal: React.FC<AddClassSessionModalProps> = ({
         </DialogContent>
         <DialogActions>
           <Button onClick={handleClose} color="secondary">
-            Cancel
+            {t("cancel")}
           </Button>
           <Button
             onClick={handleOpenConfirm}
@@ -140,7 +141,7 @@ const AddClassSessionModal: React.FC<AddClassSessionModalProps> = ({
             variant="contained"
             disabled={disabled}
           >
-            Save
+            {t("save")}
           </Button>
         </DialogActions>
       </Dialog>
@@ -149,9 +150,9 @@ const AddClassSessionModal: React.FC<AddClassSessionModalProps> = ({
         open={confirmOpen}
         onClose={handleCloseConfirm}
         onConfirm={handleConfirmSave}
-        title="Confirm Save"
+        title={t("confirm_save")}
         content="Please review all details carefully before saving. Are you sure you want to save?"
-        confirmButtonText="Save"
+        confirmButtonText={t("save")}
       />
     </>
   );

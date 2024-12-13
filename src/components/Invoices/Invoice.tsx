@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { fetchInvoiceById } from 'src/services/invoiceService';
 import { useAuth } from 'src/hooks/useAuth';
 import generateInvoicePDF from 'src/content/applications/Invoices/teacherInvoice';
+import { t } from "i18next"
 
 export default function InvoiceComponent() {
   const [selectedInvoiceId, setSelectedInvoiceId] = useState(null);
@@ -38,7 +39,7 @@ export default function InvoiceComponent() {
 
   return (
     <div>
-      <button onClick={() => handleDownloadInvoice(123)}>Download Invoice PDF</button>
+      <button onClick={() => handleDownloadInvoice(123)}>{t("download_invoice_pdf")}</button>
     </div>
   );
 }

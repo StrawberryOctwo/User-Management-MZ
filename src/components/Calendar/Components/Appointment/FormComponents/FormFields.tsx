@@ -22,7 +22,8 @@ import { fetchStudents } from 'src/services/studentService';
 import { fetchLocations } from 'src/services/locationService';
 import { useSession } from '../../SessionContext';
 import { fetchSessionTypes } from 'src/services/contractPackagesService';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
+
 
 export default function FormFields({
   strongestRoles,
@@ -40,7 +41,7 @@ export default function FormFields({
   isPartial?: boolean;
 }) {
   const { session, setSession, setDayDetail, resetDayDetails } = useSession();
-
+  const { t } = useTranslation();
   const [selectedTopic, setSelectedTopic] = useState(null);
   const [selectedTeacher, setSelectedTeacher] = useState(null);
   const [selectedStudents, setSelectedStudents] = useState([]);
@@ -115,7 +116,7 @@ export default function FormFields({
         <Box sx={{ mb: 3 }}>
           <SingleSelectWithAutocomplete
             width="100%"
-            label="Search Topic"
+            label={t("search_topic")}
             fetchData={(query) =>
               fetchTopics(1, 5, query).then((response) => response.data)
             }
@@ -144,7 +145,7 @@ export default function FormFields({
                 ))
               ) : (
                 <MenuItem disabled value="">
-                  No options available
+                  {t("no_options_available")}
                 </MenuItem>
               )}
             </Select>
@@ -154,27 +155,27 @@ export default function FormFields({
         <Box sx={{ mb: 3 }}>
           <SingleSelectWithAutocomplete
             width="100%"
-            label="Search Teacher"
+            label={t("search_teacher")}
             fetchData={(query) =>
               strongestRoles.includes('Teacher')
                 ? fetchTeacherByUserId(userId).then((teacher) => [
-                    {
-                      ...teacher,
-                      fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
-                    }
-                  ])
+                  {
+                    ...teacher,
+                    fullName: `${teacher.user.firstName} ${teacher.user.lastName}`
+                  }
+                ])
                 : fetchTeachers(1, 5, query).then((data) =>
-                    data.data.map((teacher: any) => ({
-                      ...teacher,
-                      fullName: `${teacher.firstName} ${teacher.lastName}`
-                    }))
-                  )
+                  data.data.map((teacher: any) => ({
+                    ...teacher,
+                    fullName: `${teacher.firstName} ${teacher.lastName}`
+                  }))
+                )
             }
             onSelect={(teacher) =>
               setSession({ ...session, teacherId: teacher?.id })
             }
             displayProperty="fullName"
-            placeholder="Search Teacher"
+            placeholder={t("search_teacher")}
             initialValue={selectedTeacher}
           />
         </Box>
@@ -182,7 +183,7 @@ export default function FormFields({
         <Box sx={{ mb: 3 }}>
           <MultiSelectWithCheckboxes
             width="100%"
-            label="Search Students"
+            label={t("search_students")}
             fetchData={(query) =>
               fetchStudents(1, 5, query).then((data) =>
                 data.data.map((student) => ({
@@ -198,7 +199,7 @@ export default function FormFields({
               })
             }
             displayProperty="fullName"
-            placeholder="Enter student name"
+            placeholder={t("enter_student_name")}
             initialValue={selectedStudents}
           />
         </Box>
@@ -206,7 +207,7 @@ export default function FormFields({
         <Box sx={{ mb: 3 }}>
           <SingleSelectWithAutocomplete
             width="100%"
-            label="Select Location"
+            label={t("select_location")}
             fetchData={(query) =>
               fetchLocations(1, 5, query).then((data) => data.data)
             }
@@ -215,16 +216,16 @@ export default function FormFields({
               setSelectedLocation(location);
             }}
             displayProperty="name"
-            placeholder="Search Location"
+            placeholder={t("select_location")}
             initialValue={selectedLocation}
             disabled={!strongestRoles.includes('Teacher')}
           />
         </Box>
 
         <FormControl fullWidth>
-          <InputLabel>Room</InputLabel>
+          <InputLabel>{t("room")}</InputLabel>
           <Select
-            label="Room"
+            label={t("room")}
             value={session.room || ''}
             onChange={(e) => setSession({ ...session, room: e.target.value })}
           >

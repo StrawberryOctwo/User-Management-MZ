@@ -184,10 +184,10 @@ const ReusableForm: React.FC<ReusableFormProps> = ({
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
-    if (formData.iban && !isValidIBAN(formData.iban)) {
-      alert('Please enter a valid IBAN.');
-      return;
-    }
+    // if (formData.iban && !isValidIBAN(formData.iban)) {
+    //   alert('Please enter a valid IBAN.');
+    //   return;
+    // }
 
     try {
       const response = await onSubmit(formData);

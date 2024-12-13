@@ -6,6 +6,7 @@ import React, {
   useCallback
 } from 'react';
 import { TextField, Autocomplete, CircularProgress } from '@mui/material';
+import { t } from "i18next"
 
 interface SingleSelectWithAutocompleteProps {
   label: string;

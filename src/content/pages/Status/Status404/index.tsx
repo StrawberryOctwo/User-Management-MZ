@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import { Helmet } from 'react-helmet-async';
 import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
-
+import { t } from "i18next"
 import { styled } from '@mui/material/styles';
 
 const MainContent = styled(Box)(
@@ -42,7 +42,7 @@ function Status404() {
   return (
     <>
       <Helmet>
-        <title>Status - 404</title>
+        <title>{t("status-404")}</title>
       </Helmet>
       <MainContent>
         <Container maxWidth="md">

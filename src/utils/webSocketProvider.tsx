@@ -21,17 +21,17 @@ const socket = io(SOCKET_SERVER_URL, {
   transports: ["polling"],
 });
   
-console.log(socket)
+
 // WebSocketProvider Component
 export const WebSocketProvider: React.FC<WebSocketProviderProps> = ({ children }) => {
   useEffect(() => {
     // Handle connection events
     socket.on("connect", () => {
-      console.log("Connected to WebSocket server:", socket.id);
+      
     });
 
     socket.on("disconnect", () => {
-      console.log("Disconnected from WebSocket server");
+      
     });
     socket.on("connect_error", (err) => {
       console.error("Connection Error:", err.message);

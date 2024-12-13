@@ -1,11 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
 import Box from '@mui/material/Box';
-import { t } from 'i18next';
 import { useParams } from 'react-router-dom';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
 import ReusableForm from 'src/components/Table/tableRowCreate';
 import { fetchFranchises } from 'src/services/franchiseService';
 import { fetchLocationById, updateLocation } from 'src/services/locationService';
+import { useTranslation } from 'react-i18next';
 
 export default function EditLocation() {
     const { id } = useParams<{ id: string }>();
@@ -13,7 +13,7 @@ export default function EditLocation() {
     const [locationData, setLocationData] = useState<Record<string, any> | null>(null);
     const [loading, setLoading] = useState(false);
     const franchiseRef = useRef<any>(null);
-
+    const { t } = useTranslation();
     const updateLocalStorageLocation = (updatedLocation: any) => {
         try {
             // Get current selected locations from localStorage
@@ -32,7 +32,7 @@ export default function EditLocation() {
                 return loc;
             });
 
-            // Save back to localStorage
+            // {t("save")} back to localStorage
             localStorage.setItem('selectedLocations', JSON.stringify(updatedLocations));
         } catch (error) {
             console.error('Error updating localStorage:', error);

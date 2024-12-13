@@ -3,7 +3,7 @@ import PageHeader from './PageHeader';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 import { Grid, Container, Box } from '@mui/material';
 import Footer from 'src/components/Footer';
-
+import { t } from "i18next"
 import RecentOrders from './RecentOrders';
 
 function ApplicationsFranchises() {
@@ -15,7 +15,7 @@ function ApplicationsFranchises() {
       <PageTitleWrapper>
         <PageHeader />
       </PageTitleWrapper>
-      <Box sx={{ mx: 15, px: 0 }}>
+      <Box sx={{ mx: 10, px: 0 }}>
         <Grid
           container
           direction="row"
@@ -24,11 +24,11 @@ function ApplicationsFranchises() {
           spacing={3}
           sx={{ mx: 0 }}
         >
-          <Grid item xs={12}>
+          <Grid item xs={14}>
             <RecentOrders />
           </Grid>
         </Grid>
-      </Box >
+      </Box>
       <Footer />
     </>
   );

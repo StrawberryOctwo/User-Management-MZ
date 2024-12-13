@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import ContractCard from 'src/components/Cards';
 import { deleteContractPackages, fetchContractPackages } from 'src/services/contractPackagesService';
 import { useNavigate } from 'react-router-dom';
+import { t } from "i18next"
 
 export default function ContractPage() {
   const [contracts, setContracts] = useState<any[]>([]);
@@ -21,7 +22,7 @@ export default function ContractPage() {
       setContracts(data);
     } catch (error) {
       console.error('Error fetching contracts:', error);
-      setErrorMessage('Error fetching contracts');
+      setErrorMessage(t('error_fetching_contracts'));
     } finally {
       setLoading(false);
     }

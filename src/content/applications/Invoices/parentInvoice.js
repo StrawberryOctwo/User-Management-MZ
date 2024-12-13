@@ -17,7 +17,7 @@ const generateParentInvoicePDF = async (invoice, preview = false) => {
 
     // Helper Functions
     const formatDate = (date) => new Date(date).toLocaleDateString('de-DE');
-    const formatCurrency = (amount) => `€${Number(amount).toFixed(2)}`;
+    const formatCurrency = (amount) => `${Number(amount).toFixed(2)}€`;
     const loadImage = (src) =>
         new Promise((resolve, reject) => {
             const img = new Image();

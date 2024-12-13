@@ -16,6 +16,7 @@ import {
 import CalendarTodayIcon from '@mui/icons-material/CalendarToday';
 import { useRef, useState, useEffect } from 'react';
 import { fetchAvailabilityForSelf, updateAvailabilityForSelf } from 'src/services/availabilityService';
+import { t } from "i18next"
 
 function HeaderAvailability() {
     const ref = useRef<any>(null);
@@ -48,12 +49,12 @@ function HeaderAvailability() {
         daysOfWeek.forEach(day => {
             const dayAvailability = data.find(item => item.dayOfWeek === day);
             formatted[day] = dayAvailability
-                ? { 
-                    id: dayAvailability.id, 
-                    startTime: dayAvailability.startTime, 
-                    endTime: dayAvailability.endTime, 
-                    checked: !(dayAvailability.startTime === '00:00:00' && dayAvailability.endTime === '00:00:00') 
-                  }
+                ? {
+                    id: dayAvailability.id,
+                    startTime: dayAvailability.startTime,
+                    endTime: dayAvailability.endTime,
+                    checked: !(dayAvailability.startTime === '00:00:00' && dayAvailability.endTime === '00:00:00')
+                }
                 : { startTime: '00:00:00', endTime: '00:00:00', checked: false };
         });
         return formatted;
@@ -187,7 +188,7 @@ function HeaderAvailability() {
                         onClick={handleAvailabilitySubmit}
                         sx={{ minWidth: 120 }}
                     >
-                        Save Availability
+                        {t("save_availability")}
                     </Button>
                 </Box>
             </Popover>

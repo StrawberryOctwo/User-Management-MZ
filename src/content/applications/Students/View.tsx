@@ -11,7 +11,6 @@ import {
   DialogContent,
   DialogTitle
 } from '@mui/material';
-import { t } from 'i18next';
 import {
   fetchStudentById,
   fetchStudentDocumentsById
@@ -29,6 +28,7 @@ import {
   decodeAvailableDates,
   formatDate
 } from './utils';
+import { useTranslation } from 'react-i18next';
 
 const ViewStudentPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -37,10 +37,9 @@ const ViewStudentPage: React.FC = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [documents, setDocuments] = useState<any[]>([]);
   const [sessionReports, setSessionReports] = useState<any[]>([]);
-  const [payments, setPayments] = useState<any[]>([]);
   const [isReportDialogOpen, setIsReportDialogOpen] = useState(false);
   const [selectedReportId, setSelectedReportId] = useState<string | null>(null);
-
+  const { t } = useTranslation();
   // Function to load the student and associated data
   const loadStudentData = async () => {
     setLoading(true);
@@ -53,6 +52,7 @@ const ViewStudentPage: React.FC = () => {
       studentData.availableDates = decodeAvailableDates(
         studentData.availableDates
       ).map(capitalizeFirstLetter);
+      studentData.availableTime = [studentData.availableTime.start,studentData.availableTime.end]
 
       // Transform locations: Array of Objects to Array of Names
       if (studentData.locations && Array.isArray(studentData.locations)) {
@@ -72,8 +72,7 @@ const ViewStudentPage: React.FC = () => {
       const reports = await getSessionReportsForStudent(id);
       setSessionReports(reports);
 
-      const userPayments = await getPaymentsForUser(studentData.user?.id);
-      setPayments(userPayments.data);
+
     } catch (error: any) {
       console.error('Failed to fetch student data:', error);
       setErrorMessage(t('failed_to_fetch_student'));
@@ -83,22 +82,6 @@ const ViewStudentPage: React.FC = () => {
   };
 
 
-  const handleUpdateStatus = async (paymentId: number, newStatus: string) => {
-    setPayments((prevPayments) =>
-      prevPayments.map((payment) =>
-        payment.id === paymentId
-          ? { ...payment, paymentStatus: newStatus }
-          : payment
-      )
-    );
-
-    try {
-      await updatePaymentStatus(paymentId, newStatus); // Call API to confirm update
-    } catch (error) {
-      console.error('Failed to update payment status:', error);
-      loadStudentData();
-    }
-  };
 
   useEffect(() => {
     if (id) {
@@ -110,7 +93,6 @@ const ViewStudentPage: React.FC = () => {
     ...student,
     sessionReports,
     documents,
-    payments,
     sessionBalance: student?.sessionBalance,
     firstName: student?.user?.firstName || '',
     lastName: student?.user?.lastName || '',
@@ -179,7 +161,14 @@ const ViewStudentPage: React.FC = () => {
       label: t('available_dates'),
       section: t('student_details'),
       isArray: true,
-      isTextArray: true // Display available dates as comma-separated
+      isTextArray: true 
+    },
+    {
+      name: 'availableTime', // Add availableTime here
+      label: t('available_time'),
+      section: t('student_details'),
+      isArray: true,
+      isTextArray: true 
     },
     {
       name: 'createdAt',
@@ -220,48 +209,6 @@ const ViewStudentPage: React.FC = () => {
           ),
           sortable: false,
           width: 150
-        }
-      ]
-    },
-    {
-      name: 'payments',
-      label: t('payments'),
-      section: t('payments_section'),
-      isArray: true,
-      columns: [
-        { field: 'amount', headerName: t('amount'), flex: 1 },
-        {
-          field: 'paymentDate',
-          headerName: t('payment_date'),
-          flex: 1,
-          render: (value: any) =>
-            new Date(value).toLocaleDateString(undefined, {
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit'
-            })
-        },
-        {
-          field: 'paymentStatus',
-          headerName: t('payment_status'),
-          renderCell: (params: {
-            row: { id: number; paymentStatus: string };
-          }) => (
-            <Select
-              value={params.row.paymentStatus}
-              onChange={(e) =>
-                handleUpdateStatus(params.row.id, e.target.value)
-              }
-              fullWidth
-              sx={{ height: 40 }}
-            >
-              <MenuItem value="Pending">{t('pending')}</MenuItem>
-              <MenuItem value="Paid">{t('paid')}</MenuItem>
-              <MenuItem value="Cancelled">{t('cancelled')}</MenuItem>
-            </Select>
-          ),
-          sortable: false,
-          width: 180
         }
       ]
     },

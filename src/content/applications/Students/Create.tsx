@@ -1,6 +1,6 @@
+// src/pages/CreateStudent.tsx
 import React, { useRef, useState } from 'react';
 import Box from '@mui/material/Box';
-import { t } from 'i18next';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
@@ -20,29 +20,32 @@ import {
   Checkbox,
   FormControlLabel,
   FormGroup,
-  FormLabel,
-  Grid
+  FormLabel
 } from '@mui/material';
 import { daysOfWeek } from './utils';
+import { useTranslation } from 'react-i18next';
+import AvailableTimePicker from './AvailableTimesPicker';
 
 export default function CreateStudent() {
-  const [selectedLocationIds, setSelectedLocationIds] = useState<number[]>([]); // Update to handle multiple IDs
+  const { t } = useTranslation();
+  const [selectedLocationIds, setSelectedLocationIds] = useState<number[]>([]);
   const [selectedContractId, setSelectedContractId] = useState<number | null>(
     null
   );
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [availableTime, setAvailableTime] = useState<{ start: string; end: string }>({
+    start: '',
+    end: '',
+  }); // Add availableTime state
   const [selectedTopics, setSelectedTopics] = useState<any[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
   const [selectedGradeLevel, setSelectedGradeLevel] = useState<number | null>(
     null
   );
-  const [selectedSchoolTypeId, setSelectedSchoolTypeId] = useState<
-    number | null
-  >(null);
-
-  const [studentData, setStudentData] = useState<Record<string, any> | null>(
+  const [selectedSchoolTypeId, setSelectedSchoolTypeId] = useState<number | null>(
     null
   );
+
   const [loading, setLoading] = useState(false);
   const dropdownRef = useRef<any>(null);
   const { showMessage } = useSnackbar();
@@ -84,6 +87,7 @@ export default function CreateStudent() {
   const handleSchoolTypeSelect = (schoolType: any) => {
     setSelectedSchoolTypeId(schoolType ? schoolType.id : null);
   };
+
   const handleStudentSubmit = async (
     data: Record<string, any>
   ): Promise<{ message: string }> => {
@@ -93,6 +97,15 @@ export default function CreateStudent() {
     }
     if (selectedTopics.length === 0) {
       showMessage("Topics field can't be empty", 'error');
+      return;
+    }
+    if (!availableTime.start || !availableTime.end) {
+      showMessage('Available time must have both start and end times', 'error');
+      return;
+    }
+    // Optional: Validate that start time is before end time
+    if (availableTime.start >= availableTime.end) {
+      showMessage('Start time must be before end time', 'error');
       return;
     }
 
@@ -108,6 +121,7 @@ export default function CreateStudent() {
           contractEndDate: data['contractEndDate'],
           notes: data['notes'],
           availableDates: selectedDays,
+          availableTime: availableTime, // Include availableTime in payload
           locationIds: selectedLocationIds,
           schoolType: selectedSchoolTypeId
         },
@@ -124,9 +138,13 @@ export default function CreateStudent() {
         }
       };
 
+
+
       const response = await addStudent(payload);
       await assignStudentToTopics(response.studentId, topicIds);
-      await assignStudentToContract(response.studentId, selectedContractId);
+      if (selectedContractId) {
+        await assignStudentToContract(response.studentId, selectedContractId);
+      }
 
       const userId = response.userId;
       for (const file of uploadedFiles) {
@@ -138,16 +156,22 @@ export default function CreateStudent() {
         await addDocument(documentPayload, file.file);
       }
 
+      // Reset form fields
       setSelectedLocationIds([]);
       setSelectedContractId(null);
       setSelectedTopics([]);
       setUploadedFiles([]);
       setSelectedSchoolTypeId(null);
+      setSelectedGradeLevel(null);
+      setSelectedDays([]);
+      setAvailableTime({ start: '', end: '' });
       if (dropdownRef.current) dropdownRef.current.reset();
 
+      showMessage('Student added successfully', 'success');
       return response;
     } catch (error: any) {
       console.error('Error adding student:', error);
+      showMessage('Error adding student', 'error');
       throw error;
     } finally {
       setLoading(false);
@@ -155,10 +179,7 @@ export default function CreateStudent() {
   };
 
   const handleGradeLevelSelect = (selectedGrade: any) => {
-    // Update the form data directly instead of using separate state
-    console.log('selectedGrade:', selectedGrade);
-    setSelectedGradeLevel(selectedGrade.id);
-    return selectedGrade ? selectedGrade.id : null;
+    setSelectedGradeLevel(selectedGrade ? selectedGrade.id : null);
   };
 
   const schoolTypeSelectionField = {
@@ -178,18 +199,18 @@ export default function CreateStudent() {
   };
   const contractSelectionField = {
     name: 'contracts',
-    label: t('contract'),
+    label: t('contracts'),
     type: 'custom',
     section: 'Student Information',
     component: (
       <SingleSelectWithAutocomplete
-        label="Search Contracts"
+        label={t('search_contracts')}
         fetchData={(query) =>
           fetchContractPackagesByEntity(1, 5, query).then((data) => data.data)
         }
         onSelect={handleContractSelect}
         displayProperty="name"
-        placeholder="Type to search contracts"
+        placeholder={t('type_to_search_contracts')}
       />
     )
   };
@@ -200,13 +221,13 @@ export default function CreateStudent() {
     section: 'Student Assignment',
     component: (
       <MultiSelectWithCheckboxes
-        label="Search Location"
+        label={t('search_location')}
         fetchData={(query) =>
           fetchLocations(1, 5, query).then((data) => data.data)
         }
         onSelect={handleLocationSelect}
         displayProperty="name"
-        placeholder="Type to search location"
+        placeholder={t('type_to_search_location')}
       />
     )
   };
@@ -283,7 +304,7 @@ export default function CreateStudent() {
     }
   ];
 
-  const studentFields = [
+  const studentFields: FieldConfig[] = [
     {
       name: 'status',
       label: t('status'),
@@ -309,7 +330,6 @@ export default function CreateStudent() {
           ref={dropdownRef}
         />
       ),
-      getValue: (selectedValue: any) => selectedValue // Add this line
     },
     {
       name: 'contractEndDate',
@@ -325,7 +345,6 @@ export default function CreateStudent() {
       required: false,
       section: 'Student Information'
     },
-
     contractSelectionField,
     schoolTypeSelectionField,
     {
@@ -345,7 +364,7 @@ export default function CreateStudent() {
           }}
         >
           <FormLabel component="legend" sx={{ whiteSpace: 'nowrap' }}>
-            Available Days:
+            {t('available_days')}:
           </FormLabel>
           <FormGroup row sx={{ flexWrap: 'nowrap', gap: 2 }}>
             {daysOfWeek.map((day) => (
@@ -359,13 +378,13 @@ export default function CreateStudent() {
                   />
                 }
                 label={day.label}
-                sx={{ width: 'auto' }} // Adjust width to fit content
+                sx={{ width: 'auto' }}
               />
             ))}
           </FormGroup>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Button variant="outlined" size="small" onClick={handleSelectAll}>
-              Select All
+              {t('select_all')}
             </Button>
             <Button
               variant="outlined"
@@ -373,16 +392,21 @@ export default function CreateStudent() {
               color="error"
               onClick={handleClearAll}
             >
-              Clear All
+              {t('clear_all')}
             </Button>
           </Box>
+          {/* Add AvailableTimePicker */}
+          <AvailableTimePicker
+            availableTime={availableTime}
+            setAvailableTime={setAvailableTime}
+          />
         </Box>
       )
     },
     locationSelectionField,
     {
       name: 'topics',
-      label: 'Assign Topics',
+      label: t('assign_topics'),
       type: 'custom',
       section: 'Student Assignment',
       component: (
@@ -399,7 +423,7 @@ export default function CreateStudent() {
     },
     {
       name: 'documents',
-      label: 'Upload Documents',
+      label: t('upload_documents'),
       type: 'custom',
       section: 'Documents',
       component: <UploadSection onUploadChange={handleFilesChange} />,

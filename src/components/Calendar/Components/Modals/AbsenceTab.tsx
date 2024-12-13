@@ -10,7 +10,8 @@ import { calendarsharedService } from '../../CalendarSharedService';
 import WarningAmberIcon from '@mui/icons-material/WarningAmber';
 import PreviewIcon from '@mui/icons-material/Visibility';
 import { downloadFile } from 'src/services/fileUploadService';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
+
 
 interface AbsenceTabProps {
     classSessionId: string;
@@ -25,7 +26,7 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
     const [loading, setLoading] = useState(false);
     const [absenceId, setAbsenceId] = useState<number | null>(null);
     const [sessionDate, setSessionDate] = useState<number | null>(null);
-
+    const { t } = useTranslation();
     const [isStatusEditable, setIsStatusEditable] = useState(true);
     const [confirmStatusChange, setConfirmStatusChange] = useState(false);
     const [originalStatus, setOriginalStatus] = useState<boolean | null>(null);
@@ -177,7 +178,7 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
                 }}
             >
                 {loading ? (
-                    <Typography>Loading absence data...</Typography>
+                    <Typography>{t("loading_absence_data")}...</Typography>
                 ) : (
                     <>
                         <Box
@@ -192,7 +193,7 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
                                 sx={{ flexShrink: 0 }}
                             >
                                 {student?.user.firstName} {student?.user.lastName} is
-                                currently:
+                                {t("currently")}:
                             </Typography>
                             <Box display="flex" alignItems="center" flexShrink={0}>
                                 <FormControlLabel
@@ -213,7 +214,7 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
                                                 whiteSpace: 'nowrap',
                                             }}
                                         >
-                                            {absenceId ? 'Absent' : 'Present'}
+                                            {absenceId ? t('absent') : t('present')}
                                         </Typography>
                                     }
                                     labelPlacement="start"
@@ -223,17 +224,17 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
                         </Box>
 
                         {absenceId ? (
-                            (reason !== "" || isDateOlderThan3Days(sessionDate))? (
+                            (reason !== "" || isDateOlderThan3Days(sessionDate)) ? (
                                 <>
                                     <TextField
-                                        label="Reason for Absence"
+                                        label={t("reason_for_absence")}
                                         value={reason}
                                         fullWidth
                                         sx={{ mb: 1 }}
                                         disabled
                                     />
                                     <FormControl fullWidth sx={{ mb: 1 }}>
-                                        <InputLabel>{t('status')}</InputLabel>
+                                        <InputLabel>{t("status")}</InputLabel>
                                         <Select
                                             label={t("status")}
                                             value={
@@ -250,10 +251,10 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
                                                     : !isStatusEditable
                                             }
                                         >
-                                            <MenuItem value="true">Accepted</MenuItem>
-                                            <MenuItem value="false">Rejected</MenuItem>
+                                            <MenuItem value="true">{t("accepted")}</MenuItem>
+                                            <MenuItem value="false">{t("rejected")}</MenuItem>
                                             <MenuItem value="">
-                                                Awaiting Student Proof
+                                                {t("awaiting Student Proof")}
                                             </MenuItem>
                                         </Select>
                                     </FormControl>
@@ -261,7 +262,7 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
                                         variant="subtitle1"
                                         sx={{ mt: 1 }}
                                     >
-                                        Files:
+                                        {t("files")}:
                                     </Typography>
                                     <List>
                                         {files.length > 0 ? (
@@ -308,7 +309,7 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
                                                 variant="body2"
                                                 color="textSecondary"
                                             >
-                                                No files attached to this absence.
+                                                {t("no_files_attached_to_this_absence")}.
                                             </Typography>
                                         )}
                                     </List>
@@ -319,7 +320,7 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
                                     color="textSecondary"
                                     sx={{ mt: 2 }}
                                 >
-                                    Awaiting reason from student...
+                                    {t("awaiting_reason_from_student")}...
                                 </Typography>
                             )
                         ) : null}
@@ -334,7 +335,7 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
                     }}
                     color="secondary"
                 >
-                    Cancel
+                    {t("cancel")}
                 </Button>
             </DialogActions>
 
@@ -342,7 +343,7 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
                 <Dialog open={confirmStatusChange} onClose={cancelStatusChange} maxWidth="xs" fullWidth>
                     <DialogTitle>
                         <WarningAmberIcon fontSize="large" color="error" sx={{ verticalAlign: 'middle', mr: 1 }} />
-                        Confirm Status Change
+                        {t("confirm_status_change")}
                     </DialogTitle>
                     <DialogContent>
                         <Typography>
@@ -350,9 +351,9 @@ const AbsenceTab: React.FC<AbsenceTabProps> = ({ classSessionId, isOpen, student
                         </Typography>
                     </DialogContent>
                     <DialogActions>
-                        <Button onClick={cancelStatusChange} color="secondary">Cancel</Button>
+                        <Button onClick={cancelStatusChange} color="secondary">{t("cancel")}</Button>
                         <Button onClick={confirmStatusUpdate} color="primary" variant="contained">
-                            Confirm
+                            {t("confirm")}
                         </Button>
                     </DialogActions>
                 </Dialog>

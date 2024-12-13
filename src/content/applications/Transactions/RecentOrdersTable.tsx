@@ -30,7 +30,7 @@ import { CryptoOrder, CryptoOrderStatus } from 'src/models/crypto_order';
 import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import BulkActions from './BulkActions';
-import { t } from 'i18next';
+import { t } from "i18next";
 
 interface RecentOrdersTableProps {
   className?: string;
@@ -48,11 +48,11 @@ const getStatusLabel = (cryptoOrderStatus: CryptoOrderStatus): JSX.Element => {
       color: 'error'
     },
     completed: {
-      text: 'Completed',
+      text: '{t("completed")}',
       color: 'success'
     },
     pending: {
-      text: 'Pending',
+      text: '{t("pending")}',
       color: 'warning'
     }
   };
@@ -187,7 +187,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
           action={
             <Box width={150}>
               <FormControl fullWidth variant="outlined">
-                <InputLabel>{t('status')}</InputLabel>
+                <InputLabel>{t("status")}</InputLabel>
                 <Select
                   value={filters.status || 'all'}
                   onChange={handleStatusChange}
@@ -200,8 +200,8 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                     </MenuItem>
                   ))}
                 </Select>
-              </FormControl>
-            </Box>
+              </FormControl >
+            </Box >
           }
           title="Recent Orders"
         />
@@ -219,14 +219,14 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
                   onChange={handleSelectAllCryptoOrders}
                 />
               </TableCell>
-              <TableCell>Order Details</TableCell>
-              <TableCell>Order ID</TableCell>
-              <TableCell>Source</TableCell>
-              <TableCell align="right">Amount</TableCell>
-              <TableCell align="right">{t('status')}</TableCell>
-              <TableCell align="right">Actions</TableCell>
-            </TableRow>
-          </TableHead>
+              <TableCell>{t("order_details")}</TableCell>
+              <TableCell>{t("order_id")}</TableCell>
+              <TableCell>{t("source")}</TableCell>
+              <TableCell align="right">{t("amout")}</TableCell>
+              <TableCell align="right">{t("status")}</TableCell>
+              <TableCell align="right">{t("actions")}</TableCell>
+            </TableRow >
+          </TableHead >
           <TableBody>
             {paginatedCryptoOrders.map((cryptoOrder) => {
               const isCryptoOrderSelected = selectedCryptoOrders.includes(
@@ -339,8 +339,8 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
               );
             })}
           </TableBody>
-        </Table>
-      </TableContainer>
+        </Table >
+      </TableContainer >
       <Box p={2}>
         <TablePagination
           component="div"
@@ -352,7 +352,7 @@ const RecentOrdersTable: FC<RecentOrdersTableProps> = ({ cryptoOrders }) => {
           rowsPerPageOptions={[5, 10, 25, 30]}
         />
       </Box>
-    </Card>
+    </Card >
   );
 };
 

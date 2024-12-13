@@ -17,6 +17,7 @@ import TotalStudents from './components/total/TotalStudents';
 import { DashboardProvider } from 'src/contexts/DashboardContext';
 import StudentsByFilters from './components/StudentsByFilters';
 import RecentTodos from './components/TodoAnalytics';
+import NotificationsTab from './components/NotificationsTab';
 
 function DashboardAnalytics() {
   return (
@@ -55,8 +56,8 @@ function DashboardAnalytics() {
             </Grid>
           </Grid>
         </Grid>
-        <Grid item lg={4} md={4} xs={12}>
-          <RecentTodos />
+        <Grid item lg={4} md={6} xs={12}>
+          <NotificationsTab /> {/* Add the NotificationsTab here */}
         </Grid>
         <Grid item lg={4} md={6} xs={12}>
           <SessionsByCountry />

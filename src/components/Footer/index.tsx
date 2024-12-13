@@ -1,4 +1,5 @@
 import { Box, Container, Link, Typography, styled } from '@mui/material';
+import { t } from "i18next"
 
 const FooterWrapper = styled(Container)(
   ({ theme }) => `
@@ -18,7 +19,7 @@ function Footer() {
       >
         <Box>
           <Typography variant="subtitle1">
-            &copy; 2024 - User Management System
+            &copy; 2024 - {t("user_management_system")}
           </Typography>
         </Box>
         <Typography
@@ -27,7 +28,7 @@ function Footer() {
           }}
           variant="subtitle1"
         >
-          Crafted by{' '}
+          {t("crafted_by")}{' '}
           <Link
             href="https://antrieb2punkt0.de"
             target="_blank"

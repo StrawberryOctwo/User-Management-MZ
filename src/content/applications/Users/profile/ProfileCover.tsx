@@ -10,7 +10,7 @@ import {
   IconButton
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-
+import { t } from "i18next"
 import ArrowBackTwoToneIcon from '@mui/icons-material/ArrowBackTwoTone';
 import ArrowForwardTwoToneIcon from '@mui/icons-material/ArrowForwardTwoTone';
 import UploadTwoToneIcon from '@mui/icons-material/UploadTwoTone';

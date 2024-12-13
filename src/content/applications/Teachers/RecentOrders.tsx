@@ -5,7 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { fetchTeachers, deleteTeacher } from 'src/services/teacherService';
 import { useNavigate } from 'react-router-dom';
 import { format } from 'date-fns';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 export default function TeachersContent() {
   const [teachers, setTeachers] = useState([]);
@@ -19,7 +19,7 @@ export default function TeachersContent() {
   const isMounted = useRef(false);
 
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   useEffect(() => {
     if (isMounted.current) {
       loadTeachers();
@@ -38,13 +38,18 @@ export default function TeachersContent() {
         id: teacher.id,
         fullName: `${teacher.firstName} ${teacher.lastName}`.trim(), // Merged full name
         employeeNumber: teacher.employeeNumber,
-        contractStartDate: format(new Date(teacher.contractStartDate), 'dd/MM/yyyy'),
-        contractEndDate: format(new Date(teacher.contractEndDate), 'dd/MM/yyyy'),
-        contractPeriod: `${format(new Date(teacher.contractStartDate), 'dd/MM/yyyy')} - ${format(new Date(teacher.contractEndDate), 'dd/MM/yyyy')}`,
+        contractStartDate:
+          new Date(teacher.contractStartDate).toLocaleDateString('de'),
+        contractEndDate:
+          new Date(teacher.contractEndDate).toLocaleDateString('de')
+        ,
+        contractPeriod: `${(
+          new Date(teacher.contractStartDate).toLocaleDateString('de')
+        )} - ${(new Date(teacher.contractEndDate).toLocaleDateString('de'))}`,
         hourlyRate: teacher.hourlyRate,
         email: teacher.email,
         status: teacher.status,
-        franchise: teacher.franchiseName,
+        franchise: teacher.franchiseName
       }));
 
       setTeachers(mappedTeachers);
@@ -56,21 +61,19 @@ export default function TeachersContent() {
     }
   };
 
-
-
   const columns = [
-    { field: 'fullName', headerName: 'Full Name' },
+    { field: 'fullName', headerName: t('full_name') },
     { field: 'franchise', headerName: t('franchise_name') },
     { field: 'email', headerName: t('email') },
     { field: 'employeeNumber', headerName: t('employee_number') },
     {
       field: 'contractPeriod',
-      headerName: 'Contract Period',
+      headerName: t('Contract Period'),
       render: (value: any, row: any) =>
-        `${row.contractStartDate} - ${row.contractEndDate}`,
+        `${row.contractStartDate} - ${row.contractEndDate}`
     },
     { field: 'status', headerName: t('status') },
-    { field: 'hourlyRate', headerName: t('hourly_rate') },
+    { field: 'hourlyRate', headerName: t('Hourly Rate') },
   ];
 
   const handleEdit = (id: any) => {
@@ -136,7 +139,11 @@ export default function TeachersContent() {
         onClose={() => setDialogOpen(false)}
         actions={
           <>
-            <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
+            <Button
+              onClick={() => setDialogOpen(false)}
+              color="inherit"
+              disabled={loading}
+            >
               Cancel
             </Button>
             <Button
@@ -145,7 +152,7 @@ export default function TeachersContent() {
               autoFocus
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+              {loading ? <CircularProgress size={24} /> : t("confirm")}
             </Button>
           </>
         }

@@ -3,14 +3,14 @@ import PageHeader from './PageHeader';
 import PageTitleWrapper from 'src/components/PageTitleWrapper';
 import { Grid, Container } from '@mui/material';
 import Footer from 'src/components/Footer';
-
+import { t } from "i18next"
 import RecentOrders from './RecentOrders';
 
 function ApplicationsFranchises() {
   return (
     <>
       <Helmet>
-        <title>Billings - Applications</title>
+        <title>{t("billings_applications")}</title>
       </Helmet>
       <PageTitleWrapper>
         <PageHeader />

@@ -12,14 +12,47 @@ import {
   Radio,
   RadioGroup,
   FormLabel,
-  Stepper,
-  Step,
-  StepLabel,
-  Typography
+  Typography,
+  CircularProgress,
+  Divider,
+  styled
 } from '@mui/material';
 import { useTranslation } from 'react-i18next';
 import { addSessionReport } from 'src/services/sessionReportService';
-import { t } from 'i18next';
+
+// Styled DialogContent with customized scrollbar
+const StyledDialogContent = styled(DialogContent)(({ theme }) => ({
+  // For WebKit browsers
+  '&::-webkit-scrollbar': {
+    width: '8px',
+  },
+  '&::-webkit-scrollbar-track': {
+    background: 'transparent',
+  },
+  '&::-webkit-scrollbar-thumb': {
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? theme.palette.primary.light
+        : theme.palette.primary.main,
+    borderRadius: '4px',
+    border: `2px solid ${theme.palette.mode === 'dark'
+      ? theme.palette.background.paper
+      : theme.palette.background.default
+      }`,
+  },
+  '&::-webkit-scrollbar-thumb:hover': {
+    backgroundColor:
+      theme.palette.mode === 'dark'
+        ? theme.palette.primary.dark
+        : theme.palette.primary.dark,
+  },
+  // For Firefox
+  scrollbarWidth: 'thin',
+  scrollbarColor: `${theme.palette.primary.main} ${theme.palette.mode === 'dark'
+    ? theme.palette.background.paper
+    : theme.palette.background.default
+    }`,
+}));
 
 interface AddSessionReportFormProps {
   isOpen: boolean;
@@ -40,6 +73,7 @@ const steps = [
   'Homework & Notes'
 ];
 
+const { t } = useTranslation();
 const StepContent = ({
   step,
   formData,
@@ -243,7 +277,7 @@ const AddSessionReportForm: React.FC<AddSessionReportFormProps> = ({
   sessionDate
 }) => {
   const { t } = useTranslation();
-  const [activeStep, setActiveStep] = useState(0);
+  const [loading, setLoading] = useState(false);
   const [formData, setFormData] = useState({
     lessonTopic: '',
     coveredMaterials: '',
@@ -254,7 +288,7 @@ const AddSessionReportForm: React.FC<AddSessionReportFormProps> = ({
     worksIndependently: 'no',
     cooperation: 'no',
     previousHomeworkCompleted: 'no',
-    nextHomework: 'worksheets',
+    nextHomework: '',
     tutorRemarks: '',
     participationNotes: '',
     concentrationNotes: '',
@@ -262,27 +296,21 @@ const AddSessionReportForm: React.FC<AddSessionReportFormProps> = ({
     cooperationNotes: ''
   });
 
-  const handleStepClick = (step: number) => {
-    setActiveStep(step);
-  };
-
   const handleChange =
     (field: string) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setFormData((prev) => ({ ...prev, [field]: e.target.value }));
-    };
-
-  const handleNext = () => {
-    setActiveStep((prevStep) => prevStep + 1);
-  };
-
-  const handleBack = () => {
-    setActiveStep((prevStep) => prevStep - 1);
-  };
+      (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setFormData((prev) => ({ ...prev, [field]: e.target.value }));
+      };
 
   const handleSave = async () => {
+    // Basic form validation
+    if (!formData.lessonTopic || !formData.coveredMaterials) {
+      alert(t('Please fill out all required fields.'));
+      return;
+    }
+
+    setLoading(true);
     try {
-      // Save the session report
       const newReport = {
         ...formData,
         studentId: studentId,
@@ -294,9 +322,13 @@ const AddSessionReportForm: React.FC<AddSessionReportFormProps> = ({
         previousHomeworkCompleted: formData.previousHomeworkCompleted === 'yes'
       };
       await addSessionReport(newReport);
+      onSave(newReport);
       onClose();
     } catch (error) {
       console.error('Error saving session report:', error);
+      alert(t('An error occurred while saving the report. Please try again.'));
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -317,15 +349,12 @@ const AddSessionReportForm: React.FC<AddSessionReportFormProps> = ({
               <strong>{t('Session Date')}:</strong> {sessionDate || '-'}
             </Typography>
           </Box>
-          <Box sx={{ display: 'flex', flexDirection: 'column', gap: 0.5 }}>
+          <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
             <Typography variant="body1">
-              <strong>{t('Student')}:</strong>{' '}
-              {user?.user?.firstName
-                ? `${user.user.firstName} ${user.user.lastName}`
-                : '-'}
+              <strong>{t('Student')}:</strong> {studentName || '-'}
             </Typography>
             <Typography variant="body1">
-              <strong>{t('Teacher')}:</strong>{' '}
+              <strong>{t('Teacher')}:</strong>
               {teacher?.user?.firstName
                 ? `${teacher.user.firstName} ${teacher.user.lastName}`
                 : '-'}
@@ -333,58 +362,191 @@ const AddSessionReportForm: React.FC<AddSessionReportFormProps> = ({
           </Box>
         </Box>
       </DialogTitle>
-      <DialogContent>
-        <Box sx={{ width: '100%', mt: 2 }}>
-          <Stepper activeStep={activeStep} alternativeLabel>
-            {steps.map((label, index) => (
-              <Step
-                key={label}
-                sx={{ cursor: 'pointer' }}
-                onClick={() => handleStepClick(index)}
-              >
-                <StepLabel
-                  StepIconProps={{
-                    sx: {
-                      cursor: 'pointer',
-                      '&:hover': {
-                        transform: 'scale(1.1)',
-                        transition: 'transform 0.2s'
-                      }
-                    }
-                  }}
+      <StyledDialogContent dividers>
+        <Box component="form" sx={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+          {/* Lesson Content Section */}
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              {t('1. Lesson Content')}
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <TextField
+                label={t('Topic of the Lesson')}
+                value={formData.lessonTopic}
+                onChange={handleChange('lessonTopic')}
+                fullWidth
+                required
+              />
+              <TextField
+                label={t('Covered Topics/Exercises')}
+                value={formData.coveredMaterials}
+                onChange={handleChange('coveredMaterials')}
+                fullWidth
+                multiline
+                rows={3}
+                required
+              />
+            </Box>
+          </Box>
+
+          {/* Progress & Learning Section */}
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              {t('2. Progress & Learning')}
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
+            <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+              <FormControl component="fieldset">
+                <FormLabel component="legend">{t('Progress')}</FormLabel>
+                <RadioGroup
+                  value={formData.progress}
+                  onChange={handleChange('progress')}
+                  row
                 >
-                  {label}
-                </StepLabel>
-              </Step>
+                  <FormControlLabel value="very-good" control={<Radio />} label={t('Very Good')} />
+                  <FormControlLabel value="good" control={<Radio />} label={t('Good')} />
+                  <FormControlLabel value="needs-improvement" control={<Radio />} label={t('Needs Improvement')} />
+                  <FormControlLabel value="difficult" control={<Radio />} label={t('Difficult')} />
+                </RadioGroup>
+              </FormControl>
+              <TextField
+                label={t('Brief Explanation/Assessment of Learning Progress')}
+                value={formData.learningAssessment}
+                onChange={handleChange('learningAssessment')}
+                multiline
+                rows={3}
+                fullWidth
+                required
+              />
+            </Box>
+          </Box>
+
+          {/* Attention Section */}
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              {t('3. Attention')}
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
+            {[
+              {
+                field: 'activeParticipation',
+                label: t('Regular and active participation in class'),
+                inputField: 'participationNotes'
+              },
+              {
+                field: 'concentration',
+                label: t('Remains focused'),
+                inputField: 'concentrationNotes'
+              },
+              {
+                field: 'worksIndependently',
+                label: t('Works independently'),
+                inputField: 'independentWorkNotes'
+              },
+              {
+                field: 'cooperation',
+                label: t('Cooperative'),
+                inputField: 'cooperationNotes'
+              }
+            ].map(({ field, label, inputField }) => (
+              <Box key={field} sx={{ mb: 3 }}>
+                <FormLabel>{label}</FormLabel>
+                <Box sx={{ display: 'flex', alignItems: 'center', gap: 2, mt: 1 }}>
+                  <TextField
+                    label={t('Notes')}
+                    value={formData[inputField]}
+                    onChange={handleChange(inputField)}
+                    size="small"
+                    fullWidth
+                  />
+                  <RadioGroup
+                    value={formData[field]}
+                    onChange={handleChange(field)}
+                    row
+                    sx={{ minWidth: '150px' }}
+                  >
+                    <FormControlLabel value="yes" control={<Radio />} label={t('Yes')} />
+                    <FormControlLabel value="no" control={<Radio />} label={t('No')} />
+                  </RadioGroup>
+                </Box>
+              </Box>
             ))}
-          </Stepper>
-          <Box sx={{ mt: 4 }}>
-            <StepContent
-              step={activeStep}
-              formData={formData}
-              handleChange={handleChange}
-              user={user}
-              teacher={teacher}
-              sessionDate={sessionDate}
-            />
+          </Box>
+
+          {/* Homework & Notes Section */}
+          <Box>
+            <Typography variant="h6" gutterBottom>
+              {t('4. Homework & Notes')}
+            </Typography>
+            <Divider sx={{ mb: 2 }} />
+            {/* Homework Subsection */}
+            <Box sx={{ mb: 3 }}>
+              <Typography variant="subtitle1" gutterBottom>
+                {t('Homework')}
+              </Typography>
+              <FormControl fullWidth sx={{ mt: 2 }}>
+                <FormLabel>{t('Previous homework completed')}</FormLabel>
+                <RadioGroup
+                  value={formData.previousHomeworkCompleted}
+                  onChange={handleChange('previousHomeworkCompleted')}
+                  row
+                >
+                  <FormControlLabel value="yes" control={<Radio />} label={t('Yes')} />
+                  <FormControlLabel value="no" control={<Radio />} label={t('No')} />
+                </RadioGroup>
+              </FormControl>
+              <FormControl fullWidth sx={{ mt: 2 }}>
+                <FormLabel>{t('Homework for the next session')}</FormLabel>
+                <RadioGroup
+                  value={formData.nextHomework}
+                  onChange={handleChange('nextHomework')}
+                  row
+                >
+                  <FormControlLabel
+                    value="worksheets"
+                    control={<Radio />}
+                    label={t('Worksheets')}
+                  />
+                  <FormControlLabel
+                    value="school-materials"
+                    control={<Radio />}
+                    label={t('School Materials')}
+                  />
+                </RadioGroup>
+              </FormControl>
+            </Box>
+            {/* Notes Subsection */}
+            <Box>
+              <Typography variant="subtitle1" gutterBottom>
+                {t('Notes from the Tutor')}
+              </Typography>
+              <TextField
+                label={t('Additional Comments')}
+                value={formData.tutorRemarks}
+                onChange={handleChange('tutorRemarks')}
+                multiline
+                rows={4}
+                fullWidth
+                margin="normal"
+              />
+            </Box>
           </Box>
         </Box>
-      </DialogContent>
+      </StyledDialogContent>
       <DialogActions>
         <Button onClick={onClose} color="secondary">
           {t('Cancel')}
         </Button>
         <Box sx={{ display: 'flex', gap: 1 }}>
-          {activeStep > 0 && <Button onClick={handleBack}>{t('Back')}</Button>}
-          {activeStep === steps.length - 1 ? (
-            <Button onClick={handleSave} variant="contained" color="primary">
-              {t('Save')}
-            </Button>
-          ) : (
-            <Button onClick={handleNext} variant="contained" color="primary">
-              {t('Next')}
-            </Button>
-          )}
+          <Button
+            onClick={handleSave}
+            variant="contained"
+            color="primary"
+            disabled={loading}
+          >
+            {loading ? <CircularProgress size={24} /> : t('Save')}
+          </Button>
         </Box>
       </DialogActions>
     </Dialog>

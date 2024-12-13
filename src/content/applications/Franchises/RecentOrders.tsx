@@ -5,7 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { Franchise } from 'src/models/FranchiseModel';
 import { deleteFranchise, fetchFranchises } from 'src/services/franchiseService';
 import { useNavigate } from 'react-router-dom';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 export default function ViewFranchisePage() {
   const [franchises, setFranchises] = useState<Franchise[]>([]);
@@ -19,6 +19,7 @@ export default function ViewFranchisePage() {
   const isMounted = useRef(false);
 
   const navigate = useNavigate();
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (isMounted.current) {
@@ -46,7 +47,7 @@ export default function ViewFranchisePage() {
     { field: 'ownerName', headerName: t('owner_name') },
     { field: 'status', headerName: t('status') },
     { field: 'totalEmployees', headerName: t('total_employees') },
-    { field: 'createdAt', headerName: 'Created At', render: (value: any) => new Date(value).toLocaleDateString() },
+    { field: 'createdAt', headerName: t('created_at'), render: (value: any) => new Date(value).toLocaleDateString() },
   ];
 
   const handleEdit = (id: any) => {
@@ -113,7 +114,7 @@ export default function ViewFranchisePage() {
         actions={
           <>
             <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               onClick={handleDelete}
@@ -121,7 +122,7 @@ export default function ViewFranchisePage() {
               autoFocus
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+              {loading ? <CircularProgress size={24} /> : t("confirm")}
             </Button>
           </>
         }

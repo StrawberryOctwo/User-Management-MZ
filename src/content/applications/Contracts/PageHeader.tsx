@@ -1,6 +1,7 @@
 import { Typography, Button, Grid } from '@mui/material';
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
+import { t } from "i18next"
 
 function PageHeader() {
   const navigate = useNavigate(); // Initialize useNavigate
@@ -19,10 +20,10 @@ function PageHeader() {
     <Grid container justifyContent="space-between" alignItems="center">
       <Grid item>
         <Typography variant="h3" component="h3" gutterBottom>
-          Contracts
+          {t("contracts")}
         </Typography>
         <Typography variant="subtitle2">
-          {user.name}These are your recent conracts
+          {user.name}{t("these_are_your_recent_conracts")}
         </Typography>
       </Grid>
       <Grid item>
@@ -32,7 +33,7 @@ function PageHeader() {
           startIcon={<AddTwoToneIcon fontSize="small" />}
           onClick={handleCreateContract} // Add onClick handler
         >
-          Create conract
+          {t("create_contract")}
         </Button>
       </Grid>
     </Grid>

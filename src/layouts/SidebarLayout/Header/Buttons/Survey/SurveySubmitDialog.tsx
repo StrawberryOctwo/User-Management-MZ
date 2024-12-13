@@ -13,6 +13,7 @@ import {
   CircularProgress,
 } from '@mui/material';
 import { fetchSurveyById, skipSurveyForSelf, submitSurveyForSelf } from 'src/services/survey';
+import { t } from "i18next"
 
 interface SurveySubmitDialogProps {
   surveyId: number;
@@ -42,13 +43,13 @@ function SurveySubmitDialog({ surveyId, onClose, onSubmitSuccess }: SurveySubmit
   }, [surveyId]);
   const handleSkip = async () => {
     try {
-        await skipSurveyForSelf(surveyId);
-        onSubmitSuccess(); // Refresh survey list in parent component
-        onClose(); // Close the dialog
+      await skipSurveyForSelf(surveyId);
+      onSubmitSuccess(); // Refresh survey list in parent component
+      onClose(); // Close the dialog
     } catch (error) {
-        console.error('Error skipping survey:', error);
+      console.error('Error skipping survey:', error);
     }
-};
+  };
   const handleChange = (questionId: number, value: string | string[], type: string) => {
     setAnswers((prev) => ({
       ...prev,
@@ -88,7 +89,7 @@ function SurveySubmitDialog({ surveyId, onClose, onSubmitSuccess }: SurveySubmit
   if (error || !survey) {
     return (
       <Dialog open={true} onClose={onClose}>
-        <DialogTitle>Error</DialogTitle>
+        <DialogTitle>{t("error")}</DialogTitle>
         <DialogContent>
           <Typography color="error">{error || 'Survey not found'}</Typography>
         </DialogContent>
@@ -105,7 +106,7 @@ function SurveySubmitDialog({ surveyId, onClose, onSubmitSuccess }: SurveySubmit
     <Dialog open={true} onClose={onClose} maxWidth="md" fullWidth>
       <Box display="flex" flexDirection="column" p={2} sx={{ gap: 2 }}>
         <DialogTitle sx={{ textAlign: 'center', fontSize: '1.75rem' }}>{survey.title}</DialogTitle>
-        
+
         <DialogContent sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
           {survey.questions?.map((question) => (
             <Box key={question.id} p={2} sx={{ border: '1px solid', borderColor: 'divider', borderRadius: 1 }}>
@@ -160,11 +161,11 @@ function SurveySubmitDialog({ surveyId, onClose, onSubmitSuccess }: SurveySubmit
             </Box>
           ))}
         </DialogContent>
-        
+
         <DialogActions sx={{ justifyContent: 'center', gap: 2, pb: 2 }}>
-        <Button onClick={handleSkip} color="secondary" variant="outlined">
+          <Button onClick={handleSkip} color="secondary" variant="outlined">
             Skip Survey
-        </Button>
+          </Button>
           <Button onClick={handleSubmit} color="primary" variant="contained">
             Submit Survey
           </Button>

@@ -1,12 +1,18 @@
 import React, { useState } from 'react';
 import { FieldConfig } from 'src/components/Table/tableRowCreate';
 import { Box } from '@mui/material';
-import { t } from 'i18next';
 import { addFranchise } from 'src/services/franchiseService';
 import ReusableForm from 'src/components/Table/tableRowCreate';
+import { useTranslation } from 'react-i18next';
+import IbanInput from 'src/utils/IbanInput';
 
 const CreateFranchise = () => {
   const [loading, setLoading] = useState(false);
+  const { t } = useTranslation();
+  const [iban, setIban] = useState('');
+  const handleIbanChange = (value: string) => {
+    setIban(value);
+  };
 
   const handleFranchiseSubmit = async (
     data: Record<string, any>
@@ -18,7 +24,7 @@ const CreateFranchise = () => {
         name: data.name,
         ownerName: data.ownerName,
         cardHolderName: data.cardHolderName,
-        iban: data.iban,
+        iban: iban.replace(/\s+/g, ''), // Trim all whitespaces from IBAN
         bic: data.bic,
         status: data.status,
         totalEmployees: data.totalEmployees,
@@ -40,7 +46,6 @@ const CreateFranchise = () => {
       setLoading(false);
     }
   };
-
   const statusOptions = [
     { label: t('active'), value: 'active' },
     { label: t('inactive'), value: 'inactive' },
@@ -70,13 +75,6 @@ const CreateFranchise = () => {
       section: 'Franchise Information'
     },
     {
-      name: 'iban',
-      label: t('iban'),
-      type: 'text',
-      required: true,
-      section: 'Franchise Information'
-    },
-    {
       name: 'bic',
       label: t('bic'),
       type: 'text',
@@ -90,6 +88,21 @@ const CreateFranchise = () => {
       required: true,
       section: 'Franchise Information',
       options: statusOptions
+    },
+    {
+      name: 'iban',
+      label: t('iban'),
+      type: 'custom',
+      section: 'Franchise Information',
+      component: (
+        <IbanInput
+          label="IBAN"
+          value={iban}
+          onChange={handleIbanChange}
+          required
+          sx={{ width: '95%' }}
+        />
+      )
     },
     {
       name: 'totalEmployees',
@@ -148,6 +161,7 @@ const CreateFranchise = () => {
       section: 'Contact Information'
     }
   ];
+
   return (
     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
       <ReusableForm

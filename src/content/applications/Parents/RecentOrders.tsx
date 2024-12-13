@@ -4,7 +4,7 @@ import ReusableTable from 'src/components/Table';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { fetchParents, deleteParents } from 'src/services/parentService';
 import { useNavigate } from 'react-router-dom';
-import { t } from 'i18next';
+import { t } from "i18next"
 
 export default function ParentsContent() {
   const [parents, setParents] = useState([]);
@@ -50,7 +50,11 @@ export default function ParentsContent() {
   };
 
   const columns = [
+<<<<<<< HEAD
     { field: 'fullName', headerName: 'Full Name' },
+=======
+    { field: 'fullName', headerName: t('Full Name') },
+>>>>>>> ba0a5a854b05e44e85b8e88be2005c440f139d34
     { field: 'email', headerName: t('email') },
     { field: 'address', headerName: t('address') },
   ];
@@ -119,7 +123,7 @@ export default function ParentsContent() {
         actions={
           <>
             <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               onClick={handleDelete}
@@ -127,7 +131,7 @@ export default function ParentsContent() {
               autoFocus
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+              {loading ? <CircularProgress size={24} /> : t("confirm")}
             </Button>
           </>
         }

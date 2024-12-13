@@ -14,7 +14,7 @@ import {
 } from '@mui/material';
 import { Helmet } from 'react-helmet-async';
 import Logo from 'src/components/LogoSign';
-
+import { t } from "i18next"
 import { styled } from '@mui/material/styles';
 import FacebookIcon from '@mui/icons-material/Facebook';
 import TwitterIcon from '@mui/icons-material/Twitter';
@@ -100,7 +100,7 @@ function StatusComingSoon() {
   return (
     <>
       <Helmet>
-        <title>Status - Coming Soon</title>
+        <title>{t("status_coming_soon")}</title>
       </Helmet>
       <MainContent>
         <Container maxWidth="md">

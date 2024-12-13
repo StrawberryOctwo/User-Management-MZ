@@ -1,6 +1,8 @@
+// ContractCard.jsx
 import React from 'react';
 import { Card, CardContent, Typography, Box, Button } from '@mui/material';
 import DeleteButtonWithConfirmation from '../DeleteButton';
+import { useTranslation } from 'react-i18next';
 
 type SessionTypePrice = {
     name: string;
@@ -37,6 +39,8 @@ const ContractCard: React.FC<ContractCardProps> = ({
     onEdit,
     onDelete
 }) => {
+    const { t } = useTranslation(); // Initialize the t function
+
     return (
         <Card sx={{ minWidth: 275, marginBottom: 4, borderRadius: 2, boxShadow: 3, textAlign: 'center', padding: 2 }}>
             <CardContent>
@@ -46,7 +50,7 @@ const ContractCard: React.FC<ContractCardProps> = ({
                 </Typography>
 
                 {/* Contract Name */}
-                <Typography variant="h5" component="div" sx={{ fontWeight: 'bold', color: '#1976d2', mb: 2 }}>
+                <Typography variant="h5" component="div" sx={{ fontWeight: 'bold', mb: 2 }}>
                     {name.toUpperCase()}
                 </Typography>
 
@@ -57,7 +61,7 @@ const ContractCard: React.FC<ContractCardProps> = ({
                             Monthly Fee
                         </Typography>
                         <Typography variant="h6" color="primary">
-                            {monthly_fee ? `€${monthly_fee.toFixed(2)}` : 'No Monthly Fee'}
+                            {monthly_fee ? `${monthly_fee.toFixed(2)}${t('€')}` : t('No Monthly Fee')}
                         </Typography>
                     </Box>
                     <Box>
@@ -65,7 +69,7 @@ const ContractCard: React.FC<ContractCardProps> = ({
                             One-Time Fee
                         </Typography>
                         <Typography variant="h6" color="primary">
-                            {one_time_fee ? `€${one_time_fee.toFixed(2)}` : 'No One-Time Fee'}
+                            {one_time_fee ? `${one_time_fee.toFixed(2)}${t('€')}` : t('No One-Time Fee')}
                         </Typography>
                     </Box>
                 </Box>
@@ -75,7 +79,9 @@ const ContractCard: React.FC<ContractCardProps> = ({
                     <Typography variant="body2" sx={{ fontWeight: 'bold', mb: 1 }}>Session Prices:</Typography>
                     {sessions.map((session, index) => (
                         <Box key={`session-${index}`} display="flex" alignItems="center" justifyContent="center" my={1}>
-                            <Typography variant="body2">• {session.name}: €{Number(session.price).toFixed(2)}</Typography>
+                            <Typography variant="body2">
+                                • {session.name}: {Number(session.price).toFixed(2)}{t('€')}
+                            </Typography>
                         </Box>
                     ))}
 
@@ -95,7 +101,7 @@ const ContractCard: React.FC<ContractCardProps> = ({
                         </Box>
                     )}
 
-                    {/* VAT Status */}
+                    {/* VAT {t("status")} */}
                     <Box display="flex" alignItems="center" justifyContent="center" my={1}>
                         {isVatExempt ? (
                             <Typography variant="body2">• VAT Exempt</Typography>
@@ -112,7 +118,7 @@ const ContractCard: React.FC<ContractCardProps> = ({
                     sx={{ mt: 2, width: '100%', fontWeight: 'bold', borderRadius: '50px' }}
                     onClick={onEdit}
                 >
-                    Edit
+                    {t('Edit')}
                 </Button>
                 <Typography variant="body2" color="textSecondary" sx={{ mt: 1, cursor: 'pointer' }}>
                 <DeleteButtonWithConfirmation onDelete={onDelete} />

@@ -197,6 +197,11 @@ const Payments = Loader(
   lazy(() => import('src/content/applications/Payments'))
 );
 
+
+const ManageToDo = Loader(
+  lazy(() => import('src/layouts/SidebarLayout/Header/Buttons/ToDo'))
+);
+
 const Invoices = Loader(
   lazy(() => import('src/content/applications/Invoices'))
 );
@@ -360,6 +365,16 @@ const routes: RouteObject[] = [
                 ]}
               >
                 <ApplicationsMessenger />
+              </ProtectedRoute>
+            )
+          },
+          {
+            path: 'manage/todos',
+            element: (
+              <ProtectedRoute
+                requiredRoles={[ROLES.SUPER_ADMIN, ROLES.FRANCHISE_ADMIN,ROLES.LOCATION_ADMIN,ROLES.TEACHER]}
+              >
+                <ManageToDo />
               </ProtectedRoute>
             )
           },

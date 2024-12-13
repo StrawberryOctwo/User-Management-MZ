@@ -14,7 +14,8 @@ import { fetchHolidayById, updateHoliday } from 'src/services/specialDaysService
 import { fetchLocations } from 'src/services/locationService';
 import dayjs from 'dayjs';
 import { DatePicker } from '@mui/x-date-pickers';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
+
 
 export interface HolidayData {
     id?: number;
@@ -27,6 +28,7 @@ export interface HolidayData {
 export default function EditHoliday() {
     const { id } = useParams<{ id: string }>();
     const navigate = useNavigate();
+    const { t } = useTranslation();
     const [holidayData, setHolidayData] = useState<HolidayData | null>(null);
     const [selectedLocation, setSelectedLocation] = useState<any>(null);
     const [loading, setLoading] = useState(false);
@@ -112,11 +114,11 @@ export default function EditHoliday() {
             component: (
                 <SingleSelectWithAutocomplete
                     width="100%"
-                    label="Select Location"
+                    label={t("select_location")}
                     fetchData={(query) => fetchLocations(1, 5, query).then((data) => data.data)}
                     onSelect={handleLocationSelect}
                     displayProperty="name"
-                    placeholder="Search Location"
+                    placeholder={t("search_location")}
                     initialValue={selectedLocation}
                 />
             ),
@@ -128,7 +130,7 @@ export default function EditHoliday() {
             section: 'Holiday Dates',
             component: (
                 <DatePicker
-                    label="Start Date"
+                    label={t("start_date")}
                     value={holidayData?.start_date ? dayjs(holidayData.start_date) : null}
                     onChange={(newValue) => {
                         if (holidayData) {
@@ -149,7 +151,7 @@ export default function EditHoliday() {
             section: 'Holiday Dates',
             component: (
                 <DatePicker
-                    label="End Date"
+                    label={t("end_date")}
                     value={holidayData?.end_date ? dayjs(holidayData.end_date) : null}
                     onChange={(newValue) => {
                         if (holidayData) {

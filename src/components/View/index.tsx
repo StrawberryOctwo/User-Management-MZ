@@ -3,9 +3,9 @@ import {
   Box,
   Typography,
   Grid,
-  Card,
-  CardContent,
-  CardHeader,
+  Accordion,
+  AccordionSummary,
+  AccordionDetails,
   Divider,
   Link,
   Paper,
@@ -14,7 +14,11 @@ import {
   List,
   ListItem,
   ListItemText,
+  Chip,
+  Tooltip,
+  Stack,
 } from '@mui/material';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import {
   DataGrid,
   GridColDef,
@@ -25,6 +29,8 @@ import {
   GridToolbarFilterButton,
   GridToolbarQuickFilter,
 } from '@mui/x-data-grid';
+import InfoIcon from '@mui/icons-material/Info';
+import { useTranslation } from "react-i18next";
 
 interface DetailFieldConfig {
   name: string;
@@ -52,7 +58,7 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({
 }) => {
   const theme = useTheme();
   const isSmDown = useMediaQuery(theme.breakpoints.down('sm'));
-
+  const { t } = useTranslation();
   const [pageSizes, setPageSizes] = useState<Record<string, number>>({});
 
   // Group fields by their section
@@ -89,39 +95,57 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({
         {entityName} Details
       </Typography>
 
-      {/* Iterate through each section */}
-      {Object.entries(groupedFields).map(([section, fields], index, arr) => {
+      {/* Iterate through each section using Accordions */}
+      {Object.entries(groupedFields).map(([section, fields], index) => {
         // Separate fields into categories
-        const nonTableFields = fields.filter((field) => !field.isArray && !field.isTextArray);
-        const tableFields = fields.filter((field) => field.isArray && !field.isTextArray);
-        const textArrayFields = fields.filter((field) => field.isArray && field.isTextArray);
+        const nonTableFields = fields.filter(
+          (field) => !field.isArray && !field.isTextArray
+        );
+        const tableFields = fields.filter(
+          (field) => field.isArray && !field.isTextArray
+        );
+        const textArrayFields = fields.filter(
+          (field) => field.isArray && field.isTextArray
+        );
 
         return (
-          <Card
+          <Accordion
             key={`${section}-${index}`} // Ensure unique key
+            defaultExpanded={index === 0} // Expand the first section by default
             sx={{
-              mb: 3,
-              boxShadow: theme.shadows[3],
+              mb: 2,
+              boxShadow: theme.shadows[2],
               borderRadius: 2,
-              background: theme.palette.background.paper,
-              width: '100%',
-              transition: 'transform 0.2s',
+              '&:before': {
+                display: 'none', // Remove default accordion border
+              },
+              '& .MuiAccordionSummary-root': {
+                backgroundColor: theme.palette.action.hover,
+                borderRadius: 2,
+                minHeight: 48,
+                '& .MuiAccordionSummary-content': {
+                  margin: '12px 0',
+                },
+              },
+              '& .MuiAccordionDetails-root': {
+                padding: theme.spacing(2),
+              },
             }}
           >
-            <CardHeader
-              title={section}
-              titleTypographyProps={{
-                variant: 'h6',
-                fontWeight: '700',
-                color: theme.palette.text.primary,
-              }}
-              sx={{
-                borderBottom: `1px solid ${theme.palette.divider}`,
-                backgroundColor: theme.palette.action.hover,
-                padding: { xs: 1.5, sm: 2.5 },
-              }}
-            />
-            <CardContent>
+            <AccordionSummary
+              expandIcon={<ExpandMoreIcon />}
+              aria-controls={`${section}-content`}
+              id={`${section}-header`}
+            >
+              <Typography
+                variant="h6"
+                fontWeight="700"
+                color={theme.palette.text.primary}
+              >
+                {section}
+              </Typography>
+            </AccordionSummary>
+            <AccordionDetails>
               {/* Render non-table fields in Grid */}
               {nonTableFields.length > 0 && (
                 <Grid container spacing={2}>
@@ -132,16 +156,19 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({
                       sm={6}
                       md={4}
                       key={field.name}
+                      sx={{
+                        display: 'flex',
+                        alignItems: 'center',
+                      }}
                     >
                       <Box
                         sx={{
-                          p: 1.5,
+                          p: 2,
                           border: `1px solid ${theme.palette.divider}`,
                           borderRadius: 2,
                           backgroundColor: theme.palette.background.paper,
-                          height: '100%',
-                          display: 'flex',
-                          alignItems: 'center',
+                          width: '100%',
+                          boxShadow: theme.shadows[1],
                         }}
                       >
                         {typeof field.component === 'function' ? (
@@ -150,17 +177,28 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({
                           // This condition is now redundant as textArrayFields are handled separately
                           // But keeping it for safety
                           data[field.name] && data[field.name].length > 0 ? (
-                            <Typography variant="body2" color="text.secondary">
-                              <strong>{field.label}:</strong> {data[field.name].join(', ')}
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                            >
+                              <strong>{field.label}:</strong>{' '}
+                              {data[field.name].join(', ')}
                             </Typography>
                           ) : (
-                            <Typography variant="body2" color="text.secondary">
+                            <Typography
+                              variant="body2"
+                              color="text.secondary"
+                            >
                               <strong>{field.label}:</strong> N/A
                             </Typography>
                           )
                         ) : (
-                          <Typography variant="body2" color="text.secondary">
-                            <strong>{field.label}:</strong> {data[field.name] || 'N/A'}
+                          <Typography
+                            variant="body2"
+                            color="text.secondary"
+                          >
+                            <strong>{field.label}:</strong>{' '}
+                            {data[field.name] || 'N/A'}
                           </Typography>
                         )}
                       </Box>
@@ -169,56 +207,42 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({
                 </Grid>
               )}
 
-              {/* Render text array fields */}
+              {/* Render text array fields using Chips */}
               {textArrayFields.length > 0 && (
-                <Grid container spacing={2} sx={{ mt: 2 }}>
+                <Box sx={{ mt: 3 }}>
                   {textArrayFields.map((field) => (
-                    <Grid
-                      item
-                      xs={12}
-                      sm={6}
-                      md={4}
-                      key={field.name}
-                    >
-                      <Box
-                        sx={{
-                          p: 1.5,
-                          border: `1px solid ${theme.palette.divider}`,
-                          borderRadius: 2,
-                          backgroundColor: theme.palette.background.paper,
-                          height: '100%',
-                          display: 'flex',
-                          flexDirection: 'column',
-                        }}
+                    <Box key={field.name} sx={{ mb: 2 }}>
+                      <Typography
+                        variant="body2"
+                        color="text.secondary"
+                        sx={{ mb: 1, fontWeight: 600 }}
                       >
-                        <Typography variant="body2" color="text.secondary" sx={{ mb: 1 }}>
-                          <strong>{field.label}:</strong>
-                        </Typography>
+                        {field.label}:
+                      </Typography>
+                      <Stack direction="row" spacing={1} flexWrap="wrap">
                         {data[field.name] && data[field.name].length > 0 ? (
-                          // Display as comma-separated
-                          <Typography variant="body2" color="text.secondary">
-                            {data[field.name].join(', ')}
-                          </Typography>
-                          // Alternatively, display as list:
-                          // <List dense>
-                          //   {data[field.name].map((item: string, idx: number) => (
-                          //     <ListItem key={idx} sx={{ pl: 0 }}>
-                          //       <ListItemText primary={item} />
-                          //     </ListItem>
-                          //   ))}
-                          // </List>
+                          data[field.name].map((item: string, idx: number) => (
+                            <Chip
+                              key={idx}
+                              label={item}
+                              variant="outlined"
+                              color="primary"
+                              size="small"
+                              sx={{ mb: 1 }}
+                            />
+                          ))
                         ) : (
                           <Typography variant="body2" color="text.secondary">
                             N/A
                           </Typography>
                         )}
-                      </Box>
-                    </Grid>
+                      </Stack>
+                    </Box>
                   ))}
-                </Grid>
+                </Box>
               )}
 
-              {/* Render table fields separately */}
+              {/* Render table fields */}
               {tableFields.map((field) => {
                 if (!field.columns) {
                   console.warn(
@@ -230,7 +254,7 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({
                         {field.label}
                       </Typography>
                       <Typography variant="body2" color="error">
-                        Columns not defined for this table.
+                        {t("columns_not_defined_for_this_table.")}
                       </Typography>
                     </Box>
                   );
@@ -245,7 +269,11 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({
 
                 return (
                   <Box key={field.name} sx={{ mt: 3 }}>
-                    <Typography variant="h6" gutterBottom>
+                    <Typography
+                      variant="h6"
+                      gutterBottom
+                      sx={{ mb: 2, fontWeight: 600 }}
+                    >
                       {field.label}
                     </Typography>
                     <DataGrid
@@ -268,7 +296,7 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({
                         noRowsOverlay: {
                           children: (
                             <Typography variant="body2" sx={{ mt: 1 }}>
-                              No results found.
+                              {t("no_results_found.")}
                             </Typography>
                           ),
                         },
@@ -307,11 +335,8 @@ const ReusableDetails: React.FC<ReusableDetailsProps> = ({
                   </Box>
                 );
               })}
-            </CardContent>
-            {index < arr.length - 1 && (
-              <Box sx={{ mt: 3, mb: 2, borderBottomWidth: '1px' }} />
-            )}
-          </Card>
+            </AccordionDetails>
+          </Accordion>
         );
       })}
     </Paper>

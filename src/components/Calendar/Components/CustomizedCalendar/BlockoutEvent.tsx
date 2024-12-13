@@ -1,5 +1,6 @@
 import { Typography, Box } from '@mui/material';
 import { Blockout } from '../../types';
+import { t } from "i18next"
 
 export default function BlockoutEvent({ blockout }: { blockout: Blockout }) {
   return (
@@ -18,7 +19,7 @@ export default function BlockoutEvent({ blockout }: { blockout: Blockout }) {
         fontSize="small"
         textAlign="center"
       >
-        {blockout.name}
+        {t(blockout.name)}
       </Typography>
     </Box>
   );

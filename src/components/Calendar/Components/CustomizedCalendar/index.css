@@ -9,6 +9,7 @@
   height: 90vh;
 }
 
+
 .fc-toolbar {
   display: flex;
   justify-content: space-between;
@@ -19,10 +20,20 @@
 .fc-toolbar-title {
   font-size: 1.8rem;
   font-weight: 700;
-  color: #333333;
+  color: 'text.secondary';
   margin: 0 10px;
 }
 
+.fc-list-event-time,
+.fc-list-event-title,
+.fc-list-event-graphic{
+  background-color: #f9f9f9;
+
+}
+
+
+.fc-list-day-text,
+.fc-list-day-side-text,
 .fc-toolbar .fc-button-group .fc-button,
 .fc-toolbar .fc-button {
   background-color: #f9f9f9;
@@ -35,9 +46,10 @@
   transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-.fc-button:hover {
+/* .fc-button:hover {
   background-color: #eaeaea;
-}
+} */
+
 
 .fc-button.fc-button-primary {
   background-color: var(--swiper-theme-color) ;
@@ -47,10 +59,10 @@
   transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
-.fc-button.fc-button-primary:hover {
+/* .fc-button.fc-button-primary:hover {
   background-color: var(--swiper-theme-color) ;
   transform: scale(1.05);
-}
+} */
 
 .fc-view-harness,
 .fc-daygrid-day,
@@ -62,9 +74,9 @@
   text-transform: uppercase;
 }
 
-.fc-today-button:hover {
+/* .fc-today-button:hover {
   background-color: var(--swiper-theme-color) !important;
-}
+} */
 
 .fc .fc-button:disabled {
   opacity: 0.5;
@@ -77,6 +89,7 @@
   font-size: 1rem;
 }
 
+
 .fc .fc-timeline-slot-cushion,
 .fc .fc-datagrid-cell-cushion {
   padding: 16px 24px;
@@ -88,7 +101,7 @@
 
 .fc-scroller {
   overflow-y: auto;
-  overflow-x: auto;
+  overflow-x: hidden;
   scrollbar-width: thin;
   scrollbar-color: #b0b0b0 #f0f0f0;
 }
@@ -139,7 +152,9 @@
 .fc-timeline-now-indicator-container {
   position: relative;
 }
-
+.fc-resource:last-child {
+  flex: 0; /* This could cause the last resource to stretch */
+}
 .fc-resource-area .fc-cell-text {
   font-size: 1.1rem;
   font-weight: 600;
@@ -148,6 +163,7 @@
   color: #333333;
 }
 
+.fc-scroller .fc-scroller-liquid,
 .fc-scrollgrid,
 .fc-scrollgrid-liquid {
   border-collapse: separate;
@@ -176,9 +192,9 @@
   transition: background-color 0.3s ease;
 }
 
-.fc-event:hover {
+/* .fc-event:hover {
   background-color: #dce8ff;
-}
+} */
 
 .fc-header-toolbar .fc-toolbar-chunk {
   display: flex;
@@ -215,13 +231,13 @@
   transform: scale(1.05);
 }
 
-.fc .fc-next-button:hover,
+/* .fc .fc-next-button:hover,
 .fc .fc-prev-button:hover {
   color: #3b57d1;
   transform: scale(1.1);
   background-color: #f1f1f1;
   transition: color 0.2s, transform 0.2s, background-color 0.2s;
-}
+} */
 
 .fc-resource.selected,
 .fc-timegrid-slot.selected {

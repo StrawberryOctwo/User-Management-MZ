@@ -5,7 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { deleteFranchiseAdmin, fetchFranchiseAdmins } from 'src/services/franchiseAdminService';
 import { useNavigate } from 'react-router-dom';
 import { FranchiseAdmin } from 'src/models/FranchiseAdminModel';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 export default function FranchiseAdminsContent() {
   const [admins, setAdmins] = useState<FranchiseAdmin[]>([]);
@@ -18,7 +18,7 @@ export default function FranchiseAdminsContent() {
   const [limit, setLimit] = useState(25);
   const isMounted = useRef(false);
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   useEffect(() => {
     if (isMounted.current) {
       loadAdmins();
@@ -63,7 +63,7 @@ export default function FranchiseAdminsContent() {
     /* {
       field: 'dob',
       headerName: 'DOB',
-      render: (value: any) => new Date(value).toLocaleDateString()
+      render: (value: any) => new Date(value).toLocaleDateString('de')
     }, */
     { field: 'email', headerName: t('email') },
     /* { field: 'address', headerName: 'Address' },
@@ -135,7 +135,7 @@ export default function FranchiseAdminsContent() {
         actions={
           <>
             <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               onClick={handleDelete}
@@ -143,7 +143,7 @@ export default function FranchiseAdminsContent() {
               autoFocus
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+              {loading ? <CircularProgress size={24} /> : t("confirm")}
             </Button>
           </>
         }

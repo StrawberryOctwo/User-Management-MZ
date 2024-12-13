@@ -12,7 +12,7 @@ import {
   Typography
 } from '@mui/material';
 import RoleBasedComponent from 'src/components/ProtectedComponent';
-import { t } from 'i18next';
+import { t } from "i18next"
 
 type EventTypeSelectionModalProps = {
   isOpen: boolean;
@@ -52,7 +52,7 @@ export default function EventTypeSelectionModal({
         style: { padding: '20px' }
       }}
     >
-      <DialogTitle>What are you adding?</DialogTitle>
+      <DialogTitle>{t("what are you adding?")}</DialogTitle>
       <DialogContent>
         <Box padding={2}>
           <RadioGroup
@@ -60,12 +60,12 @@ export default function EventTypeSelectionModal({
             onChange={handleEventTypeChange}
           >
             <Typography variant="subtitle2" color="textSecondary" gutterBottom>
-              Regular Events
+              {t("regular_events")}
             </Typography>
             <FormControlLabel
               value="Class Session"
               control={<Radio />}
-              label={t("classSessions")}
+              label={t("class_session")}
             />
             {/* <FormControlLabel value="To-Do" control={<Radio />} label="To-Do" /> */}
 
@@ -78,18 +78,18 @@ export default function EventTypeSelectionModal({
                     color="textSecondary"
                     gutterBottom
                   >
-                    Administrative Options
+                    {t("administrative_options")}
                   </Typography>
                 </Box>
                 <FormControlLabel
                   value="Holiday"
                   control={<Radio />}
-                  label="Holiday"
+                  label={t("holiday")}
                 />
                 <FormControlLabel
                   value="Closing Day"
                   control={<Radio />}
-                  label="Closing Day"
+                  label={t("closing_day")}
                 />
               </>
             </RoleBasedComponent>
@@ -97,9 +97,9 @@ export default function EventTypeSelectionModal({
         </Box>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onClose}>Cancel</Button>
+        <Button onClick={onClose}>{t("cancel")}</Button>
         <Button onClick={handleContinue} variant="contained" color="primary">
-          Continue
+          {t("continue")}
         </Button>
       </DialogActions>
     </Dialog>
