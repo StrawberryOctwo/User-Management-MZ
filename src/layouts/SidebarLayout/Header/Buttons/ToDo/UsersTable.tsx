@@ -10,7 +10,8 @@ import {
     CircularProgress,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
-import { t } from 'i18next';
+import { t } from "i18next"
+
 interface User {
     id?: number;
     userId?: number;
@@ -39,12 +40,12 @@ const UsersTable: React.FC<UsersTableProps> = ({
             <Table size="small">
                 <TableHead>
                     <TableRow>
-                        <TableCell>Role</TableCell>
-                        <TableCell>Name</TableCell>
-                        <TableCell>{t('email')}</TableCell>
-                        <TableCell>Action</TableCell>
-                    </TableRow>
-                </TableHead>
+                        <TableCell>{t("role")}</TableCell>
+                        <TableCell>{t("name")}</TableCell>
+                        <TableCell>{t("email")}</TableCell>
+                        <TableCell>{t("action")}</TableCell>
+                    </TableRow >
+                </TableHead >
                 <TableBody>
                     {loading ? (
                         <TableRow>
@@ -93,13 +94,13 @@ const UsersTable: React.FC<UsersTableProps> = ({
                     ) : (
                         <TableRow>
                             <TableCell colSpan={4} align="center">
-                                No users found.
+                                {t("no_users_found")}
                             </TableCell>
                         </TableRow>
                     )}
                 </TableBody>
-            </Table>
-        </TableContainer>
+            </Table >
+        </TableContainer >
     );
 };
 

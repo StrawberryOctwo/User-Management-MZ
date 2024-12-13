@@ -2,6 +2,7 @@ import { Grid, Typography, Box, CardContent, TextField } from '@mui/material';
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import Text from 'src/components/Text';
+import { t } from "i18next"
 
 interface UserInfo {
   firstName: string;

@@ -73,15 +73,3 @@ export const fetchStudentAnalytics = async (
     throw error;
   }
 };
-
-export const fetchDashboardTodos = async (page: number, limit: number) => {
-  try {
-    const params = { page, limit };
-
-    const response = await api.get('/dashboard/todo-analytics', { params });
-    return response.data;
-  } catch (error) {
-    console.error('Error fetching student analytics:', error);
-    throw error;
-  }
-};

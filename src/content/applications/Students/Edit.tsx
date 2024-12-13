@@ -1,7 +1,7 @@
+// src/pages/EditStudent.tsx
 import React, { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import { useParams } from 'react-router-dom';
-import { t } from 'i18next';
 import UploadSection from 'src/components/Files/UploadDocuments';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
@@ -27,19 +27,26 @@ import {
   FormGroup,
   FormLabel
 } from '@mui/material';
-import { daysOfWeek, decodeAvailableDates } from './utils';
+import { daysOfWeek, decodeAvailableDates, decodeAvailableTimes } from './utils';
+import { useTranslation } from 'react-i18next';
+import AvailableTimePicker from './AvailableTimesPicker';
 
 const EditStudent = () => {
+  const { t } = useTranslation();
   const { id } = useParams<{ id: string }>();
   const [studentData, setStudentData] = useState<Record<string, any> | null>(
     null
   );
-  const [selectedLocations, setSelectedLocations] = useState<any[]>([]); // Changed to an array for multiple locations
+  const [selectedLocations, setSelectedLocations] = useState<any[]>([]); // Multiple locations
   const [selectedContract, setSelectedContract] = useState<any | null>(null);
   const [selectedSchoolType, setSelectedSchoolType] = useState<any | null>(
     null
   );
   const [selectedDays, setSelectedDays] = useState<string[]>([]);
+  const [availableTime, setAvailableTime] = useState<{ start: string; end: string }>({
+    start: '',
+    end: '',
+  }); // Single available time
 
   const [selectedTopics, setSelectedTopics] = useState<any[]>([]);
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
@@ -90,6 +97,10 @@ const EditStudent = () => {
         setSelectedContract(fetchedData.contract);
         setSelectedSchoolType(fetchedData.schoolType);
         setSelectedDays(decodeAvailableDates(fetchedData.availableDates) || []);
+        setAvailableTime(decodeAvailableTimes(fetchedData.availableTime) || {
+          start: '',
+          end: '',
+        });
       }
 
       const formattedDocuments = studentDocuments.documents.map((doc) => ({
@@ -103,12 +114,11 @@ const EditStudent = () => {
       setUploadedFiles(formattedDocuments);
     } catch (error) {
       console.error('Error fetching student:', error);
+      showMessage(t("error_fetching_student"), "error");
     } finally {
       setLoading(false);
     }
   };
-
-
 
   useEffect(() => {
     fetchStudent();
@@ -151,6 +161,11 @@ const EditStudent = () => {
       showMessage("Topics field can't be empty", 'error');
       return;
     }
+    if (!availableTime.start || !availableTime.end) {
+      showMessage("Available time must have both start and end times", 'error');
+      return;
+    }
+    // Optional: Add validation to ensure start time is before end time
 
     setLoading(true);
     try {
@@ -175,11 +190,11 @@ const EditStudent = () => {
         contractEndDate: data.contractEndDate,
         notes: data.notes,
         availableDates: selectedDays,
+        availableTime, // Include availableTime
         gradeLevel: data.gradeLevel,
         locationIds,
         schoolType: selectedSchoolType?.id
       };
-
 
       const response = await updateStudent(
         Number(id),
@@ -207,9 +222,11 @@ const EditStudent = () => {
       }
 
       await fetchStudent();
+      showMessage(t("student_updated_successfully"), "success");
       return response;
     } catch (error) {
       console.error('Error updating student:', error);
+      showMessage(t("error_updating_student"), "error");
       throw error;
     } finally {
       setLoading(false);
@@ -238,12 +255,12 @@ const EditStudent = () => {
   };
   const contractSelectionField = {
     name: 'contracts',
-    label: t('contract'),
+    label: t('contracts'),
     type: 'custom',
     section: 'Student Information',
     component: (
       <SingleSelectWithAutocomplete
-        label="Search Contracts"
+        label={t("search_contracts")}
         fetchData={(query) =>
           fetchContractPackagesByEntity(1, 5, query).then((data) => data.data)
         }
@@ -334,7 +351,7 @@ const EditStudent = () => {
     }
   ];
 
-  const studentFields = [
+  const studentFields: FieldConfig[] = [
     {
       name: 'status',
       label: t('status'),
@@ -360,7 +377,7 @@ const EditStudent = () => {
             }))
           }
           displayProperty="name"
-          placeholder="Select Grade"
+          placeholder={t("select_grade")}
           initialValue={
             studentData?.gradeLevel
               ? gradeOptions.find(
@@ -385,7 +402,6 @@ const EditStudent = () => {
       required: false,
       section: 'Student Information'
     },
-
     {
       name: 'locations',
       label: t('locations'),
@@ -393,7 +409,7 @@ const EditStudent = () => {
       section: 'Student Assignment',
       component: (
         <MultiSelectWithCheckboxes
-          label="Search Location"
+          label={t("search_location")}
           fetchData={(query) =>
             fetchLocations(1, 5, query).then((data) => data.data)
           }
@@ -423,7 +439,7 @@ const EditStudent = () => {
           }}
         >
           <FormLabel component="legend" sx={{ whiteSpace: 'nowrap' }}>
-            Available Days:
+            {t('available_days')}:
           </FormLabel>
           <FormGroup row sx={{ flexWrap: 'nowrap', gap: 2 }}>
             {daysOfWeek.map((day) => (
@@ -443,7 +459,7 @@ const EditStudent = () => {
           </FormGroup>
           <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
             <Button variant="outlined" size="small" onClick={handleSelectAll}>
-              Select All
+              {t('select_all')}
             </Button>
             <Button
               variant="outlined"
@@ -451,16 +467,20 @@ const EditStudent = () => {
               color="error"
               onClick={handleClearAll}
             >
-              Clear All
+              {t('clear_all')}
             </Button>
           </Box>
+          {/* Add AvailableTimePicker */}
+          <AvailableTimePicker
+            availableTime={availableTime}
+            setAvailableTime={setAvailableTime}
+          />
         </Box>
       )
     },
-
     {
       name: 'topics',
-      label: 'Assign Topics',
+      label: t('assign_topics'),
       type: 'custom',
       section: 'Student Assignment',
       component: (
@@ -477,7 +497,7 @@ const EditStudent = () => {
     },
     {
       name: 'documents',
-      label: 'Uploaded Documents',
+      label: t('uploaded_documents'),
       type: 'custom',
       section: 'Documents',
       component: (

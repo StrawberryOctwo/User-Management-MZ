@@ -3,6 +3,7 @@
 import React from 'react';
 import Chart from 'react-apexcharts';
 import { ApexOptions } from 'apexcharts';
+import { t } from "i18next"
 
 type ExpenseChartProps = {
   data: number[];
@@ -51,7 +52,7 @@ const ExpenseChart: React.FC<ExpenseChartProps> = ({ data, categories, themeMode
     tooltip: {
       theme: themeMode,
       y: {
-        formatter: (val: number) => `€${val.toLocaleString()}`,
+        formatter: (val: number) => `${val.toLocaleString('de')}€`,
       },
     },
     grid: {

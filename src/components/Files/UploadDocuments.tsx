@@ -3,9 +3,9 @@ import { Box, Button, Grid, TextField, MenuItem, Typography, IconButton, List, L
 import DeleteIcon from '@mui/icons-material/Delete';
 import UploadFileIcon from '@mui/icons-material/UploadFile';
 import { deleteFiles } from '../../services/fileUploadService';
-import { t } from 'i18next';
 import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import FileView from './FileView';
+import { useTranslation } from 'react-i18next';
 
 interface UploadedFile {
     id?: number;  // `id` is optional because a file might not be saved yet
@@ -19,8 +19,8 @@ interface UploadSectionProps {
     onUploadChange: (files: UploadedFile[]) => void;
     initialDocuments?: UploadedFile[];
 }
-
 const UploadSection: React.FC<UploadSectionProps> = ({ onUploadChange, initialDocuments = [] }) => {
+    const { t } = useTranslation();
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [fileName, setFileName] = useState('');
     const [fileType, setFileType] = useState('');
@@ -131,19 +131,19 @@ const UploadSection: React.FC<UploadSectionProps> = ({ onUploadChange, initialDo
 
                         <Grid item xs={12} sm={12}>
                             <TextField
-                                label="File Type"
+                                label={t("file_type")}
                                 select
                                 fullWidth
                                 value={fileType}
                                 onChange={(e) => setFileType(e.target.value)}
                                 placeholder="Select file type"
                             >
-                            <MenuItem value="fee_agreement">{t('fee_agreement')}</MenuItem>
-                            <MenuItem value="affidavit">{t('affidavit')}</MenuItem>
-                            <MenuItem value="confidentiality_agreement">{t('confidentiality_agreement')}</MenuItem>
-                            <MenuItem value="non_compete_agreement">{t('non_compete_agreement')}</MenuItem>
-                            <MenuItem value="contract">{t('contract')}</MenuItem>
-                            <MenuItem value="absence">{t('absence')}</MenuItem>
+                                <MenuItem value="fee_agreement">{t('fee_agreement')}</MenuItem>
+                                <MenuItem value="affidavit">{t('affidavit')}</MenuItem>
+                                <MenuItem value="confidentiality_agreement">{t('confidentiality_agreement')}</MenuItem>
+                                <MenuItem value="non_compete_agreement">{t('non_compete_agreement')}</MenuItem>
+                                <MenuItem value="contract">{t('contract')}</MenuItem>
+                                <MenuItem value="absence">{t('absence')}</MenuItem>
 
                             </TextField>
                         </Grid>
@@ -222,13 +222,13 @@ const UploadSection: React.FC<UploadSectionProps> = ({ onUploadChange, initialDo
                 onClose={() => setOpenDialog(false)}
                 actions={
                     <>
-                        <Button onClick={() => setOpenDialog(false)}>Cancel</Button>
-                        <Button color="error" onClick={confirmDelete}>Delete</Button>
+                        <Button onClick={() => setOpenDialog(false)}>{t("cancel")}</Button>
+                        <Button color="error" onClick={confirmDelete}>{t("delete")}</Button>
                     </>
                 }
             >
                 <Typography>
-                    Are you sure you want to delete this file?
+                    {t("are_you_sure_you_want_to_delete_this_file?")}
                 </Typography>
             </ReusableDialog>
         </Box>

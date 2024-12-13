@@ -21,10 +21,11 @@ import {
 } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import EditIcon from '@mui/icons-material/Edit';
-import RateReviewIcon from '@mui/icons-material/RateReview';import SubmissionsTable from './SubmissionsTable';
+import RateReviewIcon from '@mui/icons-material/RateReview'; import SubmissionsTable from './SubmissionsTable';
 import { fetchSurveyById, fetchAllSurveys } from 'src/services/survey';
 import moment from 'moment';
 import SurveyBuilderDialog from './SurveyBuilderDialog';
+import { t } from "i18next"
 
 function ViewSurveysTable() {
   const [surveys, setSurveys] = useState([]);
@@ -111,21 +112,21 @@ function ViewSurveysTable() {
       },
     },
   }));
-  
+
   return (
     <div>
 
 
       <Tooltip arrow title="Survey Submissions">
-      <IconButton color="primary" onClick={() => setOpenSurveyListDialog(true)}>
-      <CustomBadge>
-        <RateReviewIcon />
+        <IconButton color="primary" onClick={() => setOpenSurveyListDialog(true)}>
+          <CustomBadge>
+            <RateReviewIcon />
           </CustomBadge>
         </IconButton>
       </Tooltip>
 
       <Dialog open={openSurveyListDialog} onClose={handleCloseSurveyListDialog} maxWidth="md" fullWidth>
-      <DialogTitle>Survey Submissions</DialogTitle>
+        <DialogTitle>Survey Submissions</DialogTitle>
         <DialogContent>
           <TableContainer component={Paper}>
             <Table>
@@ -134,7 +135,7 @@ function ViewSurveysTable() {
                   <TableCell><strong>Title</strong></TableCell>
                   <TableCell><strong>Created At</strong></TableCell>
                   <TableCell><strong>Updated At</strong></TableCell>
-                  <TableCell><strong>Actions</strong></TableCell>
+                  <TableCell><strong>{t("actions")}</strong></TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>

@@ -5,6 +5,7 @@ import { sendMessage } from 'src/services/chatService';
 import { useState, useRef } from 'react';
 import AvatarWithInitials from '../../utils/Avatar';
 import { useChat } from '../../context/ChatContext';
+import { t } from "i18next"
 
 function BottomBarContent() {
   const theme = useTheme();

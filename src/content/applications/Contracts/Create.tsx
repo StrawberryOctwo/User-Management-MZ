@@ -1,12 +1,12 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Box from '@mui/material/Box';
-import { t } from 'i18next';
 import { CircularProgress, Switch, FormControlLabel } from '@mui/material';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
 import ReusableForm from 'src/components/Table/tableRowCreate';
 import { fetchFranchises } from 'src/services/franchiseService';
 import { addContractPackage, fetchDiscounts, fetchSessionTypes } from 'src/services/contractPackagesService';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
+import { useTranslation } from 'react-i18next';
 
 const CreateContract = () => {
     const [selectedFranchise, setSelectedFranchise] = useState<any>(null);
@@ -18,7 +18,7 @@ const CreateContract = () => {
     const [vatPercentage, setVatPercentage] = useState(19);
     const franchiseRef = useRef<any>(null);
     const { showMessage } = useSnackbar();
-
+    const { t } = useTranslation();
     useEffect(() => {
         const loadData = async () => {
             setFormLoading(true);

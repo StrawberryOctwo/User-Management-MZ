@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
-import { t } from 'i18next';
 import UploadSection from 'src/components/Files/UploadDocuments';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
@@ -15,6 +14,8 @@ import { assignTeacherToTopics, fetchTopics } from 'src/services/topicService';
 import { generateEmployeeNumber } from 'src/utils/teacherUtils';
 import { TextField } from '@mui/material';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
+import { useTranslation } from 'react-i18next';
+import IbanInput from 'src/utils/IbanInput';
 
 const CreateTeacher = () => {
   const [selectedLocations, setSelectedLocations] = useState<any[]>([]);
@@ -22,8 +23,12 @@ const CreateTeacher = () => {
   const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [employeeNumber, setEmployeeNumber] = useState('');
+  const [iban, setIban] = useState('');
+  const handleIbanChange = (value: string) => {
+    setIban(value);
+  };
   const { showMessage } = useSnackbar();
-
+  const { t } = useTranslation();
   const handleGenerateEmployeeNumber = (formData: {
     firstName: string;
     lastName: string;
@@ -94,7 +99,7 @@ const CreateTeacher = () => {
           rateMultiplier: data.rateMultiplier,
           sessionRateMultiplier: data.sessionRateMultiplier,
           bank: data.bank,
-          iban: data.iban,
+          iban: iban.replace(/\s+/g, ''), // Trim all whitespaces from IBAN
           bic: data.bic
         }
       };
@@ -217,14 +222,14 @@ const CreateTeacher = () => {
     },
     {
       name: 'rateMultiplier',
-      label: 'rateMultiplier',
+      label: t('rateMultiplier'),
       type: 'number',
       required: true,
       section: 'Teacher Information'
     },
     {
       name: 'sessionRateMultiplier',
-      label: 'sessionRateMultiplier',
+      label: t('sessionRateMultiplier'),
       type: 'number',
       required: true,
       section: 'Teacher Information'
@@ -245,7 +250,7 @@ const CreateTeacher = () => {
       component: (
         <Box display="flex" alignItems="center" gap={1} sx={{ width: '95%' }}>
           <TextField
-            label="Teacher Number *"
+            label="employee_number *"
             value={employeeNumber}
             variant="outlined"
             fullWidth
@@ -306,9 +311,17 @@ const CreateTeacher = () => {
     {
       name: 'iban',
       label: t('iban'),
-      type: 'text',
-      required: true,
-      section: 'Bank Details'
+      type: 'custom',
+      section: 'Bank Details',
+      component: (
+        <IbanInput
+          label="IBAN"
+          value={iban}
+          onChange={handleIbanChange}
+          required
+          sx={{ width: '95%' }}
+        />
+      )
     },
     {
       name: 'bic',
@@ -354,7 +367,7 @@ const CreateTeacher = () => {
     },
     {
       name: 'documents',
-      label: 'Upload Documents',
+      label: t('Upload Documents'),
       type: 'custom',
       section: 'Documents',
       component: <UploadSection onUploadChange={handleFilesChange} />,

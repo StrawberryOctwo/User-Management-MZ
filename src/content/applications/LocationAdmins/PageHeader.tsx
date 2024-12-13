@@ -1,7 +1,7 @@
 import { Typography, Button, Grid } from '@mui/material';
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 import { useNavigate } from 'react-router-dom'; // Import useNavigate
-import { t } from 'i18next';
+import { t } from "i18next"
 
 function PageHeader() {
   const navigate = useNavigate(); // Initialize useNavigate
@@ -33,7 +33,7 @@ function PageHeader() {
           startIcon={<AddTwoToneIcon fontSize="small" />}
           onClick={handleCreateFranchise} // Add onClick handler
         >
-          Create location
+          Create location admins
         </Button>
       </Grid>
     </Grid>

@@ -19,7 +19,7 @@ import { useChat } from "../../context/ChatContext";
 import NewChatPopup from "./NewChatPopup";
 import { useWebSocket } from "src/utils/webSocketProvider";
 import { resetUnreadCount, getAllChats } from "src/services/chatService";
-import { t } from "i18next";
+import { useTranslation } from 'react-i18next';
 
 const calculateItemsPerPage = (containerHeight, itemHeight) => {
   return Math.floor(containerHeight / itemHeight);
@@ -75,7 +75,7 @@ function SidebarContent() {
   const socket = useWebSocket();
   const listRef = useRef(null);
   const chatItemHeight = 72;
-
+  const { t } = useTranslation();
   useEffect(() => {
     const updateItemsPerPage = () => {
       if (listRef.current) {
@@ -110,7 +110,7 @@ function SidebarContent() {
     socket.emit("join_room", `user_${userId}`);
 
     socket.on("chat_updated", (updatedChat) => {
-      console.log("Received chat_updated:", updatedChat);
+
 
       setChats((prevChats) => {
         const chatIndex = prevChats.findIndex(
@@ -149,7 +149,7 @@ function SidebarContent() {
     if (chat.lastMessage?.sender?.id !== userId && !chat.lastMessage?.isRead) {
       try {
         await resetUnreadCount(chat.id);
-        console.log("Unread messages reset successfully.");
+
       } catch (error) {
         console.error("Failed to reset unread messages:", error);
       }

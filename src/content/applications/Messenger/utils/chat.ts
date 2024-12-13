@@ -49,9 +49,9 @@ export const fetchMessages = async ({
   try {
     const response: MessagesResponse = await getAllMessages(chatRoomId, page, limit);
     const { messages, totalMessages, totalPages } = response;
-    
+
     setTotalMessages(totalMessages);
-    
+
     if (!messages || messages.length === 0) {
       if (!append) {
         setMessages([]);
@@ -64,11 +64,11 @@ export const fetchMessages = async ({
       );
 
       setMessages(prevMessages =>
-        append 
+        append
           ? [...sortedMessages, ...prevMessages] // Put older messages at the top
           : sortedMessages
       );
-      
+
       setHasMore(page < totalPages);
     }
   } catch (error) {
@@ -85,11 +85,11 @@ export const fetchMessages = async ({
 export const formatDateDivider = (date: string): string => {
   const today = new Date();
   const dateObj = new Date(date);
-  
+
   if (dateObj.toDateString() === today.toDateString()) {
     return 'Today';
   }
-  
+
   return format(dateObj, 'MMMM dd yyyy');
 };
 

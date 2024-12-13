@@ -1,17 +1,17 @@
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { Box, Button, Typography } from '@mui/material';
-import { t } from 'i18next';
 import { format } from 'date-fns';
 import { fetchLocationById } from 'src/services/locationService'; // Adjust the import path as necessary
 import ReusableDetails from 'src/components/View'; // Adjust the reusable details component path
+import { useTranslation } from 'react-i18next';
 
 const ViewLocationPage: React.FC = () => {
     const { id } = useParams<{ id: string }>();
     const [location, setLocation] = useState<Record<string, any> | null>(null);
     const [loading, setLoading] = useState(true);
     const [errorMessage, setErrorMessage] = useState<string | null>(null); // Error state for the page
-
+    const { t } = useTranslation();
     // Function to load the location by ID
     const loadLocation = async () => {
         setLoading(true);

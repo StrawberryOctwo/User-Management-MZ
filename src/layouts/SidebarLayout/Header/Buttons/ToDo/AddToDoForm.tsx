@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Box, Button, TextField, Grid, FormControl, InputLabel, Select, MenuItem } from '@mui/material';
 import { createToDo } from 'src/services/todoService';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 interface AddToDoFormProps {
     onAdd: () => void;
@@ -13,7 +13,7 @@ const AddToDoForm: React.FC<AddToDoFormProps> = ({ onAdd }) => {
     const [priority, setPriority] = useState('Medium');
     const [dueDate, setDueDate] = useState('');
     const [errorMessage, setErrorMessage] = useState<string | null>(null);
-
+    const { t } = useTranslation();
     const handleAddToDo = async () => {
         if (!title || !dueDate) {
             setErrorMessage('ToDo title and due date are required.');
@@ -43,7 +43,7 @@ const AddToDoForm: React.FC<AddToDoFormProps> = ({ onAdd }) => {
             <Grid container spacing={2}>
                 <Grid item xs={12}>
                     <TextField
-                        label="Title"
+                        label={t("title")}
                         variant="outlined"
                         fullWidth
                         value={title}
@@ -91,7 +91,7 @@ const AddToDoForm: React.FC<AddToDoFormProps> = ({ onAdd }) => {
             </Grid>
             <Box display="flex" justifyContent="flex-end" mt={2}>
                 <Button onClick={handleAddToDo} color="primary" variant="contained">
-                    Save ToDo
+                    {t("save")} ToDo
                 </Button>
             </Box>
             {errorMessage && <Box mt={1} color="error.main">{errorMessage}</Box>}

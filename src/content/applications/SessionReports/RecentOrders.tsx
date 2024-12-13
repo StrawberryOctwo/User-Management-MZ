@@ -5,7 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { useAuth } from 'src/hooks/useAuth';
 import { fetchParentSessionReports } from 'src/services/parentService';
 import ViewSessionReportForm from 'src/components/Calendar/Components/Modals/ViewSessionReport';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 export default function ViewSessionReports() {
   const [payments, setPayments] = useState<any[]>([]);
@@ -22,7 +22,7 @@ export default function ViewSessionReports() {
   const isMounted = useRef(false);
 
   const { userId } = useAuth();
-
+  const { t } = useTranslation();
   useEffect(() => {
     if (userId) {
       loadSessionReports();
@@ -58,23 +58,23 @@ export default function ViewSessionReports() {
     { field: 'studentName', headerName: t('name') },
     {
       field: 'sessionStartDate',
-      headerName: 'Session Start Date',
+      headerName: t('Session Start Date'),
       render: (value: any) => formatDateTime(value)
     },
     {
       field: 'sessionEndDate',
-      headerName: 'Session End Date',
+      headerName: t('Session End Date'),
       render: (value: any) => formatDateTime(value)
     },
     {
       field: 'reportDate',
-      headerName: 'Report Date',
+      headerName: t('Report Date'),
       render: (value: any) => formatDateTime(value)
     },
     { field: 'lessonTopic', headerName: t('lesson_topic') },
     {
       field: 'actions',
-      headerName: 'Actions',
+      headerName: t('{t("actions")}'),
       render: (value: any, row: any) => (
         <Button
           variant="outlined"
@@ -90,11 +90,11 @@ export default function ViewSessionReports() {
 
   const formatDateTime = (date: string | Date): string => {
     const parsedDate = new Date(date);
-    return `${parsedDate.toLocaleDateString('en-GB', {
+    return `${parsedDate.toLocaleDateString('de', {
       day: '2-digit',
       month: '2-digit',
       year: 'numeric'
-    })} - ${parsedDate.toLocaleTimeString('en-GB', {
+    })} - ${parsedDate.toLocaleTimeString('de', {
       hour: '2-digit',
       minute: '2-digit',
       hour12: false
@@ -157,7 +157,7 @@ export default function ViewSessionReports() {
               color="inherit"
               disabled={loading}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               // onClick={handleDelete} Uncomment if delete function is implemented
@@ -165,7 +165,7 @@ export default function ViewSessionReports() {
               autoFocus
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+              {loading ? <CircularProgress size={24} /> : t("confirm")}
             </Button>
           </>
         }

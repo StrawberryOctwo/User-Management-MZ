@@ -1,14 +1,38 @@
+// src/components/ViewInvoices.tsx
+
 import React, { useEffect, useRef, useState } from 'react';
-import { Box, Button, IconButton, Tooltip } from '@mui/material';
+import {
+  Box,
+  Button,
+  IconButton,
+  Tooltip,
+  CircularProgress,
+  Snackbar,
+  Alert,
+  TextField,
+} from '@mui/material';
+import { DatePicker, LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import ReusableTable from 'src/components/Table';
-import { fetchInvoiceById, fetchUserInvoices } from 'src/services/invoiceService';
+import {
+  fetchInvoiceById,
+  fetchUserInvoices,
+  fetchDailyInvoicesForFranchise,
+} from 'src/services/invoiceService';
 import { useAuth } from 'src/hooks/useAuth';
 import ViewInvoiceDetails from 'src/components/Invoices/ViewInvoiceDetails';
-import generateTeacherInvoicePDF from './teacherInvoice';
-import { fetchTeacherById, fetchTeacherByUserId, fetchTeacherInvoiceInfoByUserId } from 'src/services/teacherService';
+import { fetchTeacherInvoiceInfoByUserId } from 'src/services/teacherService';
+import { Visibility, Download, GetApp } from '@mui/icons-material';
+import { useTranslation } from 'react-i18next';
 import generateParentInvoicePDF from './parentInvoice';
-import { Visibility, Download } from '@mui/icons-material';
-import { t } from 'i18next';
+import generateTeacherInvoicePDF from './teacherInvoice';
+import { generateBulkInvoicesZip } from './bulkGenerateInvoices';
+import { saveAs } from 'file-saver';
+import dayjs from 'dayjs';
+import 'dayjs/locale/de'; // Import German locale
+
+// Set dayjs locale globally
+dayjs.locale('de');
 
 export default function ViewInvoices() {
   const [invoices, setInvoices] = useState<any[]>([]);
@@ -17,13 +41,17 @@ export default function ViewInvoices() {
   const [totalCount, setTotalCount] = useState(0);
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(25);
-  const [isInvoiceDialogOpen, setIsInvoiceDialogOpen] = useState(false);
-  const [selectedInvoiceId, setSelectedInvoiceId] = useState<string | null>(null);
+  const [bulkLoading, setBulkLoading] = useState(false);
+  const [selectedDate, setSelectedDate] = useState<Date | null>(null); // Date Picker state
+  const [message, setMessage] = useState<{
+    text: string;
+    severity: 'success' | 'error' | 'info' | 'warning';
+  } | null>(null);
 
   const { userId, userRoles } = useAuth();
-  const isMounted = useRef(false); // Check if component is mounted
+  const isMounted = useRef(false);
+  const { t } = useTranslation();
 
-  // Handle component mount and unmount
   useEffect(() => {
     isMounted.current = true;
     if (userId) {
@@ -36,7 +64,7 @@ export default function ViewInvoices() {
   }, [userId, page, limit]);
 
   const loadUserInvoices = async () => {
-    if (!isMounted.current) return; // Prevent action if unmounted
+    if (!isMounted.current) return;
     setLoading(true);
 
     try {
@@ -54,54 +82,118 @@ export default function ViewInvoices() {
     }
   };
 
+  // Function to show messages
+  const showMessage = (
+    text: string,
+    severity: 'success' | 'error' | 'info' | 'warning'
+  ) => {
+    setMessage({ text, severity });
+  };
+
   const handlePreviewPDF = async (invoiceId: number, invoiceUserId: number) => {
     try {
-      let fetchingUserId = userRoles.includes('FranchiseAdmin') ? invoiceUserId : userId;
+      let fetchingUserId = userRoles.includes('FranchiseAdmin')
+        ? invoiceUserId
+        : userId;
       const invoiceData = await fetchInvoiceById(invoiceId, fetchingUserId);
       if (userRoles.includes('Parent')) {
-        if (isMounted.current) generateParentInvoicePDF(invoiceData, true);
+        if (isMounted.current)
+          generateParentInvoicePDF(invoiceData, true);
       } else if (userRoles.includes('Teacher')) {
-        const teacherData = await fetchTeacherInvoiceInfoByUserId(fetchingUserId);
-        if (isMounted.current) generateTeacherInvoicePDF(invoiceData, teacherData, true);
+        const teacherData = await fetchTeacherInvoiceInfoByUserId(
+          fetchingUserId
+        );
+        if (isMounted.current)
+          generateTeacherInvoicePDF(invoiceData, teacherData, true);
       } else if (userRoles.includes('FranchiseAdmin')) {
         if (invoiceData.student) {
-          console.log(invoiceData);
-          if (isMounted.current) generateParentInvoicePDF(invoiceData, true);
+
+          if (isMounted.current)
+            generateParentInvoicePDF(invoiceData, true);
         } else {
-          const teacherData = await fetchTeacherInvoiceInfoByUserId(fetchingUserId);
-          if (isMounted.current) generateTeacherInvoicePDF(invoiceData, teacherData, true);
+          const teacherData = await fetchTeacherInvoiceInfoByUserId(
+            fetchingUserId
+          );
+          if (isMounted.current)
+            generateTeacherInvoicePDF(invoiceData, teacherData, true);
         }
       }
     } catch (error) {
       console.error('Error generating invoice PDF:', error);
+      showMessage('Error generating invoice PDF.', 'error');
     }
   };
+
   const handleDownloadPDF = async (invoiceId: number, invoiceUserId: number) => {
     try {
-      let fetchingUserId = userRoles.includes('FranchiseAdmin') ? invoiceUserId : userId;
+      let fetchingUserId = userRoles.includes('FranchiseAdmin')
+        ? invoiceUserId
+        : userId;
       const invoiceData = await fetchInvoiceById(invoiceId, fetchingUserId);
       if (userRoles.includes('Parent')) {
-        if (isMounted.current) generateParentInvoicePDF(invoiceData, true);
+        if (isMounted.current)
+          generateParentInvoicePDF(invoiceData, false);
       } else if (userRoles.includes('Teacher')) {
-        const teacherData = await fetchTeacherInvoiceInfoByUserId(fetchingUserId);
-        if (isMounted.current) generateTeacherInvoicePDF(invoiceData, teacherData, true);
+        const teacherData = await fetchTeacherInvoiceInfoByUserId(
+          fetchingUserId
+        );
+        if (isMounted.current)
+          generateTeacherInvoicePDF(invoiceData, teacherData, false);
       } else if (userRoles.includes('FranchiseAdmin')) {
         if (invoiceData.student) {
-          console.log(invoiceData);
-          if (isMounted.current) generateParentInvoicePDF(invoiceData, false);
+
+          if (isMounted.current)
+            generateParentInvoicePDF(invoiceData, false);
         } else {
-          const teacherData = await fetchTeacherInvoiceInfoByUserId(fetchingUserId);
-          if (isMounted.current) generateTeacherInvoicePDF(invoiceData, teacherData, false);
+          const teacherData = await fetchTeacherInvoiceInfoByUserId(
+            fetchingUserId
+          );
+          if (isMounted.current)
+            generateTeacherInvoicePDF(invoiceData, teacherData, false);
         }
       }
     } catch (error) {
       console.error('Error generating invoice PDF:', error);
+      showMessage('Error generating invoice PDF.', 'error');
     }
   };
 
+  /**
+   * Handles the bulk download of all invoices for a specific date.
+   */
+  const handleBulkDownload = async () => {
+    if (!selectedDate) {
+      showMessage('Please select a date to download invoices.', 'warning');
+      return;
+    }
+
+    try {
+      setBulkLoading(true);
+
+      const formattedDate = dayjs(selectedDate).format('DD-MM-YYYY');
+      const { data: dailyInvoices } = await fetchDailyInvoicesForFranchise(
+        formattedDate
+      );
+
+      if (dailyInvoices.length === 0) {
+        showMessage('No invoices found for the selected date.', 'info');
+        setBulkLoading(false);
+        return;
+      }
+
+      const zipBlob = await generateBulkInvoicesZip(dailyInvoices);
+      saveAs(zipBlob, `invoices_bulk_${formattedDate}.zip`);
+      showMessage('Bulk invoices downloaded successfully!', 'success');
+    } catch (error: any) {
+      console.error('Error downloading bulk invoices:', error);
+      showMessage(error.message || 'Failed to download bulk invoices.', 'error');
+    } finally {
+      setBulkLoading(false);
+    }
+  };
 
   const columns = [
-    { field: 'invoiceId', headerName: 'Invoice ID' },
+    { field: 'invoiceId', headerName: t('Invoice ID') },
     {
       field: 'firstName',
       headerName: t('first_name'),
@@ -113,12 +205,12 @@ export default function ViewInvoices() {
       render: (value: any, row: any) => row.user.lastName,
     },
 
-    { field: 'totalAmount', headerName: 'Total Amount' },
+    { field: 'totalAmount', headerName: t('total_amount') },
     { field: 'status', headerName: t('status') },
     {
       field: 'createdAt',
-      headerName: 'Created At',
-      render: (value: any) => new Date(value).toLocaleString(),
+      headerName: t('Created At'),
+      render: (value: any) => new Date(value).toLocaleString('de-DE'),
     },
     {
       field: 'actions',
@@ -163,19 +255,67 @@ export default function ViewInvoices() {
   if (errorMessage) return <div>{errorMessage}</div>;
 
   return (
-    <Box>
-      <ReusableTable
-        data={invoices}
-        columns={columns}
-        title="Invoices List"
-        loading={loading}
-        page={page}
-        limit={limit}
-        totalCount={totalCount}
-        onPageChange={handlePageChange}
-        onLimitChange={handleLimitChange}
-        showDefaultActions={false}
-      />
-    </Box>
+    // Wrap with LocalizationProvider for DatePicker
+    <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="de">
+      <Box>
+        {userRoles.includes('FranchiseAdmin') && (
+          <Box mb={2}>
+            {/* Date Picker for selecting invoice date */}
+            <DatePicker
+              label="Datum auswählen" // Translated label
+              value={selectedDate}
+              onChange={(newValue) => setSelectedDate(newValue)}
+              renderInput={(params) => (
+                <TextField {...params} fullWidth margin="normal" />
+              )}
+            />
+
+            {/* Bulk Download Button */}
+            <Button
+              variant="contained"
+              color="primary"
+              startIcon={<GetApp />}
+              onClick={handleBulkDownload}
+              disabled={bulkLoading}
+              fullWidth
+            >
+              {bulkLoading ? <CircularProgress size={24} /> : 'Bulk Download Invoices'}
+            </Button>
+          </Box>
+        )}
+
+        {/* Snackbar for showing messages */}
+        <Snackbar
+          open={!!message}
+          autoHideDuration={6000}
+          onClose={() => setMessage(null)}
+          anchorOrigin={{ vertical: 'top', horizontal: 'center' }}
+        >
+          {message && (
+            <Alert
+              onClose={() => setMessage(null)}
+              severity={message.severity}
+              sx={{ width: '100%' }}
+            >
+              {message.text}
+            </Alert>
+          )}
+        </Snackbar>
+
+        {/* Reusable Table for displaying invoices */}
+        <ReusableTable
+          data={invoices}
+          columns={columns}
+          title="Invoices List"
+          loading={loading}
+          page={page}
+          limit={limit}
+          totalCount={totalCount}
+          onPageChange={handlePageChange}
+          onLimitChange={handleLimitChange}
+          showDefaultActions={false}
+        />
+      </Box>
+    </LocalizationProvider>
   );
 }

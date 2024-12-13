@@ -28,6 +28,7 @@ import { getSurveyAnswers } from 'src/services/survey';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import { debounce } from 'lodash';
 import { visuallyHidden } from '@mui/utils';
+import { useTranslation } from 'react-i18next';
 
 // Define the Answer interface
 interface Answer {
@@ -75,7 +76,7 @@ function SubmissionsTable({
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedAnswers, setSelectedAnswers] = useState<Answer[] | null>(null);
   const [error, setError] = useState<string | null>(null);
-
+  const { t } = useTranslation();
   // Debounced search to optimize API calls
   const debouncedSearch = useMemo(
     () =>
@@ -204,7 +205,7 @@ function SubmissionsTable({
         }}
       >
         <TextField
-          label="Search by User Name"
+          label={t("search_by_user_name")}
           variant="outlined"
           fullWidth
           onChange={handleSearchChange}
@@ -213,10 +214,10 @@ function SubmissionsTable({
           }}
         />
         <FormControl fullWidth variant="outlined">
-          <InputLabel id="sort-status-label">Sort By Status</InputLabel>
+          <InputLabel id="sort-status-label">{t("sort_by_status")}</InputLabel>
           <Select
             labelId="sort-status-label"
-            label="Sort By Status"
+            label={t("sort_by_status")}
             value={sortStatus}
             onChange={(e) => {
               setSortStatus(e.target.value);
@@ -227,84 +228,88 @@ function SubmissionsTable({
             }}
           >
             <MenuItem value="">
-              <em>All</em>
+              <em>{t("all")}</em>
             </MenuItem>
-            <MenuItem value="completed">Completed</MenuItem>
-            <MenuItem value="skipped">Skipped</MenuItem>
-            <MenuItem value="pending">Pending</MenuItem>
+            <MenuItem value="completed">{t("completed")}</MenuItem>
+            <MenuItem value="skipped">{t("skipped")}</MenuItem>
+            <MenuItem value="pending">{t("pending")}</MenuItem>
           </Select>
         </FormControl>
       </Box>
 
       {/* Error Message */}
-      {error && (
-        <Typography color="error" sx={{ mb: 2 }}>
-          {error}
-        </Typography>
-      )}
+      {
+        error && (
+          <Typography color="error" sx={{ mb: 2 }}>
+            {error}
+          </Typography>
+        )
+      }
 
       {/* Loading Indicator */}
-      {loading ? (
-        <Box
-          display="flex"
-          justifyContent="center"
-          alignItems="center"
-          sx={{ height: '300px' }}
-        >
-          <CircularProgress aria-label="Loading submissions" />
-        </Box>
-      ) : (
-        <TableContainer component={Paper} elevation={3}>
-          <Table aria-label="Submissions Table">
-            <TableHead>
-              <TableRow>
-                <TableCell>
-                  <Typography variant="subtitle2">User</Typography>
-                </TableCell>
-                <TableCell>
-                  <Typography variant="subtitle2">Status</Typography>
-                </TableCell>
-                <TableCell align="center">
-                  <Typography variant="subtitle2">Actions</Typography>
-                </TableCell>
-              </TableRow>
-            </TableHead>
-            <TableBody>
-              {submissions.length > 0 ? (
-                tableRows
-              ) : (
+      {
+        loading ? (
+          <Box
+            display="flex"
+            justifyContent="center"
+            alignItems="center"
+            sx={{ height: '300px' }}
+          >
+            <CircularProgress aria-label="Loading submissions" />
+          </Box>
+        ) : (
+          <TableContainer component={Paper} elevation={3}>
+            <Table aria-label="Submissions Table">
+              <TableHead>
                 <TableRow>
-                  <TableCell colSpan={3} align="center">
-                    <Typography variant="body2">No submissions found.</Typography>
+                  <TableCell>
+                    <Typography variant="subtitle2">User</Typography>
+                  </TableCell>
+                  <TableCell>
+                    <Typography variant="subtitle2">{t("status")}</Typography>
+                  </TableCell>
+                  <TableCell align="center">
+                    <Typography variant="subtitle2">{t("actions")}</Typography>
                   </TableCell>
                 </TableRow>
-              )}
-            </TableBody>
-            <TableFooter>
-              <TableRow>
-                <TablePagination
-                  rowsPerPageOptions={[5, 10, 20]}
-                  count={totalSubmissions}
-                  rowsPerPage={submissionsLimit}
-                  page={submissionsPage - 1}
-                  onPageChange={(event, newPage) => setSubmissionsPage(newPage + 1)}
-                  onRowsPerPageChange={(event) => {
-                    setSubmissionsLimit(parseInt(event.target.value, 10));
-                    setSubmissionsPage(1); // Reset to first page on limit change
-                  }}
-                  labelRowsPerPage="Rows per page"
-                  SelectProps={{
-                    inputProps: {
-                      'aria-label': 'Rows per page',
-                    },
-                  }}
-                  sx={{ '& .MuiTablePagination-toolbar': { flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, gap: 2 } }}
-                />
-              </TableRow>
-            </TableFooter>
-          </Table>
-        </TableContainer>
-      )}
+              </TableHead>
+              <TableBody>
+                {submissions.length > 0 ? (
+                  tableRows
+                ) : (
+                  <TableRow>
+                    <TableCell colSpan={3} align="center">
+                      <Typography variant="body2">No submissions found.</Typography>
+                    </TableCell>
+                  </TableRow>
+                )}
+              </TableBody>
+              <TableFooter>
+                <TableRow>
+                  <TablePagination
+                    rowsPerPageOptions={[5, 10, 20]}
+                    count={totalSubmissions}
+                    rowsPerPage={submissionsLimit}
+                    page={submissionsPage - 1}
+                    onPageChange={(event, newPage) => setSubmissionsPage(newPage + 1)}
+                    onRowsPerPageChange={(event) => {
+                      setSubmissionsLimit(parseInt(event.target.value, 10));
+                      setSubmissionsPage(1); // Reset to first page on limit change
+                    }}
+                    labelRowsPerPage="Rows per page"
+                    SelectProps={{
+                      inputProps: {
+                        'aria-label': 'Rows per page',
+                      },
+                    }}
+                    sx={{ '& .MuiTablePagination-toolbar': { flexDirection: { xs: 'column', sm: 'row' }, alignItems: { xs: 'flex-start', sm: 'center' }, gap: 2 } }}
+                  />
+                </TableRow>
+              </TableFooter>
+            </Table>
+          </TableContainer>
+        )
+      }
 
       {/* Answers Dialog */}
       <Dialog
@@ -325,9 +330,9 @@ function SubmissionsTable({
                 <Typography variant="body1" component="div" sx={{ pl: 2 }}>
                   {answer.answer
                     ? answer.answer.text ||
-                      (answer.answer.selectedOptions &&
-                        answer.answer.selectedOptions.join(', ')) ||
-                      'No answer provided.'
+                    (answer.answer.selectedOptions &&
+                      answer.answer.selectedOptions.join(', ')) ||
+                    'No answer provided.'
                     : 'No answer provided.'}
                 </Typography>
               </Box>
@@ -337,7 +342,7 @@ function SubmissionsTable({
           )}
         </DialogContent>
       </Dialog>
-    </Box>
+    </Box >
   );
 }
 

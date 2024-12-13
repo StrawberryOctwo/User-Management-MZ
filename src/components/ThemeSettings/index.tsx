@@ -22,6 +22,7 @@ import { useTranslation } from 'react-i18next';
 import UnfoldMoreTwoToneIcon from '@mui/icons-material/UnfoldMoreTwoTone';
 import { NavLink } from 'react-router-dom';
 import ContrastIcon from '@mui/icons-material/Contrast';
+import { t } from "i18next"
 
 const ThemeSettingsButton = styled(Badge)(
   ({ theme }) => `
@@ -250,7 +251,7 @@ const ThemeSettings = () => {
     <>
       <ThemeSettingsButton>
         <Tooltip arrow title={t('Theme Settings')}>
-        <IconButton color="primary" ref={ref} onClick={handleOpen}>
+          <IconButton color="primary" ref={ref} onClick={handleOpen}>
             <ContrastIcon />
           </IconButton>
         </Tooltip>
@@ -268,109 +269,6 @@ const ThemeSettings = () => {
             horizontal: 'right'
           }}
         >
-          <Box p={2}>
-            <Typography
-              sx={{
-                mb: 2,
-                textAlign: 'center',
-                fontWeight: 'bold',
-                textTransform: 'uppercase'
-              }}
-              variant="body1"
-            >
-              Layout Blueprints
-            </Typography>
-            <Button
-              fullWidth
-              size="large"
-              variant="outlined"
-              endIcon={<UnfoldMoreTwoToneIcon />}
-              color="primary"
-              aria-haspopup="true"
-              aria-expanded={open ? 'true' : undefined}
-              onClick={openMenu}
-            >
-              Choose layout
-            </Button>
-            <Menu
-              disableScrollLock
-              anchorEl={anchorEl}
-              open={open}
-              onClose={closeMenu}
-              anchorOrigin={{
-                vertical: 'center',
-                horizontal: 'center'
-              }}
-              transformOrigin={{
-                vertical: 'center',
-                horizontal: 'center'
-              }}
-            >
-              <MenuItem
-                sx={{
-                  fontWeight: 'bold'
-                }}
-                component={NavLink}
-                to="/extended-sidebar/dashboards"
-              >
-                Extended Sidebar
-              </MenuItem>
-              <MenuItem
-                sx={{
-                  fontWeight: 'bold'
-                }}
-                component={NavLink}
-                to="/accent-header/dashboards"
-              >
-                Accent Header
-              </MenuItem>
-              <MenuItem
-                sx={{
-                  fontWeight: 'bold'
-                }}
-                component={NavLink}
-                to="/accent-sidebar/dashboards"
-              >
-                Accent Sidebar
-              </MenuItem>
-              <MenuItem
-                sx={{
-                  fontWeight: 'bold'
-                }}
-                component={NavLink}
-                to="/boxed-sidebar/dashboards"
-              >
-                Boxed Sidebar
-              </MenuItem>
-              <MenuItem
-                sx={{
-                  fontWeight: 'bold'
-                }}
-                component={NavLink}
-                to="/collapsed-sidebar/dashboards"
-              >
-                Collapsed Sidebar
-              </MenuItem>
-              <MenuItem
-                sx={{
-                  fontWeight: 'bold'
-                }}
-                component={NavLink}
-                to="/bottom-navigation/dashboards"
-              >
-                Bottom Navigation
-              </MenuItem>
-              <MenuItem
-                sx={{
-                  fontWeight: 'bold'
-                }}
-                component={NavLink}
-                to="/top-navigation/dashboards"
-              >
-                Top Navigation
-              </MenuItem>
-            </Menu>
-          </Box>
           <Divider />
           <ThemeToggleWrapper>
             <Typography
@@ -383,7 +281,7 @@ const ThemeSettings = () => {
               }}
               variant="body1"
             >
-              Light color schemes
+              {t("light_color_schemes")}
             </Typography>
             <Stack alignItems="center" spacing={2}>
               <Tooltip placement="left" title="Pure Light" arrow>

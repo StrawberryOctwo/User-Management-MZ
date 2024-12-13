@@ -7,7 +7,8 @@ import {
   List,
   styled,
   Button,
-  ListItem
+  ListItem,
+  SpeedDialIcon
 } from '@mui/material';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import InsertChartIcon from '@mui/icons-material/InsertChart';
@@ -33,7 +34,8 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import ReceiptIcon from '@mui/icons-material/Receipt';
 import withRole from 'src/hooks/withRole';
 import EventBusyIcon from '@mui/icons-material/EventBusy';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
+
 
 const MenuWrapper = styled(Box)(
   ({ theme }) => `
@@ -150,9 +152,9 @@ const SubMenuWrapper = styled(Box)(
                 background: ${theme.colors.alpha.trueWhite[100]};
                 opacity: 0;
                 transition: ${theme.transitions.create([
-                  'transform',
-                  'opacity'
-                ])};
+    'transform',
+    'opacity'
+  ])};
                 width: 6px;
                 height: 6px;
                 transform: scale(0);
@@ -179,7 +181,7 @@ const SubMenuWrapper = styled(Box)(
 
 function SidebarMenu() {
   const { closeSidebar } = useContext(SidebarContext);
-
+  const { t } = useTranslation();
   return (
     <MenuWrapper>
       {/* Dashboards Section */}
@@ -187,7 +189,7 @@ function SidebarMenu() {
         component="div"
         subheader={
           <ListSubheader component="div" disableSticky>
-            Dashboards
+            {t("dashboards")}
           </ListSubheader>
         }
       >
@@ -211,7 +213,7 @@ function SidebarMenu() {
                   to="/dashboard/calendar"
                   startIcon={<EditCalendarIcon />}
                 >
-                  Calendar
+                  {t("calendar")}
                 </Button>
               </ListItem>
             </ProtectedListItem>
@@ -226,7 +228,7 @@ function SidebarMenu() {
                   to="/dashboard/charts"
                   startIcon={<InsertChartIcon />}
                 >
-                  Dashboard
+                  {t("dashboards")}
                 </Button>
               </ListItem>
             </ProtectedListItem>
@@ -239,7 +241,7 @@ function SidebarMenu() {
                   to="/dashboard/interests"
                   startIcon={<Interests />}
                 >
-                  Interests
+                  {t("interests")}
                 </Button>
               </ListItem>
             </ProtectedListItem>
@@ -254,7 +256,7 @@ function SidebarMenu() {
           component="div"
           subheader={
             <ListSubheader component="div" disableSticky>
-              User Management
+              {t("user_management")}
             </ListSubheader>
           }
         >
@@ -279,7 +281,7 @@ function SidebarMenu() {
                 to="/management/franchises"
                 startIcon={<BusinessOutlined />}
               >
-                Franchises
+                {t("franchises")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -295,7 +297,7 @@ function SidebarMenu() {
                 to="/management/locations"
                 startIcon={<LocationOnIcon />}
               >
-                Locations
+                {t("locations")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -308,7 +310,7 @@ function SidebarMenu() {
                 to="/management/franchise-admins"
                 startIcon={<LocationSearchingTwoTone />}
               >
-                Franchise Admins
+                {t("franchise_admins")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -321,10 +323,10 @@ function SidebarMenu() {
                 to="/management/location-admins"
                 startIcon={<LocationSearching />}
               >
-                {t('location_admins')}
-              </Button>
-            </ListItem>
-          </ProtectedListItem>
+                {t("location_admins")}
+              </Button >
+            </ListItem >
+          </ProtectedListItem >
           <ProtectedListItem
             allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin']}
           >
@@ -336,7 +338,7 @@ function SidebarMenu() {
                 to="/management/teachers"
                 startIcon={<Person />}
               >
-                Teachers
+                {t("teachers")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -351,7 +353,7 @@ function SidebarMenu() {
                 to="/management/parents"
                 startIcon={<PersonAddAlt1Sharp />}
               >
-                Parents
+                {t("parents")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -372,19 +374,19 @@ function SidebarMenu() {
                 to="/management/students"
                 startIcon={<PersonAddAlt1Sharp />}
               >
-                Students
+                {t("students")}
               </Button>
             </ListItem>
           </ProtectedListItem>
-        </List>
+        </List >
 
         {/* NEW Chat Subsection */}
-        <List
+        < List
           component="div"
           subheader={
-            <ListSubheader component="div" disableSticky>
-              Chat
-            </ListSubheader>
+            < ListSubheader component="div" disableSticky >
+              {t("chat")}
+            </ListSubheader >
           }
         >
           <ProtectedListItem
@@ -405,22 +407,35 @@ function SidebarMenu() {
                 to="/management/chat"
                 startIcon={<ChatBubble />}
               >
-                Chat Room
+                {t("chat_room")}
               </Button>
             </ListItem>
           </ProtectedListItem>
-        </List>
+        </List >
 
         {/* Content Management Subsection */}
-        <List
+        < List
           component="div"
           subheader={
-            <ListSubheader component="div" disableSticky>
-              Content Management
-            </ListSubheader>
+            < ListSubheader component="div" disableSticky >
+              {t("content_management")}
+            </ListSubheader >
           }
         >
-          <ProtectedListItem allowedRoles={['SuperAdmin', 'FranchiseAdmin']}>
+          <ProtectedListItem allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'Parent', 'Teacher']}>
+            <ListItem component="div">
+              <Button
+                disableRipple
+                component={RouterLink}
+                onClick={closeSidebar}
+                to="/management/manage/todos"
+                startIcon={<SpeedDialIcon />}
+              >
+                {t("todos")}
+              </Button>
+            </ListItem>
+          </ProtectedListItem>
+          <ProtectedListItem allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'Parent', 'Student', 'Teacher']}>
             <ListItem component="div">
               <Button
                 disableRipple
@@ -429,7 +444,7 @@ function SidebarMenu() {
                 to="/management/files"
                 startIcon={<FileUploadSharp />}
               >
-                Files
+                {t("files")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -442,7 +457,7 @@ function SidebarMenu() {
                 to="/management/topics"
                 startIcon={<Topic />}
               >
-                Topics
+                {t("topics")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -455,19 +470,19 @@ function SidebarMenu() {
                 to="/management/contracts"
                 startIcon={<Topic />}
               >
-                Contracts
+                {t("contracts")}
               </Button>
             </ListItem>
           </ProtectedListItem>
-        </List>
+        </List >
 
         {/* Reports Subsection */}
-        <List
+        < List
           component="div"
           subheader={
-            <ListSubheader component="div" disableSticky>
-              Reports
-            </ListSubheader>
+            < ListSubheader component="div" disableSticky >
+              {t("reports")}
+            </ListSubheader >
           }
         >
           <ProtectedListItem allowedRoles={['Parent', 'Student']}>
@@ -479,7 +494,7 @@ function SidebarMenu() {
                 to="/management/session-reports"
                 startIcon={<DescriptionOutlinedIcon />}
               >
-                Session Reports
+                {t("session_reports")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -492,19 +507,19 @@ function SidebarMenu() {
                 to="/management/payments"
                 startIcon={<AttachMoney />}
               >
-                Session Payments
+                {t("session_payments")}
               </Button>
             </ListItem>
           </ProtectedListItem>
-        </List>
+        </List >
 
         {/* Finance Subsection */}
-        <List
+        < List
           component="div"
           subheader={
-            <ListSubheader component="div" disableSticky>
-              Finance
-            </ListSubheader>
+            < ListSubheader component="div" disableSticky >
+              {t("finance")}
+            </ListSubheader >
           }
         >
           <ProtectedListItem allowedRoles={['FranchiseAdmin', 'Teacher', 'Parent']}>
@@ -516,7 +531,7 @@ function SidebarMenu() {
                 to="/management/invoices"
                 startIcon={<ReceiptIcon />}
               >
-                Monthly Invoices
+                {t("monthly_invoices")}
               </Button>
             </ListItem>
           </ProtectedListItem>
@@ -529,19 +544,19 @@ function SidebarMenu() {
                 to="/management/billings"
                 startIcon={<MoneyRounded />}
               >
-                Franchise Bills
+                {t("franchise_bills")}
               </Button>
             </ListItem>
           </ProtectedListItem>
-        </List>
+        </List >
 
         {/* HR Subsection */}
-        <List
+        < List
           component="div"
           subheader={
-            <ListSubheader component="div" disableSticky>
-              HR
-            </ListSubheader>
+            < ListSubheader component="div" disableSticky >
+              {t("HR")}
+            </ListSubheader >
           }
         >
           <ProtectedListItem allowedRoles={['SuperAdmin', 'FranchiseAdmin', 'LocationAdmin']}>
@@ -553,13 +568,13 @@ function SidebarMenu() {
                 to="/management/daysoff"
                 startIcon={<EventBusyIcon />}
               >
-                Days Off
+                {t("days_off")}
               </Button>
             </ListItem>
           </ProtectedListItem>
-        </List>
-      </SubMenuWrapper>
-    </MenuWrapper>
+        </List >
+      </SubMenuWrapper >
+    </MenuWrapper >
   );
 }
 

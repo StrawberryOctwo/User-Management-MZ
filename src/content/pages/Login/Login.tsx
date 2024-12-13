@@ -13,7 +13,7 @@ import {
 import { login } from 'src/services/authService';
 import { isAuthenticated } from 'src/services/authService'; // Check token logic
 import { useWebSocket } from 'src/utils/webSocketProvider';
-import { t } from 'i18next';
+import { t } from "i18next";
 
 const Login: React.FC = () => {
   const socket = useWebSocket();

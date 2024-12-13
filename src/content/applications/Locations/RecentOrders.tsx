@@ -5,7 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { Location } from 'src/models/LocationModel'; // Assuming LocationModel is available
 import { fetchLocations, deleteLocation } from 'src/services/locationService';
 import { useNavigate } from 'react-router-dom';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 export default function ViewLocationPage() {
   const [locations, setLocations] = useState<Location[]>([]);
@@ -19,7 +19,7 @@ export default function ViewLocationPage() {
   const isMounted = useRef(false);
 
   const navigate = useNavigate();
-
+  const { t } = useTranslation();
   useEffect(() => {
     if (isMounted.current) {
       loadLocations();
@@ -48,7 +48,7 @@ export default function ViewLocationPage() {
   const columns = [
     { field: 'name', headerName: t('location_name') },
     { field: 'address', headerName: t('address') },
-    { field: 'postalCode', headerName: t('Postal Code') },
+    { field: 'postalCode', headerName: t('postal_code') },
     { field: 'franchiseName', headerName: t('franchise_name') },
     { field: 'totalTeachers', headerName: t('total_teachers') },
     { field: 'totalStudents', headerName: t('total_students') }
@@ -122,7 +122,7 @@ export default function ViewLocationPage() {
               color="inherit"
               disabled={loading}
             >
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               onClick={handleDelete}
@@ -130,7 +130,7 @@ export default function ViewLocationPage() {
               autoFocus
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+              {loading ? <CircularProgress size={24} /> : t("confirm")}
             </Button>
           </>
         }

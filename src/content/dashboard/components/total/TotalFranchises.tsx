@@ -17,7 +17,7 @@ import {
 } from '@mui/material';
 import { useDashboard } from 'src/contexts/DashboardContext';
 import BusinessTwoToneIcon from '@mui/icons-material/BusinessTwoTone';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 const AvatarError = styled(Avatar)(
   ({ theme }) => `
@@ -47,7 +47,7 @@ function TotalFranchises() {
     franchises,
     loadingCounts
   } = useDashboard();
-
+  const { t } = useTranslation();
   const handleFranchiseChange = (event) => {
     setSelectedFranchise(event.target.value);
   };

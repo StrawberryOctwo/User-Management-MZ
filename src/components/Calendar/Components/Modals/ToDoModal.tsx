@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Dialog, DialogTitle, DialogContent, DialogActions, Button, TextField } from '@mui/material';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
+
 
 type ToDoModalProps = {
     isOpen: boolean;
@@ -11,7 +12,7 @@ type ToDoModalProps = {
 export default function ToDoModal({ isOpen, onClose, onSave }: ToDoModalProps) {
     const [title, setTitle] = useState('');
     const [description, setDescription] = useState('');
-
+    const { t } = useTranslation();
     const handleSave = () => {
         onSave({ title, description });
         onClose();
@@ -24,7 +25,7 @@ export default function ToDoModal({ isOpen, onClose, onSave }: ToDoModalProps) {
                 <TextField
                     autoFocus
                     margin="dense"
-                    label="Title"
+                    label={t("title")}
                     type="text"
                     fullWidth
                     value={title}
@@ -42,8 +43,8 @@ export default function ToDoModal({ isOpen, onClose, onSave }: ToDoModalProps) {
                 />
             </DialogContent>
             <DialogActions>
-                <Button onClick={onClose}>Cancel</Button>
-                <Button onClick={handleSave} variant="contained" color="primary">Save</Button>
+                <Button onClick={onClose}>{t("cancel")}</Button>
+                <Button onClick={handleSave} variant="contained" color="primary">{t("save")}</Button>
             </DialogActions>
         </Dialog>
     );

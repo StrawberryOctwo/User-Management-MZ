@@ -88,11 +88,11 @@ function StudentsByFilters() {
   return (
     <Card>
       <CardHeader
-        title={t('Students by Filters')}
+        title={t('students_by_filters')}
         action={
           <FilterContainer>
             <FormControl variant="outlined" size="small">
-              <InputLabel id="filter-label">Filter</InputLabel>
+              <InputLabel id="filter-label">{t('filter')}</InputLabel>
               <Select
                 labelId="filter-label"
                 id="filter-select"
@@ -100,9 +100,9 @@ function StudentsByFilters() {
                 onChange={(event) => setStudentFilter(event.target.value)} // Update filter in context
                 label="Filter"
               >
-                <MenuItem value="location">Location</MenuItem>
-                <MenuItem value="class">Class</MenuItem>
-                <MenuItem value="school">School</MenuItem>
+                <MenuItem value="location">{t('location')}</MenuItem>
+                <MenuItem value="class">{t('class')}</MenuItem>
+                <MenuItem value="school">{t('school')}</MenuItem>
               </Select>
             </FormControl>
           </FilterContainer>

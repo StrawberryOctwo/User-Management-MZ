@@ -1,353 +1,154 @@
+import React from 'react';
 import {
-  CardHeader,
-  Divider,
-  CardContent,
-  Avatar,
-  Box,
-  CardActions,
-  Button,
-  Typography,
-  ListItemAvatar,
   Card,
-  ListItemText,
-  List,
-  ListItem,
-  styled
+  CardContent,
+  Typography,
+  Grid,
+  Box,
+  Button,
+  CircularProgress,
+  Divider,
 } from '@mui/material';
-
+import {
+  Business as BusinessIcon,
+  LocationOn as LocationOnIcon,
+  School as SchoolIcon,
+  Person as PersonIcon,
+  Receipt as ReceiptIcon,
+  MonetizationOn as MonetizationOnIcon,
+  Event as EventIcon,
+} from '@mui/icons-material';
 import { useTranslation } from 'react-i18next';
+import { useDashboard } from 'src/contexts/DashboardContext';
 import Label from 'src/components/Label';
 
-const AvatarLight = styled(Avatar)(
-  ({ theme }) => `
-      background-color: ${theme.colors.alpha.black[10]};
-      color:  ${theme.colors.alpha.black[100]};
-      font-weight: ${theme.typography.fontWeightBold};
-      font-size: ${theme.typography.pxToRem(15)};
-`
-);
+// Define a type for metric items
+interface MetricItem {
+  icon: React.ReactElement;
+  label: string;
+  value: string | number;
+  color?: 'success' | 'error' | 'info' | 'warning';
+}
 
-function TopLandingPages() {
+function DashboardMetrics() {
   const { t } = useTranslation();
+  const {
+    counts,
+    invoiceAnalytics,
+    sessionAnalytics,
+    loadingCounts,
+    loadingAnalytics,
+    loadingInvoices,
+    error,
+  } = useDashboard();
+
+  // Calculate additional metrics
+  const studentTeacherRatio =
+    counts.teachers > 0 ? (counts.students / counts.teachers).toFixed(2) : 'N/A';
+  const incomePerFranchise =
+    counts.franchises > 0 ? (invoiceAnalytics.totalIncome / counts.franchises).toFixed(2) : 'N/A';
+  const expensePerStudent =
+    counts.students > 0 ? (invoiceAnalytics.totalExpense / counts.students).toFixed(2) : 'N/A';
+  const invoicesPerLocation =
+    counts.locations > 0 ? (invoiceAnalytics.totalInvoices / counts.locations).toFixed(2) : 'N/A';
+  const sessionsPerStudent =
+    counts.students > 0 ? (sessionAnalytics.length / counts.students).toFixed(2) : 'N/A';
+
+  // Define metric items
+  const metrics: MetricItem[] = [
+    {
+      icon: <PersonIcon fontSize="large" />,
+      label: t('studentTeacherRatio'),
+      value: studentTeacherRatio,
+      color: 'info',
+    },
+    {
+      icon: <MonetizationOnIcon fontSize="large" />,
+      label: t('incomePerFranchise'),
+      value: incomePerFranchise !== 'N/A' ? `${incomePerFranchise}€` : 'N/A',
+      color: 'success',
+    },
+    {
+      icon: <ReceiptIcon fontSize="large" />,
+      label: t('expensePerStudent'),
+      value: expensePerStudent !== 'N/A' ? `${expensePerStudent}€` : 'N/A',
+      color: 'warning',
+    },
+    {
+      icon: <BusinessIcon fontSize="large" />,
+      label: t('invoicesPerLocation'),
+      value: invoicesPerLocation !== 'N/A' ? invoicesPerLocation : 'N/A',
+      color: 'info',
+    },
+    {
+      icon: <EventIcon fontSize="large" />,
+      label: t('sessionsPerStudent'),
+      value: sessionsPerStudent !== 'N/A' ? sessionsPerStudent : 'N/A',
+      color: 'success',
+    },
+  ];
+
+  // Handle Loading and Error States
+  if (loadingCounts || loadingAnalytics || loadingInvoices) {
+    return (
+      <Box display="flex" justifyContent="center" alignItems="center" height={200}>
+        <CircularProgress />
+        <Typography variant="body1" sx={{ ml: 2 }}>
+          {t('loadingMetrics')}
+        </Typography>
+      </Box>
+    );
+  }
+
+  if (error) {
+    return (
+      <Typography variant="body1" color="error" align="center">
+        {t('errorLoadingMetrics')}
+      </Typography>
+    );
+  }
 
   return (
-    <Card
-      sx={{
-        height: '100%',
-        display: 'flex',
-        flexDirection: 'column'
-      }}
-    >
-      <CardHeader title={t('Top Landing Pages')} />
-      <Divider />
+    <Card>
+      <Box p={2}>
+        <Typography variant="h6" gutterBottom>
+          {t('dashboardMetrics')}
+        </Typography>
+        <Divider />
+      </Box>
       <CardContent>
-        <List component="div" disablePadding>
-          <ListItem
-            sx={{
-              display: { xs: 'block', sm: 'flex' }
-            }}
-            disableGutters
-            alignItems="flex-start"
-            component="div"
-          >
-            <ListItemAvatar>
-              <AvatarLight>1</AvatarLight>
-            </ListItemAvatar>
-
-            <ListItemText
-              primary="/templates/react/react-free/"
-              primaryTypographyProps={{
-                variant: 'h6',
-                sx: {
-                  mt: 1
-                },
-                gutterBottom: true,
-                noWrap: true
-              }}
-              secondaryTypographyProps={{ variant: 'h3', noWrap: true }}
-              secondary={
-                <Box
-                  sx={{
-                    mt: 1,
-                    flexDirection: 'row',
-                    display: 'flex'
-                  }}
-                >
-                  <Box
-                    sx={{
-                      mr: 5
-                    }}
-                  >
-                    <Typography
-                      component="div"
-                      variant="body2"
-                      gutterBottom
-                      color="text.secondary"
-                    >
-                      {t('Impressions')}
-                    </Typography>
-                    <Box display="flex" alignItems="center">
-                      <Typography
-                        component="div"
-                        variant="h3"
-                        sx={{
-                          mr: 1
-                        }}
-                      >
-                        84.873
-                      </Typography>
-                      <Label color="success">34.76%</Label>
-                    </Box>
-                  </Box>
-                  <Box>
-                    <Typography
-                      component="div"
-                      variant="body2"
-                      gutterBottom
-                      color="text.secondary"
-                    >
-                      {t('Clicks')}
-                    </Typography>
-                    <Box display="flex" alignItems="center">
-                      <Typography
-                        component="div"
-                        variant="h3"
-                        sx={{
-                          mr: 1
-                        }}
-                      >
-                        15.594
-                      </Typography>
-                      <Label color="success">28.75%</Label>
-                    </Box>
-                  </Box>
+        <Grid container spacing={2}>
+          {metrics.map((metric, index) => (
+            <Grid item xs={12} sm={6} md={4} key={index}>
+              <Box
+                display="flex"
+                alignItems="center"
+                p={2}
+                bgcolor="background.paper"
+                borderRadius={2}
+                boxShadow={1}
+              >
+                <Box mr={2} color={metric.color === 'error' ? 'error.main' : 'info.main'}>
+                  {metric.icon}
                 </Box>
-              }
-            />
-            <Box
-              sx={{
-                mt: { xs: 2, sm: 0 }
-              }}
-              alignSelf="center"
-            >
-              <Button size="small" href="#">
-                {t('Visit URL')}
-              </Button>
-            </Box>
-          </ListItem>
-          <Divider
-            sx={{
-              my: 1
-            }}
-          />
-          <ListItem
-            sx={{
-              display: { xs: 'block', sm: 'flex' }
-            }}
-            disableGutters
-            alignItems="flex-start"
-            component="div"
-          >
-            <ListItemAvatar>
-              <AvatarLight>2</AvatarLight>
-            </ListItemAvatar>
-
-            <ListItemText
-              primary="/templates/react/react-free/"
-              primaryTypographyProps={{
-                variant: 'h6',
-                sx: {
-                  mt: 1
-                },
-                gutterBottom: true,
-                noWrap: true
-              }}
-              secondaryTypographyProps={{ variant: 'h3', noWrap: true }}
-              secondary={
-                <Box
-                  sx={{
-                    mt: 1,
-                    flexDirection: 'row',
-                    display: 'flex'
-                  }}
-                >
-                  <Box
-                    sx={{
-                      mr: 5
-                    }}
-                  >
-                    <Typography
-                      component="div"
-                      variant="body2"
-                      gutterBottom
-                      color="text.secondary"
-                    >
-                      {t('Impressions')}
-                    </Typography>
-                    <Box display="flex" alignItems="center">
-                      <Typography
-                        component="div"
-                        variant="h3"
-                        sx={{
-                          mr: 1
-                        }}
-                      >
-                        84.873
-                      </Typography>
-                      <Label color="success">34.76%</Label>
-                    </Box>
-                  </Box>
-                  <Box>
-                    <Typography
-                      component="div"
-                      variant="body2"
-                      gutterBottom
-                      color="text.secondary"
-                    >
-                      {t('Clicks')}
-                    </Typography>
-                    <Box display="flex" alignItems="center">
-                      <Typography
-                        component="div"
-                        variant="h3"
-                        sx={{
-                          mr: 1
-                        }}
-                      >
-                        15.594
-                      </Typography>
-                      <Label color="success">28.75%</Label>
-                    </Box>
-                  </Box>
+                <Box>
+                  <Typography variant="subtitle2" color="textSecondary">
+                    {metric.label}
+                  </Typography>
+                  <Typography variant="h6">{metric.value}</Typography>
+                  {metric.label === t('incomePerFranchise') && incomePerFranchise !== 'N/A' && (
+                    <Label color="success">{invoiceAnalytics.netIncomePercentage}%</Label>
+                  )}
                 </Box>
-              }
-            />
-            <Box
-              sx={{
-                mt: { xs: 2, sm: 0 }
-              }}
-              alignSelf="center"
-            >
-              <Button size="small" href="#">
-                {t('Visit URL')}
-              </Button>
-            </Box>
-          </ListItem>
-          <Divider
-            sx={{
-              my: 1
-            }}
-          />
-          <ListItem
-            sx={{
-              display: { xs: 'block', sm: 'flex' }
-            }}
-            disableGutters
-            alignItems="flex-start"
-            component="div"
-          >
-            <ListItemAvatar>
-              <AvatarLight>3</AvatarLight>
-            </ListItemAvatar>
-
-            <ListItemText
-              primary="/templates/react/react-free/"
-              primaryTypographyProps={{
-                variant: 'h6',
-                sx: {
-                  mt: 1
-                },
-                gutterBottom: true,
-                noWrap: true
-              }}
-              secondaryTypographyProps={{ variant: 'h3', noWrap: true }}
-              secondary={
-                <Box
-                  sx={{
-                    mt: 1,
-                    flexDirection: 'row',
-                    display: 'flex'
-                  }}
-                >
-                  <Box
-                    sx={{
-                      mr: 5
-                    }}
-                  >
-                    <Typography
-                      component="div"
-                      variant="body2"
-                      gutterBottom
-                      color="text.secondary"
-                    >
-                      {t('Impressions')}
-                    </Typography>
-                    <Box display="flex" alignItems="center">
-                      <Typography
-                        component="div"
-                        variant="h3"
-                        sx={{
-                          mr: 1
-                        }}
-                      >
-                        84.873
-                      </Typography>
-                      <Label color="success">34.76%</Label>
-                    </Box>
-                  </Box>
-                  <Box>
-                    <Typography
-                      component="div"
-                      variant="body2"
-                      gutterBottom
-                      color="text.secondary"
-                    >
-                      {t('Clicks')}
-                    </Typography>
-                    <Box display="flex" alignItems="center">
-                      <Typography
-                        component="div"
-                        variant="h3"
-                        sx={{
-                          mr: 1
-                        }}
-                      >
-                        15.594
-                      </Typography>
-                      <Label color="success">28.75%</Label>
-                    </Box>
-                  </Box>
-                </Box>
-              }
-            />
-            <Box
-              sx={{
-                mt: { xs: 2, sm: 0 }
-              }}
-              alignSelf="center"
-            >
-              <Button size="small" href="#">
-                {t('Visit URL')}
-              </Button>
-            </Box>
-          </ListItem>
-        </List>
+              </Box>
+            </Grid>
+          ))}
+        </Grid>
       </CardContent>
       <Divider />
-      <CardActions
-        sx={{
-          py: 2,
-          height: '100%',
-          flex: 1,
-          justifyContent: 'center'
-        }}
-      >
-        <Button size="small" variant="contained" color="primary">
-          {t('Advanced View')}
-        </Button>
-      </CardActions>
+ 
     </Card>
   );
 }
 
-export default TopLandingPages;
+export default DashboardMetrics;

@@ -30,9 +30,6 @@ function HeaderButtons() {
       <ProtectedBox allowedRoles={['SuperAdmin']}>
         <SurveyBuilder />
       </ProtectedBox>
-      <ProtectedBox allowedRoles={['SuperAdmin','FranchiseAdmin','LocationAdmin','Teacher']}>
-        <ToDoHeader />
-      </ProtectedBox>
       <ProtectedBox allowedRoles={['Teacher']}>
         <HeaderAvailability />
       </ProtectedBox>

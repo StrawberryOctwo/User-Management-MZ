@@ -2,6 +2,7 @@ import React from 'react';
 import { Card, Typography, Button, Box, IconButton } from '@mui/material';
 import { Link } from 'react-router-dom';
 import CircleIcon from '@mui/icons-material/Circle';
+import { t } from "i18next";
 
 interface StudentDetailCardProps {
   student: any; // Define more precise types based on your data model
@@ -67,7 +68,7 @@ const StudentDetailCard: React.FC<StudentDetailCardProps> = ({
               onClick={onViewReport}
               sx={{ mr: 1 }}
             >
-              View Report
+              {t("view_report")}
             </Button>
           ) : (
             !canAddReport &&
@@ -78,7 +79,7 @@ const StudentDetailCard: React.FC<StudentDetailCardProps> = ({
                 onClick={onAddReport}
                 sx={{ mr: 1 }}
               >
-                Add Report
+                {t("add_report")}
               </Button>
             )
           )}

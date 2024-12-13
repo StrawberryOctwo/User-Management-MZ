@@ -7,7 +7,7 @@ import ParentDetails from './ParentDetails';
 import TeacherDetails from './TeacherDetails';
 import UserDetails from './UserDetails';
 import { fetchUserProfile, updateUserProfile } from 'src/services/userService';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 function EditProfileTab() {
   const [isEditingUser, setIsEditingUser] = useState(false); // State for User Details
@@ -15,7 +15,7 @@ function EditProfileTab() {
   const [isEditingTeacher, setIsEditingTeacher] = useState(false); // State for Teacher Details
   const [user, setUser] = useState<any>({});
   const [userRole, setUserRole] = useState<string>('');
-
+  const { t } = useTranslation();
   const handleUserEditToggle = async () => {
     if (isEditingUser) {
       await handleSaveUser();
@@ -40,7 +40,7 @@ function EditProfileTab() {
   const handleSaveUser = async () => {
     try {
       await updateUserProfile(user);
-      console.log('User profile updated successfully!');
+
     } catch (error) {
       console.error('Failed to update user profile:', error);
     }
@@ -83,7 +83,7 @@ function EditProfileTab() {
                   startIcon={<CancelTwoToneIcon />}
                   onClick={() => setIsEditingUser(false)}
                 >
-                  Cancel
+                  {t("cancel")}
                 </Button>
               )}
               <Button
@@ -93,7 +93,7 @@ function EditProfileTab() {
                 }
                 onClick={handleUserEditToggle}
               >
-                {isEditingUser ? 'Save' : 'Edit'}
+                {isEditingUser ? '{t("save")}' : 'Edit'}
               </Button>
             </Box>
           </Box>
@@ -125,7 +125,7 @@ function EditProfileTab() {
                     startIcon={<CancelTwoToneIcon />}
                     onClick={() => setIsEditingParent(false)}
                   >
-                    Cancel
+                    {t("cancel")}
                   </Button>
                 )}
                 <Button
@@ -135,7 +135,7 @@ function EditProfileTab() {
                   }
                   onClick={handleParentEditToggle}
                 >
-                  {isEditingParent ? 'Save' : 'Edit'}
+                  {isEditingParent ? '{t("save")}' : 'Edit'}
                 </Button>
               </Box>
             </Box>
@@ -169,7 +169,7 @@ function EditProfileTab() {
                     startIcon={<CancelTwoToneIcon />}
                     onClick={() => setIsEditingTeacher(false)}
                   >
-                    Cancel
+                    {t("cancel")}
                   </Button>
                 )}
                 <Button
@@ -179,7 +179,7 @@ function EditProfileTab() {
                   }
                   onClick={handleTeacherEditToggle}
                 >
-                  {isEditingTeacher ? 'Save' : 'Edit'}
+                  {isEditingTeacher ? '{t("save")}' : 'Edit'}
                 </Button>
               </Box>
             </Box>

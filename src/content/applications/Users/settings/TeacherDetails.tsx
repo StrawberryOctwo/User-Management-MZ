@@ -12,7 +12,7 @@ import {
 import moment from 'moment';
 import { useEffect, useState } from 'react';
 import Text from 'src/components/Text';
-import { t } from 'i18next';
+import { t } from "i18next"
 
 interface TeacherInfo {
   idNumber: string;
@@ -121,7 +121,7 @@ function TeacherDetails({ user, isEditing, setUser }: TeacherDetailsProps) {
               <Box pr={3}>{t("hourly_rate")}:</Box>
             </Grid>
             <Grid item xs={12} sm={8} md={9}>
-              <Text color="black">€{teacherInfo.hourlyRate}/hr</Text>
+              <Text color="black">{teacherInfo.hourlyRate}€/hr</Text>
             </Grid>
           </Grid>
 

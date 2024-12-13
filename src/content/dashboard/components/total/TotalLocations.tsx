@@ -29,7 +29,7 @@ const AvatarSuccess = styled(Avatar)(
 const CardContentWrapper = styled(CardContent)(
   ({ theme }) => `
      padding: ${theme.spacing(2.5, 3, 3)};
-  
+
      &:last-child {
      padding-bottom: 0;
      }
@@ -39,12 +39,12 @@ const CardContentWrapper = styled(CardContent)(
 function TotalLocations() {
   const { t } = useTranslation();
   const { counts, loadingCounts } = useDashboard();
-  
+
   return (
     <Card>
       <CardContentWrapper>
         <Typography variant="overline" color="text.primary">
-          {t('Locations')}
+          {t('locations')}
         </Typography>
 
         <ListItem

@@ -11,7 +11,6 @@ import {
   Typography
 } from '@mui/material';
 import { styled } from '@mui/material/styles';
-
 import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import MoreVertTwoToneIcon from '@mui/icons-material/MoreVertTwoTone';
 import { t } from 'i18next';
@@ -44,14 +43,14 @@ function BulkActions() {
       <Box display="flex" alignItems="center" justifyContent="space-between">
         <Box display="flex" alignItems="center">
           <Typography variant="h5" color="text.secondary">
-            Bulk actions:
+            {t("bulk_actions")}:
           </Typography>
           <ButtonError
             sx={{ ml: 1 }}
             startIcon={<DeleteTwoToneIcon />}
             variant="contained"
           >
-            {t('delete')}
+            {t("delete")}
           </ButtonError>
         </Box>
         <IconButton

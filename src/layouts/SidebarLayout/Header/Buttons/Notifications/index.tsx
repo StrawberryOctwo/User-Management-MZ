@@ -1,6 +1,5 @@
 import { useRef, useState, useEffect } from 'react';
 import {
-  Avatar,
   Box,
   Button,
   Divider,
@@ -20,12 +19,14 @@ import NotificationsActiveTwoToneIcon from '@mui/icons-material/NotificationsAct
 import RemoveRedEyeOutlinedIcon from '@mui/icons-material/RemoveRedEyeOutlined';
 import CheckCircleOutlineIcon from '@mui/icons-material/CheckCircleOutline';
 import { formatDistanceToNowStrict } from 'date-fns';
-import { handleMarkAsRead } from 'src/services/notificationService';
+import { handleMarkAsRead, markAllNotificationsAsRead } from 'src/services/notificationService'; // Import the new function
 import { useAuth } from 'src/hooks/useAuth';
 import { INotification, fetchNotifications } from './utils';
 import { GridCloseIcon } from '@mui/x-data-grid';
 import { api } from 'src/services/api';
+import { t } from "i18next"
 
+// Styled Badge for Notifications
 const NotificationsBadge = styled(Badge)(
   ({ theme }) => `
   .MuiBadge-badge {
@@ -55,8 +56,7 @@ function HeaderNotifications() {
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [currentPage, setCurrentPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
-  const [selectedNotification, setSelectedNotification] =
-    useState<INotification | null>(null);
+  const [selectedNotification, setSelectedNotification] = useState<INotification | null>(null);
   const { userId } = useAuth();
   const limit = 3;
 
@@ -78,10 +78,29 @@ function HeaderNotifications() {
 
   const handleNotificationClick = (notification: INotification) => {
     setSelectedNotification(notification);
+    if (!notification.isRead) {
+      handleMarkAsRead(notification.id, setNotifications, setUnreadCount);
+    }
   };
 
   const handleModalClose = () => {
     setSelectedNotification(null);
+  };
+
+  // Handler for "Mark All as Read"
+  const handleMarkAllAsReadClick = async () => {
+    try {
+      await markAllNotificationsAsRead(); // Call the service function
+      setNotifications((prev) =>
+        prev.map((notification) => ({
+          ...notification,
+          isRead: true,
+        }))
+      );
+      setUnreadCount(0);
+    } catch (error) {
+      console.error('Error marking all notifications as read:', error);
+    }
   };
 
   useEffect(() => {
@@ -103,7 +122,7 @@ function HeaderNotifications() {
     );
 
     eventSource.onopen = () => {
-      console.log('SSE connection established successfully.');
+      
     };
 
     eventSource.onmessage = (event) => {
@@ -154,6 +173,7 @@ function HeaderNotifications() {
           horizontal: 'right'
         }}
       >
+        {/* Header Box with Fixed Layout */}
         <Box
           sx={{
             p: 2,
@@ -161,14 +181,31 @@ function HeaderNotifications() {
             alignItems: 'center',
             justifyContent: 'space-between',
             borderBottom: '1px solid',
-            borderColor: 'divider'
+            borderColor: 'divider',
+            minWidth: 400, // Set a minimum width to prevent flexing
           }}
         >
-          <Typography variant="h5" fontWeight="bold">
+          <Typography variant="h6" fontWeight="bold">
             {notifications.length > 0
-              ? `${unreadCount} Unread Notifications`
-              : 'No Notifications'}
+              ? `${unreadCount} Unread Notification${unreadCount !== 1 ? 's' : ''}`
+              : t('no_notifications')}
           </Typography>
+          <Button
+            size="small"
+            color="primary"
+            variant="text" // Changed to text variant for a cleaner look
+            onClick={handleMarkAllAsReadClick}
+            disabled={unreadCount === 0} // Disable if no unread notifications
+            sx={{
+              textTransform: 'none', // Keep text as is
+              fontSize: '0.875rem',
+              '&:hover': {
+                backgroundColor: alpha('#1976d2', 0.08),
+              },
+            }}
+          >
+            {t('mark_all_as_read')}
+          </Button>
         </Box>
         <List
           sx={{
@@ -195,13 +232,20 @@ function HeaderNotifications() {
               key={notification.id}
               sx={{
                 p: 2,
-                minWidth: 350,
+                minWidth: 400, // Ensure consistent width
                 display: 'flex',
                 flexDirection: 'column',
                 alignItems: 'flex-start',
                 borderBottom: '1px solid',
                 borderColor: 'divider',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                backgroundColor: notification.isRead ? 'background.paper' : alpha('#1976d2', 0.04), // Subtle highlight for unread
+                transition: 'background-color 0.3s',
+                '&:hover': {
+                  backgroundColor: notification.isRead
+                    ? alpha('#000', 0.04)
+                    : alpha('#1976d2', 0.08),
+                },
               }}
               onClick={() => handleNotificationClick(notification)}
             >
@@ -227,7 +271,7 @@ function HeaderNotifications() {
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
                     mb: 2,
-                    width: '450px'
+                    width: '100%'
                   }}
                 >
                   {notification.message}
@@ -266,8 +310,12 @@ function HeaderNotifications() {
                       );
                     }}
                     startIcon={<RemoveRedEyeOutlinedIcon />}
+                    sx={{
+                      textTransform: 'none', // Keep text as is
+                      fontSize: '0.75rem',
+                    }}
                   >
-                    Mark as Read
+                    {t("mark_as_read")}
                   </Button>
                 ) : (
                   <Fade in={notification.isRead}>
@@ -280,7 +328,7 @@ function HeaderNotifications() {
                       }}
                     >
                       <CheckCircleOutlineIcon sx={{ mr: 0.5 }} />
-                      Read
+                      {t("read")}
                     </Typography>
                   </Fade>
                 )}
@@ -303,10 +351,10 @@ function HeaderNotifications() {
               disabled={currentPage === 0}
               onClick={handlePreviousPage}
             >
-              Previous
+              {t("previous")}
             </Button>
             <Typography variant="body2">
-              Page {currentPage + 1} of {totalPages}
+              {t("page")} {currentPage + 1} of {totalPages}
             </Typography>
             <Button
               variant="contained"
@@ -314,7 +362,7 @@ function HeaderNotifications() {
               disabled={currentPage >= totalPages - 1}
               onClick={handleNextPage}
             >
-              Next
+              {t("next")}
             </Button>
           </Box>
         )}
@@ -392,7 +440,7 @@ function HeaderNotifications() {
               color: 'text.secondary', // Secondary text color
               fontStyle: 'italic', // Italic style
               display: 'block', // Ensure it takes up the full width
-              textAlign: 'left' // Align to the right
+              textAlign: 'left' // Align to the left
             }}
           >
             {selectedNotification &&

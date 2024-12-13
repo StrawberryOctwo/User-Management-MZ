@@ -1,19 +1,24 @@
 import React, { useState } from 'react';
 import Box from '@mui/material/Box';
-import { t } from 'i18next';
 import ReusableForm, { FieldConfig } from 'src/components/Table/tableRowCreate';
 import { addParent } from 'src/services/parentService';
 import MultiSelectWithCheckboxes from 'src/components/SearchBars/MultiSelectWithCheckboxes';
 import { useAuth } from 'src/hooks/useAuth';
 import { getStrongestRoles } from 'src/hooks/roleUtils';
 import { fetchStudents } from 'src/services/studentService';
+import { useTranslation } from 'react-i18next';
+import IbanInput from 'src/utils/IbanInput';
 
 const CreateParent = () => {
   const [loading, setLoading] = useState(false);
   const { userId, userRoles } = useAuth();
   const strongestRoles = userRoles ? getStrongestRoles(userRoles) : [];
   const [selectedStudents, setSelectedStudents] = useState(null);
-
+  const [iban, setIban] = useState('');
+  const handleIbanChange = (value: string) => {
+    setIban(value);
+  };
+  const { t } = useTranslation();
   const handleSubmit = async (
     data: Record<string, any>
   ): Promise<{ message: string }> => {
@@ -34,7 +39,7 @@ const CreateParent = () => {
         },
         parent: {
           accountHolder: data.accountHolder,
-          iban: data.iban,
+          iban: iban.replace(/\s+/g, ''), // Trim all whitespaces from IBAN
           bic: data.bic,
           studentIds: selectedStudents?.map((student: any) => student.id) || []
         }
@@ -127,7 +132,7 @@ const CreateParent = () => {
             fetchStudents(1, 5, query).then((data) =>
               data.data.map((student: any) => ({
                 ...student,
-                fullName: `${student.firstName} ${student.lastName}`,
+                fullName: `${student.firstName} ${student.lastName}`
               }))
             )
           }
@@ -148,9 +153,17 @@ const CreateParent = () => {
     {
       name: 'iban',
       label: t('iban'),
-      type: 'text',
-      required: true,
-      section: 'Banking Information'
+      type: 'custom',
+      section: 'Banking Information',
+      component: (
+        <IbanInput
+          label="IBAN"
+          value={iban}
+          onChange={handleIbanChange}
+          required
+          sx={{ width: '95%' }}
+        />
+      )
     },
     {
       name: 'bic',

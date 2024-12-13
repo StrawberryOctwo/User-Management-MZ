@@ -4,6 +4,7 @@ import Button from '@mui/material/Button';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
 import { addDocument, addUserDocument } from 'src/services/fileUploadService';
 import UploadSection from 'src/components/Files/UploadDocuments';
+import { t } from "i18next"
 
 export default function FileUploadPage() {
     const [uploadedFiles, setUploadedFiles] = useState<any[]>([]);
@@ -18,7 +19,7 @@ export default function FileUploadPage() {
     // Submit selected files to the server
     const handleFileSubmit = async () => {
         if (uploadedFiles.length === 0) {
-            showMessage('No files selected for upload', 'error');
+            showMessage(t('No files selected for upload'), 'error');
             return;
         }
 
@@ -32,11 +33,11 @@ export default function FileUploadPage() {
                 await addUserDocument(documentPayload, file.file);
             }
 
-            showMessage('Files uploaded successfully', 'success');
+            showMessage(t('files_uploaded_successfully'), 'success');
             setUploadedFiles([]); // Clear files after successful upload
         } catch (error) {
             console.error('Error uploading files:', error);
-            showMessage('Error uploading files', 'error');
+            showMessage(t('error_uploading_files'), 'error');
         } finally {
             setLoading(false);
         }

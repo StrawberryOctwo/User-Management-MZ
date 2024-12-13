@@ -1,5 +1,4 @@
 import { useRoutes } from 'react-router-dom';
-import router from 'src/router';
 import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import { CssBaseline } from '@mui/material';
@@ -10,6 +9,7 @@ import { I18nextProvider } from 'react-i18next';
 import i18n from './i18n';
 import { AxiosInterceptorSetup } from './services/useAxiosSetup';
 import { SessionProvider } from './components/Calendar/Components/SessionContext';
+import router from './router';
 
 function App() {
   const content = useRoutes(router);

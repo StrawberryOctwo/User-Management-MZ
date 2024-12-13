@@ -5,7 +5,7 @@ import ReusableDialog from 'src/content/pages/Components/Dialogs';
 import { deleteLocationAdmins, fetchLocationAdmins } from 'src/services/locationAdminService';
 import { useNavigate } from 'react-router-dom';
 import { LocationAdmin } from 'src/models/LocationAdminModel';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 export default function LocationAdminsContent() {
   const [admins, setAdmins] = useState<LocationAdmin[]>([]);
@@ -17,7 +17,7 @@ export default function LocationAdminsContent() {
   const [page, setPage] = useState(0);
   const [limit, setLimit] = useState(25);
   const isMounted = useRef(false);
-
+  const { t } = useTranslation();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,11 +49,11 @@ export default function LocationAdminsContent() {
 
 
   const columns = [
-    { field: 'fullName', headerName: 'Full Name' },
+    { field: 'fullName', headerName: t('Full Name') },
     /* {
       field: 'dob',
       headerName: 'DOB',
-      render: (value: any) => new Date(value).toLocaleDateString()
+      render: (value: any) => new Date(value).toLocaleDateString('de')
     }, */
     { field: 'email', headerName: t('email') },
     /* { field: 'address', headerName: 'Address' },
@@ -115,7 +115,7 @@ export default function LocationAdminsContent() {
       <ReusableTable
         data={admins}
         columns={columns}
-        title="Location Admins List"
+        title={t("Location Admins List")}
         onEdit={handleEdit}
         onView={handleView}
         onDelete={confirmDelete}
@@ -130,12 +130,12 @@ export default function LocationAdminsContent() {
 
       <ReusableDialog
         open={dialogOpen}
-        title="Confirm Deletion"
+        title={t('Confirm Deletion')}
         onClose={() => setDialogOpen(false)}
         actions={
           <>
             <Button onClick={() => setDialogOpen(false)} color="inherit" disabled={loading}>
-              Cancel
+              {t("cancel")}
             </Button>
             <Button
               onClick={handleDelete}
@@ -143,7 +143,7 @@ export default function LocationAdminsContent() {
               autoFocus
               disabled={loading}
             >
-              {loading ? <CircularProgress size={24} /> : 'Confirm'}
+              {loading ? <CircularProgress size={24} /> : t(t("confirm"))}
             </Button>
           </>
         }

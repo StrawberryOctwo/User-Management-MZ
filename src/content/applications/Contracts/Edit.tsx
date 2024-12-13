@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
 import Box from '@mui/material/Box';
-import { t } from 'i18next';
 import { CircularProgress, Switch, FormControlLabel, Button } from '@mui/material';
 import SingleSelectWithAutocomplete from 'src/components/SearchBars/SingleSelectWithAutocomplete';
 import ReusableForm from 'src/components/Table/tableRowCreate';
@@ -8,6 +7,7 @@ import { fetchFranchises } from 'src/services/franchiseService';
 import { fetchContractPackageById, editContractPackage, fetchDiscounts, fetchSessionTypes } from 'src/services/contractPackagesService';
 import { useParams } from 'react-router-dom';
 import { useSnackbar } from 'src/contexts/SnackbarContext';
+import { useTranslation } from 'react-i18next';
 
 const EditContract = () => {
     const { id } = useParams(); // Assuming you're using react-router for routing
@@ -21,7 +21,7 @@ const EditContract = () => {
     const [contractData, setContractData] = useState<any>(null);
     const franchiseRef = useRef<any>(null);
     const { showMessage } = useSnackbar();
-
+    const { t } = useTranslation();
     const loadData = async () => {
         try {
             const sessionTypesData = await fetchSessionTypes();

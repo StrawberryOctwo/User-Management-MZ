@@ -21,7 +21,7 @@ import { useAuth } from '../../../../hooks/useAuth';
 import { PersonOffOutlined, Settings } from '@mui/icons-material';
 import HeaderLocalization from '../Buttons/Localization';
 import { useWebSocket } from 'src/utils/webSocketProvider';
-import { t } from 'i18next';
+import { useTranslation } from 'react-i18next';
 
 const UserBoxButton = styled(Button)(
   ({ theme }) => `
@@ -62,6 +62,7 @@ const UserBoxDescription = styled(Typography)(
 function HeaderUserbox() {
   const { username, userRoles } = useAuth(); // Use the hook inside the component
   const socket = useWebSocket();
+  const { t } = useTranslation();
   const user = {
     name: username || 'Guest', // Fallback to 'Guest' if no username is available
     jobtitle: userRoles?.join(', ') || 'No Role Assigned' // Fallback if no roles
@@ -103,15 +104,15 @@ function HeaderUserbox() {
   return (
     <>
       <UserBoxButton color="secondary" ref={ref} onClick={handleOpen}>
-      <Avatar
-        variant="rounded"
-        sx={{
-          bgcolor: (theme) => theme.palette.primary.main,
-          color: (theme) => theme.palette.primary.contrastText,
-        }}
-      >
-        {getInitials(user.name)}
-      </Avatar>
+        <Avatar
+          variant="rounded"
+          sx={{
+            bgcolor: (theme) => theme.palette.primary.main,
+            color: (theme) => theme.palette.primary.contrastText,
+          }}
+        >
+          {getInitials(user.name)}
+        </Avatar>
         <Hidden mdDown>
           <UserBoxText>
             <UserBoxLabel variant="body1">{user.name}</UserBoxLabel>
@@ -153,7 +154,7 @@ function HeaderUserbox() {
         <Box sx={{ m: 1 }}>
           <Button color="primary" fullWidth onClick={handleProfile}>
             <Settings sx={{ mr: 1 }} />
-            {t('settings')}
+            {t("settings")}
           </Button>
         </Box>
         <Box sx={{ m: 1 }}>
@@ -162,7 +163,7 @@ function HeaderUserbox() {
         <Box sx={{ m: 1 }}>
           <Button color="primary" fullWidth onClick={handleLogout}>
             <LockOpenTwoToneIcon sx={{ mr: 1 }} />
-            Sign out
+            {t("sign_out")}
           </Button>
         </Box>
       </Popover>

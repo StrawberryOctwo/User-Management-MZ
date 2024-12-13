@@ -1,5 +1,4 @@
 import { useState, useRef } from 'react';
-
 import {
   Box,
   Menu,
@@ -44,16 +43,16 @@ function BulkActions() {
       <Box display="flex" alignItems="center" justifyContent="space-between">
         <Box display="flex" alignItems="center">
           <Typography variant="h5" color="text.secondary">
-            Bulk actions:
+            {t("bulk_actions")}:
           </Typography>
           <ButtonError
             sx={{ ml: 1 }}
             startIcon={<DeleteTwoToneIcon />}
             variant="contained"
           >
-            {t('delete')}
-          </ButtonError>
-        </Box>
+            {t("delete")}
+          </ButtonError >
+        </Box >
         <IconButton
           color="primary"
           onClick={openMenu}
@@ -62,7 +61,7 @@ function BulkActions() {
         >
           <MoreVertTwoToneIcon />
         </IconButton>
-      </Box>
+      </Box >
 
       <Menu
         keepMounted

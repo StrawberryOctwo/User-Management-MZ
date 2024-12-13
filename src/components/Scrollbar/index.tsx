@@ -2,6 +2,7 @@ import React, { forwardRef, ReactNode } from 'react';
 import PropTypes from 'prop-types';
 import { Scrollbars } from 'react-custom-scrollbars-2';
 import { Box, useTheme } from '@mui/material';
+import { t } from "i18next"
 
 interface ScrollbarProps {
   className?: string;
@@ -45,6 +46,6 @@ Scrollbar.propTypes = {
   autoHide: PropTypes.bool // Add PropTypes for autoHide
 };
 
-Scrollbar.displayName = 'Scrollbar';
+Scrollbar.displayName = t('scrollbar');
 
 export default Scrollbar;

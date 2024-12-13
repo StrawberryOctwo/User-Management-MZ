@@ -9,6 +9,7 @@ import Feed from './Feed';
 import PopularTags from './PopularTags';
 import MyCards from './MyCards';
 import Addresses from './Addresses';
+import { t } from "i18next"
 
 function ManagementUserProfile() {
   const user = {

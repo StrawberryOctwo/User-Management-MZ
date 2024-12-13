@@ -22,6 +22,7 @@ import {
 } from '@mui/material';
 import SchoolIcon from '@mui/icons-material/School';
 import { fetchExamsForSelf, addExamForSelf } from 'src/services/studentExamService';
+import { t } from "i18next"
 
 const StudentExamsHeader: React.FC = () => {
   const [exams, setExams] = useState<any[]>([]);
@@ -86,7 +87,7 @@ const StudentExamsHeader: React.FC = () => {
       </Tooltip>
 
       <Dialog open={isDialogOpen} onClose={handleCloseDialog}>
-        <DialogTitle>My Exams</DialogTitle>
+        <DialogTitle>{t("my_exams")}</DialogTitle>
         <DialogContent dividers>
           {errorMessage && (
             <Typography color="error" variant="body2" sx={{ mb: 2 }}>
@@ -108,7 +109,7 @@ const StudentExamsHeader: React.FC = () => {
               {exams.length === 0 && (
                 <Box p={2}>
                   <Typography variant="body2" color="textSecondary">
-                    No exams found.
+                    {t("no_exams_found.")}
                   </Typography>
                 </Box>
               )}
@@ -130,7 +131,7 @@ const StudentExamsHeader: React.FC = () => {
 
           {/* Add Exam Form */}
           <Typography variant="h6" align="center" gutterBottom>
-            Add New Exam
+            {t("add_new_exam")}
           </Typography>
           <Grid container spacing={2}>
             <Grid item xs={12}>
@@ -155,10 +156,10 @@ const StudentExamsHeader: React.FC = () => {
         </DialogContent>
         <DialogActions>
           <Button onClick={handleCloseDialog} color="secondary">
-            Cancel
+            {t("cancel")}
           </Button>
           <Button onClick={handleAddExam} color="primary" variant="contained">
-            Save Exam
+            {t("save_exam")}
           </Button>
         </DialogActions>
       </Dialog>

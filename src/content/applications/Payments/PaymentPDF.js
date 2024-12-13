@@ -16,7 +16,7 @@ const generatePDF = (payment) => {
   
         <div style="display: flex; justify-content: space-between;">
           <p>33602 Bielefeld</p>
-          <p>Berlin, den ${new Date().toLocaleDateString()}</p>
+          <p>Berlin, den ${new Date().toLocaleDateString('de')}</p>
         </div>
   
         <h3>Honorarrechnung Nr. HZ-2024-1027-001</h3>
@@ -36,8 +36,8 @@ const generatePDF = (payment) => {
             <tr>
               <td style="border: 1px solid #ddd; padding: 8px;">February</td>
               <td style="border: 1px solid #ddd; padding: 8px;">14hrs 15mins</td>
-              <td style="border: 1px solid #ddd; padding: 8px;">€15</td>
-              <td style="border: 1px solid #ddd; padding: 8px;">€135.78</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">15€</td>
+              <td style="border: 1px solid #ddd; padding: 8px;">135.78€</td>
             </tr>
           </tbody>
         </table>
@@ -65,7 +65,7 @@ const generatePDF = (payment) => {
         .from(element)
         .save()
         .then(() => {
-            console.log('PDF generated!');
+            
         })
         .catch((error) => {
             console.error('Error generating PDF:', error);
